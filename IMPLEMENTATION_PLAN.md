@@ -8,22 +8,24 @@
 
 Drop both DLLs into a VLC 4 installation and see "C# Plugin initialized" in VLC's log output.
 
-All core phases (1-7) are complete. The plugin provides:
+All core phases (1-8) are complete. The plugin provides:
 - VLC logging from C#
 - Variable creation/manipulation
 - Player event subscriptions
+- Player seeking and playback control
 - Playlist control
 - Object management
 - Generated bindings documentation
-- Unit test suite (61 tests passing)
+- Unit test suite (86 tests passing)
 
 ### Success Criteria Met
 - [x] Plugin loads in VLC 4
 - [x] C# log messages appear in VLC log output
 - [x] Variable creation works
 - [x] Player events work (state, position, media changes)
+- [x] Player seeking works (time, position, pause/resume, can_seek/can_pause)
 - [x] Playlist control works (start, stop, pause, resume, next, prev, goto)
-- [x] Unit tests pass (61 tests)
+- [x] Unit tests pass (86 tests)
 
 ## Architecture
 
@@ -92,6 +94,9 @@ VlcObject wrapper class with object hierarchy navigation (parent, typename, root
 ### Phase 7: Binding Documentation ✓
 Created Generated/ directory with VlcTypes.cs, VlcConstants.cs, and documentation. Updated libvlccore-bindings.md spec to reflect C bridge architecture (ClangSharp doesn't work with VLC headers).
 
+### Phase 8: Player Seeking and Playback Control ✓
+Extended VlcPlayer with seeking functionality: Time/Length/Position properties, SeekByTime/SeekByPosition methods, Pause/Resume, CanSeek/CanPause properties. Added SeekSpeed and SeekWhence enums. 25 new unit tests (86 total).
+
 ---
 
 ## Implemented Features
@@ -100,9 +105,10 @@ Created Generated/ directory with VlcTypes.cs, VlcConstants.cs, and documentatio
 - VLC variable creation and manipulation (integer and string types)
 - Clean plugin lifecycle (Open/Close callbacks)
 - React to VLC player events (state changes, media changes)
+- Player seeking and control (time, position, pause, resume, can_seek, can_pause)
 - Playlist control (start, stop, pause, resume, next, prev, goto, count, current index)
 - Object management (vlc_object_parent, vlc_object_typename)
-- Unit test suite with xUnit (61 tests)
+- Unit test suite with xUnit (86 tests)
 
 ## Future Work (DEFERRED)
 
@@ -137,57 +143,9 @@ These are out of scope for the current goal:
 10. **Playlist locking**: The playlist and player share the same lock (`vlc_playlist_Lock`/`vlc_playlist_Unlock`). All playlist operations must be performed within the lock.
 11. **vlc_object_find_name deprecated**: The `vlc_object_find_name` function is not exported in VLC 4.x libvlccore. Object lookup should use alternative methods.
 
----
-
-## Phase 6: Object Management - COMPLETED
-
-### Priority 15: Add object management functions to vlccore.def - COMPLETED
-- [x] Added `vlc_object_parent` to vlccore.def
-- [x] Added `vlc_object_typename` to vlccore.def
-- [x] Regenerated vlccore.lib import library
-
-### Priority 16: Implement C bridge functions for object management - COMPLETED
-- [x] Created `csharp_bridge_object_parent()` to get parent of VLC object
-- [x] Created `csharp_bridge_object_typename()` to get object type name
-
-### Priority 17: Add C# VlcObject wrapper class - COMPLETED
-- [x] Created `VlcObject.cs` with wrapper methods for object hierarchy navigation
-- [x] Added GetParent() and GetTypeName() instance methods
-- [x] Added GetRoot() method to traverse to root object
-- [x] Added static helper methods
-
-### Priority 18: Expand unit test suite - COMPLETED
-- [x] Added `VlcObjectTests.cs` with 10 tests for VlcObject class
-- [x] Added `WrapperArchitectureTests.cs` with 34 tests for all wrapper classes
-- [x] Total test count increased from 17 to 61
-
-### Success Criteria
-- VlcObject wrapper can navigate object hierarchy
-- All 61 unit tests pass
-
----
-
-## Phase 7: Binding Documentation - COMPLETED
-
-### Goal
-Document the binding architecture and create Generated/ directory structure per libvlccore-bindings.md spec.
-
-### Findings
-ClangSharp auto-generation doesn't work with VLC headers due to:
-1. Complex macro systems (`VLC_API`, `VLC_FORMAT`, attribute macros) break ClangSharp parsing
-2. Variadic functions (logging, etc.) cannot be called via P/Invoke directly
-3. C bridge approach is required regardless
-
-### Completed Work
-- [x] Created `src/VlcPlugin/clangsharp.rsp` configuration (reference/documentation)
-- [x] Created `src/VlcPlugin/Generated/VlcTypes.cs` with enums and structs
-- [x] Created `src/VlcPlugin/Generated/VlcConstants.cs` with VLC constants
-- [x] Created `src/VlcPlugin/Generated/README.md` explaining architecture
-- [x] Updated `specs/libvlccore-bindings.md` to document C bridge architecture
-- [x] All 61 tests still passing
-
 ### Learnings
 12. **ClangSharp and VLC headers**: VLC headers use complex C macros that break ClangSharp parsing. The C bridge approach is the correct architecture - types/constants are manually maintained in Generated/, function calls go through the C bridge.
+13. **Type definition separation**: VlcLogType, VlcPlayerState, VlcVarType, and other enums/structs should live in `VlcPlugin.Generated` namespace only. Don't duplicate them in `VlcPlugin.Native` (VlcBridge.cs). All wrapper classes must import `using VlcPlugin.Generated;`.
 
 ---
 

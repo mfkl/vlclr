@@ -118,6 +118,80 @@ internal static partial class VlcBridge
     [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_remove_listener")]
     internal static partial void PlayerRemoveListener(nint player, nint listenerHandle);
 
+    /// <summary>
+    /// Get the current playback time.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>Current time in VLC ticks (microseconds), or VLC_TICK_INVALID if not playing</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_get_time")]
+    internal static partial long PlayerGetTime(nint player);
+
+    /// <summary>
+    /// Get the total length of the current media.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>Total length in VLC ticks (microseconds), or VLC_TICK_INVALID if unknown</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_get_length")]
+    internal static partial long PlayerGetLength(nint player);
+
+    /// <summary>
+    /// Get the current playback position as a ratio.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>Position as a ratio [0.0, 1.0], or -1.0 if not playing</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_get_position")]
+    internal static partial double PlayerGetPosition(nint player);
+
+    /// <summary>
+    /// Seek to a specific time.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <param name="time">Time in VLC ticks (microseconds)</param>
+    /// <param name="speed">Seek precision (0=precise, 1=fast)</param>
+    /// <param name="whence">Seek reference (0=absolute, 1=relative)</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_seek_by_time")]
+    internal static partial void PlayerSeekByTime(nint player, long time, int speed, int whence);
+
+    /// <summary>
+    /// Seek to a specific position.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <param name="position">Position as a ratio [0.0, 1.0]</param>
+    /// <param name="speed">Seek precision (0=precise, 1=fast)</param>
+    /// <param name="whence">Seek reference (0=absolute, 1=relative)</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_seek_by_pos")]
+    internal static partial void PlayerSeekByPos(nint player, double position, int speed, int whence);
+
+    /// <summary>
+    /// Check if seeking is supported.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>1 if seeking is supported, 0 otherwise</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_can_seek")]
+    internal static partial int PlayerCanSeek(nint player);
+
+    /// <summary>
+    /// Check if pausing is supported.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>1 if pausing is supported, 0 otherwise</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_can_pause")]
+    internal static partial int PlayerCanPause(nint player);
+
+    /// <summary>
+    /// Pause the player.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_pause")]
+    internal static partial void PlayerPause(nint player);
+
+    /// <summary>
+    /// Resume the player.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_resume")]
+    internal static partial void PlayerResume(nint player);
+
     #endregion
 
     #region Playlist Control

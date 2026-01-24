@@ -6,6 +6,28 @@ using VlcPlugin.Native;
 namespace VlcPlugin;
 
 /// <summary>
+/// Seek precision options.
+/// </summary>
+public enum SeekSpeed
+{
+    /// <summary>Seek to exact time (may be slower)</summary>
+    Precise = 0,
+    /// <summary>Seek to nearest keyframe (faster)</summary>
+    Fast = 1,
+}
+
+/// <summary>
+/// Seek reference point options.
+/// </summary>
+public enum SeekWhence
+{
+    /// <summary>Seek from beginning of media</summary>
+    Absolute = 0,
+    /// <summary>Seek relative to current position</summary>
+    Relative = 1,
+}
+
+/// <summary>
 /// Delegate for player state change events.
 /// </summary>
 /// <param name="newState">The new player state</param>
@@ -99,6 +121,117 @@ public sealed class VlcPlayer : IDisposable
             int state = VlcBridge.PlayerGetState(_player);
             return (VlcPlayerState)state;
         }
+    }
+
+    /// <summary>
+    /// Gets the current playback time in microseconds.
+    /// Returns Int64.MinValue if not playing or unavailable.
+    /// </summary>
+    public long Time => VlcBridge.PlayerGetTime(_player);
+
+    /// <summary>
+    /// Gets the current playback time as a TimeSpan.
+    /// Returns TimeSpan.Zero if not playing or unavailable.
+    /// </summary>
+    public TimeSpan TimeSpan
+    {
+        get
+        {
+            long time = Time;
+            if (time == long.MinValue)
+                return TimeSpan.Zero;
+            // VLC ticks are microseconds
+            return TimeSpan.FromTicks(time * 10);  // Convert microseconds to 100-nanosecond ticks
+        }
+    }
+
+    /// <summary>
+    /// Gets the total length of the current media in microseconds.
+    /// Returns Int64.MinValue if unknown.
+    /// </summary>
+    public long Length => VlcBridge.PlayerGetLength(_player);
+
+    /// <summary>
+    /// Gets the total length of the current media as a TimeSpan.
+    /// Returns TimeSpan.Zero if unknown.
+    /// </summary>
+    public TimeSpan LengthTimeSpan
+    {
+        get
+        {
+            long length = Length;
+            if (length == long.MinValue)
+                return TimeSpan.Zero;
+            // VLC ticks are microseconds
+            return TimeSpan.FromTicks(length * 10);  // Convert microseconds to 100-nanosecond ticks
+        }
+    }
+
+    /// <summary>
+    /// Gets the current playback position as a ratio [0.0, 1.0].
+    /// Returns -1.0 if not playing.
+    /// </summary>
+    public double Position => VlcBridge.PlayerGetPosition(_player);
+
+    /// <summary>
+    /// Gets whether seeking is supported for the current media.
+    /// </summary>
+    public bool CanSeek => VlcBridge.PlayerCanSeek(_player) != 0;
+
+    /// <summary>
+    /// Gets whether pausing is supported for the current media.
+    /// </summary>
+    public bool CanPause => VlcBridge.PlayerCanPause(_player) != 0;
+
+    /// <summary>
+    /// Seeks to a specific time.
+    /// </summary>
+    /// <param name="time">Time in microseconds</param>
+    /// <param name="speed">Seek precision (default: Precise)</param>
+    /// <param name="whence">Seek reference (default: Absolute)</param>
+    public void SeekByTime(long time, SeekSpeed speed = SeekSpeed.Precise, SeekWhence whence = SeekWhence.Absolute)
+    {
+        VlcBridge.PlayerSeekByTime(_player, time, (int)speed, (int)whence);
+    }
+
+    /// <summary>
+    /// Seeks to a specific time.
+    /// </summary>
+    /// <param name="time">Target time</param>
+    /// <param name="speed">Seek precision (default: Precise)</param>
+    /// <param name="whence">Seek reference (default: Absolute)</param>
+    public void SeekByTime(TimeSpan time, SeekSpeed speed = SeekSpeed.Precise, SeekWhence whence = SeekWhence.Absolute)
+    {
+        // Convert from 100-nanosecond ticks to microseconds
+        long microseconds = time.Ticks / 10;
+        VlcBridge.PlayerSeekByTime(_player, microseconds, (int)speed, (int)whence);
+    }
+
+    /// <summary>
+    /// Seeks to a specific position.
+    /// </summary>
+    /// <param name="position">Position as a ratio [0.0, 1.0]</param>
+    /// <param name="speed">Seek precision (default: Precise)</param>
+    /// <param name="whence">Seek reference (default: Absolute)</param>
+    public void SeekByPosition(double position, SeekSpeed speed = SeekSpeed.Precise, SeekWhence whence = SeekWhence.Absolute)
+    {
+        VlcBridge.PlayerSeekByPos(_player, position, (int)speed, (int)whence);
+    }
+
+    /// <summary>
+    /// Pauses the player.
+    /// </summary>
+    public void Pause()
+    {
+        VlcBridge.PlayerPause(_player);
+    }
+
+    /// <summary>
+    /// Resumes playback.
+    /// </summary>
+    public void Resume()
+    {
+        VlcBridge.PlayerResume(_player);
     }
 
     /// <summary>

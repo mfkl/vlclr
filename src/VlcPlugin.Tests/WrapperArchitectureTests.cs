@@ -166,6 +166,137 @@ public class WrapperArchitectureTests
         Assert.NotNull(eventInfo);
     }
 
+    [Fact]
+    public void VlcPlayer_HasTimeProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("Time");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(long), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasTimeSpanProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("TimeSpan");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(TimeSpan), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasLengthProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("Length");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(long), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasLengthTimeSpanProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("LengthTimeSpan");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(TimeSpan), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasPositionProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("Position");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(double), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasCanSeekProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("CanSeek");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(bool), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasCanPauseProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("CanPause");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.Equal(typeof(bool), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasSeekByTimeMethod_WithLong()
+    {
+        var method = typeof(VlcPlayer).GetMethod("SeekByTime", [typeof(long), typeof(SeekSpeed), typeof(SeekWhence)]);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasSeekByTimeMethod_WithTimeSpan()
+    {
+        var method = typeof(VlcPlayer).GetMethod("SeekByTime", [typeof(TimeSpan), typeof(SeekSpeed), typeof(SeekWhence)]);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasSeekByPositionMethod()
+    {
+        var method = typeof(VlcPlayer).GetMethod("SeekByPosition", [typeof(double), typeof(SeekSpeed), typeof(SeekWhence)]);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasPauseMethod()
+    {
+        var method = typeof(VlcPlayer).GetMethod("Pause");
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasResumeMethod()
+    {
+        var method = typeof(VlcPlayer).GetMethod("Resume");
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    #endregion
+
+    #region SeekSpeed and SeekWhence Enums Tests
+
+    [Fact]
+    public void SeekSpeed_HasPreciseValue()
+    {
+        Assert.Equal(0, (int)SeekSpeed.Precise);
+    }
+
+    [Fact]
+    public void SeekSpeed_HasFastValue()
+    {
+        Assert.Equal(1, (int)SeekSpeed.Fast);
+    }
+
+    [Fact]
+    public void SeekWhence_HasAbsoluteValue()
+    {
+        Assert.Equal(0, (int)SeekWhence.Absolute);
+    }
+
+    [Fact]
+    public void SeekWhence_HasRelativeValue()
+    {
+        Assert.Equal(1, (int)SeekWhence.Relative);
+    }
+
     #endregion
 
     #region VlcPlaylist Tests
@@ -300,6 +431,105 @@ public class WrapperArchitectureTests
         var method = type.GetMethod("ObjectTypename", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
         Assert.Equal(typeof(nint), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerGetTimeMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerGetTime", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(long), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerGetLengthMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerGetLength", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(long), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerGetPositionMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerGetPosition", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(double), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerSeekByTimeMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerSeekByTime", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerSeekByPosMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerSeekByPos", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerCanSeekMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerCanSeek", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(int), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerCanPauseMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerCanPause", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(int), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerPauseMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerPause", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerResumeMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerResume", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(void), method.ReturnType);
     }
 
     #endregion
