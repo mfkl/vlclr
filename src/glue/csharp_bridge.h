@@ -166,6 +166,87 @@ BRIDGE_API void* csharp_bridge_player_add_listener(void* player, csharp_player_c
  */
 BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listener_id);
 
+/**
+ * Get the current playback time.
+ * @param player Pointer to vlc_player_t
+ * @return Current time in VLC ticks (microseconds), or VLC_TICK_INVALID if not playing
+ */
+BRIDGE_API long long csharp_bridge_player_get_time(void* player);
+
+/**
+ * Get the total length of the current media.
+ * @param player Pointer to vlc_player_t
+ * @return Total length in VLC ticks (microseconds), or VLC_TICK_INVALID if unknown
+ */
+BRIDGE_API long long csharp_bridge_player_get_length(void* player);
+
+/**
+ * Get the current playback position as a ratio.
+ * @param player Pointer to vlc_player_t
+ * @return Position as a ratio [0.0, 1.0], or -1.0 if not playing
+ */
+BRIDGE_API double csharp_bridge_player_get_position(void* player);
+
+/**
+ * Seek speed enumeration.
+ */
+typedef enum {
+    CSHARP_SEEK_PRECISE = 0,  /* Seek to exact time (may be slower) */
+    CSHARP_SEEK_FAST = 1,     /* Seek to nearest keyframe (faster) */
+} csharp_seek_speed_t;
+
+/**
+ * Seek whence enumeration.
+ */
+typedef enum {
+    CSHARP_SEEK_ABSOLUTE = 0, /* Seek from beginning of media */
+    CSHARP_SEEK_RELATIVE = 1, /* Seek relative to current position */
+} csharp_seek_whence_t;
+
+/**
+ * Seek to a specific time.
+ * @param player Pointer to vlc_player_t
+ * @param time Time in VLC ticks (microseconds)
+ * @param speed Seek precision (0=precise, 1=fast)
+ * @param whence Seek reference (0=absolute, 1=relative)
+ */
+BRIDGE_API void csharp_bridge_player_seek_by_time(void* player, long long time, int speed, int whence);
+
+/**
+ * Seek to a specific position.
+ * @param player Pointer to vlc_player_t
+ * @param position Position as a ratio [0.0, 1.0]
+ * @param speed Seek precision (0=precise, 1=fast)
+ * @param whence Seek reference (0=absolute, 1=relative)
+ */
+BRIDGE_API void csharp_bridge_player_seek_by_pos(void* player, double position, int speed, int whence);
+
+/**
+ * Check if seeking is supported.
+ * @param player Pointer to vlc_player_t
+ * @return 1 if seeking is supported, 0 otherwise
+ */
+BRIDGE_API int csharp_bridge_player_can_seek(void* player);
+
+/**
+ * Check if pausing is supported.
+ * @param player Pointer to vlc_player_t
+ * @return 1 if pausing is supported, 0 otherwise
+ */
+BRIDGE_API int csharp_bridge_player_can_pause(void* player);
+
+/**
+ * Pause the player.
+ * @param player Pointer to vlc_player_t
+ */
+BRIDGE_API void csharp_bridge_player_pause(void* player);
+
+/**
+ * Resume the player.
+ * @param player Pointer to vlc_player_t
+ */
+BRIDGE_API void csharp_bridge_player_resume(void* player);
+
 /*
  * Playlist Control API
  * These functions allow C# to control VLC playlist playback.
