@@ -30,3 +30,6 @@ nul
 
 # VLC source (tracked separately)
 vlc/
+
+# VLC binaries (downloaded separately)
+vlc-binaries/
