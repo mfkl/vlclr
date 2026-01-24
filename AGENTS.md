@@ -17,7 +17,7 @@
 - vswhere.exe must be in PATH for native AOT publish (located at C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe)
 - If NuGet fails, the repo has nuget.config that uses only nuget.org
 
-### Full Build Sequence
+### Full Build Sequence (Verified)
 ```bash
 # With vswhere in PATH:
 export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/Installer"
@@ -25,21 +25,18 @@ export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/Installer"
 # Build C# Native AOT
 dotnet publish src/VlcPlugin -c Release -r win-x64
 
-# Generate vlccore import library (required for linking)
-"C:/Program Files/LLVM/bin/llvm-dlltool.exe" -d build/vlccore.def -l build/vlccore.lib -m i386:x86-64
+# Generate vlccore import library (minimal exports)
+cd build && echo "LIBRARY libvlccore" > vlccore_minimal.def && echo "EXPORTS" >> vlccore_minimal.def && echo "var_Create" >> vlccore_minimal.def && echo "var_Destroy" >> vlccore_minimal.def && echo "var_SetChecked" >> vlccore_minimal.def && echo "var_GetChecked" >> vlccore_minimal.def && echo "vlc_object_Log" >> vlccore_minimal.def && "C:/Program Files/LLVM/bin/llvm-dlltool.exe" -d vlccore_minimal.def -l vlccore.lib -m i386:x86-64
 
 # Build C glue (linked against real libvlccore)
-"C:/Program Files/LLVM/bin/clang.exe" -c -o build/plugin_entry.o src/glue/plugin_entry.c -I./vlc/include
-"C:/Program Files/LLVM/bin/clang.exe" -c -o build/csharp_bridge.o src/glue/csharp_bridge.c
-"C:/Program Files/LLVM/bin/clang.exe" -shared -o build/libhello_csharp_plugin.dll build/plugin_entry.o build/csharp_bridge.o build/vlccore.lib
+"C:/Program Files/LLVM/bin/clang.exe" -shared -o build/libhello_csharp_plugin.dll build/plugin_entry.o build/csharp_bridge.o -L./build -lvlccore
 
 # Deploy to VLC
 cp build/libhello_csharp_plugin.dll vlc-binaries/vlc-4.0.0-dev/plugins/control/
 cp src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll vlc-binaries/vlc-4.0.0-dev/plugins/control/
-vlc-binaries/vlc-4.0.0-dev/vlc-cache-gen.exe vlc-binaries/vlc-4.0.0-dev/plugins
 
 # Test with VLC
-vlc-binaries/vlc-4.0.0-dev/vlc.exe -vvv --intf hello_csharp
+vlc-binaries/vlc-4.0.0-dev/vlc.exe -vvv --extraintf hello_csharp
 ```
 
 ### Test

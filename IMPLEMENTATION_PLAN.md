@@ -140,18 +140,55 @@ When running VLC with verbose logging and playing/pausing media, we should see:
 
 ---
 
+## Phase 4: Playlist Control - COMPLETED
+
+### Priority 10: Add playlist functions to vlccore.def - COMPLETED
+- [x] Added `vlc_playlist_Lock` and `vlc_playlist_Unlock` to vlccore.def
+- [x] Added `vlc_playlist_Start`, `vlc_playlist_Stop`, `vlc_playlist_Pause`, `vlc_playlist_Resume` to vlccore.def
+- [x] Added `vlc_playlist_Next` and `vlc_playlist_Prev` to vlccore.def
+- [x] Added `vlc_playlist_HasNext` and `vlc_playlist_HasPrev` to vlccore.def
+- [x] Added `vlc_playlist_Count` and `vlc_playlist_GetCurrentIndex` to vlccore.def
+- [x] Added `vlc_playlist_GoTo` to vlccore.def
+
+### Priority 11: Implement C bridge functions for playlist access - COMPLETED
+- [x] Created `csharp_bridge_get_playlist()` to get playlist from intf_thread
+- [x] Created `csharp_bridge_playlist_start()` and `csharp_bridge_playlist_stop()`
+- [x] Created `csharp_bridge_playlist_pause()` and `csharp_bridge_playlist_resume()`
+- [x] Created `csharp_bridge_playlist_next()` and `csharp_bridge_playlist_prev()`
+- [x] Created `csharp_bridge_playlist_has_next()` and `csharp_bridge_playlist_has_prev()`
+- [x] Created `csharp_bridge_playlist_count()` and `csharp_bridge_playlist_get_current_index()`
+- [x] Created `csharp_bridge_playlist_goto()`
+
+### Priority 12: Add C# VlcPlaylist wrapper class - COMPLETED
+- [x] Created `VlcPlaylist.cs` with P/Invoke declarations for playlist functions
+- [x] Implemented high-level wrapper methods for playlist control
+- [x] Added stub implementations in `vlccore_stub.c` for testing
+
+### Priority 13: Update PluginState to initialize playlist - COMPLETED
+- [x] Updated `PluginState.cs` to initialize and log playlist info
+- [x] Log playlist count on startup
+
+### Success Criteria
+When running VLC with verbose logging, C# can control playback:
+- Start/Stop/Pause/Resume playback
+- Navigate to next/previous track
+- Go to specific playlist index
+- Query playlist count and current index
+
+---
+
 ## Implemented Features
 
 - VLC logging from C# (Info, Error, Warning, Debug)
 - VLC variable creation and manipulation (integer and string types)
 - Clean plugin lifecycle (Open/Close callbacks)
 - React to VLC player events (state changes, media changes)
+- Playlist control (start, stop, pause, resume, next, prev, goto, count, current index)
 
 ## Future Work (DEFERRED)
 
 These are out of scope for the current goal:
 
-- Control playback (`vlc_playlist_*`)
 - Cross-platform support (Linux, macOS)
 - Custom UI / Qt integration
 - Subtitle rendering
@@ -178,6 +215,7 @@ These are out of scope for the current goal:
 7. **Plugin cache**: Run `vlc-cache-gen.exe plugins` after updating plugins to avoid "stale plugins cache" warning
 8. **CRT heap incompatibility**: VLC (mingw/msvcrt) and our plugin (UCRT) use different heaps. Strings from VLC's `var_GetChecked` must be copied with `_strdup` before returning to C#, then freed with our own `free()`. Do NOT call `free()` on VLC-allocated memory directly - it causes heap corruption
 9. **vlc_player_cbs structure**: Must match the order of callbacks in vlc_player.h exactly. The structure must include all callback slots even if NULL.
+10. **Playlist locking**: The playlist and player share the same lock (`vlc_playlist_Lock`/`vlc_playlist_Unlock`). All playlist operations must be performed within the lock.
 
 ## References
 

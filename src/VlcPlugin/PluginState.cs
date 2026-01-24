@@ -1,4 +1,5 @@
 using System;
+using VlcPlugin.Native;
 
 namespace VlcPlugin;
 
@@ -13,6 +14,8 @@ public sealed class PluginState : IDisposable
     private readonly nint _vlcObject;
     private readonly VlcLogger _logger;
     private readonly VlcVariable _variable;
+    private VlcPlayer? _player;
+    private VlcPlaylist? _playlist;
     private bool _disposed;
 
     public PluginState(nint vlcObject)
@@ -50,12 +53,39 @@ public sealed class PluginState : IDisposable
                 _logger.Info($"Counter after increment: {counter}");
             }
 
+            // Initialize player for event handling
+            _player = VlcPlayer.Create(_vlcObject, _logger);
+            if (_player != null)
+            {
+                _player.StateChanged += OnPlayerStateChanged;
+                _player.MediaChanged += OnPlayerMediaChanged;
+                _player.StartListening();
+                _logger.Info("Player event listener registered");
+            }
+
+            // Initialize playlist for playback control
+            _playlist = VlcPlaylist.Create(_vlcObject, _logger);
+            if (_playlist != null)
+            {
+                _logger.Info($"Playlist initialized: {_playlist.Count} items, current index: {_playlist.CurrentIndex}");
+            }
+
             _logger.Info("C# Plugin initialized successfully");
         }
         catch (Exception ex)
         {
             _logger.Error($"Plugin initialization failed: {ex.GetType().Name}: {ex.Message}");
         }
+    }
+
+    private void OnPlayerStateChanged(VlcPlayerState state)
+    {
+        _logger.Info($"Player state changed: {state}");
+    }
+
+    private void OnPlayerMediaChanged(nint media)
+    {
+        _logger.Info($"Media changed: {(media == nint.Zero ? "none" : $"0x{media:X}")}");
     }
 
     public void Cleanup()
@@ -65,6 +95,24 @@ public sealed class PluginState : IDisposable
 
         // Cleanup logic
         _logger.Info("C# Plugin cleaning up...");
+
+        // Stop player event listener
+        if (_player != null)
+        {
+            _player.StateChanged -= OnPlayerStateChanged;
+            _player.MediaChanged -= OnPlayerMediaChanged;
+            _player.StopListening();
+            _player.Dispose();
+            _player = null;
+            _logger.Info("Player event listener unregistered");
+        }
+
+        // Dispose playlist wrapper
+        if (_playlist != null)
+        {
+            _playlist.Dispose();
+            _playlist = null;
+        }
 
         // Destroy variables we created
         _variable.Destroy(VarPluginVersion);

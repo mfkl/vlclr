@@ -164,3 +164,181 @@ int var_GetChecked(void *obj, const char *name, int type, vlc_value_t *valp)
     }
     return 0;
 }
+
+/*
+ * Stub playlist implementation for testing
+ */
+
+/* Stub playlist state */
+static struct {
+    int item_count;
+    int64_t current_index;
+    int player_state;  /* 0=stopped, 1=started, 2=playing, 3=paused */
+} stub_playlist = {
+    .item_count = 3,      /* Simulate 3 items in playlist */
+    .current_index = 0,   /* First item selected */
+    .player_state = 0     /* Stopped */
+};
+
+/* Stub for vlc_intf_GetMainPlaylist */
+void* vlc_intf_GetMainPlaylist(void *intf)
+{
+    (void)intf;
+    /* Return a fake but non-NULL pointer */
+    static int fake_playlist = 1;
+    fprintf(stderr, "[vlccore_stub] vlc_intf_GetMainPlaylist: returning stub playlist\n");
+    return &fake_playlist;
+}
+
+/* Stub for vlc_playlist_GetPlayer */
+void* vlc_playlist_GetPlayer(void *playlist)
+{
+    (void)playlist;
+    static int fake_player = 1;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_GetPlayer: returning stub player\n");
+    return &fake_player;
+}
+
+/* Stub for vlc_player_Lock/Unlock */
+void vlc_player_Lock(void *player) { (void)player; }
+void vlc_player_Unlock(void *player) { (void)player; }
+
+/* Stub for vlc_player_AddListener */
+void* vlc_player_AddListener(void *player, const void *cbs, void *cbs_data)
+{
+    (void)player;
+    (void)cbs;
+    (void)cbs_data;
+    static int fake_listener = 1;
+    fprintf(stderr, "[vlccore_stub] vlc_player_AddListener: returning stub listener\n");
+    return &fake_listener;
+}
+
+/* Stub for vlc_player_RemoveListener */
+void vlc_player_RemoveListener(void *player, void *listener_id)
+{
+    (void)player;
+    (void)listener_id;
+    fprintf(stderr, "[vlccore_stub] vlc_player_RemoveListener\n");
+}
+
+/* Stub for vlc_player_GetState */
+int vlc_player_GetState(void *player)
+{
+    (void)player;
+    fprintf(stderr, "[vlccore_stub] vlc_player_GetState: %d\n", stub_playlist.player_state);
+    return stub_playlist.player_state;
+}
+
+/* Stub for vlc_playlist_Lock/Unlock */
+void vlc_playlist_Lock(void *playlist) { (void)playlist; }
+void vlc_playlist_Unlock(void *playlist) { (void)playlist; }
+
+/* Stub for vlc_playlist_Start */
+int vlc_playlist_Start(void *playlist)
+{
+    (void)playlist;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Start\n");
+    stub_playlist.player_state = 2;  /* Playing */
+    return 0;
+}
+
+/* Stub for vlc_playlist_Stop */
+void vlc_playlist_Stop(void *playlist)
+{
+    (void)playlist;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Stop\n");
+    stub_playlist.player_state = 0;  /* Stopped */
+}
+
+/* Stub for vlc_playlist_Pause */
+void vlc_playlist_Pause(void *playlist)
+{
+    (void)playlist;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Pause\n");
+    stub_playlist.player_state = 3;  /* Paused */
+}
+
+/* Stub for vlc_playlist_Resume */
+void vlc_playlist_Resume(void *playlist)
+{
+    (void)playlist;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Resume\n");
+    stub_playlist.player_state = 2;  /* Playing */
+}
+
+/* Stub for vlc_playlist_Next */
+int vlc_playlist_Next(void *playlist)
+{
+    (void)playlist;
+    if (stub_playlist.current_index < stub_playlist.item_count - 1) {
+        stub_playlist.current_index++;
+        fprintf(stderr, "[vlccore_stub] vlc_playlist_Next: moved to index %lld\n",
+                (long long)stub_playlist.current_index);
+        return 0;
+    }
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Next: at end of playlist\n");
+    return -1;
+}
+
+/* Stub for vlc_playlist_Prev */
+int vlc_playlist_Prev(void *playlist)
+{
+    (void)playlist;
+    if (stub_playlist.current_index > 0) {
+        stub_playlist.current_index--;
+        fprintf(stderr, "[vlccore_stub] vlc_playlist_Prev: moved to index %lld\n",
+                (long long)stub_playlist.current_index);
+        return 0;
+    }
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Prev: at start of playlist\n");
+    return -1;
+}
+
+/* Stub for vlc_playlist_HasNext */
+int vlc_playlist_HasNext(void *playlist)
+{
+    (void)playlist;
+    int result = stub_playlist.current_index < stub_playlist.item_count - 1;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_HasNext: %d\n", result);
+    return result;
+}
+
+/* Stub for vlc_playlist_HasPrev */
+int vlc_playlist_HasPrev(void *playlist)
+{
+    (void)playlist;
+    int result = stub_playlist.current_index > 0;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_HasPrev: %d\n", result);
+    return result;
+}
+
+/* Stub for vlc_playlist_Count */
+size_t vlc_playlist_Count(void *playlist)
+{
+    (void)playlist;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_Count: %d\n", stub_playlist.item_count);
+    return (size_t)stub_playlist.item_count;
+}
+
+/* Stub for vlc_playlist_GetCurrentIndex */
+int64_t vlc_playlist_GetCurrentIndex(void *playlist)
+{
+    (void)playlist;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_GetCurrentIndex: %lld\n",
+            (long long)stub_playlist.current_index);
+    return stub_playlist.current_index;
+}
+
+/* Stub for vlc_playlist_GoTo */
+int vlc_playlist_GoTo(void *playlist, int64_t index)
+{
+    (void)playlist;
+    if (index < -1 || index >= stub_playlist.item_count) {
+        fprintf(stderr, "[vlccore_stub] vlc_playlist_GoTo: invalid index %lld\n", (long long)index);
+        return -1;
+    }
+    stub_playlist.current_index = index;
+    fprintf(stderr, "[vlccore_stub] vlc_playlist_GoTo: %lld\n", (long long)index);
+    return 0;
+}
