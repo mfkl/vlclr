@@ -86,7 +86,7 @@ Player state/position/media change events via vlc_player_AddListener. C# VlcPlay
 Full playlist control: start/stop/pause/resume, next/prev, goto, count, current index. C# VlcPlaylist wrapper.
 
 ### Phase 5: Unit Testing ✓
-xUnit test project with 61 tests covering UTF-8 marshalling and API contract verification.
+xUnit test project covering UTF-8 marshalling and API contract verification.
 
 ### Phase 6: Object Management ✓
 VlcObject wrapper class with object hierarchy navigation (parent, typename, root traversal).
