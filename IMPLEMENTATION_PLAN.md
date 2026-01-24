@@ -177,6 +177,32 @@ When running VLC with verbose logging, C# can control playback:
 
 ---
 
+## Phase 5: Unit Testing - COMPLETED
+
+### Priority 14: Create Unit Test Project - COMPLETED
+- [x] Created `src/VlcPlugin.Tests/VlcPlugin.Tests.csproj` with xUnit
+- [x] Added `VlcInteropTests.cs` with UTF-8 marshalling tests
+- [x] Added `PluginArchitectureTests.cs` for API contract verification
+
+### Key Testing Considerations
+- `[UnmanagedCallersOnly]` methods cannot be called from managed code
+- Plugin lifecycle testing requires the C test harness or VLC itself
+- Unit tests verify:
+  - VlcInterop UTF-8 string marshalling (roundtrip, null handling, Unicode)
+  - PluginExports method signatures and attributes
+  - PluginState interface contract
+
+### Test Commands
+```bash
+# Run unit tests
+dotnet test src/VlcPlugin.Tests
+
+# Integration testing (requires C glue build)
+cd build && ./test_harness.exe
+```
+
+---
+
 ## Implemented Features
 
 - VLC logging from C# (Info, Error, Warning, Debug)
@@ -184,6 +210,7 @@ When running VLC with verbose logging, C# can control playback:
 - Clean plugin lifecycle (Open/Close callbacks)
 - React to VLC player events (state changes, media changes)
 - Playlist control (start, stop, pause, resume, next, prev, goto, count, current index)
+- Unit test suite with xUnit (17 tests)
 
 ## Future Work (DEFERRED)
 
