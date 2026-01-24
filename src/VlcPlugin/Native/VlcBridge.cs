@@ -119,6 +119,104 @@ internal static partial class VlcBridge
     internal static partial void PlayerRemoveListener(nint player, nint listenerHandle);
 
     #endregion
+
+    #region Playlist Control
+
+    /// <summary>
+    /// Get the playlist from an interface object.
+    /// </summary>
+    /// <param name="intf">Pointer to intf_thread_t</param>
+    /// <returns>Pointer to vlc_playlist_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_get_playlist")]
+    internal static partial nint GetPlaylist(nint intf);
+
+    /// <summary>
+    /// Start playback.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>0 on success, error code on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_start")]
+    internal static partial int PlaylistStart(nint playlist);
+
+    /// <summary>
+    /// Stop playback.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_stop")]
+    internal static partial void PlaylistStop(nint playlist);
+
+    /// <summary>
+    /// Pause playback.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_pause")]
+    internal static partial void PlaylistPause(nint playlist);
+
+    /// <summary>
+    /// Resume playback.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_resume")]
+    internal static partial void PlaylistResume(nint playlist);
+
+    /// <summary>
+    /// Go to the next item.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>0 on success, error code on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_next")]
+    internal static partial int PlaylistNext(nint playlist);
+
+    /// <summary>
+    /// Go to the previous item.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>0 on success, error code on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_prev")]
+    internal static partial int PlaylistPrev(nint playlist);
+
+    /// <summary>
+    /// Check if there is a next item.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>1 if true, 0 if false</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_has_next")]
+    internal static partial int PlaylistHasNext(nint playlist);
+
+    /// <summary>
+    /// Check if there is a previous item.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>1 if true, 0 if false</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_has_prev")]
+    internal static partial int PlaylistHasPrev(nint playlist);
+
+    /// <summary>
+    /// Get the number of items in the playlist.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>Number of items</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_count")]
+    internal static partial long PlaylistCount(nint playlist);
+
+    /// <summary>
+    /// Get the current item index.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <returns>Current index, or -1 if none</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_get_current_index")]
+    internal static partial long PlaylistGetCurrentIndex(nint playlist);
+
+    /// <summary>
+    /// Go to a specific index.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <param name="index">Index to go to (-1 for none)</param>
+    /// <returns>0 on success, error code on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_playlist_goto")]
+    internal static partial int PlaylistGoTo(nint playlist, long index);
+
+    #endregion
 }
 
 /// <summary>

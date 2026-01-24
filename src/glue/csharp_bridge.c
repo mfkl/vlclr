@@ -425,3 +425,156 @@ BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listene
     free(handle->context);
     free(handle);
 }
+
+/*
+ * Playlist Control Implementation
+ */
+
+/* VLC playlist function declarations */
+extern void vlc_playlist_Lock(vlc_playlist_t *playlist);
+extern void vlc_playlist_Unlock(vlc_playlist_t *playlist);
+extern int vlc_playlist_Start(vlc_playlist_t *playlist);
+extern void vlc_playlist_Stop(vlc_playlist_t *playlist);
+extern void vlc_playlist_Pause(vlc_playlist_t *playlist);
+extern void vlc_playlist_Resume(vlc_playlist_t *playlist);
+extern int vlc_playlist_Next(vlc_playlist_t *playlist);
+extern int vlc_playlist_Prev(vlc_playlist_t *playlist);
+extern int vlc_playlist_HasNext(vlc_playlist_t *playlist);  /* Returns bool, treat as int */
+extern int vlc_playlist_HasPrev(vlc_playlist_t *playlist);  /* Returns bool, treat as int */
+extern size_t vlc_playlist_Count(vlc_playlist_t *playlist);
+extern int64_t vlc_playlist_GetCurrentIndex(vlc_playlist_t *playlist);  /* Returns ssize_t */
+extern int vlc_playlist_GoTo(vlc_playlist_t *playlist, int64_t index);  /* Takes ssize_t */
+
+BRIDGE_API void* csharp_bridge_get_playlist(void* intf)
+{
+    if (intf == NULL)
+        return NULL;
+
+    return (void*)vlc_intf_GetMainPlaylist((intf_thread_t*)intf);
+}
+
+BRIDGE_API int csharp_bridge_playlist_start(void* playlist)
+{
+    if (playlist == NULL)
+        return -1;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int result = vlc_playlist_Start((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return result;
+}
+
+BRIDGE_API void csharp_bridge_playlist_stop(void* playlist)
+{
+    if (playlist == NULL)
+        return;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    vlc_playlist_Stop((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+}
+
+BRIDGE_API void csharp_bridge_playlist_pause(void* playlist)
+{
+    if (playlist == NULL)
+        return;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    vlc_playlist_Pause((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+}
+
+BRIDGE_API void csharp_bridge_playlist_resume(void* playlist)
+{
+    if (playlist == NULL)
+        return;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    vlc_playlist_Resume((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+}
+
+BRIDGE_API int csharp_bridge_playlist_next(void* playlist)
+{
+    if (playlist == NULL)
+        return -1;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int result = vlc_playlist_Next((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return result;
+}
+
+BRIDGE_API int csharp_bridge_playlist_prev(void* playlist)
+{
+    if (playlist == NULL)
+        return -1;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int result = vlc_playlist_Prev((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return result;
+}
+
+BRIDGE_API int csharp_bridge_playlist_has_next(void* playlist)
+{
+    if (playlist == NULL)
+        return 0;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int result = vlc_playlist_HasNext((vlc_playlist_t*)playlist) ? 1 : 0;
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return result;
+}
+
+BRIDGE_API int csharp_bridge_playlist_has_prev(void* playlist)
+{
+    if (playlist == NULL)
+        return 0;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int result = vlc_playlist_HasPrev((vlc_playlist_t*)playlist) ? 1 : 0;
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return result;
+}
+
+BRIDGE_API long long csharp_bridge_playlist_count(void* playlist)
+{
+    if (playlist == NULL)
+        return 0;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    size_t count = vlc_playlist_Count((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return (long long)count;
+}
+
+BRIDGE_API long long csharp_bridge_playlist_get_current_index(void* playlist)
+{
+    if (playlist == NULL)
+        return -1;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int64_t index = vlc_playlist_GetCurrentIndex((vlc_playlist_t*)playlist);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return (long long)index;
+}
+
+BRIDGE_API int csharp_bridge_playlist_goto(void* playlist, long long index)
+{
+    if (playlist == NULL)
+        return -1;
+
+    vlc_playlist_Lock((vlc_playlist_t*)playlist);
+    int result = vlc_playlist_GoTo((vlc_playlist_t*)playlist, (int64_t)index);
+    vlc_playlist_Unlock((vlc_playlist_t*)playlist);
+
+    return result;
+}

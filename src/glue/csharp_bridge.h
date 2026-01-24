@@ -166,4 +166,91 @@ BRIDGE_API void* csharp_bridge_player_add_listener(void* player, csharp_player_c
  */
 BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listener_id);
 
+/*
+ * Playlist Control API
+ * These functions allow C# to control VLC playlist playback.
+ */
+
+/**
+ * Get the playlist from an interface object.
+ * @param intf Pointer to intf_thread_t (passed to Open callback)
+ * @return Pointer to vlc_playlist_t, or NULL on failure
+ */
+BRIDGE_API void* csharp_bridge_get_playlist(void* intf);
+
+/**
+ * Start playback.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return 0 on success, error code on failure
+ */
+BRIDGE_API int csharp_bridge_playlist_start(void* playlist);
+
+/**
+ * Stop playback.
+ * @param playlist Pointer to vlc_playlist_t
+ */
+BRIDGE_API void csharp_bridge_playlist_stop(void* playlist);
+
+/**
+ * Pause playback.
+ * @param playlist Pointer to vlc_playlist_t
+ */
+BRIDGE_API void csharp_bridge_playlist_pause(void* playlist);
+
+/**
+ * Resume playback.
+ * @param playlist Pointer to vlc_playlist_t
+ */
+BRIDGE_API void csharp_bridge_playlist_resume(void* playlist);
+
+/**
+ * Go to the next item.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return 0 on success, error code on failure
+ */
+BRIDGE_API int csharp_bridge_playlist_next(void* playlist);
+
+/**
+ * Go to the previous item.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return 0 on success, error code on failure
+ */
+BRIDGE_API int csharp_bridge_playlist_prev(void* playlist);
+
+/**
+ * Check if there is a next item.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return 1 if true, 0 if false
+ */
+BRIDGE_API int csharp_bridge_playlist_has_next(void* playlist);
+
+/**
+ * Check if there is a previous item.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return 1 if true, 0 if false
+ */
+BRIDGE_API int csharp_bridge_playlist_has_prev(void* playlist);
+
+/**
+ * Get the number of items in the playlist.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return Number of items
+ */
+BRIDGE_API long long csharp_bridge_playlist_count(void* playlist);
+
+/**
+ * Get the current item index.
+ * @param playlist Pointer to vlc_playlist_t
+ * @return Current index, or -1 if none
+ */
+BRIDGE_API long long csharp_bridge_playlist_get_current_index(void* playlist);
+
+/**
+ * Go to a specific index.
+ * @param playlist Pointer to vlc_playlist_t
+ * @param index Index to go to (-1 for none)
+ * @return 0 on success, error code on failure
+ */
+BRIDGE_API int csharp_bridge_playlist_goto(void* playlist, long long index);
+
 #endif /* CSHARP_BRIDGE_H */
