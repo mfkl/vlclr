@@ -20,11 +20,41 @@
 #define BRIDGE_UNLOAD(h) dlclose(h)
 #endif
 
+/* VLC types forward declarations for logging */
+struct vlc_object_t;
+typedef struct vlc_object_t vlc_object_t;
+
+/* VLC logging function declaration (defined in vlccore_stub.c or libvlccore) */
+extern void vlc_object_Log(vlc_object_t *obj, int type, const char *module,
+                           const char *file, unsigned line, const char *func,
+                           const char *format, ...);
+
+/* Module name for logging */
+static const char vlc_module_name[] = "hello_csharp";
+
 static BRIDGE_HANDLE csharp_dll = NULL;
 
 /* Exported function pointers */
 csharp_open_fn csharp_plugin_open = NULL;
 csharp_close_fn csharp_plugin_close = NULL;
+
+/* VLC log type constants matching vlc_messages.h */
+#define VLC_MSG_INFO 0
+#define VLC_MSG_ERR  1
+#define VLC_MSG_WARN 2
+#define VLC_MSG_DBG  3
+
+BRIDGE_API void csharp_bridge_log(void* vlc_object, int type, const char* message)
+{
+    if (vlc_object == NULL || message == NULL)
+    {
+        fprintf(stderr, "[VlcPlugin] (null object) %s\n", message ? message : "(null)");
+        return;
+    }
+
+    vlc_object_Log((vlc_object_t*)vlc_object, type, vlc_module_name,
+                   NULL, 0, NULL, "%s", message);
+}
 
 int csharp_bridge_init(void)
 {
