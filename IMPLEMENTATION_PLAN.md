@@ -35,41 +35,46 @@ VLC 4.x Plugin System
 
 ## Phase 1: Minimal Viable Plugin (Proof of Concept)
 
-### Priority 1: C# Native AOT Project Setup
-- [ ] Create `src/VlcPlugin/VlcPlugin.csproj` with .NET 10, PublishAot=true
-- [ ] Create `src/VlcPlugin/PluginExports.cs` with `[UnmanagedCallersOnly]` exports:
+### Priority 1: C# Native AOT Project Setup - COMPLETED
+- [x] Create `src/VlcPlugin/VlcPlugin.csproj` with .NET 10, PublishAot=true
+- [x] Create `src/VlcPlugin/PluginExports.cs` with `[UnmanagedCallersOnly]` exports:
   - `CSharpPluginOpen(nint vlcObject) → int`
   - `CSharpPluginClose(nint vlcObject) → void`
-- [ ] Create `src/VlcPlugin/PluginState.cs` for state management
-- [ ] Verify `dotnet publish -c Release -r win-x64` produces native DLL
-- [ ] Verify exports visible with `dumpbin /exports`
+- [x] Create `src/VlcPlugin/PluginState.cs` for state management
+- [x] Create `src/VlcPlugin/VlcInterop.cs` for UTF-8 string marshalling
+- [x] Verify `dotnet publish -c Release -r win-x64` produces native DLL
+- [x] Verify exports visible with `dumpbin /exports`
 
-### Priority 2: C Glue Layer
-- [ ] Create `src/glue/plugin_entry.c`:
+### Priority 2: C Glue Layer - COMPLETED
+- [x] Create `src/glue/plugin_entry.c`:
   - `#define VLC_MODULE_LICENSE VLC_LICENSE_LGPL_2_1_PLUS`
   - `vlc_module_begin()` / `vlc_module_end()` block
   - `set_capability("interface", 0)`
   - `set_callbacks(Open, Close)`
-- [ ] Create `src/glue/csharp_bridge.h` - function pointer declarations
-- [ ] Create `src/glue/csharp_bridge.c`:
+- [x] Create `src/glue/csharp_bridge.h` - function pointer declarations
+- [x] Create `src/glue/csharp_bridge.c`:
   - `csharp_bridge_init()` - LoadLibrary for VlcPlugin.dll
   - `csharp_bridge_resolve()` - GetProcAddress for exports
   - `csharp_bridge_cleanup()` - FreeLibrary
-- [ ] Create `src/glue/CMakeLists.txt` for Clang build
-- [ ] Verify C glue compiles: `clang -shared -o libhello_csharp_plugin.dll ...`
+- [x] Create `src/glue/vlccore_stub.c` - stub for `vlc_object_Log` (testing only)
+- [x] Verify C glue compiles with Clang
 
-### Priority 3: Bridge Integration
-- [ ] Implement Open callback in C glue → calls `csharp_plugin_open()`
-- [ ] Implement Close callback in C glue → calls `csharp_plugin_close()`
-- [ ] Handle bridge init failure gracefully (return VLC_EGENERIC)
-- [ ] Test with standalone test harness (C program that loads both DLLs)
+### Priority 3: Bridge Integration - COMPLETED
+- [x] Implement Open callback in C glue → calls `csharp_plugin_open()`
+- [x] Implement Close callback in C glue → calls `csharp_plugin_close()`
+- [x] Handle bridge init failure gracefully (return VLC_EGENERIC)
+- [x] Test with standalone test harness (`src/test/test_harness.c`)
 
-### Priority 4: VLC Integration Test
+### Priority 4: VLC Integration Test - PARTIAL
+- [x] Both DLLs built successfully
+- [x] Test harness verifies complete call chain works
 - [ ] Copy both DLLs to VLC plugin directory
 - [ ] Test discovery: `vlc -vvv --list` shows plugin
 - [ ] Test loading: `vlc --intf hello_csharp` activates plugin
 - [ ] Verify C# code executes (console output or log file)
 - [ ] Verify clean shutdown (no crashes)
+
+> **Note**: Final VLC integration test requires VLC 4.x binaries (not yet available).
 
 ---
 
@@ -133,6 +138,13 @@ VLC 4.x Plugin System
 1. Should we embed VlcPlugin.dll inside the C glue DLL, or ship as separate file?
 2. How to handle VLC's threading model from C# managed code?
 3. What's the minimum set of libvlccore functions needed for useful plugin?
+
+## Learnings
+
+1. **vswhere.exe requirement**: Need `vswhere.exe` in PATH for native AOT publish (or use VS Developer Command Prompt)
+2. **NuGet configuration**: Created `nuget.config` to use only nuget.org source (avoid auth issues with other feeds)
+3. **vlccore stub**: `vlccore_stub.c` provides `vlc_object_Log` stub for testing without VLC binaries
+4. **Test harness**: `src/test/test_harness.c` simulates VLC's plugin loading sequence for validation
 
 ## References
 
