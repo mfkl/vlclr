@@ -294,6 +294,38 @@ extern void vlc_player_Unlock(vlc_player_t *player);
 extern vlc_player_listener_id* vlc_player_AddListener(vlc_player_t *player, const struct vlc_player_cbs *cbs, void *cbs_data);
 extern void vlc_player_RemoveListener(vlc_player_t *player, vlc_player_listener_id *listener_id);
 extern enum vlc_player_state vlc_player_GetState(vlc_player_t *player);
+extern vlc_tick_t vlc_player_GetTime(vlc_player_t *player);
+extern vlc_tick_t vlc_player_GetLength(vlc_player_t *player);
+extern double vlc_player_GetPosition(vlc_player_t *player);
+extern int vlc_player_GetCapabilities(vlc_player_t *player);
+extern void vlc_player_Pause(vlc_player_t *player);
+extern void vlc_player_Resume(vlc_player_t *player);
+
+/* VLC seek enums - match vlc_player.h */
+enum vlc_player_seek_speed {
+    VLC_PLAYER_SEEK_PRECISE = 0,
+    VLC_PLAYER_SEEK_FAST = 1,
+};
+
+enum vlc_player_whence {
+    VLC_PLAYER_WHENCE_ABSOLUTE = 0,
+    VLC_PLAYER_WHENCE_RELATIVE = 1,
+};
+
+/* VLC seek functions */
+extern void vlc_player_SeekByTime(vlc_player_t *player, vlc_tick_t time,
+                                  enum vlc_player_seek_speed speed,
+                                  enum vlc_player_whence whence);
+extern void vlc_player_SeekByPos(vlc_player_t *player, double position,
+                                 enum vlc_player_seek_speed speed,
+                                 enum vlc_player_whence whence);
+
+/* VLC player capability flags - match vlc_player.h */
+#define VLC_PLAYER_CAP_SEEK (1 << 0)
+#define VLC_PLAYER_CAP_PAUSE (1 << 1)
+
+/* VLC tick invalid constant */
+#define VLC_TICK_INVALID ((vlc_tick_t)INT64_MIN)
 
 /* Context for our listener - holds C# callbacks */
 typedef struct {
@@ -424,6 +456,110 @@ BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listene
 
     free(handle->context);
     free(handle);
+}
+
+BRIDGE_API long long csharp_bridge_player_get_time(void* player)
+{
+    if (player == NULL)
+        return VLC_TICK_INVALID;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_tick_t time = vlc_player_GetTime((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    return (long long)time;
+}
+
+BRIDGE_API long long csharp_bridge_player_get_length(void* player)
+{
+    if (player == NULL)
+        return VLC_TICK_INVALID;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_tick_t length = vlc_player_GetLength((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    return (long long)length;
+}
+
+BRIDGE_API double csharp_bridge_player_get_position(void* player)
+{
+    if (player == NULL)
+        return -1.0;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    double pos = vlc_player_GetPosition((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    return pos;
+}
+
+BRIDGE_API void csharp_bridge_player_seek_by_time(void* player, long long time, int speed, int whence)
+{
+    if (player == NULL)
+        return;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_player_SeekByTime((vlc_player_t*)player, (vlc_tick_t)time,
+                          (enum vlc_player_seek_speed)speed,
+                          (enum vlc_player_whence)whence);
+    vlc_player_Unlock((vlc_player_t*)player);
+}
+
+BRIDGE_API void csharp_bridge_player_seek_by_pos(void* player, double position, int speed, int whence)
+{
+    if (player == NULL)
+        return;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_player_SeekByPos((vlc_player_t*)player, position,
+                         (enum vlc_player_seek_speed)speed,
+                         (enum vlc_player_whence)whence);
+    vlc_player_Unlock((vlc_player_t*)player);
+}
+
+BRIDGE_API int csharp_bridge_player_can_seek(void* player)
+{
+    if (player == NULL)
+        return 0;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    int caps = vlc_player_GetCapabilities((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    return (caps & VLC_PLAYER_CAP_SEEK) ? 1 : 0;
+}
+
+BRIDGE_API int csharp_bridge_player_can_pause(void* player)
+{
+    if (player == NULL)
+        return 0;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    int caps = vlc_player_GetCapabilities((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    return (caps & VLC_PLAYER_CAP_PAUSE) ? 1 : 0;
+}
+
+BRIDGE_API void csharp_bridge_player_pause(void* player)
+{
+    if (player == NULL)
+        return;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_player_Pause((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+}
+
+BRIDGE_API void csharp_bridge_player_resume(void* player)
+{
+    if (player == NULL)
+        return;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_player_Resume((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
 }
 
 /*
