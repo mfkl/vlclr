@@ -106,13 +106,9 @@ public sealed class VlcVariable
         if (ptr == nint.Zero)
             return null;
 
-        try
-        {
-            return Marshal.PtrToStringUTF8(ptr);
-        }
-        finally
-        {
-            VlcBridge.VarFreeString(ptr);
-        }
+        // Marshal the string and free the native memory
+        string? result = Marshal.PtrToStringUTF8(ptr);
+        VlcBridge.VarFreeString(ptr);
+        return result;
     }
 }
