@@ -226,13 +226,202 @@ BRIDGE_API char* csharp_bridge_var_get_string(void* vlc_object, const char* name
         return NULL;
     vlc_value_t val;
     val.psz_string = NULL;
-    if (var_GetChecked((vlc_object_t*)vlc_object, name, VLC_VAR_STRING, &val) == 0)
-        return val.psz_string;
-    return NULL;
+    int result = var_GetChecked((vlc_object_t*)vlc_object, name, VLC_VAR_STRING, &val);
+    if (result != 0 || val.psz_string == NULL)
+        return NULL;
+
+    /* VLC uses msvcrt allocator, but we use UCRT. They're incompatible.
+     * Copy the string to our heap so C# can free it with our allocator. */
+    char *copy = _strdup(val.psz_string);
+
+    /* Free VLC's string using msvcrt-compatible free.
+     * Since we're linking against VLC, we should use the same free it uses.
+     * But for now, we'll just skip freeing it (small memory leak).
+     * TODO: Use VLC's allocator directly if available. */
+    /* free(val.psz_string);  -- This would cause heap corruption */
+
+    return copy;
 }
 
 BRIDGE_API void csharp_bridge_free_string(char* str)
 {
     if (str != NULL)
-        free(str);
+        free(str);  /* This is safe now - str was allocated with our _strdup */
+}
+
+/*
+ * Player Events Implementation
+ */
+
+/* Forward declarations for VLC types */
+typedef struct intf_thread_t intf_thread_t;
+typedef struct vlc_playlist_t vlc_playlist_t;
+typedef struct vlc_player_t vlc_player_t;
+typedef struct vlc_player_listener_id vlc_player_listener_id;
+typedef struct input_item_t input_item_t;
+typedef int64_t vlc_tick_t;
+
+/* VLC player state enum - matches vlc_player.h */
+enum vlc_player_state
+{
+    VLC_PLAYER_STATE_STOPPED = 0,
+    VLC_PLAYER_STATE_STARTED,
+    VLC_PLAYER_STATE_PLAYING,
+    VLC_PLAYER_STATE_PAUSED,
+    VLC_PLAYER_STATE_STOPPING,
+};
+
+/* VLC player callbacks structure - must match vlc_player_cbs in vlc_player.h */
+struct vlc_player_cbs
+{
+    void (*on_current_media_changed)(vlc_player_t *player, input_item_t *new_media, void *data);
+    void (*on_state_changed)(vlc_player_t *player, enum vlc_player_state new_state, void *data);
+    /* We only need a subset of callbacks - the rest can be NULL */
+    void (*on_error_changed)(vlc_player_t *player, int error, void *data);
+    void (*on_buffering_changed)(vlc_player_t *player, float new_buffering, void *data);
+    void (*on_rate_changed)(vlc_player_t *player, float new_rate, void *data);
+    void (*on_capabilities_changed)(vlc_player_t *player, int old_caps, int new_caps, void *data);
+    void (*on_position_changed)(vlc_player_t *player, vlc_tick_t new_time, double new_pos, void *data);
+    void (*on_length_changed)(vlc_player_t *player, vlc_tick_t new_length, void *data);
+    /* ... rest of callbacks we don't use ... */
+};
+
+/* VLC function declarations */
+extern vlc_playlist_t* vlc_intf_GetMainPlaylist(intf_thread_t *intf);
+extern vlc_player_t* vlc_playlist_GetPlayer(vlc_playlist_t *playlist);
+extern void vlc_player_Lock(vlc_player_t *player);
+extern void vlc_player_Unlock(vlc_player_t *player);
+extern vlc_player_listener_id* vlc_player_AddListener(vlc_player_t *player, const struct vlc_player_cbs *cbs, void *cbs_data);
+extern void vlc_player_RemoveListener(vlc_player_t *player, vlc_player_listener_id *listener_id);
+extern enum vlc_player_state vlc_player_GetState(vlc_player_t *player);
+
+/* Context for our listener - holds C# callbacks */
+typedef struct {
+    csharp_player_callbacks_t csharp_cbs;
+    struct vlc_player_cbs vlc_cbs;
+} listener_context_t;
+
+/* Handle structure to track both listener_id and context */
+typedef struct {
+    vlc_player_listener_id *listener_id;
+    listener_context_t *context;
+} listener_handle_t;
+
+/* VLC callback implementations that forward to C# */
+static void on_state_changed_cb(vlc_player_t *player, enum vlc_player_state new_state, void *data)
+{
+    (void)player;
+    listener_context_t *ctx = (listener_context_t*)data;
+    if (ctx && ctx->csharp_cbs.on_state_changed)
+    {
+        ctx->csharp_cbs.on_state_changed((int)new_state, ctx->csharp_cbs.user_data);
+    }
+}
+
+static void on_position_changed_cb(vlc_player_t *player, vlc_tick_t new_time, double new_pos, void *data)
+{
+    (void)player;
+    listener_context_t *ctx = (listener_context_t*)data;
+    if (ctx && ctx->csharp_cbs.on_position_changed)
+    {
+        ctx->csharp_cbs.on_position_changed((long long)new_time, new_pos, ctx->csharp_cbs.user_data);
+    }
+}
+
+static void on_media_changed_cb(vlc_player_t *player, input_item_t *new_media, void *data)
+{
+    (void)player;
+    listener_context_t *ctx = (listener_context_t*)data;
+    if (ctx && ctx->csharp_cbs.on_media_changed)
+    {
+        ctx->csharp_cbs.on_media_changed((void*)new_media, ctx->csharp_cbs.user_data);
+    }
+}
+
+BRIDGE_API void* csharp_bridge_get_player(void* intf)
+{
+    if (intf == NULL)
+        return NULL;
+
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist((intf_thread_t*)intf);
+    if (playlist == NULL)
+        return NULL;
+
+    return (void*)vlc_playlist_GetPlayer(playlist);
+}
+
+BRIDGE_API int csharp_bridge_player_get_state(void* player)
+{
+    if (player == NULL)
+        return 0; /* VLC_PLAYER_STATE_STOPPED */
+
+    vlc_player_Lock((vlc_player_t*)player);
+    enum vlc_player_state state = vlc_player_GetState((vlc_player_t*)player);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    return (int)state;
+}
+
+BRIDGE_API void* csharp_bridge_player_add_listener(void* player, csharp_player_callbacks_t* callbacks)
+{
+    if (player == NULL || callbacks == NULL)
+        return NULL;
+
+    /* Allocate context to hold C# callbacks */
+    listener_context_t *ctx = (listener_context_t*)malloc(sizeof(listener_context_t));
+    if (ctx == NULL)
+        return NULL;
+
+    /* Copy C# callbacks */
+    ctx->csharp_cbs = *callbacks;
+
+    /* Initialize VLC callbacks - all to NULL first */
+    memset(&ctx->vlc_cbs, 0, sizeof(ctx->vlc_cbs));
+
+    /* Set callbacks we care about */
+    ctx->vlc_cbs.on_current_media_changed = on_media_changed_cb;
+    ctx->vlc_cbs.on_state_changed = on_state_changed_cb;
+    ctx->vlc_cbs.on_position_changed = on_position_changed_cb;
+
+    /* Register with VLC */
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_player_listener_id *listener_id = vlc_player_AddListener((vlc_player_t*)player, &ctx->vlc_cbs, ctx);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    if (listener_id == NULL)
+    {
+        free(ctx);
+        return NULL;
+    }
+
+    /* Allocate handle to track both listener_id and context */
+    listener_handle_t *handle = (listener_handle_t*)malloc(sizeof(listener_handle_t));
+    if (handle == NULL)
+    {
+        vlc_player_Lock((vlc_player_t*)player);
+        vlc_player_RemoveListener((vlc_player_t*)player, listener_id);
+        vlc_player_Unlock((vlc_player_t*)player);
+        free(ctx);
+        return NULL;
+    }
+
+    handle->listener_id = listener_id;
+    handle->context = ctx;
+
+    return (void*)handle;
+}
+
+BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listener_handle)
+{
+    if (player == NULL || listener_handle == NULL)
+        return;
+
+    listener_handle_t *handle = (listener_handle_t*)listener_handle;
+
+    vlc_player_Lock((vlc_player_t*)player);
+    vlc_player_RemoveListener((vlc_player_t*)player, handle->listener_id);
+    vlc_player_Unlock((vlc_player_t*)player);
+
+    free(handle->context);
+    free(handle);
 }

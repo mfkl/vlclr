@@ -103,4 +103,67 @@ BRIDGE_API char* csharp_bridge_var_get_string(void* vlc_object, const char* name
  */
 BRIDGE_API void csharp_bridge_free_string(char* str);
 
+/*
+ * Player Events API
+ * These functions allow C# to subscribe to VLC player state changes.
+ */
+
+/**
+ * Player state enumeration matching vlc_player_state.
+ */
+typedef enum {
+    CSHARP_PLAYER_STATE_STOPPED = 0,
+    CSHARP_PLAYER_STATE_STARTED,
+    CSHARP_PLAYER_STATE_PLAYING,
+    CSHARP_PLAYER_STATE_PAUSED,
+    CSHARP_PLAYER_STATE_STOPPING,
+} csharp_player_state_t;
+
+/**
+ * Player event callback types for C#.
+ * These are called from the C glue layer when VLC events occur.
+ */
+typedef void (*csharp_on_state_changed_fn)(int new_state, void* user_data);
+typedef void (*csharp_on_position_changed_fn)(long long new_time, double new_pos, void* user_data);
+typedef void (*csharp_on_media_changed_fn)(void* new_media, void* user_data);
+
+/**
+ * Player listener callbacks structure for C#.
+ */
+typedef struct {
+    csharp_on_state_changed_fn on_state_changed;
+    csharp_on_position_changed_fn on_position_changed;
+    csharp_on_media_changed_fn on_media_changed;
+    void* user_data;
+} csharp_player_callbacks_t;
+
+/**
+ * Get the player from an interface object.
+ * @param intf Pointer to intf_thread_t (passed to Open callback)
+ * @return Pointer to vlc_player_t, or NULL on failure
+ */
+BRIDGE_API void* csharp_bridge_get_player(void* intf);
+
+/**
+ * Get the current player state.
+ * @param player Pointer to vlc_player_t
+ * @return Current player state (csharp_player_state_t values)
+ */
+BRIDGE_API int csharp_bridge_player_get_state(void* player);
+
+/**
+ * Add a player listener.
+ * @param player Pointer to vlc_player_t
+ * @param callbacks Pointer to csharp_player_callbacks_t structure
+ * @return Listener ID (opaque pointer), or NULL on failure
+ */
+BRIDGE_API void* csharp_bridge_player_add_listener(void* player, csharp_player_callbacks_t* callbacks);
+
+/**
+ * Remove a player listener.
+ * @param player Pointer to vlc_player_t
+ * @param listener_id Listener ID returned by csharp_bridge_player_add_listener
+ */
+BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listener_id);
+
 #endif /* CSHARP_BRIDGE_H */
