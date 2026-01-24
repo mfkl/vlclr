@@ -8,12 +8,22 @@
 
 Drop both DLLs into a VLC 4 installation and see "C# Plugin initialized" in VLC's log output.
 
-Phase 3 (Player Events Integration) is now complete.
+All core phases (1-7) are complete. The plugin provides:
+- VLC logging from C#
+- Variable creation/manipulation
+- Player event subscriptions
+- Playlist control
+- Object management
+- Generated bindings documentation
+- Unit test suite (61 tests passing)
 
 ### Success Criteria Met
 - [x] Plugin loads in VLC 4
 - [x] C# log messages appear in VLC log output
 - [x] Variable creation works
+- [x] Player events work (state, position, media changes)
+- [x] Playlist control works (start, stop, pause, resume, next, prev, goto)
+- [x] Unit tests pass (61 tests)
 
 ## Architecture
 
@@ -59,147 +69,28 @@ vlc-4.0.0-dev/
 
 ---
 
-## Phase 1: Minimal Viable Plugin - COMPLETED
+## Completed Phases (Summary)
 
-### Priority 1: C# Native AOT Project Setup - COMPLETED
-- [x] Create `src/VlcPlugin/VlcPlugin.csproj` with .NET 10, PublishAot=true
-- [x] Create `src/VlcPlugin/PluginExports.cs` with `[UnmanagedCallersOnly]` exports
-- [x] Create `src/VlcPlugin/PluginState.cs` for state management
-- [x] Verify `dotnet publish -c Release -r win-x64` produces native DLL
+### Phase 1: Minimal Viable Plugin ✓
+C# Native AOT project with `[UnmanagedCallersOnly]` exports, C glue layer with VLC module macros, and bridge integration.
 
-### Priority 2: C Glue Layer - COMPLETED
-- [x] Create `src/glue/plugin_entry.c` with VLC module macros
-- [x] Create `src/glue/csharp_bridge.c` - dynamic loading of VlcPlugin.dll
-- [x] Create `src/glue/vlccore_stub.c` - stub for testing without VLC
+### Phase 2: Real VLC Integration ✓
+Linked against real libvlccore.dll, deployed to VLC plugins/control/, verified logging works.
 
-### Priority 3: Bridge Integration - COMPLETED
-- [x] Implement Open/Close callbacks that bridge to C#
-- [x] Test with standalone test harness
+### Phase 3: Player Events Integration ✓
+Player state/position/media change events via vlc_player_AddListener. C# VlcPlayer wrapper class.
 
----
+### Phase 4: Playlist Control ✓
+Full playlist control: start/stop/pause/resume, next/prev, goto, count, current index. C# VlcPlaylist wrapper.
 
-## Phase 2: Real VLC Integration - COMPLETED
+### Phase 5: Unit Testing ✓
+xUnit test project with 61 tests covering UTF-8 marshalling and API contract verification.
 
-### Priority 4: Link Against Real libvlccore - COMPLETED
-- [x] Rebuild C glue WITHOUT vlccore_stub.c
-- [x] Link against `libvlccore.dll` from VLC binaries
-- [x] Build command: `clang -shared -o libhello_csharp_plugin.dll src/glue/plugin_entry.c src/glue/csharp_bridge.c -I./vlc/include -L./vlc-binaries/vlc-4.0.0-dev -lvlccore`
+### Phase 6: Object Management ✓
+VlcObject wrapper class with object hierarchy navigation (parent, typename, root traversal).
 
-### Priority 5: Deploy and Test - COMPLETED
-- [x] Copy `libhello_csharp_plugin.dll` to `vlc-binaries/vlc-4.0.0-dev/plugins/control/`
-- [x] Copy `VlcPlugin.dll` to `vlc-binaries/vlc-4.0.0-dev/plugins/control/`
-- [x] Run: `vlc-binaries/vlc-4.0.0-dev/vlc.exe -vvv --intf hello_csharp`
-- [x] Verify log output contains "C# Plugin initialized"
-- [x] Verify clean shutdown (no crashes)
-
-### Success Criteria
-When running VLC with verbose logging, we should see:
-```
-[hello_csharp] C# Plugin initialized
-[hello_csharp] C# Plugin cleaned up
-```
-
----
-
-## Phase 3: Player Events Integration - COMPLETED
-
-### Priority 6: Add player functions to vlccore.def - COMPLETED
-- [x] Added `vlc_playlist_GetPlayer` to vlccore.def
-- [x] Added `vlc_player_Lock` and `vlc_player_Unlock` to vlccore.def
-- [x] Added `vlc_player_AddListener` and `vlc_player_RemoveListener` to vlccore.def
-- [x] Added `vlc_player_GetState` to vlccore.def
-- [x] Regenerated vlccore.lib import library
-
-### Priority 7: Implement C bridge functions for player access - COMPLETED
-- [x] Created `csharp_bridge_get_player()` to get player from playlist
-- [x] Created `csharp_bridge_player_lock()` and `csharp_bridge_player_unlock()`
-- [x] Created `csharp_bridge_player_add_listener()` with callback forwarding
-- [x] Created `csharp_bridge_player_remove_listener()`
-- [x] Created `csharp_bridge_player_get_state()`
-- [x] Implemented static `vlc_player_cbs` structure with state and media change callbacks
-
-### Priority 8: Add C# VlcPlayer wrapper class - COMPLETED
-- [x] Created `VlcPlayer.cs` with P/Invoke declarations for player functions
-- [x] Implemented `OnPlayerStateChanged` and `OnMediaChanged` delegate types
-- [x] Created managed wrapper that subscribes to player events
-- [x] Implemented state enum mapping for player states
-
-### Priority 9: Update PluginState to subscribe to state changes - COMPLETED
-- [x] Updated `PluginState.cs` to create VlcPlayer instance on Open
-- [x] Subscribed to `OnPlayerStateChanged` and `OnMediaChanged` events
-- [x] Log player state changes and media changes to VLC log
-- [x] Clean up player listener on Close
-
-### Success Criteria
-When running VLC with verbose logging and playing/pausing media, we should see:
-```
-[hello_csharp] Player state changed: PLAYING
-[hello_csharp] Media changed
-[hello_csharp] Player state changed: PAUSED
-```
-
----
-
-## Phase 4: Playlist Control - COMPLETED
-
-### Priority 10: Add playlist functions to vlccore.def - COMPLETED
-- [x] Added `vlc_playlist_Lock` and `vlc_playlist_Unlock` to vlccore.def
-- [x] Added `vlc_playlist_Start`, `vlc_playlist_Stop`, `vlc_playlist_Pause`, `vlc_playlist_Resume` to vlccore.def
-- [x] Added `vlc_playlist_Next` and `vlc_playlist_Prev` to vlccore.def
-- [x] Added `vlc_playlist_HasNext` and `vlc_playlist_HasPrev` to vlccore.def
-- [x] Added `vlc_playlist_Count` and `vlc_playlist_GetCurrentIndex` to vlccore.def
-- [x] Added `vlc_playlist_GoTo` to vlccore.def
-
-### Priority 11: Implement C bridge functions for playlist access - COMPLETED
-- [x] Created `csharp_bridge_get_playlist()` to get playlist from intf_thread
-- [x] Created `csharp_bridge_playlist_start()` and `csharp_bridge_playlist_stop()`
-- [x] Created `csharp_bridge_playlist_pause()` and `csharp_bridge_playlist_resume()`
-- [x] Created `csharp_bridge_playlist_next()` and `csharp_bridge_playlist_prev()`
-- [x] Created `csharp_bridge_playlist_has_next()` and `csharp_bridge_playlist_has_prev()`
-- [x] Created `csharp_bridge_playlist_count()` and `csharp_bridge_playlist_get_current_index()`
-- [x] Created `csharp_bridge_playlist_goto()`
-
-### Priority 12: Add C# VlcPlaylist wrapper class - COMPLETED
-- [x] Created `VlcPlaylist.cs` with P/Invoke declarations for playlist functions
-- [x] Implemented high-level wrapper methods for playlist control
-- [x] Added stub implementations in `vlccore_stub.c` for testing
-
-### Priority 13: Update PluginState to initialize playlist - COMPLETED
-- [x] Updated `PluginState.cs` to initialize and log playlist info
-- [x] Log playlist count on startup
-
-### Success Criteria
-When running VLC with verbose logging, C# can control playback:
-- Start/Stop/Pause/Resume playback
-- Navigate to next/previous track
-- Go to specific playlist index
-- Query playlist count and current index
-
----
-
-## Phase 5: Unit Testing - COMPLETED
-
-### Priority 14: Create Unit Test Project - COMPLETED
-- [x] Created `src/VlcPlugin.Tests/VlcPlugin.Tests.csproj` with xUnit
-- [x] Added `VlcInteropTests.cs` with UTF-8 marshalling tests
-- [x] Added `PluginArchitectureTests.cs` for API contract verification
-
-### Key Testing Considerations
-- `[UnmanagedCallersOnly]` methods cannot be called from managed code
-- Plugin lifecycle testing requires the C test harness or VLC itself
-- Unit tests verify:
-  - VlcInterop UTF-8 string marshalling (roundtrip, null handling, Unicode)
-  - PluginExports method signatures and attributes
-  - PluginState interface contract
-
-### Test Commands
-```bash
-# Run unit tests
-dotnet test src/VlcPlugin.Tests
-
-# Integration testing (requires C glue build)
-cd build && ./test_harness.exe
-```
+### Phase 7: Binding Documentation ✓
+Created Generated/ directory with VlcTypes.cs, VlcConstants.cs, and documentation. Updated libvlccore-bindings.md spec to reflect C bridge architecture (ClangSharp doesn't work with VLC headers).
 
 ---
 
@@ -210,7 +101,8 @@ cd build && ./test_harness.exe
 - Clean plugin lifecycle (Open/Close callbacks)
 - React to VLC player events (state changes, media changes)
 - Playlist control (start, stop, pause, resume, next, prev, goto, count, current index)
-- Unit test suite with xUnit (17 tests)
+- Object management (vlc_object_parent, vlc_object_typename)
+- Unit test suite with xUnit (61 tests)
 
 ## Future Work (DEFERRED)
 
@@ -243,6 +135,61 @@ These are out of scope for the current goal:
 8. **CRT heap incompatibility**: VLC (mingw/msvcrt) and our plugin (UCRT) use different heaps. Strings from VLC's `var_GetChecked` must be copied with `_strdup` before returning to C#, then freed with our own `free()`. Do NOT call `free()` on VLC-allocated memory directly - it causes heap corruption
 9. **vlc_player_cbs structure**: Must match the order of callbacks in vlc_player.h exactly. The structure must include all callback slots even if NULL.
 10. **Playlist locking**: The playlist and player share the same lock (`vlc_playlist_Lock`/`vlc_playlist_Unlock`). All playlist operations must be performed within the lock.
+11. **vlc_object_find_name deprecated**: The `vlc_object_find_name` function is not exported in VLC 4.x libvlccore. Object lookup should use alternative methods.
+
+---
+
+## Phase 6: Object Management - COMPLETED
+
+### Priority 15: Add object management functions to vlccore.def - COMPLETED
+- [x] Added `vlc_object_parent` to vlccore.def
+- [x] Added `vlc_object_typename` to vlccore.def
+- [x] Regenerated vlccore.lib import library
+
+### Priority 16: Implement C bridge functions for object management - COMPLETED
+- [x] Created `csharp_bridge_object_parent()` to get parent of VLC object
+- [x] Created `csharp_bridge_object_typename()` to get object type name
+
+### Priority 17: Add C# VlcObject wrapper class - COMPLETED
+- [x] Created `VlcObject.cs` with wrapper methods for object hierarchy navigation
+- [x] Added GetParent() and GetTypeName() instance methods
+- [x] Added GetRoot() method to traverse to root object
+- [x] Added static helper methods
+
+### Priority 18: Expand unit test suite - COMPLETED
+- [x] Added `VlcObjectTests.cs` with 10 tests for VlcObject class
+- [x] Added `WrapperArchitectureTests.cs` with 34 tests for all wrapper classes
+- [x] Total test count increased from 17 to 61
+
+### Success Criteria
+- VlcObject wrapper can navigate object hierarchy
+- All 61 unit tests pass
+
+---
+
+## Phase 7: Binding Documentation - COMPLETED
+
+### Goal
+Document the binding architecture and create Generated/ directory structure per libvlccore-bindings.md spec.
+
+### Findings
+ClangSharp auto-generation doesn't work with VLC headers due to:
+1. Complex macro systems (`VLC_API`, `VLC_FORMAT`, attribute macros) break ClangSharp parsing
+2. Variadic functions (logging, etc.) cannot be called via P/Invoke directly
+3. C bridge approach is required regardless
+
+### Completed Work
+- [x] Created `src/VlcPlugin/clangsharp.rsp` configuration (reference/documentation)
+- [x] Created `src/VlcPlugin/Generated/VlcTypes.cs` with enums and structs
+- [x] Created `src/VlcPlugin/Generated/VlcConstants.cs` with VLC constants
+- [x] Created `src/VlcPlugin/Generated/README.md` explaining architecture
+- [x] Updated `specs/libvlccore-bindings.md` to document C bridge architecture
+- [x] All 61 tests still passing
+
+### Learnings
+12. **ClangSharp and VLC headers**: VLC headers use complex C macros that break ClangSharp parsing. The C bridge approach is the correct architecture - types/constants are manually maintained in Generated/, function calls go through the C bridge.
+
+---
 
 ## References
 

@@ -217,6 +217,26 @@ internal static partial class VlcBridge
     internal static partial int PlaylistGoTo(nint playlist, long index);
 
     #endregion
+
+    #region Object Management
+
+    /// <summary>
+    /// Get the parent of a VLC object.
+    /// </summary>
+    /// <param name="obj">Pointer to vlc_object_t</param>
+    /// <returns>Pointer to parent vlc_object_t, or IntPtr.Zero if none</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_object_parent")]
+    internal static partial nint ObjectParent(nint obj);
+
+    /// <summary>
+    /// Get the type name of a VLC object.
+    /// </summary>
+    /// <param name="obj">Pointer to vlc_object_t</param>
+    /// <returns>Pointer to type name string (VLC-owned, do not free), or IntPtr.Zero on error</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_object_typename")]
+    internal static partial nint ObjectTypename(nint obj);
+
+    #endregion
 }
 
 /// <summary>

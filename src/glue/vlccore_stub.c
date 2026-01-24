@@ -342,3 +342,33 @@ int vlc_playlist_GoTo(void *playlist, int64_t index)
     fprintf(stderr, "[vlccore_stub] vlc_playlist_GoTo: %lld\n", (long long)index);
     return 0;
 }
+
+/*
+ * Object Management Stubs
+ */
+
+/* Stub object hierarchy for testing */
+static struct {
+    const char *type_name;
+    void *parent;
+} stub_objects[] = {
+    { "interface", NULL },  /* Index 0: root interface object */
+};
+
+/* Stub for vlc_object_parent */
+void* vlc_object_parent(void *obj)
+{
+    (void)obj;
+    /* For simplicity, always return NULL (no parent) in stub */
+    fprintf(stderr, "[vlccore_stub] vlc_object_parent: returning NULL\n");
+    return NULL;
+}
+
+/* Stub for vlc_object_typename */
+const char* vlc_object_typename(const void *obj)
+{
+    (void)obj;
+    /* Return a fixed type name for testing */
+    fprintf(stderr, "[vlccore_stub] vlc_object_typename: returning \"interface\"\n");
+    return "interface";
+}

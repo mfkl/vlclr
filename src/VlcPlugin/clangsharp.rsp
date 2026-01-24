@@ -1,0 +1,60 @@
+# ClangSharp PInvoke Generator Configuration
+# Purpose: Generate C# bindings for VLC types, enums, and constants
+# Note: Function calls go through the C bridge layer due to variadic functions
+
+# Input headers - use absolute paths from repo root
+--file
+C:\Users\Martin\Code\videolabs\vlclr\vlc\include\vlc_messages.h
+--file
+C:\Users\Martin\Code\videolabs\vlclr\vlc\include\vlc_variables.h
+--file
+C:\Users\Martin\Code\videolabs\vlclr\vlc\include\vlc_player.h
+
+# Include directory
+--include-directory
+C:\Users\Martin\Code\videolabs\vlclr\vlc\include
+
+# Output settings
+--output
+C:\Users\Martin\Code\videolabs\vlclr\src\VlcPlugin\Generated
+
+--namespace
+VlcPlugin.Generated
+
+--libraryPath
+libvlccore
+
+--methodClassName
+VlcCore
+
+# Type mappings for VLC types
+--remap
+vlc_object_t*=nint
+--remap
+vlc_tick_t=long
+--remap
+vlc_player_t*=nint
+--remap
+vlc_playlist_t*=nint
+--remap
+input_item_t*=nint
+--remap
+vlc_player_listener_id*=nint
+
+# Exclude internal/private symbols
+--exclude
+__.*
+--exclude
+_.*
+
+# Configuration options
+--config
+generate-file-scoped-namespaces
+--config
+generate-helper-types
+--config
+generate-macro-bindings
+--config
+log-exclusions
+--config
+log-visited-files
