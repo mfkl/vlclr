@@ -13,6 +13,35 @@
 - Copy both DLLs to VLC plugin directory
 - Test: `vlc --verbose 2 --plugin-path ./plugins`
 
+### Build Dependencies
+- vswhere.exe must be in PATH for native AOT publish (located at C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe)
+- If NuGet fails, the repo has nuget.config that uses only nuget.org
+
+### Full Build Sequence
+```bash
+# With vswhere in PATH:
+export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/Installer"
+
+# Build C# Native AOT
+dotnet publish src/VlcPlugin -c Release -r win-x64
+
+# Build C glue (from repo root)
+"C:/Program Files/LLVM/bin/clang.exe" -c -o build/plugin_entry.o src/glue/plugin_entry.c -I./vlc/include
+"C:/Program Files/LLVM/bin/clang.exe" -c -o build/csharp_bridge.o src/glue/csharp_bridge.c
+"C:/Program Files/LLVM/bin/clang.exe" -c -o build/vlccore_stub.o src/glue/vlccore_stub.c
+"C:/Program Files/LLVM/bin/clang.exe" -shared -o build/libhello_csharp_plugin.dll build/plugin_entry.o build/csharp_bridge.o build/vlccore_stub.o
+
+# Copy C# DLL
+cp src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll build/
+```
+
+### Test
+```bash
+# Build and run test harness
+"C:/Program Files/LLVM/bin/clang.exe" -o build/test_harness.exe src/test/test_harness.c
+cd build && ./test_harness.exe
+```
+
 ## Validation
 
 - C# build: `dotnet build src/VlcPlugin`

@@ -1,0 +1,32 @@
+# Build output
+build/
+bin/
+obj/
+
+# .NET
+*.user
+*.suo
+*.userprefs
+.vs/
+*.nupkg
+project.lock.json
+
+# Native AOT specific
+*.ilk
+*.pdb
+*.exp
+*.lib
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# VLC source (tracked separately)
+vlc/
