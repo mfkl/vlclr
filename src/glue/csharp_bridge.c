@@ -578,3 +578,27 @@ BRIDGE_API int csharp_bridge_playlist_goto(void* playlist, long long index)
 
     return result;
 }
+
+/*
+ * Object Management Implementation
+ */
+
+/* VLC object function declarations */
+extern vlc_object_t* vlc_object_parent(vlc_object_t *obj);
+extern const char* vlc_object_typename(const vlc_object_t *obj);
+
+BRIDGE_API void* csharp_bridge_object_parent(void* obj)
+{
+    if (obj == NULL)
+        return NULL;
+
+    return (void*)vlc_object_parent((vlc_object_t*)obj);
+}
+
+BRIDGE_API const char* csharp_bridge_object_typename(void* obj)
+{
+    if (obj == NULL)
+        return NULL;
+
+    return vlc_object_typename((const vlc_object_t*)obj);
+}

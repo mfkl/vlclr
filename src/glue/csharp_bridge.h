@@ -253,4 +253,23 @@ BRIDGE_API long long csharp_bridge_playlist_get_current_index(void* playlist);
  */
 BRIDGE_API int csharp_bridge_playlist_goto(void* playlist, long long index);
 
+/*
+ * Object Management API
+ * These functions allow C# to navigate the VLC object hierarchy.
+ */
+
+/**
+ * Get the parent of a VLC object.
+ * @param obj Pointer to vlc_object_t
+ * @return Pointer to parent vlc_object_t, or NULL if none
+ */
+BRIDGE_API void* csharp_bridge_object_parent(void* obj);
+
+/**
+ * Get the type name of a VLC object.
+ * @param obj Pointer to vlc_object_t
+ * @return Type name string (do not free - owned by VLC), or NULL on error
+ */
+BRIDGE_API const char* csharp_bridge_object_typename(void* obj);
+
 #endif /* CSHARP_BRIDGE_H */
