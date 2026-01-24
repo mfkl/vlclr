@@ -82,6 +82,56 @@ internal static partial class VlcBridge
     /// <param name="str">String pointer to free</param>
     [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_free_string")]
     internal static partial void VarFreeString(nint str);
+
+    #region Player Events
+
+    /// <summary>
+    /// Get the player from an interface object.
+    /// </summary>
+    /// <param name="intf">Pointer to intf_thread_t</param>
+    /// <returns>Pointer to vlc_player_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_get_player")]
+    internal static partial nint GetPlayer(nint intf);
+
+    /// <summary>
+    /// Get the current player state.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>Current player state</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_get_state")]
+    internal static partial int PlayerGetState(nint player);
+
+    /// <summary>
+    /// Add a player listener.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <param name="callbacks">Pointer to callbacks structure</param>
+    /// <returns>Listener handle, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_add_listener")]
+    internal static partial nint PlayerAddListener(nint player, ref PlayerCallbacksNative callbacks);
+
+    /// <summary>
+    /// Remove a player listener.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <param name="listenerHandle">Listener handle from PlayerAddListener</param>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_remove_listener")]
+    internal static partial void PlayerRemoveListener(nint player, nint listenerHandle);
+
+    #endregion
+}
+
+/// <summary>
+/// Native callback structure for player events.
+/// Must match csharp_player_callbacks_t in C.
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+internal struct PlayerCallbacksNative
+{
+    public nint OnStateChanged;
+    public nint OnPositionChanged;
+    public nint OnMediaChanged;
+    public nint UserData;
 }
 
 /// <summary>
@@ -97,6 +147,23 @@ public enum VlcLogType
     Warning = 2,
     /// <summary>Debug</summary>
     Debug = 3
+}
+
+/// <summary>
+/// VLC player states matching vlc_player_state in vlc_player.h
+/// </summary>
+public enum VlcPlayerState
+{
+    /// <summary>Player is stopped</summary>
+    Stopped = 0,
+    /// <summary>Player is starting</summary>
+    Started = 1,
+    /// <summary>Player is playing</summary>
+    Playing = 2,
+    /// <summary>Player is paused</summary>
+    Paused = 3,
+    /// <summary>Player is stopping</summary>
+    Stopping = 4
 }
 
 /// <summary>

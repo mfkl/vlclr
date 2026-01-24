@@ -8,6 +8,8 @@
 
 Drop both DLLs into a VLC 4 installation and see "C# Plugin initialized" in VLC's log output.
 
+Phase 3 (Player Events Integration) is now complete.
+
 ### Success Criteria Met
 - [x] Plugin loads in VLC 4
 - [x] C# log messages appear in VLC log output
@@ -99,15 +101,60 @@ When running VLC with verbose logging, we should see:
 
 ---
 
+## Phase 3: Player Events Integration - COMPLETED
+
+### Priority 6: Add player functions to vlccore.def - COMPLETED
+- [x] Added `vlc_playlist_GetPlayer` to vlccore.def
+- [x] Added `vlc_player_Lock` and `vlc_player_Unlock` to vlccore.def
+- [x] Added `vlc_player_AddListener` and `vlc_player_RemoveListener` to vlccore.def
+- [x] Added `vlc_player_GetState` to vlccore.def
+- [x] Regenerated vlccore.lib import library
+
+### Priority 7: Implement C bridge functions for player access - COMPLETED
+- [x] Created `csharp_bridge_get_player()` to get player from playlist
+- [x] Created `csharp_bridge_player_lock()` and `csharp_bridge_player_unlock()`
+- [x] Created `csharp_bridge_player_add_listener()` with callback forwarding
+- [x] Created `csharp_bridge_player_remove_listener()`
+- [x] Created `csharp_bridge_player_get_state()`
+- [x] Implemented static `vlc_player_cbs` structure with state and media change callbacks
+
+### Priority 8: Add C# VlcPlayer wrapper class - COMPLETED
+- [x] Created `VlcPlayer.cs` with P/Invoke declarations for player functions
+- [x] Implemented `OnPlayerStateChanged` and `OnMediaChanged` delegate types
+- [x] Created managed wrapper that subscribes to player events
+- [x] Implemented state enum mapping for player states
+
+### Priority 9: Update PluginState to subscribe to state changes - COMPLETED
+- [x] Updated `PluginState.cs` to create VlcPlayer instance on Open
+- [x] Subscribed to `OnPlayerStateChanged` and `OnMediaChanged` events
+- [x] Log player state changes and media changes to VLC log
+- [x] Clean up player listener on Close
+
+### Success Criteria
+When running VLC with verbose logging and playing/pausing media, we should see:
+```
+[hello_csharp] Player state changed: PLAYING
+[hello_csharp] Media changed
+[hello_csharp] Player state changed: PAUSED
+```
+
+---
+
+## Implemented Features
+
+- VLC logging from C# (Info, Error, Warning, Debug)
+- VLC variable creation and manipulation (integer and string types)
+- Clean plugin lifecycle (Open/Close callbacks)
+- React to VLC player events (state changes, media changes)
+
 ## Future Work (DEFERRED)
 
 These are out of scope for the current goal:
 
-- Create VLC variables from C# (`var_Create`)
-- React to VLC events
-- Control playback
+- Control playback (`vlc_playlist_*`)
 - Cross-platform support (Linux, macOS)
 - Custom UI / Qt integration
+- Subtitle rendering
 
 ---
 
@@ -129,6 +176,8 @@ These are out of scope for the current goal:
 5. **Import library generation**: Use `llvm-dlltool -d vlccore.def -l vlccore.lib -m i386:x86-64` to create import library from DLL
 6. **DLL path resolution**: Windows LoadLibrary doesn't automatically find DLLs in the same directory as the calling DLL; must use GetModuleHandleEx + GetModuleFileName to find the plugin directory and construct full path
 7. **Plugin cache**: Run `vlc-cache-gen.exe plugins` after updating plugins to avoid "stale plugins cache" warning
+8. **CRT heap incompatibility**: VLC (mingw/msvcrt) and our plugin (UCRT) use different heaps. Strings from VLC's `var_GetChecked` must be copied with `_strdup` before returning to C#, then freed with our own `free()`. Do NOT call `free()` on VLC-allocated memory directly - it causes heap corruption
+9. **vlc_player_cbs structure**: Must match the order of callbacks in vlc_player.h exactly. The structure must include all callback slots even if NULL.
 
 ## References
 

@@ -24,31 +24,38 @@ public sealed class PluginState : IDisposable
 
     public void Initialize()
     {
-        // Plugin initialization logic
-        _logger.Info("C# Plugin initializing...");
-
-        // Demonstrate VLC variable creation and usage
-        if (_variable.CreateString(VarPluginVersion, "1.0.0"))
+        try
         {
-            _logger.Info($"Created string variable '{VarPluginVersion}'");
-            string? version = _variable.GetString(VarPluginVersion);
-            _logger.Info($"Plugin version: {version}");
-        }
+            // Plugin initialization logic
+            _logger.Info("C# Plugin initializing...");
 
-        if (_variable.CreateInteger(VarPluginCounter, 0))
+            // Demonstrate VLC variable creation and usage
+            if (_variable.CreateString(VarPluginVersion, "1.0.0"))
+            {
+                _logger.Info($"Created string variable '{VarPluginVersion}'");
+                string? version = _variable.GetString(VarPluginVersion);
+                _logger.Info($"Plugin version: {version ?? "(null)"}");
+            }
+
+            if (_variable.CreateInteger(VarPluginCounter, 0))
+            {
+                _logger.Info($"Created integer variable '{VarPluginCounter}'");
+
+                // Demonstrate increment
+                long counter = _variable.GetInteger(VarPluginCounter);
+                _logger.Info($"Counter initial value: {counter}");
+
+                _variable.SetInteger(VarPluginCounter, counter + 1);
+                counter = _variable.GetInteger(VarPluginCounter);
+                _logger.Info($"Counter after increment: {counter}");
+            }
+
+            _logger.Info("C# Plugin initialized successfully");
+        }
+        catch (Exception ex)
         {
-            _logger.Info($"Created integer variable '{VarPluginCounter}'");
-
-            // Demonstrate increment
-            long counter = _variable.GetInteger(VarPluginCounter);
-            _logger.Info($"Counter initial value: {counter}");
-
-            _variable.SetInteger(VarPluginCounter, counter + 1);
-            counter = _variable.GetInteger(VarPluginCounter);
-            _logger.Info($"Counter after increment: {counter}");
+            _logger.Error($"Plugin initialization failed: {ex.GetType().Name}: {ex.Message}");
         }
-
-        _logger.Info("C# Plugin initialized successfully");
     }
 
     public void Cleanup()
