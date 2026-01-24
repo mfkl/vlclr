@@ -8,7 +8,7 @@
 
 Drop both DLLs into a VLC 4 installation and see "C# Plugin initialized" in VLC's log output.
 
-All core phases (1-8) are complete. The plugin provides:
+All core phases (1-9) are complete. The plugin provides:
 - VLC logging from C#
 - Variable creation/manipulation
 - Player event subscriptions
@@ -16,7 +16,8 @@ All core phases (1-8) are complete. The plugin provides:
 - Playlist control
 - Object management
 - Generated bindings documentation
-- Unit test suite (86 tests passing)
+- Audio volume and mute control
+- Unit test suite (94 tests passing)
 
 ### Success Criteria Met
 - [x] Plugin loads in VLC 4
@@ -25,7 +26,8 @@ All core phases (1-8) are complete. The plugin provides:
 - [x] Player events work (state, position, media changes)
 - [x] Player seeking works (time, position, pause/resume, can_seek/can_pause)
 - [x] Playlist control works (start, stop, pause, resume, next, prev, goto)
-- [x] Unit tests pass (86 tests)
+- [x] Volume control works (get/set volume, mute, unmute, toggle)
+- [x] Unit tests pass (94 tests)
 
 ## Architecture
 
@@ -97,6 +99,9 @@ Created Generated/ directory with VlcTypes.cs, VlcConstants.cs, and documentatio
 ### Phase 8: Player Seeking and Playback Control ✓
 Extended VlcPlayer with seeking functionality: Time/Length/Position properties, SeekByTime/SeekByPosition methods, Pause/Resume, CanSeek/CanPause properties. Added SeekSpeed and SeekWhence enums. 25 new unit tests (86 total).
 
+### Phase 9: Audio Volume Control ✓
+Extended VlcPlayer with audio volume control: Volume property (get/set, range 0.0-2.0), IsMuted property (nullable bool for no-audio-output case), ToggleMute() method. Note: vlc_player_aout_* functions do NOT require the player lock. 8 new unit tests (94 total).
+
 ---
 
 ## Implemented Features
@@ -108,7 +113,8 @@ Extended VlcPlayer with seeking functionality: Time/Length/Position properties, 
 - Player seeking and control (time, position, pause, resume, can_seek, can_pause)
 - Playlist control (start, stop, pause, resume, next, prev, goto, count, current index)
 - Object management (vlc_object_parent, vlc_object_typename)
-- Unit test suite with xUnit (86 tests)
+- Audio volume control (get/set volume, mute, unmute, toggle mute)
+- Unit test suite with xUnit (94 tests)
 
 ## Future Work (DEFERRED)
 
@@ -146,6 +152,7 @@ These are out of scope for the current goal:
 ### Learnings
 12. **ClangSharp and VLC headers**: VLC headers use complex C macros that break ClangSharp parsing. The C bridge approach is the correct architecture - types/constants are manually maintained in Generated/, function calls go through the C bridge.
 13. **Type definition separation**: VlcLogType, VlcPlayerState, VlcVarType, and other enums/structs should live in `VlcPlugin.Generated` namespace only. Don't duplicate them in `VlcPlugin.Native` (VlcBridge.cs). All wrapper classes must import `using VlcPlugin.Generated;`.
+14. **Audio output functions don't require lock**: The `vlc_player_aout_*` functions (volume, mute) do NOT require the player lock, unlike other player functions. This is documented in vlc_player.h.
 
 ---
 

@@ -738,3 +738,62 @@ BRIDGE_API const char* csharp_bridge_object_typename(void* obj)
 
     return vlc_object_typename((const vlc_object_t*)obj);
 }
+
+/*
+ * Audio Output Control Implementation
+ */
+
+/* VLC audio output function declarations */
+extern float vlc_player_aout_GetVolume(vlc_player_t *player);
+extern int vlc_player_aout_SetVolume(vlc_player_t *player, float volume);
+extern int vlc_player_aout_IsMuted(vlc_player_t *player);
+extern int vlc_player_aout_Mute(vlc_player_t *player, int mute);
+
+BRIDGE_API float csharp_bridge_player_get_volume(void* player)
+{
+    if (player == NULL)
+        return -1.0f;
+
+    /* Note: vlc_player_aout_* functions do NOT require the player lock */
+    return vlc_player_aout_GetVolume((vlc_player_t*)player);
+}
+
+BRIDGE_API int csharp_bridge_player_set_volume(void* player, float volume)
+{
+    if (player == NULL)
+        return -1;
+
+    /* Note: vlc_player_aout_* functions do NOT require the player lock */
+    return vlc_player_aout_SetVolume((vlc_player_t*)player, volume);
+}
+
+BRIDGE_API int csharp_bridge_player_is_muted(void* player)
+{
+    if (player == NULL)
+        return -1;
+
+    /* Note: vlc_player_aout_* functions do NOT require the player lock */
+    return vlc_player_aout_IsMuted((vlc_player_t*)player);
+}
+
+BRIDGE_API int csharp_bridge_player_set_mute(void* player, int mute)
+{
+    if (player == NULL)
+        return -1;
+
+    /* Note: vlc_player_aout_* functions do NOT require the player lock */
+    return vlc_player_aout_Mute((vlc_player_t*)player, mute);
+}
+
+BRIDGE_API int csharp_bridge_player_toggle_mute(void* player)
+{
+    if (player == NULL)
+        return -1;
+
+    /* Toggle mute state: get current state and set opposite */
+    int muted = vlc_player_aout_IsMuted((vlc_player_t*)player);
+    if (muted < 0)
+        return -1;
+
+    return vlc_player_aout_Mute((vlc_player_t*)player, !muted);
+}
