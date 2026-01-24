@@ -269,6 +269,34 @@ public class WrapperArchitectureTests
         Assert.Equal(typeof(void), method.ReturnType);
     }
 
+    [Fact]
+    public void VlcPlayer_HasVolumeProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("Volume");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.True(property.CanWrite);
+        Assert.Equal(typeof(float), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasIsMutedProperty()
+    {
+        var property = typeof(VlcPlayer).GetProperty("IsMuted");
+        Assert.NotNull(property);
+        Assert.True(property.CanRead);
+        Assert.True(property.CanWrite);
+        Assert.Equal(typeof(bool?), property.PropertyType);
+    }
+
+    [Fact]
+    public void VlcPlayer_HasToggleMuteMethod()
+    {
+        var method = typeof(VlcPlayer).GetMethod("ToggleMute");
+        Assert.NotNull(method);
+        Assert.Equal(typeof(bool), method.ReturnType);
+    }
+
     #endregion
 
     #region SeekSpeed and SeekWhence Enums Tests
@@ -530,6 +558,61 @@ public class WrapperArchitectureTests
         var method = type.GetMethod("PlayerResume", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(method);
         Assert.Equal(typeof(void), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerGetVolumeMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerGetVolume", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(float), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerSetVolumeMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerSetVolume", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(int), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerIsMutedMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerIsMuted", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(int), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerSetMuteMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerSetMute", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(int), method.ReturnType);
+    }
+
+    [Fact]
+    public void VlcBridge_HasPlayerToggleMuteMethod()
+    {
+        var type = typeof(VlcLogger).Assembly.GetType("VlcPlugin.Native.VlcBridge");
+        Assert.NotNull(type);
+
+        var method = type.GetMethod("PlayerToggleMute", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull(method);
+        Assert.Equal(typeof(int), method.ReturnType);
     }
 
     #endregion

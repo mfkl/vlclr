@@ -353,4 +353,47 @@ BRIDGE_API void* csharp_bridge_object_parent(void* obj);
  */
 BRIDGE_API const char* csharp_bridge_object_typename(void* obj);
 
+/*
+ * Audio Output Control API
+ * These functions allow C# to control volume and mute.
+ * Note: These functions do NOT require the player lock.
+ */
+
+/**
+ * Get the audio volume.
+ * @param player Pointer to vlc_player_t
+ * @return Volume in the range [0.0, 2.0], or -1.0 if no audio outputs
+ */
+BRIDGE_API float csharp_bridge_player_get_volume(void* player);
+
+/**
+ * Set the audio volume.
+ * @param player Pointer to vlc_player_t
+ * @param volume Volume in the range [0.0, 2.0]
+ * @return 0 on success, -1 on failure
+ */
+BRIDGE_API int csharp_bridge_player_set_volume(void* player, float volume);
+
+/**
+ * Check if the audio output is muted.
+ * @param player Pointer to vlc_player_t
+ * @return 0 if not muted, 1 if muted, -1 if no audio outputs
+ */
+BRIDGE_API int csharp_bridge_player_is_muted(void* player);
+
+/**
+ * Mute or unmute the audio output.
+ * @param player Pointer to vlc_player_t
+ * @param mute 1 to mute, 0 to unmute
+ * @return 0 on success, -1 on failure
+ */
+BRIDGE_API int csharp_bridge_player_set_mute(void* player, int mute);
+
+/**
+ * Toggle the mute state.
+ * @param player Pointer to vlc_player_t
+ * @return 0 on success, -1 on failure
+ */
+BRIDGE_API int csharp_bridge_player_toggle_mute(void* player);
+
 #endif /* CSHARP_BRIDGE_H */

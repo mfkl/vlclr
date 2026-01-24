@@ -292,6 +292,52 @@ internal static partial class VlcBridge
 
     #endregion
 
+    #region Audio Output Control
+
+    /// <summary>
+    /// Get the audio volume.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>Volume in the range [0.0, 2.0], or -1.0 if no audio outputs</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_get_volume")]
+    internal static partial float PlayerGetVolume(nint player);
+
+    /// <summary>
+    /// Set the audio volume.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <param name="volume">Volume in the range [0.0, 2.0]</param>
+    /// <returns>0 on success, -1 on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_set_volume")]
+    internal static partial int PlayerSetVolume(nint player, float volume);
+
+    /// <summary>
+    /// Check if the audio output is muted.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>0 if not muted, 1 if muted, -1 if no audio outputs</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_is_muted")]
+    internal static partial int PlayerIsMuted(nint player);
+
+    /// <summary>
+    /// Mute or unmute the audio output.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <param name="mute">1 to mute, 0 to unmute</param>
+    /// <returns>0 on success, -1 on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_set_mute")]
+    internal static partial int PlayerSetMute(nint player, int mute);
+
+    /// <summary>
+    /// Toggle the mute state.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>0 on success, -1 on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_player_toggle_mute")]
+    internal static partial int PlayerToggleMute(nint player);
+
+    #endregion
+
     #region Object Management
 
     /// <summary>
