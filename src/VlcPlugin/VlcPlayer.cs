@@ -184,6 +184,46 @@ public sealed class VlcPlayer : IDisposable
     public bool CanPause => VlcBridge.PlayerCanPause(_player) != 0;
 
     /// <summary>
+    /// Gets or sets the audio volume.
+    /// Valid range is [0.0, 2.0] where 1.0 is 100% volume.
+    /// Returns -1.0 if no audio output is available.
+    /// </summary>
+    public float Volume
+    {
+        get => VlcBridge.PlayerGetVolume(_player);
+        set => VlcBridge.PlayerSetVolume(_player, value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether the audio output is muted.
+    /// Returns null if no audio output is available.
+    /// </summary>
+    public bool? IsMuted
+    {
+        get
+        {
+            int result = VlcBridge.PlayerIsMuted(_player);
+            return result < 0 ? null : result != 0;
+        }
+        set
+        {
+            if (value.HasValue)
+            {
+                VlcBridge.PlayerSetMute(_player, value.Value ? 1 : 0);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Toggles the mute state.
+    /// </summary>
+    /// <returns>True if successful, false if no audio output is available</returns>
+    public bool ToggleMute()
+    {
+        return VlcBridge.PlayerToggleMute(_player) == 0;
+    }
+
+    /// <summary>
     /// Seeks to a specific time.
     /// </summary>
     /// <param name="time">Time in microseconds</param>

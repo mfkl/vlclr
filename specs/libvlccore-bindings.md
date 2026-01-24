@@ -54,6 +54,7 @@ Bridge functions use the `csharp_bridge_` prefix:
 | `csharp_bridge_var_set_integer` | Set integer variable |
 | `csharp_bridge_var_get_string` | Get string variable |
 | `csharp_bridge_get_player` | Get player from interface |
+| `csharp_bridge_player_*` | Player control (state, seek, pause, volume, mute) |
 | `csharp_bridge_playlist_*` | Playlist control functions |
 
 ## Generated/ Directory (Manually Maintained)
@@ -200,9 +201,44 @@ Key points:
 |----------|-----------|
 | **Logging** | Log messages at Info/Warn/Error/Debug levels |
 | **Variables** | Create, destroy, get/set integer and string variables |
-| **Player** | Get state, add/remove event listeners |
+| **Player** | Get state, add/remove event listeners, seeking (time/position), pause/resume |
+| **Audio** | Volume control (get/set), mute control (get/set/toggle) |
 | **Playlist** | Start, stop, pause, resume, next, prev, goto, count |
 | **Objects** | Get parent, get typename |
+
+### Player Control Functions
+
+The bridge provides comprehensive player control:
+
+```c
+// State and position
+csharp_bridge_player_get_state(player)     // Returns VlcPlayerState enum value
+csharp_bridge_player_get_time(player)      // Returns current time in microseconds
+csharp_bridge_player_get_length(player)    // Returns total length in microseconds
+csharp_bridge_player_get_position(player)  // Returns position as ratio [0.0, 1.0]
+
+// Seeking
+csharp_bridge_player_seek_by_time(player, time, speed, whence)  // Seek by microseconds
+csharp_bridge_player_seek_by_pos(player, pos, speed, whence)    // Seek by ratio
+csharp_bridge_player_can_seek(player)      // Returns 1 if seekable
+
+// Playback control
+csharp_bridge_player_pause(player)         // Pause playback
+csharp_bridge_player_resume(player)        // Resume playback
+csharp_bridge_player_can_pause(player)     // Returns 1 if pausable
+
+// Audio output control
+csharp_bridge_player_get_volume(player)    // Returns volume [0.0, 2.0], -1.0 if no audio
+csharp_bridge_player_set_volume(player, v) // Set volume, returns 0 on success
+csharp_bridge_player_is_muted(player)      // Returns 0/1 for mute state, -1 if no audio
+csharp_bridge_player_set_mute(player, m)   // Set mute (0/1), returns 0 on success
+csharp_bridge_player_toggle_mute(player)   // Toggle mute, returns 0 on success
+```
+
+The C# `VlcPlayer` class exposes these through:
+- `Volume` property (get/set, range 0.0-2.0)
+- `IsMuted` property (get/set, nullable bool for no-audio case)
+- `ToggleMute()` method (returns success bool)
 
 ### Player Event Callbacks
 
