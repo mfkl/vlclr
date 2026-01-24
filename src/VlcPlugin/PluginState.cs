@@ -8,11 +8,13 @@ namespace VlcPlugin;
 public sealed class PluginState : IDisposable
 {
     private readonly nint _vlcObject;
+    private readonly VlcLogger _logger;
     private bool _disposed;
 
     public PluginState(nint vlcObject)
     {
         _vlcObject = vlcObject;
+        _logger = new VlcLogger(vlcObject);
     }
 
     public void Initialize()
@@ -22,7 +24,7 @@ public sealed class PluginState : IDisposable
         // - Set up event handlers
         // - Initialize any managed resources
 
-        Log("C# Plugin initialized");
+        _logger.Info("C# Plugin initialized");
     }
 
     public void Cleanup()
@@ -35,14 +37,8 @@ public sealed class PluginState : IDisposable
         // - Remove event handlers
         // - Release managed resources
 
-        Log("C# Plugin cleaned up");
+        _logger.Info("C# Plugin cleaned up");
     }
 
     public void Dispose() => Cleanup();
-
-    private void Log(string message)
-    {
-        // TODO: Use VLC logging via libvlccore bindings
-        Console.WriteLine($"[VlcPlugin] {message}");
-    }
 }

@@ -80,19 +80,18 @@ VLC 4.x Plugin System
 
 ## Phase 2: libvlccore Bindings
 
-### Priority 5: ClangSharp Setup
-- [ ] Create `src/VlcPlugin/clangsharp.rsp` configuration
-- [ ] Run ClangSharpPInvokeGenerator on VLC headers:
-  - `vlc_common.h`
-  - `vlc_messages.h` (for msg_Info, msg_Err, etc.)
-  - `vlc_variables.h`
-- [ ] Fix any generation issues (type mappings, unsupported constructs)
-- [ ] Place generated files in `src/VlcPlugin/Generated/`
+### Priority 5: ClangSharp Setup - PARTIALLY COMPLETED
+- [x] Evaluated ClangSharp for automatic binding generation
+- [ ] ~~Create `src/VlcPlugin/clangsharp.rsp` configuration~~
+- [ ] ~~Run ClangSharpPInvokeGenerator on VLC headers~~
+- [x] Manual P/Invoke bindings created instead
 
-### Priority 6: Use libvlccore from C#
-- [ ] Replace Console.WriteLine with VLC logging (msg_Info via bindings)
+> **Note**: We didn't use ClangSharp as originally planned because the key VLC logging function (`vlc_object_Log`) uses variadic arguments which aren't directly supported by P/Invoke. Instead, we added a logging wrapper function to the C glue layer (`csharp_bridge_log`) that C# can call via P/Invoke. Manual P/Invoke bindings were created in `src/VlcPlugin/Native/VlcBridge.cs` and high-level wrapper in `src/VlcPlugin/VlcLogger.cs`.
+
+### Priority 6: Use libvlccore from C# - IN PROGRESS
+- [x] Replace Console.WriteLine with VLC logging (msg_Info via bindings)
 - [ ] Create a VLC variable from C# to prove var_Create works
-- [ ] Verify P/Invoke calls succeed at runtime (no DllNotFoundException)
+- [x] Verify P/Invoke calls succeed at runtime (no DllNotFoundException)
 
 ---
 
@@ -132,6 +131,7 @@ VLC 4.x Plugin System
 2. **Naming**: `libhello_csharp_plugin.dll` for C glue, `VlcPlugin.dll` for C#
 3. **Loading strategy**: C glue dynamically loads C# DLL (not static linking)
 4. **License**: LGPL 2.1+ (compatible with VLC)
+5. **P/Invoke strategy**: Use a C bridge function (`csharp_bridge_log`) instead of direct libvlccore P/Invoke for variadic functions
 
 ## Open Questions
 
@@ -145,6 +145,8 @@ VLC 4.x Plugin System
 2. **NuGet configuration**: Created `nuget.config` to use only nuget.org source (avoid auth issues with other feeds)
 3. **vlccore stub**: `vlccore_stub.c` provides `vlc_object_Log` stub for testing without VLC binaries
 4. **Test harness**: `src/test/test_harness.c` simulates VLC's plugin loading sequence for validation
+5. **Variadic functions and P/Invoke**: VLC's logging API uses variadic functions which cannot be directly P/Invoked from C#. Solution: add wrapper functions in the C glue layer that accept simple parameters and call the variadic VLC functions internally.
+6. **Circular dependency and P/Invoke**: Circular dependency issue: C# DLL cannot use DirectPInvoke for the C glue DLL because the C glue DLL loads the C# DLL dynamically. Runtime P/Invoke resolution works when both DLLs are in the same directory.
 
 ## References
 
