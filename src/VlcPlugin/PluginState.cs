@@ -7,24 +7,48 @@ namespace VlcPlugin;
 /// </summary>
 public sealed class PluginState : IDisposable
 {
+    private const string VarPluginVersion = "csharp-plugin-version";
+    private const string VarPluginCounter = "csharp-plugin-counter";
+
     private readonly nint _vlcObject;
     private readonly VlcLogger _logger;
+    private readonly VlcVariable _variable;
     private bool _disposed;
 
     public PluginState(nint vlcObject)
     {
         _vlcObject = vlcObject;
         _logger = new VlcLogger(vlcObject);
+        _variable = new VlcVariable(vlcObject);
     }
 
     public void Initialize()
     {
         // Plugin initialization logic
-        // - Register variables with VLC
-        // - Set up event handlers
-        // - Initialize any managed resources
+        _logger.Info("C# Plugin initializing...");
 
-        _logger.Info("C# Plugin initialized");
+        // Demonstrate VLC variable creation and usage
+        if (_variable.CreateString(VarPluginVersion, "1.0.0"))
+        {
+            _logger.Info($"Created string variable '{VarPluginVersion}'");
+            string? version = _variable.GetString(VarPluginVersion);
+            _logger.Info($"Plugin version: {version}");
+        }
+
+        if (_variable.CreateInteger(VarPluginCounter, 0))
+        {
+            _logger.Info($"Created integer variable '{VarPluginCounter}'");
+
+            // Demonstrate increment
+            long counter = _variable.GetInteger(VarPluginCounter);
+            _logger.Info($"Counter initial value: {counter}");
+
+            _variable.SetInteger(VarPluginCounter, counter + 1);
+            counter = _variable.GetInteger(VarPluginCounter);
+            _logger.Info($"Counter after increment: {counter}");
+        }
+
+        _logger.Info("C# Plugin initialized successfully");
     }
 
     public void Cleanup()
@@ -33,9 +57,11 @@ public sealed class PluginState : IDisposable
         _disposed = true;
 
         // Cleanup logic
-        // - Unregister variables
-        // - Remove event handlers
-        // - Release managed resources
+        _logger.Info("C# Plugin cleaning up...");
+
+        // Destroy variables we created
+        _variable.Destroy(VarPluginVersion);
+        _variable.Destroy(VarPluginCounter);
 
         _logger.Info("C# Plugin cleaned up");
     }

@@ -25,14 +25,21 @@ export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/Installer"
 # Build C# Native AOT
 dotnet publish src/VlcPlugin -c Release -r win-x64
 
-# Build C glue (from repo root)
+# Generate vlccore import library (required for linking)
+"C:/Program Files/LLVM/bin/llvm-dlltool.exe" -d build/vlccore.def -l build/vlccore.lib -m i386:x86-64
+
+# Build C glue (linked against real libvlccore)
 "C:/Program Files/LLVM/bin/clang.exe" -c -o build/plugin_entry.o src/glue/plugin_entry.c -I./vlc/include
 "C:/Program Files/LLVM/bin/clang.exe" -c -o build/csharp_bridge.o src/glue/csharp_bridge.c
-"C:/Program Files/LLVM/bin/clang.exe" -c -o build/vlccore_stub.o src/glue/vlccore_stub.c
-"C:/Program Files/LLVM/bin/clang.exe" -shared -o build/libhello_csharp_plugin.dll build/plugin_entry.o build/csharp_bridge.o build/vlccore_stub.o
+"C:/Program Files/LLVM/bin/clang.exe" -shared -o build/libhello_csharp_plugin.dll build/plugin_entry.o build/csharp_bridge.o build/vlccore.lib
 
-# Copy C# DLL
-cp src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll build/
+# Deploy to VLC
+cp build/libhello_csharp_plugin.dll vlc-binaries/vlc-4.0.0-dev/plugins/control/
+cp src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll vlc-binaries/vlc-4.0.0-dev/plugins/control/
+vlc-binaries/vlc-4.0.0-dev/vlc-cache-gen.exe vlc-binaries/vlc-4.0.0-dev/plugins
+
+# Test with VLC
+vlc-binaries/vlc-4.0.0-dev/vlc.exe -vvv --intf hello_csharp
 ```
 
 ### Test
