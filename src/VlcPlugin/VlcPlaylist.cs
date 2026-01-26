@@ -61,18 +61,18 @@ public sealed class VlcPlaylist : IDisposable
     {
         if (intf == nint.Zero)
         {
-            logger.Error("Cannot create VlcPlaylist: invalid interface pointer");
+            logger.Error(".NET plugin Cannot create VlcPlaylist: invalid interface pointer");
             return null;
         }
 
         nint playlist = VlcBridge.GetPlaylist(intf);
         if (playlist == nint.Zero)
         {
-            logger.Error("Failed to get playlist from interface");
+            logger.Error(".NET plugin Failed to get playlist from interface");
             return null;
         }
 
-        logger.Debug("VlcPlaylist created successfully");
+        logger.Debug(".NET plugin VlcPlaylist created successfully");
         return new VlcPlaylist(intf, playlist, logger);
     }
 
@@ -87,11 +87,11 @@ public sealed class VlcPlaylist : IDisposable
         int result = VlcBridge.PlaylistStart(_playlist);
         if (result != 0)
         {
-            _logger.Warning($"Playlist start failed with code {result}");
+            _logger.Warning($".NET plugin Playlist start failed with code {result}");
             return false;
         }
 
-        _logger.Debug("Playlist started");
+        _logger.Debug(".NET plugin Playlist started");
         return true;
     }
 
@@ -103,7 +103,7 @@ public sealed class VlcPlaylist : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         VlcBridge.PlaylistStop(_playlist);
-        _logger.Debug("Playlist stopped");
+        _logger.Debug(".NET plugin Playlist stopped");
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public sealed class VlcPlaylist : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         VlcBridge.PlaylistPause(_playlist);
-        _logger.Debug("Playlist paused");
+        _logger.Debug(".NET plugin Playlist paused");
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public sealed class VlcPlaylist : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         VlcBridge.PlaylistResume(_playlist);
-        _logger.Debug("Playlist resumed");
+        _logger.Debug(".NET plugin Playlist resumed");
     }
 
     /// <summary>
@@ -162,11 +162,11 @@ public sealed class VlcPlaylist : IDisposable
         int result = VlcBridge.PlaylistNext(_playlist);
         if (result != 0)
         {
-            _logger.Debug($"Playlist next failed with code {result}");
+            _logger.Debug($".NET plugin Playlist next failed with code {result}");
             return false;
         }
 
-        _logger.Debug("Playlist moved to next item");
+        _logger.Debug(".NET plugin Playlist moved to next item");
         return true;
     }
 
@@ -181,11 +181,11 @@ public sealed class VlcPlaylist : IDisposable
         int result = VlcBridge.PlaylistPrev(_playlist);
         if (result != 0)
         {
-            _logger.Debug($"Playlist prev failed with code {result}");
+            _logger.Debug($".NET plugin Playlist prev failed with code {result}");
             return false;
         }
 
-        _logger.Debug("Playlist moved to previous item");
+        _logger.Debug(".NET plugin Playlist moved to previous item");
         return true;
     }
 
@@ -201,11 +201,11 @@ public sealed class VlcPlaylist : IDisposable
         int result = VlcBridge.PlaylistGoTo(_playlist, index);
         if (result != 0)
         {
-            _logger.Debug($"Playlist goto {index} failed with code {result}");
+            _logger.Debug($".NET plugin Playlist goto {index} failed with code {result}");
             return false;
         }
 
-        _logger.Debug($"Playlist moved to index {index}");
+        _logger.Debug($".NET plugin Playlist moved to index {index}");
         return true;
     }
 
@@ -233,6 +233,6 @@ public sealed class VlcPlaylist : IDisposable
             return;
 
         _disposed = true;
-        _logger.Debug("VlcPlaylist disposed");
+        _logger.Debug(".NET plugin VlcPlaylist disposed");
     }
 }
