@@ -2,10 +2,8 @@
 // Source: vlc/include/vlc_messages.h, vlc/include/vlc_variables.h, vlc/include/vlc_player.h
 // VLC Version: 4.0.6
 //
-// Note: These bindings are maintained manually rather than auto-generated because:
-// 1. VLC headers use complex macro systems that break ClangSharp parsing
-// 2. Function calls require a C bridge layer due to variadic functions
-// 3. Only types, enums, and constants are needed in C# (not direct P/Invoke to libvlccore)
+// Note: These bindings are maintained manually because function calls require
+// a C bridge layer due to variadic functions in VLC.
 //
 // To update: Compare with VLC header files and update types as needed.
 // Reference: vlc/include/vlc_*.h

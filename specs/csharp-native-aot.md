@@ -17,8 +17,11 @@ src/VlcPlugin/
 ├── PluginExports.cs           # [UnmanagedCallersOnly] entry points
 ├── PluginState.cs             # Plugin state management
 ├── VlcInterop.cs              # Helpers for VLC type handling
-└── Generated/                 # ClangSharp-generated bindings
-    └── libvlccore.cs          # P/Invoke declarations
+├── Native/
+│   └── VlcBridge.cs           # P/Invoke to C bridge layer
+└── Generated/
+    ├── VlcTypes.cs            # VLC type definitions
+    └── VlcConstants.cs        # VLC constant values
 ```
 
 ## Project Configuration

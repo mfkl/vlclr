@@ -4,7 +4,7 @@
  */
 
 /* VLC requires MODULE_NAME and VLC_DYNAMIC_PLUGIN before headers */
-#define MODULE_NAME hello_dotnet
+#define MODULE_NAME dotnet_bridge
 #define VLC_DYNAMIC_PLUGIN
 
 /* LGPL 2.1+ license for VLC compatibility */

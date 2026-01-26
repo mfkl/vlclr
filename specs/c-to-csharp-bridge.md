@@ -104,13 +104,13 @@ public struct PluginData
 
 static HMODULE g_csharp_dll = NULL;
 
-int csharp_bridge_init(void)
+int dotnet_bridge_init(void)
 {
     // Look for C# DLL in same directory as glue DLL
     HMODULE glue_module;
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-        (LPCSTR)csharp_bridge_init,
+        (LPCSTR)dotnet_bridge_init,
         &glue_module
     );
 
@@ -140,10 +140,10 @@ int csharp_bridge_init(void)
 
 static void* g_csharp_dll = NULL;
 
-int csharp_bridge_init(void)
+int dotnet_bridge_init(void)
 {
     Dl_info info;
-    if (dladdr(csharp_bridge_init, &info))
+    if (dladdr(dotnet_bridge_init, &info))
     {
         // Construct path relative to glue library
         char path[PATH_MAX];
@@ -165,7 +165,7 @@ int csharp_bridge_init(void)
 ## Function Resolution
 
 ```c
-int csharp_bridge_resolve(void)
+int dotnet_bridge_resolve(void)
 {
     if (!g_csharp_dll)
         return -1;
@@ -192,16 +192,16 @@ int csharp_bridge_resolve(void)
 ```c
 static int Open(vlc_object_t *obj)
 {
-    if (csharp_bridge_init() != 0)
+    if (dotnet_bridge_init() != 0)
     {
         msg_Err(obj, "Failed to load C# plugin DLL");
         return VLC_EGENERIC;
     }
 
-    if (csharp_bridge_resolve() != 0)
+    if (dotnet_bridge_resolve() != 0)
     {
         msg_Err(obj, "Failed to resolve C# plugin exports");
-        csharp_bridge_cleanup();
+        dotnet_bridge_cleanup();
         return VLC_EGENERIC;
     }
 
@@ -209,7 +209,7 @@ static int Open(vlc_object_t *obj)
     if (result != 0)
     {
         msg_Err(obj, "C# plugin Open failed with code %d", result);
-        csharp_bridge_cleanup();
+        dotnet_bridge_cleanup();
         return VLC_EGENERIC;
     }
 
@@ -255,7 +255,7 @@ public static int Open(nint vlcObject)
 ## Thread Safety
 
 ### Initialization
-- Bridge initialization (`csharp_bridge_init`) must be thread-safe
+- Bridge initialization (`dotnet_bridge_init`) must be thread-safe
 - Use atomic operations or locks if multiple callers possible
 
 ### Callbacks
@@ -289,18 +289,18 @@ public static int Open(nint vlcObject)
 ### Integration Test Harness (C)
 ```c
 #include <stdio.h>
-#include "csharp_bridge.h"
+#include "dotnet_bridge.h"
 
 int main()
 {
     printf("Initializing bridge...\n");
-    if (csharp_bridge_init() != 0)
+    if (dotnet_bridge_init() != 0)
     {
         printf("FAIL: Bridge init failed\n");
         return 1;
     }
 
-    if (csharp_bridge_resolve() != 0)
+    if (dotnet_bridge_resolve() != 0)
     {
         printf("FAIL: Function resolution failed\n");
         return 1;
@@ -313,7 +313,7 @@ int main()
     printf("Calling Close...\n");
     csharp_plugin_close(NULL);
 
-    csharp_bridge_cleanup();
+    dotnet_bridge_cleanup();
     printf("SUCCESS\n");
     return 0;
 }
