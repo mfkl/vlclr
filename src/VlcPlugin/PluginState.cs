@@ -9,8 +9,8 @@ namespace VlcPlugin;
 /// </summary>
 public sealed class PluginState : IDisposable
 {
-    private const string VarPluginVersion = "csharp-plugin-version";
-    private const string VarPluginCounter = "csharp-plugin-counter";
+    private const string VarPluginVersion = "dotnet-plugin-version";
+    private const string VarPluginCounter = "dotnet-plugin-counter";
 
     private readonly nint _vlcObject;
     private readonly VlcLogger _logger;
