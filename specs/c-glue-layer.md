@@ -52,8 +52,8 @@ clang -shared -o libvlc_csharp_glue.dll \
 ```
 src/glue/
 ├── plugin_entry.c      # VLC module descriptor and entry points
-├── csharp_bridge.h     # Function pointer declarations for C# exports
-└── csharp_bridge.c     # Dynamic loading of C# DLL, function resolution
+├── dotnet_bridge.h     # Function pointer declarations for C# exports
+└── dotnet_bridge.c     # Dynamic loading of C# DLL, function resolution
 ```
 
 ## Plugin Entry Implementation
@@ -64,12 +64,12 @@ src/glue/
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include "csharp_bridge.h"
+#include "dotnet_bridge.h"
 
 static int Open(vlc_object_t *obj)
 {
     // Initialize bridge to C# DLL
-    if (csharp_bridge_init() != 0)
+    if (dotnet_bridge_init() != 0)
         return VLC_EGENERIC;
 
     // Forward to C# implementation
@@ -82,7 +82,7 @@ static void Close(vlc_object_t *obj)
     csharp_plugin_close((void*)obj);
 
     // Cleanup bridge
-    csharp_bridge_cleanup();
+    dotnet_bridge_cleanup();
 }
 
 vlc_module_begin()
@@ -96,17 +96,17 @@ vlc_module_end()
 
 ## C# Bridge Implementation
 
-### csharp_bridge.h
+### dotnet_bridge.h
 
 ```c
-#ifndef CSHARP_BRIDGE_H
-#define CSHARP_BRIDGE_H
+#ifndef DOTNET_BRIDGE_H
+#define DOTNET_BRIDGE_H
 
 // Initialize the bridge (load C# DLL, resolve functions)
-int csharp_bridge_init(void);
+int dotnet_bridge_init(void);
 
 // Cleanup (unload C# DLL)
-void csharp_bridge_cleanup(void);
+void dotnet_bridge_cleanup(void);
 
 // Function pointers to C# exports
 typedef int (*csharp_open_fn)(void* vlc_object);
@@ -118,10 +118,10 @@ extern csharp_close_fn csharp_plugin_close;
 #endif
 ```
 
-### csharp_bridge.c
+### dotnet_bridge.c
 
 ```c
-#include "csharp_bridge.h"
+#include "dotnet_bridge.h"
 #include <windows.h>  // Or dlfcn.h on Unix
 
 static HMODULE csharp_dll = NULL;
@@ -129,7 +129,7 @@ static HMODULE csharp_dll = NULL;
 csharp_open_fn csharp_plugin_open = NULL;
 csharp_close_fn csharp_plugin_close = NULL;
 
-int csharp_bridge_init(void)
+int dotnet_bridge_init(void)
 {
     // Load C# Native AOT DLL (same directory as glue)
     csharp_dll = LoadLibraryA("VlcPlugin.dll");
@@ -150,7 +150,7 @@ int csharp_bridge_init(void)
     return 0;
 }
 
-void csharp_bridge_cleanup(void)
+void dotnet_bridge_cleanup(void)
 {
     if (csharp_dll)
     {

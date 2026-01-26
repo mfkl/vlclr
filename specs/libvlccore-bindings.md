@@ -8,25 +8,21 @@ This spec covers the C# bindings for `libvlccore`, enabling the C# plugin to cal
 
 ### Why Not Direct P/Invoke to libvlccore?
 
-Direct ClangSharp auto-generation from VLC headers does not work for this project due to:
+Direct P/Invoke to libvlccore is not possible due to:
 
-1. **Complex Macro Systems**: VLC headers heavily use C preprocessor macros for API definitions, inline functions, and type abstractions. ClangSharp cannot parse these correctly.
+1. **Variadic Functions**: Core VLC functions like `msg_Info`, `msg_Warn`, `msg_Err` use variadic arguments (`...`). C# P/Invoke cannot call variadic C functions directly - there is no standard way to marshal variable argument lists.
 
-2. **Variadic Functions**: Core VLC functions like `msg_Info`, `msg_Warn`, `msg_Err` use variadic arguments (`...`). C# P/Invoke cannot call variadic C functions directly - there is no standard way to marshal variable argument lists.
+2. **Internal Type Complexity**: VLC's internal types (`vlc_object_t`, opaque structures) use complex inheritance and memory layouts that require C-level understanding.
 
-3. **Internal Type Complexity**: VLC's internal types (`vlc_object_t`, opaque structures) use complex inheritance and memory layouts that require C-level understanding.
-
-4. **Header Dependencies**: VLC headers have deep include chains with platform-specific conditionals that break standalone parsing.
-
-### Solution: C Bridge Layer (libhello_csharp_plugin)
+### Solution: C Bridge Layer (libdotnet_bridge_plugin)
 
 Instead of direct P/Invoke to libvlccore, this project uses a **C bridge layer**:
 
 ```
-┌─────────────────┐     P/Invoke      ┌──────────────────────┐     Direct C calls     ┌─────────────┐
-│   C# Plugin     │ ───────────────▶ │  C Bridge Layer       │ ───────────────────▶  │  libvlccore │
-│  (VlcPlugin.dll)│                   │(libhello_csharp_plugin)│                        │             │
-└─────────────────┘                   └──────────────────────┘                        └─────────────┘
+┌─────────────────┐     P/Invoke      ┌────────────────────────┐     Direct C calls     ┌─────────────┐
+│   C# Plugin     │ ───────────────▶ │    C Bridge Layer       │ ───────────────────▶  │  libvlccore │
+│  (VlcPlugin.dll)│                   │(libdotnet_bridge_plugin)│                        │             │
+└─────────────────┘                   └────────────────────────┘                        └─────────────┘
 ```
 
 The C bridge:
@@ -39,23 +35,23 @@ The C bridge:
 
 | File | Purpose |
 |------|---------|
-| `src/glue/csharp_bridge.c` | Bridge function implementations |
-| `src/glue/csharp_bridge.h` | Bridge function declarations |
+| `src/glue/dotnet_bridge.c` | Bridge function implementations |
+| `src/glue/dotnet_bridge.h` | Bridge function declarations |
 | `src/VlcPlugin/Native/VlcBridge.cs` | C# P/Invoke declarations to the bridge |
 
 ### Bridge Function Naming Convention
 
-Bridge functions use the `csharp_bridge_` prefix:
+Bridge functions use the `dotnet_bridge_` prefix:
 
 | C Bridge Function | Purpose |
 |------------------|---------|
-| `csharp_bridge_log` | Log to VLC (wraps variadic vlc_object_Log) |
-| `csharp_bridge_var_create` | Create VLC variable |
-| `csharp_bridge_var_set_integer` | Set integer variable |
-| `csharp_bridge_var_get_string` | Get string variable |
-| `csharp_bridge_get_player` | Get player from interface |
-| `csharp_bridge_player_*` | Player control (state, seek, pause, volume, mute) |
-| `csharp_bridge_playlist_*` | Playlist control functions |
+| `dotnet_bridge_log` | Log to VLC (wraps variadic vlc_object_Log) |
+| `dotnet_bridge_var_create` | Create VLC variable |
+| `dotnet_bridge_var_set_integer` | Set integer variable |
+| `dotnet_bridge_var_get_string` | Get string variable |
+| `dotnet_bridge_get_player` | Get player from interface |
+| `dotnet_bridge_player_*` | Player control (state, seek, pause, volume, mute) |
+| `dotnet_bridge_playlist_*` | Playlist control functions |
 
 ## Generated/ Directory (Manually Maintained)
 
@@ -69,12 +65,11 @@ src/VlcPlugin/Generated/
 
 ### Why Manual Maintenance?
 
-These files are maintained manually rather than auto-generated because:
+These files are maintained manually because:
 
-1. ClangSharp cannot parse VLC headers (see above)
-2. Only a subset of VLC types are needed for the C# plugin
-3. Manual maintenance allows for proper C# documentation and naming conventions
-4. Types can be kept in sync with the C bridge layer's needs
+1. Only a subset of VLC types are needed for the C# plugin
+2. Manual maintenance allows for proper C# documentation and naming conventions
+3. Types can be kept in sync with the C bridge layer's needs
 
 ### Updating Generated Files
 
@@ -100,72 +95,6 @@ When VLC headers change:
 - `VlcPlaylistOrder` class with playlist order constants
 - `VlcPlaylistRepeat` class with repeat mode constants
 
-## ClangSharp Configuration (Reference/Future)
-
-A ClangSharp configuration file exists at `src/VlcPlugin/clangsharp.rsp` for documentation and potential future use. **This file does not currently produce usable output** due to VLC header complexity.
-
-### Configuration File Location
-
-`src/VlcPlugin/clangsharp.rsp`
-
-### Configuration Contents
-
-```
-# ClangSharp PInvoke Generator Configuration
-# Purpose: Generate C# bindings for VLC types, enums, and constants
-# Note: Function calls go through the C bridge layer due to variadic functions
-
-# Input headers - use absolute paths from repo root
---file
-vlc\include\vlc_messages.h
---file
-vlc\include\vlc_variables.h
---file
-vlc\include\vlc_player.h
-
-# Include directory
---include-directory
-vlc\include
-
-# Output settings
---output
-src\VlcPlugin\Generated
-
---namespace
-VlcPlugin.Generated
-
---libraryPath
-libvlccore
-
---methodClassName
-VlcCore
-
-# Type mappings for VLC types
---remap
-vlc_object_t*=nint
---remap
-vlc_tick_t=long
-
-# Configuration options
---config
-generate-file-scoped-namespaces
---config
-generate-helper-types
---config
-generate-macro-bindings
-```
-
-### Why Keep This File?
-
-1. Documents what we would ideally generate
-2. Reference for future ClangSharp improvements
-3. Type mapping decisions are preserved
-4. May work with future VLC versions with simpler headers
-
-### Potential Future Use
-
-If VLC headers become more ClangSharp-friendly (e.g., cleaner macro usage), this configuration could be used to auto-generate type definitions. Function bindings would still need the C bridge layer due to variadic functions.
-
 ## P/Invoke Declarations (VlcBridge.cs)
 
 The actual P/Invoke declarations are in `src/VlcPlugin/Native/VlcBridge.cs`:
@@ -173,13 +102,13 @@ The actual P/Invoke declarations are in `src/VlcPlugin/Native/VlcBridge.cs`:
 ```csharp
 internal static partial class VlcBridge
 {
-    private const string LibraryName = "libhello_csharp_plugin";
+    private const string LibraryName = "libdotnet_bridge_plugin";
 
-    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_log",
+    [LibraryImport(LibraryName, EntryPoint = "dotnet_bridge_log",
         StringMarshalling = StringMarshalling.Utf8)]
     internal static partial void Log(nint vlcObject, int type, string message);
 
-    [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_var_set_integer",
+    [LibraryImport(LibraryName, EntryPoint = "dotnet_bridge_var_set_integer",
         StringMarshalling = StringMarshalling.Utf8)]
     internal static partial int VarSetInteger(nint vlcObject, string name, long value);
 
@@ -189,7 +118,7 @@ internal static partial class VlcBridge
 
 Key points:
 - Uses `LibraryImport` (source-generated P/Invoke) for AOT compatibility
-- All calls go to `libhello_csharp_plugin`, NOT `libvlccore`
+- All calls go to `libdotnet_bridge_plugin`, NOT `libvlccore`
 - Uses `StringMarshalling.Utf8` for string parameters
 - VLC object pointers are passed as `nint`
 
@@ -212,27 +141,27 @@ The bridge provides comprehensive player control:
 
 ```c
 // State and position
-csharp_bridge_player_get_state(player)     // Returns VlcPlayerState enum value
-csharp_bridge_player_get_time(player)      // Returns current time in microseconds
-csharp_bridge_player_get_length(player)    // Returns total length in microseconds
-csharp_bridge_player_get_position(player)  // Returns position as ratio [0.0, 1.0]
+dotnet_bridge_player_get_state(player)     // Returns VlcPlayerState enum value
+dotnet_bridge_player_get_time(player)      // Returns current time in microseconds
+dotnet_bridge_player_get_length(player)    // Returns total length in microseconds
+dotnet_bridge_player_get_position(player)  // Returns position as ratio [0.0, 1.0]
 
 // Seeking
-csharp_bridge_player_seek_by_time(player, time, speed, whence)  // Seek by microseconds
-csharp_bridge_player_seek_by_pos(player, pos, speed, whence)    // Seek by ratio
-csharp_bridge_player_can_seek(player)      // Returns 1 if seekable
+dotnet_bridge_player_seek_by_time(player, time, speed, whence)  // Seek by microseconds
+dotnet_bridge_player_seek_by_pos(player, pos, speed, whence)    // Seek by ratio
+dotnet_bridge_player_can_seek(player)      // Returns 1 if seekable
 
 // Playback control
-csharp_bridge_player_pause(player)         // Pause playback
-csharp_bridge_player_resume(player)        // Resume playback
-csharp_bridge_player_can_pause(player)     // Returns 1 if pausable
+dotnet_bridge_player_pause(player)         // Pause playback
+dotnet_bridge_player_resume(player)        // Resume playback
+dotnet_bridge_player_can_pause(player)     // Returns 1 if pausable
 
 // Audio output control
-csharp_bridge_player_get_volume(player)    // Returns volume [0.0, 2.0], -1.0 if no audio
-csharp_bridge_player_set_volume(player, v) // Set volume, returns 0 on success
-csharp_bridge_player_is_muted(player)      // Returns 0/1 for mute state, -1 if no audio
-csharp_bridge_player_set_mute(player, m)   // Set mute (0/1), returns 0 on success
-csharp_bridge_player_toggle_mute(player)   // Toggle mute, returns 0 on success
+dotnet_bridge_player_get_volume(player)    // Returns volume [0.0, 2.0], -1.0 if no audio
+dotnet_bridge_player_set_volume(player, v) // Set volume, returns 0 on success
+dotnet_bridge_player_is_muted(player)      // Returns 0/1 for mute state, -1 if no audio
+dotnet_bridge_player_set_mute(player, m)   // Set mute (0/1), returns 0 on success
+dotnet_bridge_player_toggle_mute(player)   // Toggle mute, returns 0 on success
 ```
 
 The C# `VlcPlayer` class exposes these through:
@@ -275,22 +204,22 @@ The implementation is fully AOT-compatible:
 
 To expose additional VLC functionality:
 
-1. **Add C bridge function** in `src/glue/csharp_bridge.c`:
+1. **Add C bridge function** in `src/glue/dotnet_bridge.c`:
    ```c
-   BRIDGE_API int csharp_bridge_new_function(void* obj, const char* param)
+   BRIDGE_API int dotnet_bridge_new_function(void* obj, const char* param)
    {
        return vlc_actual_function((vlc_object_t*)obj, param);
    }
    ```
 
-2. **Declare in header** `src/glue/csharp_bridge.h`:
+2. **Declare in header** `src/glue/dotnet_bridge.h`:
    ```c
-   BRIDGE_API int csharp_bridge_new_function(void* obj, const char* param);
+   BRIDGE_API int dotnet_bridge_new_function(void* obj, const char* param);
    ```
 
 3. **Add P/Invoke declaration** in `src/VlcPlugin/Native/VlcBridge.cs`:
    ```csharp
-   [LibraryImport(LibraryName, EntryPoint = "csharp_bridge_new_function",
+   [LibraryImport(LibraryName, EntryPoint = "dotnet_bridge_new_function",
        StringMarshalling = StringMarshalling.Utf8)]
    internal static partial int NewFunction(nint obj, string param);
    ```

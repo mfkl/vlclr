@@ -36,7 +36,7 @@ VLC 4.x Plugin System
         │
         ▼
 ┌──────────────────────────┐
-│  libhello_csharp_plugin  │  C glue (VLC-facing)
+│  libdotnet_bridge_plugin  │  C glue (VLC-facing)
 │  - vlc_module_begin/end  │
 │  - Open() → bridges to   │──────┐
 │  - Close() → C# exports  │      │
@@ -51,7 +51,7 @@ VLC 4.x Plugin System
 └──────────────────────────┘      │
                                   │ P/Invoke callback
                                   ▼
-                      csharp_bridge_log() in C glue
+                      dotnet_bridge_log() in C glue
                                   │
                                   ▼
                           vlc_object_Log() in libvlccore.dll
@@ -67,7 +67,7 @@ vlc-4.0.0-dev/
 ├── libvlccore.dll
 └── plugins/
     └── control/
-        ├── libhello_csharp_plugin.dll   ← C glue (copy here)
+        ├── libdotnet_bridge_plugin.dll   ← C glue (copy here)
         └── VlcPlugin.dll                 ← C# Native AOT (copy here)
 ```
 
@@ -94,7 +94,7 @@ xUnit test project covering UTF-8 marshalling and API contract verification.
 VlcObject wrapper class with object hierarchy navigation (parent, typename, root traversal).
 
 ### Phase 7: Binding Documentation ✓
-Created Generated/ directory with VlcTypes.cs, VlcConstants.cs, and documentation. Updated libvlccore-bindings.md spec to reflect C bridge architecture (ClangSharp doesn't work with VLC headers).
+Created Generated/ directory with VlcTypes.cs, VlcConstants.cs, and documentation. Updated libvlccore-bindings.md spec to reflect C bridge architecture.
 
 ### Phase 8: Player Seeking and Playback Control ✓
 Extended VlcPlayer with seeking functionality: Time/Length/Position properties, SeekByTime/SeekByPosition methods, Pause/Resume, CanSeek/CanPause properties. Added SeekSpeed and SeekWhence enums. 25 new unit tests (86 total).
@@ -129,7 +129,7 @@ These are out of scope for the current goal:
 ## Decisions Made
 
 1. **Plugin type**: Interface plugin (`set_capability("interface", 0)`)
-2. **Naming**: `libhello_csharp_plugin.dll` for C glue, `VlcPlugin.dll` for C#
+2. **Naming**: `libdotnet_bridge_plugin.dll` for C glue, `VlcPlugin.dll` for C#
 3. **Loading strategy**: C glue dynamically loads C# DLL
 4. **License**: LGPL 2.1+
 5. **P/Invoke strategy**: Use C bridge function for variadic VLC functions
@@ -149,8 +149,6 @@ These are out of scope for the current goal:
 10. **Playlist locking**: The playlist and player share the same lock (`vlc_playlist_Lock`/`vlc_playlist_Unlock`). All playlist operations must be performed within the lock.
 11. **vlc_object_find_name deprecated**: The `vlc_object_find_name` function is not exported in VLC 4.x libvlccore. Object lookup should use alternative methods.
 
-### Learnings
-12. **ClangSharp and VLC headers**: VLC headers use complex C macros that break ClangSharp parsing. The C bridge approach is the correct architecture - types/constants are manually maintained in Generated/, function calls go through the C bridge.
 13. **Type definition separation**: VlcLogType, VlcPlayerState, VlcVarType, and other enums/structs should live in `VlcPlugin.Generated` namespace only. Don't duplicate them in `VlcPlugin.Native` (VlcBridge.cs). All wrapper classes must import `using VlcPlugin.Generated;`.
 14. **Audio output functions don't require lock**: The `vlc_player_aout_*` functions (volume, mute) do NOT require the player lock, unlike other player functions. This is documented in vlc_player.h.
 

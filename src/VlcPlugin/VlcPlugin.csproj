@@ -22,7 +22,7 @@
   <ItemGroup>
     <!-- Direct P/Invoke for native libraries that will be linked at build time -->
     <DirectPInvoke Include="libvlccore" />
-    <!-- Note: libhello_csharp_plugin is NOT included here because it creates a
+    <!-- Note: libdotnet_bridge_plugin is NOT included here because it creates a
          circular dependency (C glue loads VlcPlugin.dll, VlcPlugin calls back to C glue).
          The P/Invoke will resolve at runtime when both DLLs are in the same directory. -->
   </ItemGroup>

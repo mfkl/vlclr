@@ -32,7 +32,7 @@ extern void vlc_object_Log(vlc_object_t *obj, int type, const char *module,
                            const char *format, ...);
 
 /* Module name for logging */
-static const char vlc_module_name[] = "hello_dotnet";
+static const char vlc_module_name[] = "dotnet_bridge";
 
 static BRIDGE_HANDLE dotnet_dll = NULL;
 

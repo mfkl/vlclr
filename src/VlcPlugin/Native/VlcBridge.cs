@@ -4,11 +4,11 @@ namespace VlcPlugin.Native;
 
 /// <summary>
 /// P/Invoke declarations for the C glue layer bridge functions.
-/// These are exported from libhello_dotnet_plugin.dll (the C glue layer).
+/// These are exported from libdotnet_bridge_plugin.dll (the C glue layer).
 /// </summary>
 internal static partial class VlcBridge
 {
-    private const string LibraryName = "libhello_dotnet_plugin";
+    private const string LibraryName = "libdotnet_bridge_plugin";
 
     /// <summary>
     /// Log a message through VLC's logging system.

@@ -2,9 +2,8 @@
 // Source: vlc/include/vlc_variables.h
 // VLC Version: 4.0.6
 //
-// Note: These constants are maintained manually rather than auto-generated because:
-// 1. VLC headers use complex macro systems that break ClangSharp parsing
-// 2. Only a subset of constants are needed for the C# plugin
+// Note: These constants are maintained manually. Only a subset of constants
+// are needed for the C# plugin.
 //
 // To update: Compare with vlc/include/vlc_variables.h and update as needed.
 

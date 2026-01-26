@@ -4,12 +4,11 @@ This directory contains C# type definitions for VLC structures, enums, and const
 
 ## Why Manual Instead of Auto-Generated?
 
-The spec originally called for ClangSharp-generated bindings. However, this approach has practical limitations:
+These bindings are maintained manually due to practical limitations:
 
-1. **Complex VLC Macros**: VLC headers use sophisticated C macros (`VLC_API`, `VLC_FORMAT`, attribute macros) that break ClangSharp parsing
-2. **Variadic Functions**: VLC's logging and other core functions are variadic (`printf`-style) which cannot be called via P/Invoke directly
-3. **C Bridge Requirement**: Due to (2), function calls go through a C bridge layer (`libhello_csharp_plugin`), not direct P/Invoke to `libvlccore`
-4. **Minimal Surface Area**: Only types, enums, and constants are needed - not function bindings
+1. **Variadic Functions**: VLC's logging and other core functions are variadic (`printf`-style) which cannot be called via P/Invoke directly
+2. **C Bridge Requirement**: Due to (1), function calls go through a C bridge layer (`libdotnet_bridge_plugin`), not direct P/Invoke to `libvlccore`
+3. **Minimal Surface Area**: Only types, enums, and constants are needed - not function bindings
 
 ## Files
 
@@ -27,16 +26,12 @@ When VLC headers change:
 3. Update the "VLC Version" comment at the top of each file
 4. Run tests: `dotnet test src/VlcPlugin.Tests`
 
-## ClangSharp Configuration
-
-The `clangsharp.rsp` file in the parent directory documents the intended configuration. While it doesn't work due to the issues above, it serves as documentation for future attempts if ClangSharp improves VLC header support.
-
 ## Architecture
 
 ```
 VLC Process
     |
-libhello_csharp_plugin.dll (C glue) <-- Wraps variadic VLC functions
+libdotnet_bridge_plugin.dll (C glue) <-- Wraps variadic VLC functions
     |
 VlcPlugin.dll (C# Native AOT)
     |
