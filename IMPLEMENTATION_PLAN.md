@@ -39,6 +39,7 @@ The initial implementation failed because:
 - **DX11 opaque format**: Windows hardware-accelerated decoding produces `chroma=0x31315844 (DX11)`
 - **GPU textures have 0 planes**: Cannot directly access pixel data
 - **Solution needed**: Either request software decoding (`--avcodec-hw=none`) or handle D3D11 textures
+- **RESOLVED**: Using --no-hw-dec with file:/// URL produces I420 format with 3 accessible planes
 
 ### Finding from Phase 11-13 Testing (2026-01-26)
 - **Software decoding required for CPU-accessible frames**: Use `--no-hw-dec`
@@ -166,49 +167,15 @@ Remove all complexity (ImageSharp, fonts, C# frame processing) and just write a 
 
 ### Tasks
 - [x] Test with software decoding: `vlc --no-hw-dec --video-filter=dotnet_overlay video.mp4`
-- [x] Verify we receive a format with accessible planes (I420 received, 3 planes)
-- [ ] In C `Filter()` callback, write a red rectangle directly:
-  ```c
-  static picture_t *Filter(filter_t *filter, picture_t *pic) {
-      // Log every 100 frames
-      static int frame_count = 0;
-      if (++frame_count % 100 == 0)
-          msg_Info(filter, ".NET Overlay: Frame %d", frame_count);
-
-      picture_t *out = filter_NewPicture(filter);
-      if (!out) {
-          picture_Release(pic);
-          return NULL;
-      }
-
-      picture_Copy(out, pic);
-
-      // Draw red rectangle at top-left (for RGB32/BGRA formats)
-      if (out->i_planes > 0) {
-          uint8_t *pixels = out->p[0].p_pixels;
-          int pitch = out->p[0].i_pitch;
-          // Draw 100x50 red box
-          for (int y = 10; y < 60 && y < out->p[0].i_visible_lines; y++) {
-              uint32_t *row = (uint32_t*)(pixels + y * pitch);
-              for (int x = 10; x < 110 && x < out->p[0].i_visible_pitch/4; x++) {
-                  row[x] = 0xFFFF0000; // ARGB red
-              }
-          }
-      }
-
-      picture_CopyProperties(out, pic);
-      picture_Release(pic);
-      return out;
-  }
-  ```
-- [ ] Test with VLC - should see red rectangle on video
-- [ ] If works: proceed to Phase 12 (add .NET calls)
-- [ ] If doesn't work: debug filter_NewPicture, picture format, etc.
+- [x] Verify we receive a format with accessible planes (RGB32, I420, NV12, etc.)
+- [x] In C `Filter()` callback, write a red rectangle directly (white for YUV)
+- [x] Test with VLC - should see red/white rectangle on video
+- [x] If works: proceed to Phase 12 (add .NET calls)
 
 ### Acceptance Criteria
-- [x] Red rectangle visible on playing video (grayscale Y-plane modification working)
-- [x] Frame count logged every 100 frames (confirmed: 100, 200, 300, 400)
-- Note: Current implementation overlays on Y plane only - shows as grayscale
+- [x] Red/white rectangle visible on playing video (YUV draws white on Y plane)
+- [x] Frame count logged every 100 frames
+- [x] No crashes or visual corruption
 
 ---
 
@@ -378,6 +345,7 @@ vlc-binaries/vlc-4.0.0-dev/vlc.exe --video-filter=dotnet_overlay "C:/Users/Marti
 22. **VLC 4.x hardware decoding option**: Use `--no-hw-dec` (not `--avcodec-hw=none` which is obsolete)
 23. **Git Bash + VLC file arguments**: VLC may not receive file paths correctly when launched from Git Bash. Use `cmd.exe /c` or batch scripts.
 24. **I420 format for software decoding**: VLC uses I420 (planar YUV 4:2:0) when hardware decoding is disabled
+25. **VLC Qt interface requires file:/// URL**: VLC 4.x Qt interface doesn't auto-play files from command line path. Use `file:///path/to/video.mp4` URL format with `--play-and-exit` for automatic playback.
 
 ---
 
