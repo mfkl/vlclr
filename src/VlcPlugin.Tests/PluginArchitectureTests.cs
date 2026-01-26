@@ -39,7 +39,7 @@ public class PluginArchitectureTests
 
         var attribute = method.GetCustomAttribute<UnmanagedCallersOnlyAttribute>();
         Assert.NotNull(attribute);
-        Assert.Equal("CSharpPluginOpen", attribute.EntryPoint);
+        Assert.Equal("DotNetPluginOpen", attribute.EntryPoint);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class PluginArchitectureTests
 
         var attribute = method.GetCustomAttribute<UnmanagedCallersOnlyAttribute>();
         Assert.NotNull(attribute);
-        Assert.Equal("CSharpPluginClose", attribute.EntryPoint);
+        Assert.Equal("DotNetPluginClose", attribute.EntryPoint);
     }
 
     [Fact]

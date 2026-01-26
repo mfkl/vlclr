@@ -1,9 +1,9 @@
 /**
- * C# Bridge Implementation
- * Dynamically loads VlcPlugin.dll (C# Native AOT) and resolves exports.
+ * .NET Bridge Implementation
+ * Dynamically loads VlcPlugin.dll (.NET Native AOT) and resolves exports.
  */
 
-#include "csharp_bridge.h"
+#include "dotnet_bridge.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -32,13 +32,13 @@ extern void vlc_object_Log(vlc_object_t *obj, int type, const char *module,
                            const char *format, ...);
 
 /* Module name for logging */
-static const char vlc_module_name[] = "hello_csharp";
+static const char vlc_module_name[] = "hello_dotnet";
 
-static BRIDGE_HANDLE csharp_dll = NULL;
+static BRIDGE_HANDLE dotnet_dll = NULL;
 
 /* Exported function pointers */
-csharp_open_fn csharp_plugin_open = NULL;
-csharp_close_fn csharp_plugin_close = NULL;
+dotnet_open_fn dotnet_plugin_open = NULL;
+dotnet_close_fn dotnet_plugin_close = NULL;
 
 /* VLC log type constants matching vlc_messages.h */
 #define VLC_MSG_INFO 0
@@ -46,7 +46,7 @@ csharp_close_fn csharp_plugin_close = NULL;
 #define VLC_MSG_WARN 2
 #define VLC_MSG_DBG  3
 
-BRIDGE_API void csharp_bridge_log(void* vlc_object, int type, const char* message)
+BRIDGE_API void dotnet_bridge_log(void* vlc_object, int type, const char* message)
 {
     if (vlc_object == NULL || message == NULL)
     {
@@ -67,7 +67,7 @@ static int get_plugin_directory(char *buf, size_t bufsize)
     /* Get handle to this DLL by using a function address inside it */
     if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
                             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                            (LPCSTR)&csharp_bridge_init, &hModule))
+                            (LPCSTR)&dotnet_bridge_init, &hModule))
     {
         return -1;
     }
@@ -89,9 +89,9 @@ static int get_plugin_directory(char *buf, size_t bufsize)
 }
 #endif
 
-int csharp_bridge_init(void)
+int dotnet_bridge_init(void)
 {
-    if (csharp_dll != NULL)
+    if (dotnet_dll != NULL)
     {
         /* Already initialized */
         return 0;
@@ -105,55 +105,55 @@ int csharp_bridge_init(void)
     if (get_plugin_directory(plugin_dir, sizeof(plugin_dir)) == 0)
     {
         snprintf(plugin_path, sizeof(plugin_path), "%s\\VlcPlugin.dll", plugin_dir);
-        fprintf(stderr, "[csharp_bridge] Loading C# DLL from: %s\n", plugin_path);
-        csharp_dll = LoadLibraryA(plugin_path);
+        fprintf(stderr, "[dotnet_bridge] Loading .NET DLL from: %s\n", plugin_path);
+        dotnet_dll = LoadLibraryA(plugin_path);
     }
 
     /* Fallback to just the filename if path-based loading failed */
-    if (!csharp_dll)
+    if (!dotnet_dll)
     {
-        fprintf(stderr, "[csharp_bridge] Path-based loading failed, trying direct load\n");
-        csharp_dll = LoadLibraryA("VlcPlugin.dll");
+        fprintf(stderr, "[dotnet_bridge] Path-based loading failed, trying direct load\n");
+        dotnet_dll = LoadLibraryA("VlcPlugin.dll");
     }
 #else
     /* On non-Windows, try relative path first, then direct */
-    csharp_dll = BRIDGE_LOAD("./VlcPlugin.dll");
-    if (!csharp_dll)
-        csharp_dll = BRIDGE_LOAD("VlcPlugin.dll");
+    dotnet_dll = BRIDGE_LOAD("./VlcPlugin.dll");
+    if (!dotnet_dll)
+        dotnet_dll = BRIDGE_LOAD("VlcPlugin.dll");
 #endif
 
-    if (!csharp_dll)
+    if (!dotnet_dll)
     {
-        fprintf(stderr, "[csharp_bridge] Failed to load VlcPlugin.dll\n");
+        fprintf(stderr, "[dotnet_bridge] Failed to load VlcPlugin.dll\n");
         return -1;
     }
 
     /* Resolve exported functions */
-    csharp_plugin_open = (csharp_open_fn)BRIDGE_SYMBOL(csharp_dll, "CSharpPluginOpen");
-    csharp_plugin_close = (csharp_close_fn)BRIDGE_SYMBOL(csharp_dll, "CSharpPluginClose");
+    dotnet_plugin_open = (dotnet_open_fn)BRIDGE_SYMBOL(dotnet_dll, "DotNetPluginOpen");
+    dotnet_plugin_close = (dotnet_close_fn)BRIDGE_SYMBOL(dotnet_dll, "DotNetPluginClose");
 
-    if (!csharp_plugin_open || !csharp_plugin_close)
+    if (!dotnet_plugin_open || !dotnet_plugin_close)
     {
-        fprintf(stderr, "[csharp_bridge] Failed to resolve C# exports: open=%p close=%p\n",
-                (void*)csharp_plugin_open, (void*)csharp_plugin_close);
-        BRIDGE_UNLOAD(csharp_dll);
-        csharp_dll = NULL;
+        fprintf(stderr, "[dotnet_bridge] Failed to resolve .NET exports: open=%p close=%p\n",
+                (void*)dotnet_plugin_open, (void*)dotnet_plugin_close);
+        BRIDGE_UNLOAD(dotnet_dll);
+        dotnet_dll = NULL;
         return -1;
     }
 
-    fprintf(stderr, "[csharp_bridge] Successfully loaded VlcPlugin.dll\n");
+    fprintf(stderr, "[dotnet_bridge] Successfully loaded VlcPlugin.dll\n");
     return 0;
 }
 
-void csharp_bridge_cleanup(void)
+void dotnet_bridge_cleanup(void)
 {
-    if (csharp_dll)
+    if (dotnet_dll)
     {
-        BRIDGE_UNLOAD(csharp_dll);
-        csharp_dll = NULL;
+        BRIDGE_UNLOAD(dotnet_dll);
+        dotnet_dll = NULL;
     }
-    csharp_plugin_open = NULL;
-    csharp_plugin_close = NULL;
+    dotnet_plugin_open = NULL;
+    dotnet_plugin_close = NULL;
 }
 
 /* VLC value union - matches vlc_value_t from vlc_variables.h */
@@ -177,21 +177,21 @@ extern int var_GetChecked(vlc_object_t *obj, const char *name, int type, vlc_val
 #define VLC_VAR_INTEGER   0x0030
 #define VLC_VAR_STRING    0x0040
 
-BRIDGE_API int csharp_bridge_var_create(void* vlc_object, const char* name, int type)
+BRIDGE_API int dotnet_bridge_var_create(void* vlc_object, const char* name, int type)
 {
     if (vlc_object == NULL || name == NULL)
         return -1;
     return var_Create((vlc_object_t*)vlc_object, name, type);
 }
 
-BRIDGE_API void csharp_bridge_var_destroy(void* vlc_object, const char* name)
+BRIDGE_API void dotnet_bridge_var_destroy(void* vlc_object, const char* name)
 {
     if (vlc_object == NULL || name == NULL)
         return;
     var_Destroy((vlc_object_t*)vlc_object, name);
 }
 
-BRIDGE_API int csharp_bridge_var_set_integer(void* vlc_object, const char* name, long long value)
+BRIDGE_API int dotnet_bridge_var_set_integer(void* vlc_object, const char* name, long long value)
 {
     if (vlc_object == NULL || name == NULL)
         return -1;
@@ -200,7 +200,7 @@ BRIDGE_API int csharp_bridge_var_set_integer(void* vlc_object, const char* name,
     return var_SetChecked((vlc_object_t*)vlc_object, name, VLC_VAR_INTEGER, val);
 }
 
-BRIDGE_API long long csharp_bridge_var_get_integer(void* vlc_object, const char* name)
+BRIDGE_API long long dotnet_bridge_var_get_integer(void* vlc_object, const char* name)
 {
     if (vlc_object == NULL || name == NULL)
         return 0;
@@ -211,7 +211,7 @@ BRIDGE_API long long csharp_bridge_var_get_integer(void* vlc_object, const char*
     return 0;
 }
 
-BRIDGE_API int csharp_bridge_var_set_string(void* vlc_object, const char* name, const char* value)
+BRIDGE_API int dotnet_bridge_var_set_string(void* vlc_object, const char* name, const char* value)
 {
     if (vlc_object == NULL || name == NULL)
         return -1;
@@ -220,7 +220,7 @@ BRIDGE_API int csharp_bridge_var_set_string(void* vlc_object, const char* name, 
     return var_SetChecked((vlc_object_t*)vlc_object, name, VLC_VAR_STRING, val);
 }
 
-BRIDGE_API char* csharp_bridge_var_get_string(void* vlc_object, const char* name)
+BRIDGE_API char* dotnet_bridge_var_get_string(void* vlc_object, const char* name)
 {
     if (vlc_object == NULL || name == NULL)
         return NULL;
@@ -231,7 +231,7 @@ BRIDGE_API char* csharp_bridge_var_get_string(void* vlc_object, const char* name
         return NULL;
 
     /* VLC uses msvcrt allocator, but we use UCRT. They're incompatible.
-     * Copy the string to our heap so C# can free it with our allocator. */
+     * Copy the string to our heap so .NET can free it with our allocator. */
     char *copy = _strdup(val.psz_string);
 
     /* Free VLC's string using msvcrt-compatible free.
@@ -243,7 +243,7 @@ BRIDGE_API char* csharp_bridge_var_get_string(void* vlc_object, const char* name
     return copy;
 }
 
-BRIDGE_API void csharp_bridge_free_string(char* str)
+BRIDGE_API void dotnet_bridge_free_string(char* str)
 {
     if (str != NULL)
         free(str);  /* This is safe now - str was allocated with our _strdup */
@@ -353,9 +353,9 @@ extern void vlc_player_SeekByPos(vlc_player_t *player, double position,
 /* VLC tick invalid constant */
 #define VLC_TICK_INVALID ((vlc_tick_t)INT64_MIN)
 
-/* Context for our listener - holds C# callbacks */
+/* Context for our listener - holds .NET callbacks */
 typedef struct {
-    csharp_player_callbacks_t csharp_cbs;
+    dotnet_player_callbacks_t dotnet_cbs;
     struct vlc_player_cbs vlc_cbs;
 } listener_context_t;
 
@@ -365,14 +365,14 @@ typedef struct {
     listener_context_t *context;
 } listener_handle_t;
 
-/* VLC callback implementations that forward to C# */
+/* VLC callback implementations that forward to .NET */
 static void on_state_changed_cb(vlc_player_t *player, enum vlc_player_state new_state, void *data)
 {
     (void)player;
     listener_context_t *ctx = (listener_context_t*)data;
-    if (ctx && ctx->csharp_cbs.on_state_changed)
+    if (ctx && ctx->dotnet_cbs.on_state_changed)
     {
-        ctx->csharp_cbs.on_state_changed((int)new_state, ctx->csharp_cbs.user_data);
+        ctx->dotnet_cbs.on_state_changed((int)new_state, ctx->dotnet_cbs.user_data);
     }
 }
 
@@ -380,9 +380,9 @@ static void on_position_changed_cb(vlc_player_t *player, vlc_tick_t new_time, do
 {
     (void)player;
     listener_context_t *ctx = (listener_context_t*)data;
-    if (ctx && ctx->csharp_cbs.on_position_changed)
+    if (ctx && ctx->dotnet_cbs.on_position_changed)
     {
-        ctx->csharp_cbs.on_position_changed((long long)new_time, new_pos, ctx->csharp_cbs.user_data);
+        ctx->dotnet_cbs.on_position_changed((long long)new_time, new_pos, ctx->dotnet_cbs.user_data);
     }
 }
 
@@ -390,13 +390,13 @@ static void on_media_changed_cb(vlc_player_t *player, input_item_t *new_media, v
 {
     (void)player;
     listener_context_t *ctx = (listener_context_t*)data;
-    if (ctx && ctx->csharp_cbs.on_media_changed)
+    if (ctx && ctx->dotnet_cbs.on_media_changed)
     {
-        ctx->csharp_cbs.on_media_changed((void*)new_media, ctx->csharp_cbs.user_data);
+        ctx->dotnet_cbs.on_media_changed((void*)new_media, ctx->dotnet_cbs.user_data);
     }
 }
 
-BRIDGE_API void* csharp_bridge_get_player(void* intf)
+BRIDGE_API void* dotnet_bridge_get_player(void* intf)
 {
     if (intf == NULL)
         return NULL;
@@ -408,7 +408,7 @@ BRIDGE_API void* csharp_bridge_get_player(void* intf)
     return (void*)vlc_playlist_GetPlayer(playlist);
 }
 
-BRIDGE_API int csharp_bridge_player_get_state(void* player)
+BRIDGE_API int dotnet_bridge_player_get_state(void* player)
 {
     if (player == NULL)
         return 0; /* VLC_PLAYER_STATE_STOPPED */
@@ -420,18 +420,18 @@ BRIDGE_API int csharp_bridge_player_get_state(void* player)
     return (int)state;
 }
 
-BRIDGE_API void* csharp_bridge_player_add_listener(void* player, csharp_player_callbacks_t* callbacks)
+BRIDGE_API void* dotnet_bridge_player_add_listener(void* player, dotnet_player_callbacks_t* callbacks)
 {
     if (player == NULL || callbacks == NULL)
         return NULL;
 
-    /* Allocate context to hold C# callbacks */
+    /* Allocate context to hold .NET callbacks */
     listener_context_t *ctx = (listener_context_t*)malloc(sizeof(listener_context_t));
     if (ctx == NULL)
         return NULL;
 
-    /* Copy C# callbacks */
-    ctx->csharp_cbs = *callbacks;
+    /* Copy .NET callbacks */
+    ctx->dotnet_cbs = *callbacks;
 
     /* Initialize VLC callbacks - all to NULL first */
     memset(&ctx->vlc_cbs, 0, sizeof(ctx->vlc_cbs));
@@ -469,7 +469,7 @@ BRIDGE_API void* csharp_bridge_player_add_listener(void* player, csharp_player_c
     return (void*)handle;
 }
 
-BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listener_handle)
+BRIDGE_API void dotnet_bridge_player_remove_listener(void* player, void* listener_handle)
 {
     if (player == NULL || listener_handle == NULL)
         return;
@@ -484,7 +484,7 @@ BRIDGE_API void csharp_bridge_player_remove_listener(void* player, void* listene
     free(handle);
 }
 
-BRIDGE_API long long csharp_bridge_player_get_time(void* player)
+BRIDGE_API long long dotnet_bridge_player_get_time(void* player)
 {
     if (player == NULL)
         return VLC_TICK_INVALID;
@@ -496,7 +496,7 @@ BRIDGE_API long long csharp_bridge_player_get_time(void* player)
     return (long long)time;
 }
 
-BRIDGE_API long long csharp_bridge_player_get_length(void* player)
+BRIDGE_API long long dotnet_bridge_player_get_length(void* player)
 {
     if (player == NULL)
         return VLC_TICK_INVALID;
@@ -508,7 +508,7 @@ BRIDGE_API long long csharp_bridge_player_get_length(void* player)
     return (long long)length;
 }
 
-BRIDGE_API double csharp_bridge_player_get_position(void* player)
+BRIDGE_API double dotnet_bridge_player_get_position(void* player)
 {
     if (player == NULL)
         return -1.0;
@@ -520,7 +520,7 @@ BRIDGE_API double csharp_bridge_player_get_position(void* player)
     return pos;
 }
 
-BRIDGE_API void csharp_bridge_player_seek_by_time(void* player, long long time, int speed, int whence)
+BRIDGE_API void dotnet_bridge_player_seek_by_time(void* player, long long time, int speed, int whence)
 {
     if (player == NULL)
         return;
@@ -532,7 +532,7 @@ BRIDGE_API void csharp_bridge_player_seek_by_time(void* player, long long time, 
     vlc_player_Unlock((vlc_player_t*)player);
 }
 
-BRIDGE_API void csharp_bridge_player_seek_by_pos(void* player, double position, int speed, int whence)
+BRIDGE_API void dotnet_bridge_player_seek_by_pos(void* player, double position, int speed, int whence)
 {
     if (player == NULL)
         return;
@@ -544,7 +544,7 @@ BRIDGE_API void csharp_bridge_player_seek_by_pos(void* player, double position, 
     vlc_player_Unlock((vlc_player_t*)player);
 }
 
-BRIDGE_API int csharp_bridge_player_can_seek(void* player)
+BRIDGE_API int dotnet_bridge_player_can_seek(void* player)
 {
     if (player == NULL)
         return 0;
@@ -556,7 +556,7 @@ BRIDGE_API int csharp_bridge_player_can_seek(void* player)
     return (caps & VLC_PLAYER_CAP_SEEK) ? 1 : 0;
 }
 
-BRIDGE_API int csharp_bridge_player_can_pause(void* player)
+BRIDGE_API int dotnet_bridge_player_can_pause(void* player)
 {
     if (player == NULL)
         return 0;
@@ -568,7 +568,7 @@ BRIDGE_API int csharp_bridge_player_can_pause(void* player)
     return (caps & VLC_PLAYER_CAP_PAUSE) ? 1 : 0;
 }
 
-BRIDGE_API void csharp_bridge_player_pause(void* player)
+BRIDGE_API void dotnet_bridge_player_pause(void* player)
 {
     if (player == NULL)
         return;
@@ -578,7 +578,7 @@ BRIDGE_API void csharp_bridge_player_pause(void* player)
     vlc_player_Unlock((vlc_player_t*)player);
 }
 
-BRIDGE_API void csharp_bridge_player_resume(void* player)
+BRIDGE_API void dotnet_bridge_player_resume(void* player)
 {
     if (player == NULL)
         return;
@@ -607,7 +607,7 @@ extern size_t vlc_playlist_Count(vlc_playlist_t *playlist);
 extern int64_t vlc_playlist_GetCurrentIndex(vlc_playlist_t *playlist);  /* Returns ssize_t */
 extern int vlc_playlist_GoTo(vlc_playlist_t *playlist, int64_t index);  /* Takes ssize_t */
 
-BRIDGE_API void* csharp_bridge_get_playlist(void* intf)
+BRIDGE_API void* dotnet_bridge_get_playlist(void* intf)
 {
     if (intf == NULL)
         return NULL;
@@ -615,7 +615,7 @@ BRIDGE_API void* csharp_bridge_get_playlist(void* intf)
     return (void*)vlc_intf_GetMainPlaylist((intf_thread_t*)intf);
 }
 
-BRIDGE_API int csharp_bridge_playlist_start(void* playlist)
+BRIDGE_API int dotnet_bridge_playlist_start(void* playlist)
 {
     if (playlist == NULL)
         return -1;
@@ -627,7 +627,7 @@ BRIDGE_API int csharp_bridge_playlist_start(void* playlist)
     return result;
 }
 
-BRIDGE_API void csharp_bridge_playlist_stop(void* playlist)
+BRIDGE_API void dotnet_bridge_playlist_stop(void* playlist)
 {
     if (playlist == NULL)
         return;
@@ -637,7 +637,7 @@ BRIDGE_API void csharp_bridge_playlist_stop(void* playlist)
     vlc_playlist_Unlock((vlc_playlist_t*)playlist);
 }
 
-BRIDGE_API void csharp_bridge_playlist_pause(void* playlist)
+BRIDGE_API void dotnet_bridge_playlist_pause(void* playlist)
 {
     if (playlist == NULL)
         return;
@@ -647,7 +647,7 @@ BRIDGE_API void csharp_bridge_playlist_pause(void* playlist)
     vlc_playlist_Unlock((vlc_playlist_t*)playlist);
 }
 
-BRIDGE_API void csharp_bridge_playlist_resume(void* playlist)
+BRIDGE_API void dotnet_bridge_playlist_resume(void* playlist)
 {
     if (playlist == NULL)
         return;
@@ -657,7 +657,7 @@ BRIDGE_API void csharp_bridge_playlist_resume(void* playlist)
     vlc_playlist_Unlock((vlc_playlist_t*)playlist);
 }
 
-BRIDGE_API int csharp_bridge_playlist_next(void* playlist)
+BRIDGE_API int dotnet_bridge_playlist_next(void* playlist)
 {
     if (playlist == NULL)
         return -1;
@@ -669,7 +669,7 @@ BRIDGE_API int csharp_bridge_playlist_next(void* playlist)
     return result;
 }
 
-BRIDGE_API int csharp_bridge_playlist_prev(void* playlist)
+BRIDGE_API int dotnet_bridge_playlist_prev(void* playlist)
 {
     if (playlist == NULL)
         return -1;
@@ -681,7 +681,7 @@ BRIDGE_API int csharp_bridge_playlist_prev(void* playlist)
     return result;
 }
 
-BRIDGE_API int csharp_bridge_playlist_has_next(void* playlist)
+BRIDGE_API int dotnet_bridge_playlist_has_next(void* playlist)
 {
     if (playlist == NULL)
         return 0;
@@ -693,7 +693,7 @@ BRIDGE_API int csharp_bridge_playlist_has_next(void* playlist)
     return result;
 }
 
-BRIDGE_API int csharp_bridge_playlist_has_prev(void* playlist)
+BRIDGE_API int dotnet_bridge_playlist_has_prev(void* playlist)
 {
     if (playlist == NULL)
         return 0;
@@ -705,7 +705,7 @@ BRIDGE_API int csharp_bridge_playlist_has_prev(void* playlist)
     return result;
 }
 
-BRIDGE_API long long csharp_bridge_playlist_count(void* playlist)
+BRIDGE_API long long dotnet_bridge_playlist_count(void* playlist)
 {
     if (playlist == NULL)
         return 0;
@@ -717,7 +717,7 @@ BRIDGE_API long long csharp_bridge_playlist_count(void* playlist)
     return (long long)count;
 }
 
-BRIDGE_API long long csharp_bridge_playlist_get_current_index(void* playlist)
+BRIDGE_API long long dotnet_bridge_playlist_get_current_index(void* playlist)
 {
     if (playlist == NULL)
         return -1;
@@ -729,7 +729,7 @@ BRIDGE_API long long csharp_bridge_playlist_get_current_index(void* playlist)
     return (long long)index;
 }
 
-BRIDGE_API int csharp_bridge_playlist_goto(void* playlist, long long index)
+BRIDGE_API int dotnet_bridge_playlist_goto(void* playlist, long long index)
 {
     if (playlist == NULL)
         return -1;
@@ -749,7 +749,7 @@ BRIDGE_API int csharp_bridge_playlist_goto(void* playlist, long long index)
 extern vlc_object_t* vlc_object_parent(vlc_object_t *obj);
 extern const char* vlc_object_typename(const vlc_object_t *obj);
 
-BRIDGE_API void* csharp_bridge_object_parent(void* obj)
+BRIDGE_API void* dotnet_bridge_object_parent(void* obj)
 {
     if (obj == NULL)
         return NULL;
@@ -757,7 +757,7 @@ BRIDGE_API void* csharp_bridge_object_parent(void* obj)
     return (void*)vlc_object_parent((vlc_object_t*)obj);
 }
 
-BRIDGE_API const char* csharp_bridge_object_typename(void* obj)
+BRIDGE_API const char* dotnet_bridge_object_typename(void* obj)
 {
     if (obj == NULL)
         return NULL;
@@ -775,7 +775,7 @@ extern int vlc_player_aout_SetVolume(vlc_player_t *player, float volume);
 extern int vlc_player_aout_IsMuted(vlc_player_t *player);
 extern int vlc_player_aout_Mute(vlc_player_t *player, int mute);
 
-BRIDGE_API float csharp_bridge_player_get_volume(void* player)
+BRIDGE_API float dotnet_bridge_player_get_volume(void* player)
 {
     if (player == NULL)
         return -1.0f;
@@ -784,7 +784,7 @@ BRIDGE_API float csharp_bridge_player_get_volume(void* player)
     return vlc_player_aout_GetVolume((vlc_player_t*)player);
 }
 
-BRIDGE_API int csharp_bridge_player_set_volume(void* player, float volume)
+BRIDGE_API int dotnet_bridge_player_set_volume(void* player, float volume)
 {
     if (player == NULL)
         return -1;
@@ -793,7 +793,7 @@ BRIDGE_API int csharp_bridge_player_set_volume(void* player, float volume)
     return vlc_player_aout_SetVolume((vlc_player_t*)player, volume);
 }
 
-BRIDGE_API int csharp_bridge_player_is_muted(void* player)
+BRIDGE_API int dotnet_bridge_player_is_muted(void* player)
 {
     if (player == NULL)
         return -1;
@@ -802,7 +802,7 @@ BRIDGE_API int csharp_bridge_player_is_muted(void* player)
     return vlc_player_aout_IsMuted((vlc_player_t*)player);
 }
 
-BRIDGE_API int csharp_bridge_player_set_mute(void* player, int mute)
+BRIDGE_API int dotnet_bridge_player_set_mute(void* player, int mute)
 {
     if (player == NULL)
         return -1;
@@ -811,7 +811,7 @@ BRIDGE_API int csharp_bridge_player_set_mute(void* player, int mute)
     return vlc_player_aout_Mute((vlc_player_t*)player, mute);
 }
 
-BRIDGE_API int csharp_bridge_player_toggle_mute(void* player)
+BRIDGE_API int dotnet_bridge_player_toggle_mute(void* player)
 {
     if (player == NULL)
         return -1;

@@ -1,6 +1,6 @@
 /**
  * Test Harness
- * Standalone test program to verify the C# plugin bridge works.
+ * Standalone test program to verify the .NET plugin bridge works.
  * This simulates what VLC does when loading a plugin.
  */
 
@@ -105,14 +105,14 @@ static int test_vlc_set(void *opaque, void *target, int property, ...)
 
 int main(int argc, char **argv)
 {
-    printf("=== VLC C# Plugin Test Harness ===\n\n");
+    printf("=== VLC .NET Plugin Test Harness ===\n\n");
 
     /* Load the C glue plugin DLL */
-    printf("[1] Loading libhello_csharp_plugin.dll...\n");
-    HMODULE glue = LoadLibraryA("libhello_csharp_plugin.dll");
+    printf("[1] Loading libhello_dotnet_plugin.dll...\n");
+    HMODULE glue = LoadLibraryA("libhello_dotnet_plugin.dll");
     if (!glue)
     {
-        printf("ERROR: Failed to load libhello_csharp_plugin.dll (error %lu)\n", GetLastError());
+        printf("ERROR: Failed to load libhello_dotnet_plugin.dll (error %lu)\n", GetLastError());
         return 1;
     }
     printf("    Loaded at %p\n", glue);
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
     /* Create a fake VLC object for testing */
     void *fake_vlc_obj = (void*)0xDEADBEEF;
 
-    /* Call Open (this will load VlcPlugin.dll and call C#) */
+    /* Call Open (this will load VlcPlugin.dll and call .NET) */
     printf("\n[5] Calling Open callback...\n");
     result = stored_open(fake_vlc_obj);
     printf("    Open returned: %d\n", result);
