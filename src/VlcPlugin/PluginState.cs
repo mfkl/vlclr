@@ -31,27 +31,27 @@ public sealed class PluginState : IDisposable
         try
         {
             // Plugin initialization logic
-            _logger.Info("C# Plugin initializing...");
+            _logger.Info(".NET plugin initializing...");
 
             // Demonstrate VLC variable creation and usage
             if (_variable.CreateString(VarPluginVersion, "1.0.0"))
             {
-                _logger.Info($"Created string variable '{VarPluginVersion}'");
+                _logger.Info($".NET plugin Created string variable '{VarPluginVersion}'");
                 string? version = _variable.GetString(VarPluginVersion);
-                _logger.Info($"Plugin version: {version ?? "(null)"}");
+                _logger.Info($".NET plugin Plugin version: {version ?? "(null)"}");
             }
 
             if (_variable.CreateInteger(VarPluginCounter, 0))
             {
-                _logger.Info($"Created integer variable '{VarPluginCounter}'");
+                _logger.Info($".NET plugin Created integer variable '{VarPluginCounter}'");
 
                 // Demonstrate increment
                 long counter = _variable.GetInteger(VarPluginCounter);
-                _logger.Info($"Counter initial value: {counter}");
+                _logger.Info($".NET plugin Counter initial value: {counter}");
 
                 _variable.SetInteger(VarPluginCounter, counter + 1);
                 counter = _variable.GetInteger(VarPluginCounter);
-                _logger.Info($"Counter after increment: {counter}");
+                _logger.Info($".NET plugin Counter after increment: {counter}");
             }
 
             // Initialize player for event handling
@@ -61,32 +61,36 @@ public sealed class PluginState : IDisposable
                 _player.StateChanged += OnPlayerStateChanged;
                 _player.MediaChanged += OnPlayerMediaChanged;
                 _player.StartListening();
-                _logger.Info("Player event listener registered");
+                _logger.Info(".NET plugin Player event listener registered");
             }
 
             // Initialize playlist for playback control
             _playlist = VlcPlaylist.Create(_vlcObject, _logger);
             if (_playlist != null)
             {
-                _logger.Info($"Playlist initialized: {_playlist.Count} items, current index: {_playlist.CurrentIndex}");
+                _logger.Info($".NET plugin Playlist initialized: {_playlist.Count} items, current index: {_playlist.CurrentIndex}");
             }
 
-            _logger.Info("C# Plugin initialized successfully");
+            _logger.Info(".NET plugin initialized successfully");
         }
         catch (Exception ex)
         {
-            _logger.Error($"Plugin initialization failed: {ex.GetType().Name}: {ex.Message}");
+            _logger.Error($".NET plugin initialization failed: {ex.GetType().Name}: {ex.Message}");
         }
     }
 
     private void OnPlayerStateChanged(VlcPlayerState state)
     {
-        _logger.Info($"Player state changed: {state}");
+        _logger.Info($".NET plugin Player state changed: {state}");
+        if (state == VlcPlayerState.Playing)
+        {
+            _logger.Info(".NET Message -> Playback started");
+        }
     }
 
     private void OnPlayerMediaChanged(nint media)
     {
-        _logger.Info($"Media changed: {(media == nint.Zero ? "none" : $"0x{media:X}")}");
+        _logger.Info($".NET plugin Media changed: {(media == nint.Zero ? "none" : $"0x{media:X}")}");
     }
 
     public void Cleanup()
@@ -95,7 +99,7 @@ public sealed class PluginState : IDisposable
         _disposed = true;
 
         // Cleanup logic
-        _logger.Info("C# Plugin cleaning up...");
+        _logger.Info(".NET plugin cleaning up...");
 
         // Stop player event listener
         if (_player != null)
@@ -105,7 +109,7 @@ public sealed class PluginState : IDisposable
             _player.StopListening();
             _player.Dispose();
             _player = null;
-            _logger.Info("Player event listener unregistered");
+            _logger.Info(".NET plugin Player event listener unregistered");
         }
 
         // Dispose playlist wrapper
@@ -119,7 +123,7 @@ public sealed class PluginState : IDisposable
         _variable.Destroy(VarPluginVersion);
         _variable.Destroy(VarPluginCounter);
 
-        _logger.Info("C# Plugin cleaned up");
+        _logger.Info(".NET plugin cleaned up");
     }
 
     public void Dispose() => Cleanup();

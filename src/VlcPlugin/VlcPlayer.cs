@@ -98,7 +98,7 @@ public sealed class VlcPlayer : IDisposable
         nint player = VlcBridge.GetPlayer(intf);
         if (player == nint.Zero)
         {
-            logger.Warning("Failed to get player from interface");
+            logger.Warning(".NET plugin Failed to get player from interface");
             return null;
         }
 
@@ -282,7 +282,7 @@ public sealed class VlcPlayer : IDisposable
     {
         if (_listenerHandle != nint.Zero)
         {
-            _logger.Warning("Already listening to player events");
+            _logger.Warning(".NET plugin Already listening to player events");
             return false;
         }
 
@@ -303,14 +303,14 @@ public sealed class VlcPlayer : IDisposable
         _listenerHandle = VlcBridge.PlayerAddListener(_player, ref callbacks);
         if (_listenerHandle == nint.Zero)
         {
-            _logger.Error("Failed to add player listener");
+            _logger.Error(".NET plugin Failed to add player listener");
             _onStateChangedDelegate = null;
             _onPositionChangedDelegate = null;
             _onMediaChangedDelegate = null;
             return false;
         }
 
-        _logger.Info("Started listening to player events");
+        _logger.Info(".NET plugin Started listening to player events");
         return true;
     }
 
@@ -330,7 +330,7 @@ public sealed class VlcPlayer : IDisposable
         _onPositionChangedDelegate = null;
         _onMediaChangedDelegate = null;
 
-        _logger.Info("Stopped listening to player events");
+        _logger.Info(".NET plugin Stopped listening to player events");
     }
 
     private void OnStateChangedNative(int newState, nint userData)
@@ -338,12 +338,12 @@ public sealed class VlcPlayer : IDisposable
         try
         {
             var state = (VlcPlayerState)newState;
-            _logger.Debug($"Player state changed: {state}");
+            _logger.Debug($".NET plugin Player state changed: {state}");
             StateChanged?.Invoke(state);
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error in StateChanged handler: {ex.Message}");
+            _logger.Error($".NET plugin Error in StateChanged handler: {ex.Message}");
         }
     }
 
@@ -356,7 +356,7 @@ public sealed class VlcPlayer : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error in PositionChanged handler: {ex.Message}");
+            _logger.Error($".NET plugin Error in PositionChanged handler: {ex.Message}");
         }
     }
 
@@ -364,12 +364,12 @@ public sealed class VlcPlayer : IDisposable
     {
         try
         {
-            _logger.Debug($"Media changed: {(newMedia != nint.Zero ? "new media" : "no media")}");
+            _logger.Debug($".NET plugin Media changed: {(newMedia != nint.Zero ? "new media" : "no media")}");
             MediaChanged?.Invoke(newMedia);
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error in MediaChanged handler: {ex.Message}");
+            _logger.Error($".NET plugin Error in MediaChanged handler: {ex.Message}");
         }
     }
 

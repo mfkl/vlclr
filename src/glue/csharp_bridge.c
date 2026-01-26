@@ -271,19 +271,45 @@ enum vlc_player_state
     VLC_PLAYER_STATE_STOPPING,
 };
 
-/* VLC player callbacks structure - must match vlc_player_cbs in vlc_player.h */
+/* VLC player callbacks structure - must match vlc_player_cbs in vlc_player.h exactly */
+/* All 35 callbacks must be present even if NULL, as VLC reads the full struct */
 struct vlc_player_cbs
 {
     void (*on_current_media_changed)(vlc_player_t *player, input_item_t *new_media, void *data);
     void (*on_state_changed)(vlc_player_t *player, enum vlc_player_state new_state, void *data);
-    /* We only need a subset of callbacks - the rest can be NULL */
     void (*on_error_changed)(vlc_player_t *player, int error, void *data);
     void (*on_buffering_changed)(vlc_player_t *player, float new_buffering, void *data);
     void (*on_rate_changed)(vlc_player_t *player, float new_rate, void *data);
     void (*on_capabilities_changed)(vlc_player_t *player, int old_caps, int new_caps, void *data);
     void (*on_position_changed)(vlc_player_t *player, vlc_tick_t new_time, double new_pos, void *data);
     void (*on_length_changed)(vlc_player_t *player, vlc_tick_t new_length, void *data);
-    /* ... rest of callbacks we don't use ... */
+    void (*on_track_list_changed)(vlc_player_t *player, int action, void *track, void *data);
+    void (*on_track_selection_changed)(vlc_player_t *player, void *unselected_id, void *selected_id, void *data);
+    void (*on_track_delay_changed)(vlc_player_t *player, void *es_id, vlc_tick_t delay, void *data);
+    void (*on_program_list_changed)(vlc_player_t *player, int action, void *prgm, void *data);
+    void (*on_program_selection_changed)(vlc_player_t *player, int unselected_id, int selected_id, void *data);
+    void (*on_titles_changed)(vlc_player_t *player, void *titles, void *data);
+    void (*on_title_selection_changed)(vlc_player_t *player, void *new_title, size_t new_idx, void *data);
+    void (*on_chapter_selection_changed)(vlc_player_t *player, void *title, size_t title_idx, void *chapter, size_t chapter_idx, void *data);
+    void (*on_teletext_menu_changed)(vlc_player_t *player, int has_teletext_menu, void *data);
+    void (*on_teletext_enabled_changed)(vlc_player_t *player, int enabled, void *data);
+    void (*on_teletext_page_changed)(vlc_player_t *player, unsigned new_page, void *data);
+    void (*on_teletext_transparency_changed)(vlc_player_t *player, int enabled, void *data);
+    void (*on_category_delay_changed)(vlc_player_t *player, int cat, vlc_tick_t new_delay, void *data);
+    void (*on_associated_subs_fps_changed)(vlc_player_t *player, float subs_fps, void *data);
+    void (*on_renderer_changed)(vlc_player_t *player, void *new_item, void *data);
+    void (*on_recording_changed)(vlc_player_t *player, int recording, void *data);
+    void (*on_signal_changed)(vlc_player_t *player, float quality, float strength, void *data);
+    void (*on_statistics_changed)(vlc_player_t *player, void *stats, void *data);
+    void (*on_atobloop_changed)(vlc_player_t *player, int new_state, vlc_tick_t time, double pos, void *data);
+    void (*on_media_meta_changed)(vlc_player_t *player, input_item_t *media, void *data);
+    void (*on_media_epg_changed)(vlc_player_t *player, input_item_t *media, void *data);
+    void (*on_media_subitems_changed)(vlc_player_t *player, input_item_t *media, void *new_subitems, void *data);
+    void (*on_media_attachments_added)(vlc_player_t *player, input_item_t *media, void *array, size_t count, void *data);
+    void (*on_vout_changed)(vlc_player_t *player, int action, void *vout, int order, void *es_id, void *data);
+    void (*on_cork_changed)(vlc_player_t *player, unsigned cork_count, void *data);
+    void (*on_playback_restore_queried)(vlc_player_t *player, void *data);
+    void (*on_stopping_current_media)(vlc_player_t *player, input_item_t *current_media, int stopping_reason, void *data);
 };
 
 /* VLC function declarations */
