@@ -108,11 +108,11 @@ int main(int argc, char **argv)
     printf("=== VLC .NET Plugin Test Harness ===\n\n");
 
     /* Load the C glue plugin DLL */
-    printf("[1] Loading libhello_dotnet_plugin.dll...\n");
-    HMODULE glue = LoadLibraryA("libhello_dotnet_plugin.dll");
+    printf("[1] Loading libdotnet_bridge_plugin.dll...\n");
+    HMODULE glue = LoadLibraryA("libdotnet_bridge_plugin.dll");
     if (!glue)
     {
-        printf("ERROR: Failed to load libhello_dotnet_plugin.dll (error %lu)\n", GetLastError());
+        printf("ERROR: Failed to load libdotnet_bridge_plugin.dll (error %lu)\n", GetLastError());
         return 1;
     }
     printf("    Loaded at %p\n", glue);
