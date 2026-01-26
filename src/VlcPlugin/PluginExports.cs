@@ -16,7 +16,7 @@ public static unsafe class PluginExports
     /// </summary>
     /// <param name="vlcObject">Opaque pointer to vlc_object_t</param>
     /// <returns>0 for success, -1 for failure</returns>
-    [UnmanagedCallersOnly(EntryPoint = "CSharpPluginOpen")]
+    [UnmanagedCallersOnly(EntryPoint = "DotNetPluginOpen")]
     public static int Open(nint vlcObject)
     {
         try
@@ -35,7 +35,7 @@ public static unsafe class PluginExports
     /// Called when VLC unloads the plugin.
     /// </summary>
     /// <param name="vlcObject">Opaque pointer to vlc_object_t</param>
-    [UnmanagedCallersOnly(EntryPoint = "CSharpPluginClose")]
+    [UnmanagedCallersOnly(EntryPoint = "DotNetPluginClose")]
     public static void Close(nint vlcObject)
     {
         try
