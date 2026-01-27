@@ -3,7 +3,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VLC_EXE="$SCRIPT_DIR/vlc-binaries/vlc-4.0.0-dev/vlc.exe"
-VIDEO="${1:-C:/Users/Martin/Videos/BigBuckBunny.mp4}"
+VIDEO="${1:-$HOME/Videos/BigBuckBunny.mp4}"
 FILTER="${2:-dotnet_overlay}"
 
 # Convert to file:// URL

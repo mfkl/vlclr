@@ -28,7 +28,7 @@ Use PowerShell for reliable Windows process management with:
 
 ```powershell
 param(
-    [string]$VideoPath = "C:\Users\Martin\Videos\BigBuckBunny.mp4",
+    [string]$VideoPath = "$env:USERPROFILE\Videos\BigBuckBunny.mp4",
     [int]$TimeoutSeconds = 10,
     [string]$Filter = "dotnet_overlay"
 )
@@ -82,7 +82,7 @@ For simpler cases, use Windows `timeout` command:
 setlocal
 
 set VLC=vlc-binaries\vlc-4.0.0-dev\vlc.exe
-set VIDEO=file:///C:/Users/Martin/Videos/BigBuckBunny.mp4
+set VIDEO=file:///%USERPROFILE:\=/%/Videos/BigBuckBunny.mp4
 
 echo Starting VLC with dotnet_overlay filter...
 start /wait /b "" "%VLC%" -vvv --no-hw-dec --video-filter=dotnet_overlay --play-and-exit %VIDEO%
