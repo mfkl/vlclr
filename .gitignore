@@ -36,3 +36,6 @@ vlc-binaries/
 vlc-sdk/
 vlc-download/
 *.7z
+
+# Claude Code local settings
+.claude/
