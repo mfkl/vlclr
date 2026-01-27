@@ -33,3 +33,6 @@ vlc/
 
 # VLC binaries (downloaded separately)
 vlc-binaries/
+vlc-sdk/
+vlc-download/
+*.7z
