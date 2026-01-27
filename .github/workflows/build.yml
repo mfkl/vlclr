@@ -1,0 +1,75 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  VLC_URL: https://artifacts.videolan.org/vlc/nightly-win64-llvm/20260127-0438/vlc-4.0.0-dev-win64-2deb1c14.7z
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install LLVM
+        run: choco install llvm -y
+
+      - name: Download and extract VLC SDK
+        run: |
+          Invoke-WebRequest -Uri "$env:VLC_URL" -OutFile vlc.7z
+          7z x vlc.7z -ovlc-download
+          # Move the inner folder to vlc-sdk
+          $innerFolder = Get-ChildItem vlc-download | Select-Object -First 1
+          Move-Item $innerFolder.FullName vlc-sdk
+
+      - name: Add vswhere to PATH
+        run: |
+          $vsWherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer"
+          echo "$vsWherePath" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build C# Plugin (Native AOT)
+        run: dotnet publish src/VlcPlugin -c Release -r win-x64
+
+      - name: Compile C glue (interface plugin)
+        run: |
+          New-Item -ItemType Directory -Force -Path build
+          clang.exe -c -o build/plugin_entry.o src/glue/plugin_entry.c -I./vlc-sdk/sdk/include/vlc/plugins
+          clang.exe -c -o build/dotnet_bridge.o src/glue/dotnet_bridge.c -I./vlc-sdk/sdk/include/vlc/plugins
+          clang.exe -shared -o build/libdotnet_bridge_plugin.dll build/plugin_entry.o build/dotnet_bridge.o ./vlc-sdk/sdk/lib/libvlccore.lib
+
+      - name: Compile C glue (video filter plugin)
+        run: |
+          clang.exe -c -o build/video_filter_entry.o src/glue/video_filter_entry.c -I./vlc-sdk/sdk/include/vlc/plugins
+          clang.exe -shared -o build/libdotnet_filter_plugin.dll build/video_filter_entry.o ./vlc-sdk/sdk/lib/libvlccore.lib
+
+      - name: Run tests
+        run: dotnet test src/VlcPlugin.Tests -c Release --logger trx --results-directory TestResults
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/*.trx
+
+      - name: Upload plugins
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: |
+            build/libdotnet_bridge_plugin.dll
+            build/libdotnet_filter_plugin.dll
+            src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll
