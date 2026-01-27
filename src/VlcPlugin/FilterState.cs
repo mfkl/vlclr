@@ -18,7 +18,7 @@ public static class FilterState
 
     // For debug frame save
     private static bool _savedDebugFrame;
-    private const string DebugFramePath = @"C:\temp\overlay_test.png";
+    private const string DebugFramePath = "overlay_test.png";
 
     /// <summary>
     /// Current frame count (increments each frame).

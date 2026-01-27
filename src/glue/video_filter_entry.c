@@ -173,95 +173,6 @@ static int filter_load_dotnet(vlc_object_t *obj)
     return 0;
 }
 
-/* Draw a solid color rectangle directly on pixel data (Phase 11 minimal test)
- * This function works with RGB32/BGRA formats where each pixel is 4 bytes.
- * For YUV formats, we modify the Y plane to create a visible change.
- */
-static void draw_red_rectangle(uint8_t *pixels, int pitch, int visible_pitch, int visible_lines, uint32_t chroma)
-{
-    /* Rectangle dimensions: 100x50 at position (10, 10) */
-    const int rect_x = 10;
-    const int rect_y = 10;
-    const int rect_w = 100;
-    const int rect_h = 50;
-
-    /* Determine bytes per pixel based on chroma format */
-    int bpp = 0;
-    int is_yuv = 0;
-
-    /* Common RGB formats */
-    if (chroma == 0x32335652 /* RV32 */ ||
-        chroma == 0x41424752 /* RGBA */ ||
-        chroma == 0x41524742 /* BGRA */ ||
-        chroma == 0x58524742 /* BGRX */)
-    {
-        bpp = 4;
-    }
-    else if (chroma == 0x34325652 /* RV24 */ ||
-             chroma == 0x33524742 /* BGR3 */)
-    {
-        bpp = 3;
-    }
-    /* YUV planar formats - modify Y plane (1 byte per pixel) */
-    else if (chroma == 0x30323449 /* I420 */ ||
-             chroma == 0x32315659 /* YV12 */ ||
-             chroma == 0x3231564E /* NV12 */)
-    {
-        bpp = 1;
-        is_yuv = 1;
-    }
-    else
-    {
-        /* Unknown format - try 4 bpp as default for most RGB formats */
-        bpp = 4;
-    }
-
-    /* Calculate actual pixel width */
-    int pixel_width = visible_pitch / bpp;
-
-    /* Draw the rectangle */
-    for (int y = rect_y; y < rect_y + rect_h && y < visible_lines; y++)
-    {
-        uint8_t *row = pixels + y * pitch;
-
-        for (int x = rect_x; x < rect_x + rect_w && x < pixel_width; x++)
-        {
-            if (bpp == 4)
-            {
-                /* For BGRA/RGBA: write bright red */
-                uint8_t *pixel = row + x * 4;
-                if (chroma == 0x41524742 /* BGRA */ || chroma == 0x58524742 /* BGRX */)
-                {
-                    pixel[0] = 0x00;  /* B */
-                    pixel[1] = 0x00;  /* G */
-                    pixel[2] = 0xFF;  /* R */
-                    pixel[3] = 0xFF;  /* A */
-                }
-                else /* RGBA or RV32 */
-                {
-                    pixel[0] = 0xFF;  /* R */
-                    pixel[1] = 0x00;  /* G */
-                    pixel[2] = 0x00;  /* B */
-                    pixel[3] = 0xFF;  /* A */
-                }
-            }
-            else if (bpp == 3)
-            {
-                /* For BGR3/RV24: write bright red */
-                uint8_t *pixel = row + x * 3;
-                pixel[0] = 0x00;  /* B */
-                pixel[1] = 0x00;  /* G */
-                pixel[2] = 0xFF;  /* R */
-            }
-            else if (is_yuv)
-            {
-                /* For YUV: write bright luminance (red in Y is ~76, but we use 255 for max visibility) */
-                row[x] = 0xFF;  /* Y = max brightness (white rectangle) */
-            }
-        }
-    }
-}
-
 /* Video filter callback - processes each frame */
 static picture_t *Filter(filter_t *filter, picture_t *pic)
 {
@@ -286,7 +197,7 @@ static picture_t *Filter(filter_t *filter, picture_t *pic)
 
     /* Write first frame info to debug file */
     if (sys->frame_count == 1) {
-        FILE *debug_file = fopen("C:\\temp\\dotnet_filter_frame.txt", "w");
+        FILE *debug_file = fopen("dotnet_filter_frame.txt", "w");
         if (debug_file) {
             fprintf(debug_file, "First frame processed!\n");
             fprintf(debug_file, "chroma=0x%08X (%c%c%c%c)\n",
@@ -324,29 +235,16 @@ static picture_t *Filter(filter_t *filter, picture_t *pic)
     /* Copy input to output */
     picture_Copy(outpic, pic);
 
-    /* PHASE 11: Draw red rectangle directly in C (minimal test without .NET) */
-    if (outpic->i_planes > 0 && outpic->p[0].p_pixels != NULL)
+    /* Call .NET/ImageSharp for frame processing */
+    if (outpic->i_planes > 0 && outpic->p[0].p_pixels != NULL && dotnet_filter_frame)
     {
         plane_t *plane = &outpic->p[0];
-
-        /* Draw red rectangle at top-left for visual proof */
-        draw_red_rectangle(
+        dotnet_filter_frame(filter,
             plane->p_pixels,
             plane->i_pitch,
             plane->i_visible_pitch,
             plane->i_visible_lines,
             chroma);
-
-        /* Also call .NET for additional overlay (if available) */
-        if (dotnet_filter_frame)
-        {
-            dotnet_filter_frame(filter,
-                plane->p_pixels,
-                plane->i_pitch,
-                plane->i_visible_pitch,
-                plane->i_visible_lines,
-                chroma);
-        }
     }
 
     /* Copy properties and release input */
@@ -391,7 +289,7 @@ static int Open(filter_t *filter)
     uint32_t chroma = fmt->i_chroma;
 
     /* FIRST THING: File-based debug proof that Open() is being called */
-    FILE *debug_file = fopen("C:\\temp\\dotnet_filter_open.txt", "w");
+    FILE *debug_file = fopen("dotnet_filter_open.txt", "w");
     if (debug_file) {
         fprintf(debug_file, "Open called at filter=%p\n", (void*)filter);
         fprintf(debug_file, "chroma=0x%08X (%c%c%c%c)\n",

@@ -67,6 +67,40 @@ cd build && ./test_harness.exe
 - Key headers: `vlc_plugin.h`, `vlc_common.h`, `vlc_interface.h`
 - VLC 4.x API version: 4.0.6
 
+## Video Filter Build & Test
+
+### Build Video Filter Plugin
+```bash
+# 1. Build C# Native AOT
+export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/Installer"
+dotnet publish src/VlcPlugin -c Release -r win-x64
+
+# 2. Build C glue for video filter
+"C:/Program Files/LLVM/bin/clang.exe" -c -o build/video_filter_entry.o src/glue/video_filter_entry.c -I./vlc/include
+"C:/Program Files/LLVM/bin/clang.exe" -shared -o build/libdotnet_filter_plugin.dll build/video_filter_entry.o build/vlccore.lib
+
+# 3. Deploy to VLC
+cp build/libdotnet_filter_plugin.dll vlc-binaries/vlc-4.0.0-dev/plugins/video_filter/
+cp src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll vlc-binaries/vlc-4.0.0-dev/plugins/video_filter/
+
+# 4. Regenerate plugin cache
+./vlc-binaries/vlc-4.0.0-dev/vlc-cache-gen.exe ./vlc-binaries/vlc-4.0.0-dev/plugins
+```
+
+### Test Video Filter
+```bash
+# Run from Git Bash (Windows Terminal has console I/O issues with VLC)
+./test-vlc-filter.sh
+```
+
+### VLC Testing Notes
+- **Use Git Bash**: Windows Terminal PowerShell/cmd hangs when running VLC
+- **Use `--no-hw-dec`**: Required for CPU-accessible pixel formats (I420)
+- **Use `file:///` URLs**: VLC Qt may not auto-play regular file paths
+- **Debug files created**: `dotnet_filter_open.txt`, `dotnet_filter_frame.txt`, `overlay_test.png`
+
 ## Codebase Patterns
 
-(Ralph will update this section as patterns emerge)
+- C glue handles VLC ABI, C# handles business logic
+- Video filter: C passes raw pixel pointers to C# via `DotNetFilterFrame()`
+- Debug with files (fopen/fwrite), not console output
