@@ -437,6 +437,52 @@ internal static partial class VlcCore
     internal static partial void Free(nint ptr);
 
     #endregion
+
+    #region Picture Management
+
+    /// <summary>
+    /// Create a new picture from a video format.
+    /// The picture must be released with PictureRelease.
+    /// </summary>
+    /// <param name="format">Pointer to video_format_t structure</param>
+    /// <returns>Pointer to picture_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "picture_NewFromFormat")]
+    internal static partial nint PictureNewFromFormat(nint format);
+
+    /// <summary>
+    /// Copy both picture dynamic properties and pixels.
+    /// </summary>
+    /// <param name="dst">Destination picture pointer</param>
+    /// <param name="src">Source picture pointer</param>
+    [LibraryImport(LibraryName, EntryPoint = "picture_Copy")]
+    internal static partial void PictureCopy(nint dst, nint src);
+
+    /// <summary>
+    /// Copy picture dynamic properties (date, flags, etc) without copying pixels.
+    /// </summary>
+    /// <param name="dst">Destination picture pointer</param>
+    /// <param name="src">Source picture pointer</param>
+    [LibraryImport(LibraryName, EntryPoint = "picture_CopyProperties")]
+    internal static partial void PictureCopyProperties(nint dst, nint src);
+
+    /// <summary>
+    /// Destroy a picture with zero references.
+    /// Note: In C, picture_Release decrements refs and calls this when refs reaches 0.
+    /// For filters, VLC manages the refcount, so we typically use filter_NewPicture instead.
+    /// </summary>
+    /// <param name="picture">Picture pointer</param>
+    [LibraryImport(LibraryName, EntryPoint = "picture_Destroy")]
+    internal static partial void PictureDestroy(nint picture);
+
+    /// <summary>
+    /// Get the chroma description for a fourcc code.
+    /// </summary>
+    /// <param name="fourcc">Fourcc chroma code (e.g., VLC_CODEC_I420)</param>
+    /// <returns>Pointer to vlc_chroma_description_t, or IntPtr.Zero if unknown</returns>
+    [LibraryImport(LibraryName, EntryPoint = "vlc_fourcc_GetChromaDescription")]
+    internal static partial nint FourccGetChromaDescription(uint fourcc);
+
+    #endregion
 }
 
 /// <summary>

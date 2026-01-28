@@ -21,9 +21,6 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      - name: Install LLVM
-        run: choco install llvm -y
-
       - name: Download and extract VLC SDK
         run: |
           Invoke-WebRequest -Uri "$env:VLC_URL" -OutFile vlc.7z
@@ -43,18 +40,6 @@ jobs:
       - name: Build C# Plugin (Native AOT)
         run: dotnet publish src/VlcPlugin -c Release -r win-x64
 
-      - name: Compile C glue (interface plugin)
-        run: |
-          New-Item -ItemType Directory -Force -Path build
-          clang.exe -c -o build/plugin_entry.o src/glue/plugin_entry.c -I./vlc-sdk/sdk/include/vlc/plugins
-          clang.exe -c -o build/dotnet_bridge.o src/glue/dotnet_bridge.c -I./vlc-sdk/sdk/include/vlc/plugins
-          clang.exe -shared -o build/libdotnet_bridge_plugin.dll build/plugin_entry.o build/dotnet_bridge.o ./vlc-sdk/sdk/lib/libvlccore.lib
-
-      - name: Compile C glue (video filter plugin)
-        run: |
-          clang.exe -c -o build/video_filter_entry.o src/glue/video_filter_entry.c -I./vlc-sdk/sdk/include/vlc/plugins
-          clang.exe -shared -o build/libdotnet_filter_plugin.dll build/video_filter_entry.o ./vlc-sdk/sdk/lib/libvlccore.lib
-
       - name: Run tests
         run: dotnet test src/VlcPlugin.Tests -c Release --logger trx --results-directory TestResults
 
@@ -65,11 +50,9 @@ jobs:
           name: test-results
           path: TestResults/*.trx
 
-      - name: Upload plugins
+      - name: Upload plugin
         uses: actions/upload-artifact@v4
         with:
           name: plugins
           path: |
-            build/libdotnet_bridge_plugin.dll
-            build/libdotnet_filter_plugin.dll
-            src/VlcPlugin/bin/Release/net10.0/win-x64/native/VlcPlugin.dll
+            src/VlcPlugin/bin/Release/net10.0/win-x64/native/libdotnet_plugin.dll
