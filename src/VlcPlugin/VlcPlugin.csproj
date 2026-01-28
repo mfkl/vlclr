@@ -8,6 +8,9 @@
     <PublishAot>true</PublishAot>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
+    <!-- VLC expects plugins named lib*.dll -->
+    <AssemblyName>libdotnet_plugin</AssemblyName>
+
     <!-- Minimize binary size -->
     <OptimizationPreference>Size</OptimizationPreference>
     <IlcOptimizationPreference>Size</IlcOptimizationPreference>
