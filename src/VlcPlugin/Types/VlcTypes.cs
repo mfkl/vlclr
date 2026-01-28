@@ -8,7 +8,7 @@
 // To update: Compare with VLC header files and update types as needed.
 // Reference: vlc/include/vlc_*.h
 
-namespace VlcPlugin.Generated;
+namespace VlcPlugin.Types;
 
 /// <summary>
 /// VLC log message types.
