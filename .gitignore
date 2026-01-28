@@ -39,3 +39,11 @@ vlc-download/
 
 # Claude Code local settings
 .claude/
+
+# AI/Agent files
+AGENTS.md
+PROMPT*.md
+ralph-playbook/
+IMPLEMENTATION_PLAN.md
+loop.sh
+specs/
