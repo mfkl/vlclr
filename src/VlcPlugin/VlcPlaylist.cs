@@ -6,6 +6,7 @@ namespace VlcPlugin;
 /// <summary>
 /// High-level wrapper for VLC playlist control.
 /// Provides methods to control playback (play, pause, stop, next, prev).
+/// All operations that require the playlist lock handle locking internally.
 /// </summary>
 public sealed class VlcPlaylist : IDisposable
 {
@@ -27,22 +28,78 @@ public sealed class VlcPlaylist : IDisposable
     /// <summary>
     /// Gets the number of items in the playlist.
     /// </summary>
-    public long Count => VlcBridge.PlaylistCount(_playlist);
+    public long Count
+    {
+        get
+        {
+            VlcCore.PlaylistLock(_playlist);
+            try
+            {
+                return (long)VlcCore.PlaylistCount(_playlist);
+            }
+            finally
+            {
+                VlcCore.PlaylistUnlock(_playlist);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the current item index (-1 if none).
     /// </summary>
-    public long CurrentIndex => VlcBridge.PlaylistGetCurrentIndex(_playlist);
+    public long CurrentIndex
+    {
+        get
+        {
+            VlcCore.PlaylistLock(_playlist);
+            try
+            {
+                return VlcCore.PlaylistGetCurrentIndex(_playlist);
+            }
+            finally
+            {
+                VlcCore.PlaylistUnlock(_playlist);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets whether there is a next item available.
     /// </summary>
-    public bool HasNext => VlcBridge.PlaylistHasNext(_playlist) != 0;
+    public bool HasNext
+    {
+        get
+        {
+            VlcCore.PlaylistLock(_playlist);
+            try
+            {
+                return VlcCore.PlaylistHasNext(_playlist);
+            }
+            finally
+            {
+                VlcCore.PlaylistUnlock(_playlist);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets whether there is a previous item available.
     /// </summary>
-    public bool HasPrev => VlcBridge.PlaylistHasPrev(_playlist) != 0;
+    public bool HasPrev
+    {
+        get
+        {
+            VlcCore.PlaylistLock(_playlist);
+            try
+            {
+                return VlcCore.PlaylistHasPrev(_playlist);
+            }
+            finally
+            {
+                VlcCore.PlaylistUnlock(_playlist);
+            }
+        }
+    }
 
     private VlcPlaylist(nint intf, nint playlist, VlcLogger logger)
     {
@@ -65,7 +122,7 @@ public sealed class VlcPlaylist : IDisposable
             return null;
         }
 
-        nint playlist = VlcBridge.GetPlaylist(intf);
+        nint playlist = VlcCore.IntfGetMainPlaylist(intf);
         if (playlist == nint.Zero)
         {
             logger.Error(".NET plugin Failed to get playlist from interface");
@@ -84,15 +141,23 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        int result = VlcBridge.PlaylistStart(_playlist);
-        if (result != 0)
+        VlcCore.PlaylistLock(_playlist);
+        try
         {
-            _logger.Warning($".NET plugin Playlist start failed with code {result}");
-            return false;
-        }
+            int result = VlcCore.PlaylistStart(_playlist);
+            if (result != 0)
+            {
+                _logger.Warning($".NET plugin Playlist start failed with code {result}");
+                return false;
+            }
 
-        _logger.Debug(".NET plugin Playlist started");
-        return true;
+            _logger.Debug(".NET plugin Playlist started");
+            return true;
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>
@@ -102,8 +167,16 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        VlcBridge.PlaylistStop(_playlist);
-        _logger.Debug(".NET plugin Playlist stopped");
+        VlcCore.PlaylistLock(_playlist);
+        try
+        {
+            VlcCore.PlaylistStop(_playlist);
+            _logger.Debug(".NET plugin Playlist stopped");
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>
@@ -113,8 +186,16 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        VlcBridge.PlaylistPause(_playlist);
-        _logger.Debug(".NET plugin Playlist paused");
+        VlcCore.PlaylistLock(_playlist);
+        try
+        {
+            VlcCore.PlaylistPause(_playlist);
+            _logger.Debug(".NET plugin Playlist paused");
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>
@@ -124,8 +205,16 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        VlcBridge.PlaylistResume(_playlist);
-        _logger.Debug(".NET plugin Playlist resumed");
+        VlcCore.PlaylistLock(_playlist);
+        try
+        {
+            VlcCore.PlaylistResume(_playlist);
+            _logger.Debug(".NET plugin Playlist resumed");
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>
@@ -159,15 +248,23 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        int result = VlcBridge.PlaylistNext(_playlist);
-        if (result != 0)
+        VlcCore.PlaylistLock(_playlist);
+        try
         {
-            _logger.Debug($".NET plugin Playlist next failed with code {result}");
-            return false;
-        }
+            int result = VlcCore.PlaylistNext(_playlist);
+            if (result != 0)
+            {
+                _logger.Debug($".NET plugin Playlist next failed with code {result}");
+                return false;
+            }
 
-        _logger.Debug(".NET plugin Playlist moved to next item");
-        return true;
+            _logger.Debug(".NET plugin Playlist moved to next item");
+            return true;
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>
@@ -178,15 +275,23 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        int result = VlcBridge.PlaylistPrev(_playlist);
-        if (result != 0)
+        VlcCore.PlaylistLock(_playlist);
+        try
         {
-            _logger.Debug($".NET plugin Playlist prev failed with code {result}");
-            return false;
-        }
+            int result = VlcCore.PlaylistPrev(_playlist);
+            if (result != 0)
+            {
+                _logger.Debug($".NET plugin Playlist prev failed with code {result}");
+                return false;
+            }
 
-        _logger.Debug(".NET plugin Playlist moved to previous item");
-        return true;
+            _logger.Debug(".NET plugin Playlist moved to previous item");
+            return true;
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>
@@ -198,15 +303,23 @@ public sealed class VlcPlaylist : IDisposable
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-        int result = VlcBridge.PlaylistGoTo(_playlist, index);
-        if (result != 0)
+        VlcCore.PlaylistLock(_playlist);
+        try
         {
-            _logger.Debug($".NET plugin Playlist goto {index} failed with code {result}");
-            return false;
-        }
+            int result = VlcCore.PlaylistGoTo(_playlist, (nint)index);
+            if (result != 0)
+            {
+                _logger.Debug($".NET plugin Playlist goto {index} failed with code {result}");
+                return false;
+            }
 
-        _logger.Debug($".NET plugin Playlist moved to index {index}");
-        return true;
+            _logger.Debug($".NET plugin Playlist moved to index {index}");
+            return true;
+        }
+        finally
+        {
+            VlcCore.PlaylistUnlock(_playlist);
+        }
     }
 
     /// <summary>

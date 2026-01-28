@@ -5,6 +5,7 @@ namespace VlcPlugin;
 /// <summary>
 /// Provides object management functions for navigating the VLC object hierarchy.
 /// VLC uses a tree structure of objects where each object has a parent.
+/// Uses direct P/Invoke to libvlccore.
 /// </summary>
 public sealed class VlcObject
 {
@@ -38,7 +39,7 @@ public sealed class VlcObject
         if (_handle == nint.Zero)
             return null;
 
-        nint parent = VlcBridge.ObjectParent(_handle);
+        nint parent = VlcCore.ObjectParent(_handle);
         return parent != nint.Zero ? new VlcObject(parent) : null;
     }
 
@@ -52,7 +53,7 @@ public sealed class VlcObject
         if (_handle == nint.Zero)
             return null;
 
-        nint namePtr = VlcBridge.ObjectTypename(_handle);
+        nint namePtr = VlcCore.ObjectTypename(_handle);
         if (namePtr == nint.Zero)
             return null;
 
@@ -87,7 +88,7 @@ public sealed class VlcObject
         if (obj == nint.Zero)
             return nint.Zero;
 
-        return VlcBridge.ObjectParent(obj);
+        return VlcCore.ObjectParent(obj);
     }
 
     /// <summary>
@@ -100,7 +101,7 @@ public sealed class VlcObject
         if (obj == nint.Zero)
             return null;
 
-        nint namePtr = VlcBridge.ObjectTypename(obj);
+        nint namePtr = VlcCore.ObjectTypename(obj);
         if (namePtr == nint.Zero)
             return null;
 
