@@ -20,6 +20,7 @@
     <!-- Ensure exports are visible -->
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>link</TrimMode>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +28,9 @@
     <DirectPInvoke Include="libvlccore" />
   </ItemGroup>
 
-  <!-- Link against libvlccore import library -->
+  <!-- Link against libvlccore import library (VLC 4.0 SDK) -->
   <ItemGroup>
-    <NativeLibrary Include="$(MSBuildThisFileDirectory)..\..\build\vlccore.lib" />
+    <NativeLibrary Include="$(MSBuildThisFileDirectory)..\..\lib\libvlccore.lib" />
   </ItemGroup>
 
   <!-- ImageSharp for overlay rendering -->
