@@ -7,7 +7,7 @@
 //
 // To update: Compare with vlc/include/vlc_variables.h and update as needed.
 
-namespace VlcPlugin.Generated;
+namespace VlcPlugin.Types;
 
 /// <summary>
 /// VLC variable type constants.

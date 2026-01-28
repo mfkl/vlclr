@@ -1,4 +1,4 @@
-using VlcPlugin.Generated;
+using VlcPlugin.Types;
 using VlcPlugin.Native;
 
 namespace VlcPlugin;
