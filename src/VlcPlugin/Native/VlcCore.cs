@@ -430,9 +430,10 @@ internal static partial class VlcCore
     /// <summary>
     /// Free memory allocated by VLC.
     /// Used to free strings returned by var_GetString and similar functions.
+    /// Note: VLC uses msvcrt.dll for memory allocation, so we must use the same runtime.
     /// </summary>
     /// <param name="ptr">Pointer to free</param>
-    [LibraryImport(LibraryName, EntryPoint = "free")]
+    [LibraryImport("msvcrt", EntryPoint = "free")]
     internal static partial void Free(nint ptr);
 
     #endregion

@@ -28,18 +28,15 @@ public unsafe delegate int VlcSetConfigCreateDelegate(nint opaque, nint target, 
 /// <summary>
 /// Delegate for string properties: vlc_set(opaque, module, prop, "string")
 /// Used for VLC_MODULE_NAME, VLC_MODULE_CAPABILITY, VLC_MODULE_DESCRIPTION, etc.
+/// Uses raw pointer instead of automatic marshaling for Native AOT compatibility.
 /// </summary>
 /// <param name="opaque">Opaque context from vlc_entry</param>
 /// <param name="module">Module pointer from VLC_MODULE_CREATE</param>
 /// <param name="property">Property to set (VLC_MODULE_NAME, etc.)</param>
-/// <param name="value">String value (UTF-8)</param>
+/// <param name="value">Pointer to null-terminated UTF-8 string</param>
 /// <returns>0 on success, non-zero on failure</returns>
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate int VlcSetStringDelegate(
-    nint opaque,
-    nint module,
-    int property,
-    [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
+public delegate int VlcSetStringDelegate(nint opaque, nint module, int property, nint value);
 
 /// <summary>
 /// Delegate for integer properties: vlc_set(opaque, module, prop, int_value)
@@ -58,20 +55,16 @@ public delegate int VlcSetInt64Delegate(nint opaque, nint module, int property, 
 /// <summary>
 /// Delegate for callback registration: vlc_set(opaque, module, prop, "name", func_ptr)
 /// Used for VLC_MODULE_CB_OPEN and VLC_MODULE_CB_CLOSE.
+/// Uses raw pointer instead of automatic marshaling for Native AOT compatibility.
 /// </summary>
 /// <param name="opaque">Opaque context from vlc_entry</param>
 /// <param name="module">Module pointer</param>
 /// <param name="property">VLC_MODULE_CB_OPEN or VLC_MODULE_CB_CLOSE</param>
-/// <param name="name">Name of the callback function (for debugging)</param>
+/// <param name="name">Pointer to null-terminated UTF-8 callback name string</param>
 /// <param name="callback">Function pointer to the callback</param>
 /// <returns>0 on success, non-zero on failure</returns>
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate int VlcSetCallbackDelegate(
-    nint opaque,
-    nint module,
-    int property,
-    [MarshalAs(UnmanagedType.LPUTF8Str)] string name,
-    nint callback);
+public delegate int VlcSetCallbackDelegate(nint opaque, nint module, int property, nint name, nint callback);
 
 /// <summary>
 /// Delegate for shortcuts: vlc_set(opaque, module, VLC_MODULE_SHORTCUT, count, shortcuts_array)
