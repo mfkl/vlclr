@@ -7,6 +7,7 @@ namespace VlcPlugin;
 /// <summary>
 /// High-level wrapper for VLC variable system.
 /// Provides a clean C# API for creating and managing VLC variables.
+/// Uses direct P/Invoke to libvlccore.
 /// </summary>
 public sealed class VlcVariable
 {
@@ -29,10 +30,11 @@ public sealed class VlcVariable
     /// <returns>True if created successfully</returns>
     public bool CreateInteger(string name, long initialValue = 0)
     {
-        int result = VlcBridge.VarCreate(_vlcObject, name, VlcVarType.Integer);
+        int result = VlcCore.VarCreate(_vlcObject, name, VlcVarType.Integer);
         if (result == 0)
         {
-            VlcBridge.VarSetInteger(_vlcObject, name, initialValue);
+            var value = new VlcValueNative { Integer = initialValue };
+            VlcCore.VarSetChecked(_vlcObject, name, VlcVarType.Integer, value);
             return true;
         }
         return false;
@@ -46,10 +48,19 @@ public sealed class VlcVariable
     /// <returns>True if created successfully</returns>
     public bool CreateString(string name, string? initialValue = null)
     {
-        int result = VlcBridge.VarCreate(_vlcObject, name, VlcVarType.String);
+        int result = VlcCore.VarCreate(_vlcObject, name, VlcVarType.String);
         if (result == 0 && initialValue != null)
         {
-            VlcBridge.VarSetString(_vlcObject, name, initialValue);
+            nint strPtr = Marshal.StringToCoTaskMemUTF8(initialValue);
+            try
+            {
+                var value = new VlcValueNative { String = strPtr };
+                VlcCore.VarSetChecked(_vlcObject, name, VlcVarType.String, value);
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(strPtr);
+            }
             return true;
         }
         return result == 0;
@@ -61,7 +72,7 @@ public sealed class VlcVariable
     /// <param name="name">Variable name</param>
     public void Destroy(string name)
     {
-        VlcBridge.VarDestroy(_vlcObject, name);
+        VlcCore.VarDestroy(_vlcObject, name);
     }
 
     /// <summary>
@@ -72,7 +83,8 @@ public sealed class VlcVariable
     /// <returns>True if set successfully</returns>
     public bool SetInteger(string name, long value)
     {
-        return VlcBridge.VarSetInteger(_vlcObject, name, value) == 0;
+        var vlcValue = new VlcValueNative { Integer = value };
+        return VlcCore.VarSetChecked(_vlcObject, name, VlcVarType.Integer, vlcValue) == 0;
     }
 
     /// <summary>
@@ -82,7 +94,8 @@ public sealed class VlcVariable
     /// <returns>The variable value, or 0 if not found</returns>
     public long GetInteger(string name)
     {
-        return VlcBridge.VarGetInteger(_vlcObject, name);
+        int result = VlcCore.VarGetChecked(_vlcObject, name, VlcVarType.Integer, out VlcValueNative value);
+        return result == 0 ? value.Integer : 0;
     }
 
     /// <summary>
@@ -93,7 +106,17 @@ public sealed class VlcVariable
     /// <returns>True if set successfully</returns>
     public bool SetString(string name, string? value)
     {
-        return VlcBridge.VarSetString(_vlcObject, name, value) == 0;
+        nint strPtr = value != null ? Marshal.StringToCoTaskMemUTF8(value) : nint.Zero;
+        try
+        {
+            var vlcValue = new VlcValueNative { String = strPtr };
+            return VlcCore.VarSetChecked(_vlcObject, name, VlcVarType.String, vlcValue) == 0;
+        }
+        finally
+        {
+            if (strPtr != nint.Zero)
+                Marshal.FreeCoTaskMem(strPtr);
+        }
     }
 
     /// <summary>
@@ -103,13 +126,13 @@ public sealed class VlcVariable
     /// <returns>The variable value, or null if not found</returns>
     public string? GetString(string name)
     {
-        nint ptr = VlcBridge.VarGetStringPtr(_vlcObject, name);
-        if (ptr == nint.Zero)
+        int result = VlcCore.VarGetChecked(_vlcObject, name, VlcVarType.String, out VlcValueNative value);
+        if (result != 0 || value.String == nint.Zero)
             return null;
 
-        // Marshal the string and free the native memory
-        string? result = Marshal.PtrToStringUTF8(ptr);
-        VlcBridge.VarFreeString(ptr);
-        return result;
+        // Marshal the string and free the native memory (VLC allocates this)
+        string? strResult = Marshal.PtrToStringUTF8(value.String);
+        VlcCore.Free(value.String);
+        return strResult;
     }
 }

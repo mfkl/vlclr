@@ -6,9 +6,11 @@ namespace VlcPlugin;
 /// <summary>
 /// High-level wrapper for VLC logging.
 /// Provides a clean C# API for logging messages through VLC's logging system.
+/// Uses direct P/Invoke to libvlccore with "%s" format to handle variadic logging.
 /// </summary>
 public sealed class VlcLogger
 {
+    private const string ModuleName = "dotnet";
     private readonly nint _vlcObject;
 
     /// <summary>
@@ -25,7 +27,7 @@ public sealed class VlcLogger
     /// </summary>
     public void Info(string message)
     {
-        VlcBridge.Log(_vlcObject, (int)VlcLogType.Info, message);
+        LogInternal((int)VlcLogType.Info, message);
     }
 
     /// <summary>
@@ -33,7 +35,7 @@ public sealed class VlcLogger
     /// </summary>
     public void Error(string message)
     {
-        VlcBridge.Log(_vlcObject, (int)VlcLogType.Error, message);
+        LogInternal((int)VlcLogType.Error, message);
     }
 
     /// <summary>
@@ -41,7 +43,7 @@ public sealed class VlcLogger
     /// </summary>
     public void Warning(string message)
     {
-        VlcBridge.Log(_vlcObject, (int)VlcLogType.Warning, message);
+        LogInternal((int)VlcLogType.Warning, message);
     }
 
     /// <summary>
@@ -49,7 +51,7 @@ public sealed class VlcLogger
     /// </summary>
     public void Debug(string message)
     {
-        VlcBridge.Log(_vlcObject, (int)VlcLogType.Debug, message);
+        LogInternal((int)VlcLogType.Debug, message);
     }
 
     /// <summary>
@@ -57,6 +59,17 @@ public sealed class VlcLogger
     /// </summary>
     public void Log(VlcLogType type, string message)
     {
-        VlcBridge.Log(_vlcObject, (int)type, message);
+        LogInternal((int)type, message);
+    }
+
+    /// <summary>
+    /// Internal logging method that calls VLC's variadic log function.
+    /// Uses "%s" format and passes the pre-formatted message as the single argument.
+    /// </summary>
+    private void LogInternal(int type, string message)
+    {
+        // VLC's vlc_object_Log is variadic: (obj, type, module, file, line, func, format, ...)
+        // We use "%s" as format and pass the message as a single argument
+        VlcCore.Log(_vlcObject, type, ModuleName, "", 0, "", "%s", message);
     }
 }

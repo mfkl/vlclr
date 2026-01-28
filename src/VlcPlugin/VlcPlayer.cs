@@ -49,6 +49,7 @@ public delegate void PlayerMediaChangedHandler(nint mediaPtr);
 /// <summary>
 /// High-level wrapper for VLC player.
 /// Provides access to player state and events.
+/// All operations that require the player lock handle locking internally.
 /// </summary>
 public sealed class VlcPlayer : IDisposable
 {
@@ -57,20 +58,9 @@ public sealed class VlcPlayer : IDisposable
     private nint _listenerHandle;
     private bool _disposed;
 
-    // Keep delegates alive to prevent GC
-    private OnStateChangedDelegate? _onStateChangedDelegate;
-    private OnPositionChangedDelegate? _onPositionChangedDelegate;
-    private OnMediaChangedDelegate? _onMediaChangedDelegate;
-
-    // Native callback delegates
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void OnStateChangedDelegate(int newState, nint userData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void OnPositionChangedDelegate(long newTime, double newPos, nint userData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void OnMediaChangedDelegate(nint newMedia, nint userData);
+    // Keep callbacks structure and delegates alive to prevent GC
+    private VlcPlayerCbs _callbacks;
+    private nint _callbacksPtr;
 
     /// <summary>
     /// Event raised when the player state changes.
@@ -95,10 +85,18 @@ public sealed class VlcPlayer : IDisposable
     /// <returns>VlcPlayer instance, or null if player not available</returns>
     public static VlcPlayer? Create(nint intf, VlcLogger logger)
     {
-        nint player = VlcBridge.GetPlayer(intf);
+        // Get playlist first, then get player from playlist
+        nint playlist = VlcCore.IntfGetMainPlaylist(intf);
+        if (playlist == nint.Zero)
+        {
+            logger.Warning(".NET plugin Failed to get playlist from interface");
+            return null;
+        }
+
+        nint player = VlcCore.PlaylistGetPlayer(playlist);
         if (player == nint.Zero)
         {
-            logger.Warning(".NET plugin Failed to get player from interface");
+            logger.Warning(".NET plugin Failed to get player from playlist");
             return null;
         }
 
@@ -118,8 +116,16 @@ public sealed class VlcPlayer : IDisposable
     {
         get
         {
-            int state = VlcBridge.PlayerGetState(_player);
-            return (VlcPlayerState)state;
+            VlcCore.PlayerLock(_player);
+            try
+            {
+                int state = VlcCore.PlayerGetState(_player);
+                return (VlcPlayerState)state;
+            }
+            finally
+            {
+                VlcCore.PlayerUnlock(_player);
+            }
         }
     }
 
@@ -127,7 +133,21 @@ public sealed class VlcPlayer : IDisposable
     /// Gets the current playback time in microseconds.
     /// Returns Int64.MinValue if not playing or unavailable.
     /// </summary>
-    public long Time => VlcBridge.PlayerGetTime(_player);
+    public long Time
+    {
+        get
+        {
+            VlcCore.PlayerLock(_player);
+            try
+            {
+                return VlcCore.PlayerGetTime(_player);
+            }
+            finally
+            {
+                VlcCore.PlayerUnlock(_player);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the current playback time as a TimeSpan.
@@ -149,7 +169,21 @@ public sealed class VlcPlayer : IDisposable
     /// Gets the total length of the current media in microseconds.
     /// Returns Int64.MinValue if unknown.
     /// </summary>
-    public long Length => VlcBridge.PlayerGetLength(_player);
+    public long Length
+    {
+        get
+        {
+            VlcCore.PlayerLock(_player);
+            try
+            {
+                return VlcCore.PlayerGetLength(_player);
+            }
+            finally
+            {
+                VlcCore.PlayerUnlock(_player);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the total length of the current media as a TimeSpan.
@@ -171,56 +205,106 @@ public sealed class VlcPlayer : IDisposable
     /// Gets the current playback position as a ratio [0.0, 1.0].
     /// Returns -1.0 if not playing.
     /// </summary>
-    public double Position => VlcBridge.PlayerGetPosition(_player);
+    public double Position
+    {
+        get
+        {
+            VlcCore.PlayerLock(_player);
+            try
+            {
+                return VlcCore.PlayerGetPosition(_player);
+            }
+            finally
+            {
+                VlcCore.PlayerUnlock(_player);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets whether seeking is supported for the current media.
     /// </summary>
-    public bool CanSeek => VlcBridge.PlayerCanSeek(_player) != 0;
+    public bool CanSeek
+    {
+        get
+        {
+            VlcCore.PlayerLock(_player);
+            try
+            {
+                int caps = VlcCore.PlayerGetCapabilities(_player);
+                return (caps & VlcPlayerCapabilities.Seek) != 0;
+            }
+            finally
+            {
+                VlcCore.PlayerUnlock(_player);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets whether pausing is supported for the current media.
     /// </summary>
-    public bool CanPause => VlcBridge.PlayerCanPause(_player) != 0;
+    public bool CanPause
+    {
+        get
+        {
+            VlcCore.PlayerLock(_player);
+            try
+            {
+                int caps = VlcCore.PlayerGetCapabilities(_player);
+                return (caps & VlcPlayerCapabilities.Pause) != 0;
+            }
+            finally
+            {
+                VlcCore.PlayerUnlock(_player);
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets the audio volume.
     /// Valid range is [0.0, 2.0] where 1.0 is 100% volume.
     /// Returns -1.0 if no audio output is available.
+    /// Note: Audio output functions do NOT require player lock.
     /// </summary>
     public float Volume
     {
-        get => VlcBridge.PlayerGetVolume(_player);
-        set => VlcBridge.PlayerSetVolume(_player, value);
+        get => VlcCore.PlayerAoutGetVolume(_player);
+        set => VlcCore.PlayerAoutSetVolume(_player, value);
     }
 
     /// <summary>
     /// Gets or sets whether the audio output is muted.
     /// Returns null if no audio output is available.
+    /// Note: Audio output functions do NOT require player lock.
     /// </summary>
     public bool? IsMuted
     {
         get
         {
-            int result = VlcBridge.PlayerIsMuted(_player);
+            int result = VlcCore.PlayerAoutIsMuted(_player);
             return result < 0 ? null : result != 0;
         }
         set
         {
             if (value.HasValue)
             {
-                VlcBridge.PlayerSetMute(_player, value.Value ? 1 : 0);
+                VlcCore.PlayerAoutMute(_player, value.Value);
             }
         }
     }
 
     /// <summary>
     /// Toggles the mute state.
+    /// Note: Audio output functions do NOT require player lock.
     /// </summary>
     /// <returns>True if successful, false if no audio output is available</returns>
     public bool ToggleMute()
     {
-        return VlcBridge.PlayerToggleMute(_player) == 0;
+        bool? currentMuted = IsMuted;
+        if (currentMuted == null)
+            return false;
+        return VlcCore.PlayerAoutMute(_player, !currentMuted.Value) == 0;
     }
 
     /// <summary>
@@ -231,7 +315,15 @@ public sealed class VlcPlayer : IDisposable
     /// <param name="whence">Seek reference (default: Absolute)</param>
     public void SeekByTime(long time, SeekSpeed speed = SeekSpeed.Precise, SeekWhence whence = SeekWhence.Absolute)
     {
-        VlcBridge.PlayerSeekByTime(_player, time, (int)speed, (int)whence);
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            VlcCore.PlayerSeekByTime(_player, time, (int)speed, (int)whence);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
     }
 
     /// <summary>
@@ -244,7 +336,15 @@ public sealed class VlcPlayer : IDisposable
     {
         // Convert from 100-nanosecond ticks to microseconds
         long microseconds = time.Ticks / 10;
-        VlcBridge.PlayerSeekByTime(_player, microseconds, (int)speed, (int)whence);
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            VlcCore.PlayerSeekByTime(_player, microseconds, (int)speed, (int)whence);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
     }
 
     /// <summary>
@@ -255,7 +355,15 @@ public sealed class VlcPlayer : IDisposable
     /// <param name="whence">Seek reference (default: Absolute)</param>
     public void SeekByPosition(double position, SeekSpeed speed = SeekSpeed.Precise, SeekWhence whence = SeekWhence.Absolute)
     {
-        VlcBridge.PlayerSeekByPos(_player, position, (int)speed, (int)whence);
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            VlcCore.PlayerSeekByPos(_player, position, (int)speed, (int)whence);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
     }
 
     /// <summary>
@@ -263,7 +371,15 @@ public sealed class VlcPlayer : IDisposable
     /// </summary>
     public void Pause()
     {
-        VlcBridge.PlayerPause(_player);
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            VlcCore.PlayerPause(_player);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
     }
 
     /// <summary>
@@ -271,11 +387,23 @@ public sealed class VlcPlayer : IDisposable
     /// </summary>
     public void Resume()
     {
-        VlcBridge.PlayerResume(_player);
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            VlcCore.PlayerResume(_player);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
     }
+
+    // Static instance reference for callbacks (callbacks are called without user data context in some cases)
+    private static VlcPlayer? s_currentInstance;
 
     /// <summary>
     /// Starts listening for player events.
+    /// Uses the VLC player callbacks structure with 35 callback slots.
     /// </summary>
     /// <returns>True if listener was added successfully</returns>
     public bool StartListening()
@@ -286,27 +414,45 @@ public sealed class VlcPlayer : IDisposable
             return false;
         }
 
-        // Create native callback delegates
-        _onStateChangedDelegate = OnStateChangedNative;
-        _onPositionChangedDelegate = OnPositionChangedNative;
-        _onMediaChangedDelegate = OnMediaChangedNative;
+        // Keep static reference for callbacks
+        s_currentInstance = this;
 
-        // Set up the callbacks structure
-        var callbacks = new PlayerCallbacksNative
+        // Set up the callbacks structure - all 35 slots must be present
+        // We only populate the ones we need
+        _callbacks = new VlcPlayerCbs
         {
-            OnStateChanged = Marshal.GetFunctionPointerForDelegate(_onStateChangedDelegate),
-            OnPositionChanged = Marshal.GetFunctionPointerForDelegate(_onPositionChangedDelegate),
-            OnMediaChanged = Marshal.GetFunctionPointerForDelegate(_onMediaChangedDelegate),
-            UserData = nint.Zero
+            // Callback 1: on_current_media_changed(player, new_media, data)
+            OnCurrentMediaChanged = Marshal.GetFunctionPointerForDelegate(
+                (OnCurrentMediaChangedDelegate)OnCurrentMediaChangedStatic),
+            // Callback 2: on_state_changed(player, new_state, data)
+            OnStateChanged = Marshal.GetFunctionPointerForDelegate(
+                (OnStateChangedDelegate)OnStateChangedStatic),
+            // Callback 7: on_position_changed(player, new_time, new_pos, data)
+            OnPositionChanged = Marshal.GetFunctionPointerForDelegate(
+                (OnPositionChangedDelegate)OnPositionChangedStatic),
+            // All other callbacks remain null (nint.Zero)
         };
 
-        _listenerHandle = VlcBridge.PlayerAddListener(_player, ref callbacks);
+        // Allocate and pin the callbacks structure
+        _callbacksPtr = Marshal.AllocHGlobal(Marshal.SizeOf<VlcPlayerCbs>());
+        Marshal.StructureToPtr(_callbacks, _callbacksPtr, false);
+
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            _listenerHandle = VlcCore.PlayerAddListener(_player, _callbacksPtr, nint.Zero);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
+
         if (_listenerHandle == nint.Zero)
         {
             _logger.Error(".NET plugin Failed to add player listener");
-            _onStateChangedDelegate = null;
-            _onPositionChangedDelegate = null;
-            _onMediaChangedDelegate = null;
+            Marshal.FreeHGlobal(_callbacksPtr);
+            _callbacksPtr = nint.Zero;
+            s_currentInstance = null;
             return false;
         }
 
@@ -322,54 +468,85 @@ public sealed class VlcPlayer : IDisposable
         if (_listenerHandle == nint.Zero)
             return;
 
-        VlcBridge.PlayerRemoveListener(_player, _listenerHandle);
+        VlcCore.PlayerLock(_player);
+        try
+        {
+            VlcCore.PlayerRemoveListener(_player, _listenerHandle);
+        }
+        finally
+        {
+            VlcCore.PlayerUnlock(_player);
+        }
+
         _listenerHandle = nint.Zero;
 
-        // Clear delegates
-        _onStateChangedDelegate = null;
-        _onPositionChangedDelegate = null;
-        _onMediaChangedDelegate = null;
+        // Free the callbacks structure
+        if (_callbacksPtr != nint.Zero)
+        {
+            Marshal.FreeHGlobal(_callbacksPtr);
+            _callbacksPtr = nint.Zero;
+        }
 
+        s_currentInstance = null;
         _logger.Info(".NET plugin Stopped listening to player events");
     }
 
-    private void OnStateChangedNative(int newState, nint userData)
+    // Delegate types matching VLC's callback signatures
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void OnCurrentMediaChangedDelegate(nint player, nint newMedia, nint userData);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void OnStateChangedDelegate(nint player, int newState, nint userData);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void OnPositionChangedDelegate(nint player, long newTime, double newPos, nint userData);
+
+    // Static callback methods that forward to instance methods
+    private static void OnCurrentMediaChangedStatic(nint player, nint newMedia, nint userData)
     {
         try
         {
-            var state = (VlcPlayerState)newState;
-            _logger.Debug($".NET plugin Player state changed: {state}");
-            StateChanged?.Invoke(state);
+            var instance = s_currentInstance;
+            if (instance != null)
+            {
+                instance._logger.Debug($".NET plugin Media changed: {(newMedia != nint.Zero ? "new media" : "no media")}");
+                instance.MediaChanged?.Invoke(newMedia);
+            }
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.Error($".NET plugin Error in StateChanged handler: {ex.Message}");
+            // Swallow exceptions in callbacks to avoid crashing VLC
         }
     }
 
-    private void OnPositionChangedNative(long newTime, double newPos, nint userData)
+    private static void OnStateChangedStatic(nint player, int newState, nint userData)
     {
         try
         {
-            // Only log occasionally to avoid spam
-            PositionChanged?.Invoke(newTime, newPos);
+            var instance = s_currentInstance;
+            if (instance != null)
+            {
+                var state = (VlcPlayerState)newState;
+                instance._logger.Debug($".NET plugin Player state changed: {state}");
+                instance.StateChanged?.Invoke(state);
+            }
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.Error($".NET plugin Error in PositionChanged handler: {ex.Message}");
+            // Swallow exceptions in callbacks to avoid crashing VLC
         }
     }
 
-    private void OnMediaChangedNative(nint newMedia, nint userData)
+    private static void OnPositionChangedStatic(nint player, long newTime, double newPos, nint userData)
     {
         try
         {
-            _logger.Debug($".NET plugin Media changed: {(newMedia != nint.Zero ? "new media" : "no media")}");
-            MediaChanged?.Invoke(newMedia);
+            var instance = s_currentInstance;
+            instance?.PositionChanged?.Invoke(newTime, newPos);
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.Error($".NET plugin Error in MediaChanged handler: {ex.Message}");
+            // Swallow exceptions in callbacks to avoid crashing VLC
         }
     }
 
@@ -383,5 +560,12 @@ public sealed class VlcPlayer : IDisposable
         _disposed = true;
 
         StopListening();
+
+        // Free any remaining unmanaged resources
+        if (_callbacksPtr != nint.Zero)
+        {
+            Marshal.FreeHGlobal(_callbacksPtr);
+            _callbacksPtr = nint.Zero;
+        }
     }
 }

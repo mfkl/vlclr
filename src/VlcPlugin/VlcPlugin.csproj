@@ -25,9 +25,11 @@
   <ItemGroup>
     <!-- Direct P/Invoke for native libraries that will be linked at build time -->
     <DirectPInvoke Include="libvlccore" />
-    <!-- Note: libdotnet_bridge_plugin is NOT included here because it creates a
-         circular dependency (C glue loads VlcPlugin.dll, VlcPlugin calls back to C glue).
-         The P/Invoke will resolve at runtime when both DLLs are in the same directory. -->
+  </ItemGroup>
+
+  <!-- Link against libvlccore import library -->
+  <ItemGroup>
+    <NativeLibrary Include="$(MSBuildThisFileDirectory)..\..\build\vlccore.lib" />
   </ItemGroup>
 
   <!-- ImageSharp for overlay rendering -->
