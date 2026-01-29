@@ -53,7 +53,7 @@ dotnet test src/VLCLR.Tests
 
 1. Copy the plugin DLL to VLC's plugin directory:
 ```bash
-cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_plugin.dll <vlc-path>/plugins/video_filter/
+cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll <vlc-path>/plugins/video_filter/
 ```
 
 2. Regenerate the plugin cache:

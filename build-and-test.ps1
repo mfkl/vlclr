@@ -16,12 +16,12 @@ $scriptDir = $PSScriptRoot
 $projectDir = Join-Path $scriptDir "samples\VideoOverlay"
 $projectFile = Join-Path $projectDir "VideoOverlay.csproj"
 $nativeOutputDir = Join-Path $projectDir "bin\Release\net10.0\win-x64\native"
-$pluginSource = Join-Path $nativeOutputDir "libdotnet_plugin.dll"
+$pluginSource = Join-Path $nativeOutputDir "libdotnet_overlay_plugin.dll"
 $vlcDir = Join-Path $scriptDir "vlc-binaries\vlc-4.0.0-dev"
 $pluginDir = Join-Path $vlcDir "plugins\video_filter"
-$pluginDest = Join-Path $pluginDir "libdotnet_plugin.dll"
+$pluginDest = Join-Path $pluginDir "libdotnet_overlay_plugin.dll"
 $oldPluginDir = Join-Path $vlcDir "plugins\interface"
-$oldPluginDest = Join-Path $oldPluginDir "libdotnet_plugin.dll"
+$oldPluginDest = Join-Path $oldPluginDir "libdotnet_overlay_plugin.dll"
 $vlcExe = Join-Path $vlcDir "vlc.exe"
 $cacheGenExe = Join-Path $vlcDir "vlc-cache-gen.exe"
 $pluginsDir = Join-Path $vlcDir "plugins"
@@ -69,7 +69,7 @@ if (-not $SkipBuild) {
     }
 
     $pluginSize = (Get-Item $pluginSource).Length / 1MB
-    Write-Host "      Output: libdotnet_plugin.dll ($($pluginSize.ToString('F1')) MB)" -ForegroundColor Green
+    Write-Host "      Output: libdotnet_overlay_plugin.dll ($($pluginSize.ToString('F1')) MB)" -ForegroundColor Green
 } else {
     Write-Host "[1/4] Skipping build (--SkipBuild specified)" -ForegroundColor DarkGray
 
@@ -311,7 +311,7 @@ if ($stderrContent -match "dotnet_plugin") {
 }
 
 # Check for common loading errors
-if ($stderrContent -match "cannot load.*libdotnet_plugin") {
+if ($stderrContent -match "cannot load.*libdotnet_overlay_plugin") {
     $loadError = $true
     $errorMessage = "Plugin DLL could not be loaded"
 }
