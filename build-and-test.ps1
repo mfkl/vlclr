@@ -366,14 +366,86 @@ if ($headlessTestFailed) {
     Write-Host "  - Size:   $($pluginSize.ToString('F1')) MB" -ForegroundColor Gray
     Write-Host ""
 
-    # Optional: Run with actual video if available
+    # Step 6: Test video filter with actual video playback
     if (Test-Path $VideoPath) {
-        Write-Host "Test video found at: $VideoPath" -ForegroundColor DarkGray
-        Write-Host "To test the filter visually, run:" -ForegroundColor White
-        Write-Host "  .\test-vlc-filter.ps1 -VideoPath `"$VideoPath`"" -ForegroundColor Cyan
+        Write-Host "[6/6] Testing video filter with playback..." -ForegroundColor Yellow
+        Write-Host "      Video: $VideoPath" -ForegroundColor DarkGray
+
+        $filterTestStderr = Join-Path $env:TEMP "vlc_filter_test_stderr.txt"
+        $filterTestStdout = Join-Path $env:TEMP "vlc_filter_test_stdout.txt"
+
+        $filterArgs = @(
+            "--video-filter=dotnet_overlay",
+            "--no-hw-dec",
+            "--run-time=3",
+            "--play-and-exit",
+            "--intf", "dummy",
+            "--no-audio",
+            "-vvv",
+            "file:///$($VideoPath -replace '\\','/' -replace ' ','%20')"
+        )
+
+        Write-Host "      Running: vlc.exe $($filterArgs -join ' ')" -ForegroundColor DarkGray
+
+        try {
+            $filterProcess = Start-Process -FilePath $vlcExe -ArgumentList $filterArgs -PassThru -NoNewWindow -RedirectStandardError $filterTestStderr -RedirectStandardOutput $filterTestStdout -ErrorAction Stop
+
+            $filterCompleted = $filterProcess.WaitForExit(15000)
+            if (-not $filterCompleted) {
+                $filterProcess.Kill()
+                Write-Host "      VLC playback timed out after 15s (killed)" -ForegroundColor DarkGray
+            }
+
+            # Read and analyze filter test logs
+            $filterLogs = ""
+            if (Test-Path $filterTestStderr) {
+                $filterLogs = Get-Content $filterTestStderr -Raw -ErrorAction SilentlyContinue
+            }
+
+            # Look for our plugin's log output
+            $pluginLogs = $filterLogs -split "`n" | Where-Object { $_ -match "\[VlcPlugin\]" }
+
+            Write-Host ""
+            Write-Host "      Filter Plugin Logs:" -ForegroundColor Cyan
+            if ($pluginLogs.Count -gt 0) {
+                $pluginLogs | Select-Object -First 15 | ForEach-Object {
+                    Write-Host "        $_" -ForegroundColor White
+                }
+                if ($pluginLogs.Count -gt 15) {
+                    Write-Host "        ... ($($pluginLogs.Count - 15) more lines)" -ForegroundColor DarkGray
+                }
+
+                # Check if filter was actually activated
+                if ($filterLogs -match "FilterOpen") {
+                    Write-Host ""
+                    Write-Host "      VIDEO FILTER: ACTIVATED" -ForegroundColor Green
+                } else {
+                    Write-Host ""
+                    Write-Host "      VIDEO FILTER: NOT ACTIVATED" -ForegroundColor Yellow
+                    Write-Host "      The filter is registered but VLC didn't activate it for this video." -ForegroundColor DarkGray
+                }
+            } else {
+                Write-Host "        (no plugin logs captured)" -ForegroundColor DarkGray
+
+                # Check for any filter-related messages
+                $filterMentions = $filterLogs -split "`n" | Where-Object { $_ -match "dotnet|overlay" } | Select-Object -First 5
+                if ($filterMentions.Count -gt 0) {
+                    Write-Host ""
+                    Write-Host "      Filter mentions in VLC logs:" -ForegroundColor DarkGray
+                    $filterMentions | ForEach-Object {
+                        Write-Host "        $_" -ForegroundColor DarkGray
+                    }
+                }
+            }
+        } catch {
+            Write-Host "      ERROR: Failed to run filter test: $_" -ForegroundColor Red
+        }
+
+        Write-Host ""
     } else {
+        Write-Host "No test video found at: $VideoPath" -ForegroundColor DarkGray
         Write-Host "To test the filter visually, run:" -ForegroundColor White
-        Write-Host "  .\test-vlc-filter.ps1 -VideoPath `"<path-to-video>`"" -ForegroundColor Cyan
+        Write-Host "  .\build-and-test.ps1 -VideoPath `"<path-to-video>`"" -ForegroundColor Cyan
     }
 
     exit 0

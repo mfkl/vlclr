@@ -40,148 +40,175 @@ public struct VlcPlane
 
 /// <summary>
 /// Video format description (video_format_t from vlc_es.h)
-/// This is a large structure - we define only the fields we need to access
+/// Size on 64-bit: 144 bytes
+///
+/// Layout:
+/// - offset 0-43: 11 unsigned ints (chroma through frame_rate_base)
+/// - offset 44-47: padding for pointer alignment
+/// - offset 48-55: p_palette pointer
+/// - offset 56-79: 6 enums (orientation through chroma_location)
+/// - offset 80-83: multiview_mode
+/// - offset 84: b_multiview_right_eye_first + 3 padding
+/// - offset 88-91: projection_mode
+/// - offset 92-107: viewpoint pose (4 floats)
+/// - offset 108-131: mastering (primaries + white_point + luminance)
+/// - offset 132-135: lighting (MaxCLL + MaxFALL)
+/// - offset 136-139: dovi (version + bitfields)
+/// - offset 140-143: i_cubemap_padding
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct VlcVideoFormat
 {
     /// <summary>Picture chroma (i_chroma) - fourcc like 'RV32', 'I420', etc.</summary>
-    public uint Chroma;
+    public uint Chroma;           // offset 0
 
     /// <summary>Picture width (i_width)</summary>
-    public uint Width;
+    public uint Width;            // offset 4
 
     /// <summary>Picture height (i_height)</summary>
-    public uint Height;
+    public uint Height;           // offset 8
 
     /// <summary>Start offset of visible area X (i_x_offset)</summary>
-    public uint XOffset;
+    public uint XOffset;          // offset 12
 
     /// <summary>Start offset of visible area Y (i_y_offset)</summary>
-    public uint YOffset;
+    public uint YOffset;          // offset 16
 
     /// <summary>Width of visible area (i_visible_width)</summary>
-    public uint VisibleWidth;
+    public uint VisibleWidth;     // offset 20
 
     /// <summary>Height of visible area (i_visible_height)</summary>
-    public uint VisibleHeight;
+    public uint VisibleHeight;    // offset 24
 
     /// <summary>Sample aspect ratio numerator (i_sar_num)</summary>
-    public uint SarNum;
+    public uint SarNum;           // offset 28
 
     /// <summary>Sample aspect ratio denominator (i_sar_den)</summary>
-    public uint SarDen;
+    public uint SarDen;           // offset 32
 
     /// <summary>Frame rate numerator (i_frame_rate)</summary>
-    public uint FrameRate;
+    public uint FrameRate;        // offset 36
 
     /// <summary>Frame rate denominator (i_frame_rate_base)</summary>
-    public uint FrameRateBase;
+    public uint FrameRateBase;    // offset 40
+
+    // Padding for 8-byte pointer alignment (44 % 8 = 4, need 4 more)
+    private uint _padBeforePalette;  // offset 44
 
     /// <summary>Video palette pointer (p_palette) - usually null</summary>
-    public nint Palette;
+    public nint Palette;          // offset 48
 
     /// <summary>Picture orientation</summary>
-    public int Orientation;
+    public int Orientation;       // offset 56
 
     /// <summary>Color primaries</summary>
-    public int Primaries;
+    public int Primaries;         // offset 60
 
     /// <summary>Transfer function</summary>
-    public int Transfer;
+    public int Transfer;          // offset 64
 
     /// <summary>YCbCr color space</summary>
-    public int Space;
+    public int Space;             // offset 68
 
     /// <summary>Color range (0-255 vs 16-235)</summary>
-    public int ColorRange;
+    public int ColorRange;        // offset 72
 
     /// <summary>YCbCr chroma location</summary>
-    public int ChromaLocation;
+    public int ChromaLocation;    // offset 76
 
     /// <summary>Multiview mode</summary>
-    public int MultiviewMode;
+    public int MultiviewMode;     // offset 80
 
-    /// <summary>Multiview right eye first flag</summary>
-    public byte MultiviewRightEyeFirst;
+    /// <summary>Multiview right eye first flag (bool)</summary>
+    public byte MultiviewRightEyeFirst;  // offset 84
 
-    // Padding to align next field
-    private byte _pad1;
-    private byte _pad2;
-    private byte _pad3;
+    // Padding to align next int
+    private byte _pad1;           // offset 85
+    private byte _pad2;           // offset 86
+    private byte _pad3;           // offset 87
 
     /// <summary>Projection mode</summary>
-    public int ProjectionMode;
+    public int ProjectionMode;    // offset 88
 
     /// <summary>Viewpoint pose - 4 floats (yaw, pitch, roll, fov)</summary>
-    public float PoseYaw;
-    public float PosePitch;
-    public float PoseRoll;
-    public float PoseFov;
+    public float PoseYaw;         // offset 92
+    public float PosePitch;       // offset 96
+    public float PoseRoll;        // offset 100
+    public float PoseFov;         // offset 104
 
-    // Mastering display color volume (6 uint16 primaries + 2 uint16 white point + 2 uint32 luminance)
-    public ushort MasteringPrimariesGX;
-    public ushort MasteringPrimariesGY;
-    public ushort MasteringPrimariesBX;
-    public ushort MasteringPrimariesBY;
-    public ushort MasteringPrimariesRX;
-    public ushort MasteringPrimariesRY;
-    public ushort MasteringWhitePointX;
-    public ushort MasteringWhitePointY;
-    public uint MasteringMaxLuminance;
-    public uint MasteringMinLuminance;
+    // Mastering display color volume
+    public ushort MasteringPrimariesGX;   // offset 108
+    public ushort MasteringPrimariesGY;   // offset 110
+    public ushort MasteringPrimariesBX;   // offset 112
+    public ushort MasteringPrimariesBY;   // offset 114
+    public ushort MasteringPrimariesRX;   // offset 116
+    public ushort MasteringPrimariesRY;   // offset 118
+    public ushort MasteringWhitePointX;   // offset 120
+    public ushort MasteringWhitePointY;   // offset 122
+    public uint MasteringMaxLuminance;    // offset 124
+    public uint MasteringMinLuminance;    // offset 128
 
     // Content light level
-    public ushort LightingMaxCLL;
-    public ushort LightingMaxFALL;
+    public ushort LightingMaxCLL;         // offset 132
+    public ushort LightingMaxFALL;        // offset 134
 
-    // Dolby Vision info (packed bits)
-    public byte DoviVersionMajor;
-    public byte DoviVersionMinor;
-    public ushort DoviFlags; // profile:7, level:6, rpu:1, el:1, bl:1
+    // Dolby Vision info
+    public byte DoviVersionMajor;         // offset 136
+    public byte DoviVersionMinor;         // offset 137
+    public ushort DoviFlags;              // offset 138 (bitfields packed as 16 bits)
 
     /// <summary>Cubemap padding</summary>
-    public uint CubemapPadding;
+    public uint CubemapPadding;           // offset 140
+    // Total: 144 bytes
 }
 
 /// <summary>
 /// ES format definition (es_format_t from vlc_es.h)
 /// Contains video_format_t in a union - we access .video directly
+///
+/// On 64-bit:
+/// - Fields before union: 56 bytes (including padding for pointer alignment)
+/// - Union (video_format_t): 144 bytes
+/// - Fields after union: ~32 bytes
+/// Total: ~232 bytes
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct VlcEsFormat
 {
     /// <summary>ES category (i_cat): 0=UNKNOWN, 1=VIDEO, 2=AUDIO, 3=SPU, 4=DATA</summary>
-    public int Category;
+    public int Category;          // offset 0, size 4
 
     /// <summary>FOURCC value (i_codec)</summary>
-    public uint Codec;
+    public uint Codec;            // offset 4, size 4
 
     /// <summary>Original FOURCC from container (i_original_fourcc)</summary>
-    public uint OriginalFourcc;
+    public uint OriginalFourcc;   // offset 8, size 4
 
     /// <summary>ES identifier (i_id)</summary>
-    public int Id;
+    public int Id;                // offset 12, size 4
 
     /// <summary>Group identifier (i_group)</summary>
-    public int Group;
+    public int Group;             // offset 16, size 4
 
     /// <summary>Priority (i_priority)</summary>
-    public int Priority;
+    public int Priority;          // offset 20, size 4
 
     /// <summary>Language string pointer (psz_language)</summary>
-    public nint Language;
+    public nint Language;         // offset 24, size 8
 
     /// <summary>Description string pointer (psz_description)</summary>
-    public nint Description;
+    public nint Description;      // offset 32, size 8
 
     /// <summary>Number of extra languages (i_extra_languages)</summary>
-    public uint ExtraLanguagesCount;
+    public uint ExtraLanguagesCount;  // offset 40, size 4
+
+    // Padding for 8-byte pointer alignment
+    private uint _padBeforeExtraLanguages;  // offset 44, size 4
 
     /// <summary>Extra languages pointer (p_extra_languages)</summary>
-    public nint ExtraLanguages;
+    public nint ExtraLanguages;   // offset 48, size 8
 
-    /// <summary>Video format (in union with audio and subs)</summary>
+    /// <summary>Video format (in union with audio and subs) - starts at offset 56</summary>
     public VlcVideoFormat Video;
 
     /// <summary>Bitrate (i_bitrate)</summary>
@@ -196,11 +223,11 @@ public unsafe struct VlcEsFormat
     /// <summary>Whether data is packetized (b_packetized)</summary>
     public byte Packetized;
 
-    // Padding for alignment
+    // Padding for size_t alignment (8 bytes on 64-bit)
     private byte _pad1;
     private byte _pad2;
     private byte _pad3;
-    private int _pad4; // Align to 8-byte boundary for pointers
+    private int _pad4;
 
     /// <summary>Extra data length (i_extra)</summary>
     public nuint ExtraSize;
@@ -430,30 +457,28 @@ public struct VlcFilter
 /// <summary>
 /// VLC object header - first member of all VLC objects
 /// This is struct vlc_object_t from vlc_objects.h
-/// We only define what we need to calculate offsets
+/// Size on 64-bit: 24 bytes
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = 24)]
 public struct VlcObjectHeader
 {
-    /// <summary>Logger pointer</summary>
+    /// <summary>Logger pointer (struct vlc_logger*)</summary>
+    [FieldOffset(0)]
     public nint Logger;
 
-    /// <summary>Parent object pointer</summary>
-    public nint Parent;
+    /// <summary>Private/Object union (struct vlc_object_internals* or struct vlc_object_marker*)</summary>
+    [FieldOffset(8)]
+    public nint PrivOrObj;
 
-    /// <summary>Object type name</summary>
-    public nint TypeName;
+    /// <summary>No interact flag</summary>
+    [FieldOffset(16)]
+    public byte NoInteract;
 
-    /// <summary>Header suffix - flags, etc. The exact size depends on VLC build</summary>
-    public nint Flags;
+    /// <summary>Module probe force flag</summary>
+    [FieldOffset(17)]
+    public byte Force;
 
-    /// <summary>Reference count</summary>
-    public uint Refs;
-
-    // Additional padding - vlc_object_t size varies by platform
-    // On 64-bit, it's typically 40-48 bytes
-    private uint _pad1;
-    private nint _pad2;
+    // Implicit padding from offset 18 to 24 (6 bytes) due to Size = 24
 }
 
 /// <summary>
