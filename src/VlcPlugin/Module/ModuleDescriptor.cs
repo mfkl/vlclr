@@ -415,12 +415,7 @@ public static unsafe class ModuleDescriptor
             FilterState.Initialize(filterPtr, (int)width, (int)height, chroma);
 
             // Set filter->ops to our operations structure
-            // The ops field is at a specific offset in filter_t
-            // We need to write the pointer to our operations structure
             filter.Operations = s_filterOpsPtr;
-
-            // Copy format to output (we don't change the format)
-            filter.FormatOut = filter.FormatIn;
 
             Console.Error.WriteLine("[VlcPlugin] FilterOpen completed successfully");
             return 0; // VLC_SUCCESS
@@ -446,7 +441,46 @@ public static unsafe class ModuleDescriptor
             // Check if we have accessible planes
             if (inputPic.PlaneCount == 0)
             {
-                // Opaque format (GPU) - cannot modify, pass through
+                // Input has no plane data - try to allocate output via buffer_new
+                ref VlcFilter filterRef = ref System.Runtime.CompilerServices.Unsafe.AsRef<VlcFilter>((void*)filterPtr);
+
+                if (filterRef.Owner.Callbacks != nint.Zero)
+                {
+                    ref VlcFilterVideoCallbacks videoCallbacks = ref System.Runtime.CompilerServices.Unsafe.AsRef<VlcFilterVideoCallbacks>((void*)filterRef.Owner.Callbacks);
+
+                    if (videoCallbacks.BufferNew != nint.Zero)
+                    {
+                        // Call buffer_new(filter) to allocate output picture
+                        var bufferNewFn = (delegate* unmanaged[Cdecl]<nint, nint>)videoCallbacks.BufferNew;
+                        nint outPicPtr = bufferNewFn(filterPtr);
+
+                        if (outPicPtr != nint.Zero)
+                        {
+                            ref VlcPicture outPic = ref System.Runtime.CompilerServices.Unsafe.AsRef<VlcPicture>((void*)outPicPtr);
+
+                            if (outPic.PlaneCount > 0 && outPic.Plane0.Pixels != nint.Zero)
+                            {
+                                // We have an output picture with plane data - process it
+                                VlcCore.PictureCopyProperties(outPicPtr, picturePtr);
+
+                                uint outChroma = outPic.Format.Chroma;
+                                ref VlcPlane outPlane0 = ref outPic.Plane0;
+
+                                FilterState.ProcessFrame(
+                                    outPlane0.Pixels,
+                                    outPlane0.Pitch,
+                                    outPlane0.VisiblePitch,
+                                    outPlane0.VisibleLines,
+                                    outChroma);
+
+                                // Release input, return output
+                                return outPicPtr;
+                            }
+                        }
+                    }
+                }
+
+                // Still no plane data - pass through
                 return picturePtr;
             }
 

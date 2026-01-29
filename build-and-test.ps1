@@ -121,17 +121,27 @@ try {
 
 Write-Host ""
 
-# Step 3: Test plugin loading with headless VLC (bypasses cache)
-$headlessTestFailed = $false
-$headlessTestError = ""
-Write-Host "[3/5] Testing plugin load with headless VLC..." -ForegroundColor Yellow
+# Step 3: Regenerate plugin cache immediately after deployment
+Write-Host "[3/5] Regenerating VLC plugin cache..." -ForegroundColor Yellow
 
-# Delete old cache to force fresh plugin scan
+# Delete old cache first
 $cacheFile = Join-Path $pluginsDir "plugins.dat"
 if (Test-Path $cacheFile) {
     Remove-Item $cacheFile -Force -ErrorAction SilentlyContinue
-    Write-Host "      Removed old plugin cache to force fresh scan" -ForegroundColor DarkGray
+    Write-Host "      Removed old plugin cache" -ForegroundColor DarkGray
 }
+
+# Run cache-gen
+if (Test-Path $cacheGenExe) {
+    $cacheResult = & $cacheGenExe $pluginsDir 2>&1 | Out-String
+    Start-Sleep -Seconds 1
+    Write-Host "      Plugin cache regenerated" -ForegroundColor Green
+}
+
+# Step 3b: Test plugin loading with headless VLC
+$headlessTestFailed = $false
+$headlessTestError = ""
+Write-Host "[3b/5] Testing plugin load with headless VLC..." -ForegroundColor Yellow
 
 # Run VLC headless with verbose logging to see plugin loading
 $headlessArgs = @(
@@ -207,7 +217,9 @@ if (-not $SkipCacheRegen) {
 
     if (Test-Path $cacheGenExe) {
         try {
+            # Run cache-gen and wait for filesystem to sync
             $cacheResult = & $cacheGenExe $pluginsDir 2>&1 | Out-String
+            Start-Sleep -Seconds 2
             if ($LASTEXITCODE -eq 0) {
                 Write-Host "      Plugin cache updated" -ForegroundColor Green
             } else {
@@ -239,7 +251,10 @@ Write-Host "[5/5] Testing VLC module list..." -ForegroundColor Yellow
 # First, test with --list to see if VLC recognizes the module
 Write-Host "      Checking module registration..." -ForegroundColor DarkGray
 
+# Suppress stderr errors (stale cache warnings)
+$ErrorActionPreference = "SilentlyContinue"
 $listOutput = & $vlcExe --list 2>&1 | Out-String
+$ErrorActionPreference = "Stop"
 
 $moduleFound = $false
 $filterFound = $false
@@ -371,15 +386,14 @@ if ($headlessTestFailed) {
         Write-Host "[6/6] Testing video filter with playback..." -ForegroundColor Yellow
         Write-Host "      Video: $VideoPath" -ForegroundColor DarkGray
 
-        $filterTestStderr = Join-Path $env:TEMP "vlc_filter_test_stderr.txt"
-        $filterTestStdout = Join-Path $env:TEMP "vlc_filter_test_stdout.txt"
+        $filterTestStderr = Join-Path $PSScriptRoot "vlc_filter_test_stderr.txt"
+        $filterTestStdout = Join-Path $PSScriptRoot "vlc_filter_test_stdout.txt"
 
         $filterArgs = @(
             "--video-filter=dotnet_overlay",
             "--no-hw-dec",
-            "--run-time=3",
+            "--run-time=5",
             "--play-and-exit",
-            "--intf", "dummy",
             "--no-audio",
             "-vvv",
             "file:///$($VideoPath -replace '\\','/' -replace ' ','%20')"
