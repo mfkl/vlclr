@@ -7,7 +7,7 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>libdotnet_plugin</AssemblyName>
+    <AssemblyName>libdotnet_overlay_plugin</AssemblyName>
     <!-- Optimization settings -->
     <OptimizationPreference>Size</OptimizationPreference>
     <IlcOptimizationPreference>Size</IlcOptimizationPreference>
