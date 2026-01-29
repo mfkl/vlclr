@@ -15,27 +15,32 @@ public static class VlcFilterConstants
 
 /// <summary>
 /// Description of a planar graphic field (plane_t from vlc_picture.h)
+/// Size on 64-bit: 32 bytes (28 bytes + 4 padding for 8-byte alignment in arrays)
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct VlcPlane
 {
     /// <summary>Start of the plane's data (p_pixels)</summary>
-    public nint Pixels;
+    public nint Pixels;            // offset 0, size 8
 
     /// <summary>Number of lines, including margins (i_lines)</summary>
-    public int Lines;
+    public int Lines;              // offset 8, size 4
 
     /// <summary>Number of bytes in a line, including margins (i_pitch)</summary>
-    public int Pitch;
+    public int Pitch;              // offset 12, size 4
 
     /// <summary>Size of a macropixel, defaults to 1 (i_pixel_pitch)</summary>
-    public int PixelPitch;
+    public int PixelPitch;         // offset 16, size 4
 
     /// <summary>How many visible lines are there? (i_visible_lines)</summary>
-    public int VisibleLines;
+    public int VisibleLines;       // offset 20, size 4
 
     /// <summary>How many bytes for visible pixels are there? (i_visible_pitch)</summary>
-    public int VisiblePitch;
+    public int VisiblePitch;       // offset 24, size 4
+
+    // Padding for 8-byte alignment in arrays (pointer at start requires 8-byte struct alignment)
+    private int _padding;          // offset 28, size 4
+    // Total: 32 bytes
 }
 
 /// <summary>
@@ -159,7 +164,12 @@ public struct VlcVideoFormat
 
     /// <summary>Cubemap padding</summary>
     public uint CubemapPadding;           // offset 140
-    // Total: 144 bytes
+
+    // Additional padding to reach 152 bytes (discovered via memory scanning)
+    // VLC 4.x video_format_t is 152 bytes, not 144
+    private uint _endPad1;                // offset 144
+    private uint _endPad2;                // offset 148
+    // Total: 152 bytes (actual VLC 4.x video_format_t size)
 }
 
 /// <summary>
@@ -168,9 +178,9 @@ public struct VlcVideoFormat
 ///
 /// On 64-bit:
 /// - Fields before union: 56 bytes (including padding for pointer alignment)
-/// - Union (video_format_t): 144 bytes
+/// - Union (video_format_t): 152 bytes
 /// - Fields after union: ~32 bytes
-/// Total: ~232 bytes
+/// Total: ~240 bytes
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct VlcEsFormat
@@ -224,10 +234,11 @@ public unsafe struct VlcEsFormat
     public byte Packetized;
 
     // Padding for size_t alignment (8 bytes on 64-bit)
+    // After i_level (offset 216) + b_packetized (1 byte at 220) = offset 221
+    // Next 8-byte boundary is 224, so need 3 bytes padding
     private byte _pad1;
     private byte _pad2;
     private byte _pad3;
-    private int _pad4;
 
     /// <summary>Extra data length (i_extra)</summary>
     public nuint ExtraSize;
@@ -235,6 +246,12 @@ public unsafe struct VlcEsFormat
     /// <summary>Extra data pointer (p_extra)</summary>
     public nint Extra;
 }
+
+// Verified sizes (64-bit VLC 4.x):
+// - video_format_t: 152 bytes (discovered via memory scanning)
+// - es_format_t: 56 (before union) + 152 (video) + 32 (after) = 240 bytes
+// - filter_t: 592 bytes with ops at offset 560
+// - picture_t: planes start at offset 152 (after video_format_t)
 
 /// <summary>
 /// Video picture structure (picture_t from vlc_picture.h)
@@ -407,50 +424,59 @@ public struct VlcFilterOwner
 /// <summary>
 /// Filter structure (filter_t from vlc_filter.h)
 /// IMPORTANT: The first 3 members must match decoder_t layout
+/// Uses explicit layout based on memory analysis with VLC 4.x:
+/// - es_format_t = 240 bytes (56 + 152 video_format_t + 32)
+/// - ops at offset 560
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = 592)]
 public struct VlcFilter
 {
-    /// <summary>VLC object header (struct vlc_object_t obj)</summary>
+    /// <summary>VLC object header (struct vlc_object_t obj) - 24 bytes</summary>
+    [FieldOffset(0)]
     public VlcObjectHeader Obj;
 
     /// <summary>Module pointer (p_module)</summary>
+    [FieldOffset(24)]
     public nint Module;
 
     /// <summary>Private system data (p_sys) - filter implementation stores its state here</summary>
+    [FieldOffset(32)]
     public nint Sys;
 
-    /// <summary>Input format (fmt_in)</summary>
+    /// <summary>Input format (fmt_in) - 240 bytes</summary>
+    [FieldOffset(40)]
     public VlcEsFormat FormatIn;
 
     /// <summary>Video context input (vctx_in)</summary>
+    [FieldOffset(280)]
     public nint VideoContextIn;
 
-    /// <summary>Output format (fmt_out)</summary>
+    /// <summary>Output format (fmt_out) - 240 bytes</summary>
+    [FieldOffset(288)]
     public VlcEsFormat FormatOut;
 
     /// <summary>Video context output (vctx_out)</summary>
+    [FieldOffset(528)]
     public nint VideoContextOut;
 
     /// <summary>Allow format out change flag (b_allow_fmt_out_change)</summary>
+    [FieldOffset(536)]
     public byte AllowFormatOutChange;
 
-    // Padding for alignment before pointer
-    private byte _pad1;
-    private byte _pad2;
-    private byte _pad3;
-    private int _pad4;
-
     /// <summary>Requested filter shortcut name (psz_name)</summary>
+    [FieldOffset(544)]
     public nint Name;
 
     /// <summary>Filter configuration chain (p_cfg)</summary>
+    [FieldOffset(552)]
     public nint Config;
 
     /// <summary>Filter operations pointer (ops) - MUST be set by Open callback</summary>
+    [FieldOffset(560)]
     public nint Operations;
 
-    /// <summary>Filter owner (owner)</summary>
+    /// <summary>Filter owner (owner) - 24 bytes</summary>
+    [FieldOffset(568)]
     public VlcFilterOwner Owner;
 }
 
