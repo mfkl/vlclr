@@ -13,8 +13,8 @@ $ErrorActionPreference = "Stop"
 $scriptDir = $PSScriptRoot
 
 # Paths
-$projectDir = Join-Path $scriptDir "src\VlcPlugin"
-$projectFile = Join-Path $projectDir "VlcPlugin.csproj"
+$projectDir = Join-Path $scriptDir "samples\VideoOverlay"
+$projectFile = Join-Path $projectDir "VideoOverlay.csproj"
 $nativeOutputDir = Join-Path $projectDir "bin\Release\net10.0\win-x64\native"
 $pluginSource = Join-Path $nativeOutputDir "libdotnet_plugin.dll"
 $vlcDir = Join-Path $scriptDir "vlc-binaries\vlc-4.0.0-dev"
@@ -343,7 +343,7 @@ if ($headlessTestFailed) {
     Write-Host "  - Module name set before/after shortcuts in wrong order" -ForegroundColor Gray
     Write-Host "  - Two VLC_MODULE_CREATE calls instead of VLC_SUBMODULE_CREATE" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "See: src/VlcPlugin/Module/ModuleDescriptor.cs" -ForegroundColor Cyan
+    Write-Host "See: samples/VideoOverlay/ModuleDescriptor.cs" -ForegroundColor Cyan
     exit 1
 } elseif ($cacheGenFailed) {
     Write-Host "PLUGIN LOAD: FAILED (cache-gen assertion)" -ForegroundColor Red
@@ -361,7 +361,7 @@ if ($headlessTestFailed) {
     Write-Host "  - Module name set before/after shortcuts in wrong order" -ForegroundColor Gray
     Write-Host "  - Two VLC_MODULE_CREATE calls instead of VLC_SUBMODULE_CREATE" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "See: src/VlcPlugin/Module/ModuleDescriptor.cs" -ForegroundColor Cyan
+    Write-Host "See: samples/VideoOverlay/ModuleDescriptor.cs" -ForegroundColor Cyan
     exit 1
 } elseif ($loadError) {
     Write-Host "PLUGIN LOAD: FAILED" -ForegroundColor Red
@@ -417,7 +417,7 @@ if ($headlessTestFailed) {
             }
 
             # Look for our plugin's log output
-            $pluginLogs = $filterLogs -split "`n" | Where-Object { $_ -match "\[VlcPlugin\]" }
+            $pluginLogs = $filterLogs -split "`n" | Where-Object { $_ -match "\[VideoOverlay\]" }
 
             Write-Host ""
             Write-Host "      Filter Plugin Logs:" -ForegroundColor Cyan
