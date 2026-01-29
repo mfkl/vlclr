@@ -22,7 +22,7 @@ public static unsafe class ModuleDescriptor
     private static VlcSetStringDelegate? s_setString;
     private static VlcSetIntDelegate? s_setInt;
     private static VlcSetCallbackDelegate? s_setCallback;
-    private static VlcSetShortcuts3Delegate? s_setShortcuts;
+    private static VlcSetShortcutArrayDelegate? s_setShortcuts;
     private static VlcSetConfigCreateDelegate? s_setConfigCreate;
     private static VlcSetInt64Delegate? s_setInt64;
 
@@ -95,6 +95,9 @@ public static unsafe class ModuleDescriptor
     private static nint s_filterShortcut2Ptr;
     private static nint s_filterShortcut3Ptr;
 
+    // Array of shortcut pointers for VLC_MODULE_SHORTCUT (initialized in static constructor)
+    private static nint[] s_filterShortcutsArray = null!;
+
     // Static constructor to pin all strings
     static ModuleDescriptor()
     {
@@ -146,6 +149,9 @@ public static unsafe class ModuleDescriptor
 
         s_filterShortcut3Handle = GCHandle.Alloc(s_filterShortcut3Bytes, GCHandleType.Pinned);
         s_filterShortcut3Ptr = s_filterShortcut3Handle.AddrOfPinnedObject();
+
+        // Build the shortcuts array (array of pointers to null-terminated strings)
+        s_filterShortcutsArray = [s_filterShortcut1Ptr, s_filterShortcut2Ptr, s_filterShortcut3Ptr];
     }
 
     /// <summary>
@@ -157,97 +163,47 @@ public static unsafe class ModuleDescriptor
     {
         try
         {
-            // Cache delegates - they all point to the same variadic function,
-            // but we need different delegate types for different argument patterns
-            s_setCreate = VlcSetHelpers.GetDelegate<VlcSetCreateDelegate>(vlcSetPtr);
-            s_setString = VlcSetHelpers.GetDelegate<VlcSetStringDelegate>(vlcSetPtr);
-            s_setInt = VlcSetHelpers.GetDelegate<VlcSetIntDelegate>(vlcSetPtr);
-            s_setCallback = VlcSetHelpers.GetDelegate<VlcSetCallbackDelegate>(vlcSetPtr);
-
-            // Get callback function pointers for interface Open/Close
-            s_intfOpenCallback = (nint)(delegate* unmanaged[Cdecl]<nint, int>)&InterfaceOpen;
-            s_intfCloseCallback = (nint)(delegate* unmanaged[Cdecl]<nint, void>)&InterfaceClose;
+            // Use raw function pointers for variadic vlc_set calls
+            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, int>)vlcSetPtr;
+            var vlcSetInt = (delegate* unmanaged[Cdecl]<nint, nint, int, int, int>)vlcSetPtr;
+            var vlcSetCallback = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)vlcSetPtr;
 
             // Get callback function pointers for video filter Open/Close
             s_filterOpenCallback = (nint)(delegate* unmanaged[Cdecl]<nint, int>)&FilterOpen;
             s_filterCloseCallback = (nint)(delegate* unmanaged[Cdecl]<nint, void>)&FilterClose;
 
             // ==========================================
-            // Register main module (interface)
+            // Register video filter module (single capability, like adjust.c)
             // ==========================================
-            nint module;
-            if (s_setCreate(opaque, 0, VLC_MODULE_CREATE, &module) != 0)
+            nint module = 0;
+
+            // VLC_MODULE_CREATE: vlc_set(opaque, NULL, VLC_MODULE_CREATE, &module)
+            if (((delegate* unmanaged[Cdecl]<nint, nint, int, nint*, int>)vlcSetPtr)(
+                opaque, 0, VLC_MODULE_CREATE, &module) != 0)
                 return -1;
 
-            // Set module name (must match the DLL name minus lib prefix and extension)
-            if (s_setString(opaque, module, VLC_MODULE_NAME, s_moduleNamePtr) != 0)
+            // VLC_MODULE_NAME: sets module name and adds it as first shortcut
+            if (vlcSet(opaque, module, VLC_MODULE_NAME, s_filterModuleNamePtr) != 0)
                 return -1;
 
-            // Set display names
-            if (s_setString(opaque, module, VLC_MODULE_SHORTNAME, s_shortNamePtr) != 0)
+            // VLC_MODULE_SHORTNAME: display name
+            if (vlcSet(opaque, module, VLC_MODULE_SHORTNAME, s_filterShortNamePtr) != 0)
                 return -1;
 
-            if (s_setString(opaque, module, VLC_MODULE_DESCRIPTION, s_descriptionPtr) != 0)
+            // VLC_MODULE_DESCRIPTION: long description
+            if (vlcSet(opaque, module, VLC_MODULE_DESCRIPTION, s_filterDescriptionPtr) != 0)
                 return -1;
 
-            // Set capability: interface module with score 0
-            if (s_setString(opaque, module, VLC_MODULE_CAPABILITY, s_capabilityPtr) != 0)
+            // VLC_MODULE_CAPABILITY: "video filter"
+            if (vlcSet(opaque, module, VLC_MODULE_CAPABILITY, s_filterCapabilityPtr) != 0)
                 return -1;
 
-            if (s_setInt(opaque, module, VLC_MODULE_SCORE, 0) != 0)
+            // VLC_MODULE_SCORE: priority (0 = lowest)
+            if (vlcSetInt(opaque, module, VLC_MODULE_SCORE, 0) != 0)
                 return -1;
 
-            // Register open callback
-            if (s_setCallback(opaque, module, VLC_MODULE_CB_OPEN, s_openNamePtr, s_intfOpenCallback) != 0)
-                return -1;
-
-            // Register close callback
-            if (s_setCallback(opaque, module, VLC_MODULE_CB_CLOSE, s_closeNamePtr, s_intfCloseCallback) != 0)
-                return -1;
-
-            // ==========================================
-            // Register video filter submodule
-            // ==========================================
-            s_setShortcuts = VlcSetHelpers.GetDelegate<VlcSetShortcuts3Delegate>(vlcSetPtr);
-            s_setConfigCreate = VlcSetHelpers.GetDelegate<VlcSetConfigCreateDelegate>(vlcSetPtr);
-            s_setInt64 = VlcSetHelpers.GetDelegate<VlcSetInt64Delegate>(vlcSetPtr);
-
-            nint filterModule;
-            if (s_setCreate(opaque, 0, VLC_MODULE_CREATE, &filterModule) != 0)
-                return -1;
-
-            // Set filter module name
-            if (s_setString(opaque, filterModule, VLC_MODULE_NAME, s_filterModuleNamePtr) != 0)
-                return -1;
-
-            // Set display names
-            if (s_setString(opaque, filterModule, VLC_MODULE_SHORTNAME, s_filterShortNamePtr) != 0)
-                return -1;
-
-            if (s_setString(opaque, filterModule, VLC_MODULE_DESCRIPTION, s_filterDescriptionPtr) != 0)
-                return -1;
-
-            // Set capability: video filter module with score 0
-            if (s_setString(opaque, filterModule, VLC_MODULE_CAPABILITY, s_filterCapabilityPtr) != 0)
-                return -1;
-
-            if (s_setInt(opaque, filterModule, VLC_MODULE_SCORE, 0) != 0)
-                return -1;
-
-            // Register filter open callback (close is done via ops->close)
-            if (s_setCallback(opaque, filterModule, VLC_MODULE_CB_OPEN, s_filterOpenNamePtr, s_filterOpenCallback) != 0)
-                return -1;
-
-            // Note: VLC_MODULE_NAME automatically adds the name as the first shortcut
-            // Additional shortcuts can be added via VLC_MODULE_SHORTCUT, but only BEFORE VLC_MODULE_NAME
-            // Since we already set the name, the module is accessible via "dotnet_overlay"
-
-            // Set subcategory for video filter
-            nint config;
-            if (s_setConfigCreate(opaque, 0, VLC_CONFIG_CREATE, VlcConfigTypes.CONFIG_SUBCATEGORY, &config) != 0)
-                return -1;
-
-            if (s_setInt64(opaque, config, VLC_CONFIG_VALUE, VlcConfigSubcategory.SUBCAT_VIDEO_VFILTER) != 0)
+            // VLC_MODULE_CB_OPEN: register open callback
+            if (vlcSetCallback(opaque, module, VLC_MODULE_CB_OPEN, s_filterOpenNamePtr, s_filterOpenCallback) != 0)
                 return -1;
 
             return 0; // Success

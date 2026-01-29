@@ -67,20 +67,18 @@ public delegate int VlcSetInt64Delegate(nint opaque, nint module, int property, 
 public delegate int VlcSetCallbackDelegate(nint opaque, nint module, int property, nint name, nint callback);
 
 /// <summary>
-/// Delegate for shortcuts: vlc_set(opaque, module, VLC_MODULE_SHORTCUT, count, str1, str2, ...)
+/// Delegate for shortcuts: vlc_set(opaque, module, VLC_MODULE_SHORTCUT, count, array)
 /// Registers module shortcuts (alternative names).
-/// VLC expects individual string pointers as varargs, not an array.
+/// VLC expects a count and a pointer to an array of string pointers (const char**).
 /// </summary>
 /// <param name="opaque">Opaque context from vlc_entry</param>
 /// <param name="module">Module pointer</param>
 /// <param name="property">VLC_MODULE_SHORTCUT</param>
 /// <param name="count">Number of shortcuts</param>
-/// <param name="shortcut1">First shortcut string pointer</param>
-/// <param name="shortcut2">Second shortcut string pointer</param>
-/// <param name="shortcut3">Third shortcut string pointer</param>
+/// <param name="shortcutsArray">Pointer to array of string pointers (const char**)</param>
 /// <returns>0 on success, non-zero on failure</returns>
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate int VlcSetShortcuts3Delegate(nint opaque, nint module, int property, nuint count, nint shortcut1, nint shortcut2, nint shortcut3);
+public delegate int VlcSetShortcutArrayDelegate(nint opaque, nint module, int property, nuint count, nint shortcutsArray);
 
 /// <summary>
 /// Delegate for config description: vlc_set(opaque, config, VLC_CONFIG_DESC, text, longtext, unused)
