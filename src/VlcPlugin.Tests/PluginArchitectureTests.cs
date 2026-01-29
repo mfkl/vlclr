@@ -7,13 +7,12 @@ namespace VlcPlugin.Tests;
 /// <summary>
 /// Tests that verify the plugin architecture is correctly set up.
 ///
-/// NOTE: PluginExports.Open and Close methods are marked with [UnmanagedCallersOnly]
-/// which means they cannot be called directly from managed code. These methods are
-/// designed to be called only from native code (the C glue layer).
+/// NOTE: Methods marked with [UnmanagedCallersOnly] cannot be called directly from
+/// managed code. These methods are designed to be called only from native code (VLC).
 ///
 /// Full integration testing of the plugin lifecycle requires:
 /// 1. Building the native VlcPlugin.dll via `dotnet publish -c Release -r win-x64`
-/// 2. Using the C test harness (src/test/test_harness.c) or VLC itself
+/// 2. Testing with VLC itself using the build-and-test.ps1 script
 /// </summary>
 public class PluginArchitectureTests
 {
