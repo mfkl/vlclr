@@ -37,11 +37,14 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build C# Plugin (Native AOT)
-        run: dotnet publish src/VlcPlugin -c Release -r win-x64
+      - name: Build VLCLR framework
+        run: dotnet build src/VLCLR -c Release
+
+      - name: Build VideoOverlay sample (Native AOT)
+        run: dotnet publish samples/VideoOverlay -c Release -r win-x64
 
       - name: Run tests
-        run: dotnet test src/VlcPlugin.Tests -c Release --logger trx --results-directory TestResults
+        run: dotnet test src/VLCLR.Tests -c Release --logger trx --results-directory TestResults
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -55,4 +58,4 @@ jobs:
         with:
           name: plugins
           path: |
-            src/VlcPlugin/bin/Release/net10.0/win-x64/native/libdotnet_plugin.dll
+            samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_plugin.dll
