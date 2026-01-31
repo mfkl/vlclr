@@ -4,9 +4,10 @@
 param(
     [switch]$SkipBuild,
     [switch]$SkipCacheRegen,
-    [string]$VideoPath = "$env:USERPROFILE\Videos\BigBuckBunny.mp4",
+    [string]$VideoPath = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     [string]$Filter = "dotnet_overlay",
-    [int]$TestTimeout = 10
+    [int]$TestTimeout = 15,
+    [string]$VlcBinaryPath  # Override VLC location (for CI)
 )
 
 $ErrorActionPreference = "Stop"
@@ -17,7 +18,14 @@ $projectDir = Join-Path $scriptDir "samples\VideoOverlay"
 $projectFile = Join-Path $projectDir "VideoOverlay.csproj"
 $nativeOutputDir = Join-Path $projectDir "bin\Release\net10.0\win-x64\native"
 $pluginSource = Join-Path $nativeOutputDir "libdotnet_overlay_plugin.dll"
-$vlcDir = Join-Path $scriptDir "vlc-binaries\vlc-4.0.0-dev"
+
+# Use VlcBinaryPath if provided, otherwise default
+if ($VlcBinaryPath) {
+    $vlcDir = $VlcBinaryPath
+} else {
+    $vlcDir = Join-Path $scriptDir "vlc-binaries\vlc-4.0.0-dev"
+}
+
 $pluginDir = Join-Path $vlcDir "plugins\video_filter"
 $pluginDest = Join-Path $pluginDir "libdotnet_overlay_plugin.dll"
 $oldPluginDir = Join-Path $vlcDir "plugins\interface"
@@ -251,10 +259,20 @@ Write-Host "[5/5] Testing VLC module list..." -ForegroundColor Yellow
 # First, test with --list to see if VLC recognizes the module
 Write-Host "      Checking module registration..." -ForegroundColor DarkGray
 
-# Suppress stderr errors (stale cache warnings)
-$ErrorActionPreference = "SilentlyContinue"
-$listOutput = & $vlcExe --list 2>&1 | Out-String
-$ErrorActionPreference = "Stop"
+$listStdout = Join-Path $env:TEMP "vlc_list_stdout.txt"
+$listStderr = Join-Path $env:TEMP "vlc_list_stderr.txt"
+
+$listProcess = Start-Process -FilePath $vlcExe -ArgumentList "--list" -PassThru -NoNewWindow -RedirectStandardOutput $listStdout -RedirectStandardError $listStderr
+$listCompleted = $listProcess.WaitForExit(10000)
+if (-not $listCompleted) {
+    $listProcess.Kill()
+    Write-Host "      VLC --list timed out after 10s" -ForegroundColor DarkYellow
+}
+
+$listOutput = ""
+if (Test-Path $listStdout) {
+    $listOutput = Get-Content $listStdout -Raw -ErrorAction SilentlyContinue
+}
 
 $moduleFound = $false
 $filterFound = $false
@@ -273,32 +291,10 @@ if (-not $moduleFound) {
     Write-Host "      WARNING: Module not found in VLC module list" -ForegroundColor DarkYellow
 }
 
-# Test with verbose logging to check plugin loading
-Write-Host "      Running VLC with verbose logging..." -ForegroundColor DarkGray
-
-$vlcArgs = @(
-    "-vvv",
-    "--no-hw-dec",
-    "--intf", "dummy",
-    "--no-video",
-    "--no-audio",
-    "--run-time=1",
-    "--play-and-exit"
-)
-
-$vlcProcess = Start-Process -FilePath $vlcExe -ArgumentList $vlcArgs -PassThru -NoNewWindow -RedirectStandardError "$env:TEMP\vlc_stderr.txt" -RedirectStandardOutput "$env:TEMP\vlc_stdout.txt"
-
-# Wait for process with timeout
-$completed = $vlcProcess.WaitForExit($TestTimeout * 1000)
-if (-not $completed) {
-    $vlcProcess.Kill()
-    Write-Host "      VLC process timed out after ${TestTimeout}s (this is expected)" -ForegroundColor DarkGray
-}
-
-# Read and analyze logs
+# Read and analyze logs from headless test
 $stderrContent = ""
-if (Test-Path "$env:TEMP\vlc_stderr.txt") {
-    $stderrContent = Get-Content "$env:TEMP\vlc_stderr.txt" -Raw -ErrorAction SilentlyContinue
+if (Test-Path $tempStderr) {
+    $stderrContent = Get-Content $tempStderr -Raw -ErrorAction SilentlyContinue
 }
 
 $loadSuccess = $false
@@ -326,149 +322,156 @@ if ($stderrContent -match "libvlccore.*not found|missing.*libvlccore") {
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Results" -ForegroundColor Cyan
+Write-Host " Preliminary Check Results" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Check preliminary results - fail early if plugin not found
 if ($headlessTestFailed) {
     Write-Host "PLUGIN LOAD: FAILED (headless VLC test)" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "The plugin was built successfully but VLC crashed/failed while" -ForegroundColor Yellow
-    Write-Host "trying to load it. This indicates a bug in the module descriptor." -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "Error: $headlessTestError" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Common causes:" -ForegroundColor White
-    Write-Host "  - Module shortcuts set incorrectly" -ForegroundColor Gray
-    Write-Host "  - Module name set before/after shortcuts in wrong order" -ForegroundColor Gray
-    Write-Host "  - Two VLC_MODULE_CREATE calls instead of VLC_SUBMODULE_CREATE" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "See: samples/VideoOverlay/ModuleDescriptor.cs" -ForegroundColor Cyan
+    Write-Host "Error: $headlessTestError" -ForegroundColor Red
     exit 1
 } elseif ($cacheGenFailed) {
-    Write-Host "PLUGIN LOAD: FAILED (cache-gen assertion)" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "The plugin was built successfully but vlc-cache-gen crashed while" -ForegroundColor Yellow
-    Write-Host "trying to load it. This indicates a bug in the module descriptor." -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "Error details:" -ForegroundColor White
-    $cacheGenError -split "`n" | Where-Object { $_ -match "\S" } | Select-Object -First 10 | ForEach-Object {
-        Write-Host "  $_" -ForegroundColor DarkGray
-    }
-    Write-Host ""
-    Write-Host "Common causes:" -ForegroundColor White
-    Write-Host "  - Module shortcuts set incorrectly" -ForegroundColor Gray
-    Write-Host "  - Module name set before/after shortcuts in wrong order" -ForegroundColor Gray
-    Write-Host "  - Two VLC_MODULE_CREATE calls instead of VLC_SUBMODULE_CREATE" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "See: samples/VideoOverlay/ModuleDescriptor.cs" -ForegroundColor Cyan
+    Write-Host "PLUGIN LOAD: FAILED (cache-gen crashed)" -ForegroundColor Red
     exit 1
 } elseif ($loadError) {
-    Write-Host "PLUGIN LOAD: FAILED" -ForegroundColor Red
-    Write-Host "Error: $errorMessage" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "Relevant log output:" -ForegroundColor Yellow
-    $stderrContent -split "`n" | Where-Object { $_ -match "dotnet|error|fail" } | Select-Object -First 20 | ForEach-Object {
-        Write-Host "  $_" -ForegroundColor DarkGray
-    }
+    Write-Host "PLUGIN LOAD: FAILED - $errorMessage" -ForegroundColor Red
     exit 1
-} elseif ($loadSuccess -or $moduleFound) {
-    Write-Host "PLUGIN LOAD: SUCCESS" -ForegroundColor Green
+} elseif (-not $moduleFound -and -not $loadSuccess) {
+    Write-Host "PLUGIN LOAD: FAILED - Module not found in VLC" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Plugin Details:" -ForegroundColor White
-    Write-Host "  - Module: dotnet_plugin" -ForegroundColor Gray
-    Write-Host "  - Filter: dotnet_overlay (aliases: dotnet, netoverlay)" -ForegroundColor Gray
-    Write-Host "  - Size:   $($pluginSize.ToString('F1')) MB" -ForegroundColor Gray
-    Write-Host ""
+    Write-Host "The plugin DLL was deployed but VLC does not recognize it." -ForegroundColor Yellow
+    Write-Host "This can happen if:" -ForegroundColor Yellow
+    Write-Host "  - vlc-cache-gen failed to register the plugin" -ForegroundColor Gray
+    Write-Host "  - The plugin doesn't export vlc_entry correctly" -ForegroundColor Gray
+    Write-Host "  - VLC commands are timing out in CI environment" -ForegroundColor Gray
+    exit 1
+} else {
+    Write-Host "Plugin load check: SUCCESS" -ForegroundColor Green
+}
 
-    # Step 6: Test video filter with actual video playback
-    if (Test-Path $VideoPath) {
-        Write-Host "[6/6] Testing video filter with playback..." -ForegroundColor Yellow
-        Write-Host "      Video: $VideoPath" -ForegroundColor DarkGray
+Write-Host ""
+Write-Host "Plugin Details:" -ForegroundColor White
+Write-Host "  - Module: dotnet_plugin" -ForegroundColor Gray
+Write-Host "  - Filter: dotnet_overlay" -ForegroundColor Gray
+Write-Host "  - Size:   $($pluginSize.ToString('F1')) MB" -ForegroundColor Gray
+Write-Host ""
 
-        $filterTestStderr = Join-Path $PSScriptRoot "vlc_filter_test_stderr.txt"
-        $filterTestStdout = Join-Path $PSScriptRoot "vlc_filter_test_stdout.txt"
+# Step 6: Test video filter with actual video playback (integration test)
+    Write-Host "[6/6] Running filter integration test..." -ForegroundColor Yellow
+    Write-Host "      Video: $VideoPath" -ForegroundColor DarkGray
 
-        $filterArgs = @(
-            "--video-filter=dotnet_overlay",
-            "--no-hw-dec",
-            "--run-time=5",
-            "--play-and-exit",
-            "--no-audio",
-            "-vvv",
-            "file:///$($VideoPath -replace '\\','/' -replace ' ','%20')"
-        )
+    $filterTestStderr = Join-Path $PSScriptRoot "vlc_filter_test_stderr.txt"
+    $filterTestStdout = Join-Path $PSScriptRoot "vlc_filter_test_stdout.txt"
 
-        Write-Host "      Running: vlc.exe $($filterArgs -join ' ')" -ForegroundColor DarkGray
+    # Build video path - support both URLs and local files
+    if ($VideoPath -match "^https?://") {
+        $videoArg = $VideoPath
+    } else {
+        $videoArg = "file:///$($VideoPath -replace '\\','/' -replace ' ','%20')"
+    }
 
-        try {
-            $filterProcess = Start-Process -FilePath $vlcExe -ArgumentList $filterArgs -PassThru -NoNewWindow -RedirectStandardError $filterTestStderr -RedirectStandardOutput $filterTestStdout -ErrorAction Stop
+    $filterArgs = @(
+        "--video-filter=dotnet_overlay",
+        "--no-hw-dec",
+        "--start-time=30",
+        "--run-time=5",
+        "--play-and-exit",
+        "--no-audio",
+        "-vvv",
+        $videoArg
+    )
 
-            $filterCompleted = $filterProcess.WaitForExit(15000)
-            if (-not $filterCompleted) {
-                $filterProcess.Kill()
-                Write-Host "      VLC playback timed out after 15s (killed)" -ForegroundColor DarkGray
+    Write-Host "      Running: vlc.exe $($filterArgs -join ' ')" -ForegroundColor DarkGray
+
+    $integrationTestPassed = $true
+    $integrationTestError = ""
+
+    try {
+        $filterProcess = Start-Process -FilePath $vlcExe -ArgumentList $filterArgs -PassThru -NoNewWindow -RedirectStandardError $filterTestStderr -RedirectStandardOutput $filterTestStdout -ErrorAction Stop
+
+        $filterCompleted = $filterProcess.WaitForExit($TestTimeout * 1000)
+        if (-not $filterCompleted) {
+            $filterProcess.Kill()
+            Write-Host "      VLC playback timed out after ${TestTimeout}s (killed)" -ForegroundColor DarkGray
+        }
+
+        # Read and analyze filter test logs
+        $filterLogs = ""
+        if (Test-Path $filterTestStderr) {
+            $filterLogs = Get-Content $filterTestStderr -Raw -ErrorAction SilentlyContinue
+        }
+
+        # Look for our plugin's log output
+        $pluginLogs = $filterLogs -split "`n" | Where-Object { $_ -match "\[VideoOverlay\]" }
+
+        Write-Host ""
+        Write-Host "      Filter Plugin Logs:" -ForegroundColor Cyan
+        if ($pluginLogs.Count -gt 0) {
+            $pluginLogs | Select-Object -First 15 | ForEach-Object {
+                Write-Host "        $_" -ForegroundColor White
             }
-
-            # Read and analyze filter test logs
-            $filterLogs = ""
-            if (Test-Path $filterTestStderr) {
-                $filterLogs = Get-Content $filterTestStderr -Raw -ErrorAction SilentlyContinue
+            if ($pluginLogs.Count -gt 15) {
+                Write-Host "        ... ($($pluginLogs.Count - 15) more lines)" -ForegroundColor DarkGray
             }
-
-            # Look for our plugin's log output
-            $pluginLogs = $filterLogs -split "`n" | Where-Object { $_ -match "\[VideoOverlay\]" }
-
-            Write-Host ""
-            Write-Host "      Filter Plugin Logs:" -ForegroundColor Cyan
-            if ($pluginLogs.Count -gt 0) {
-                $pluginLogs | Select-Object -First 15 | ForEach-Object {
-                    Write-Host "        $_" -ForegroundColor White
-                }
-                if ($pluginLogs.Count -gt 15) {
-                    Write-Host "        ... ($($pluginLogs.Count - 15) more lines)" -ForegroundColor DarkGray
-                }
-
-                # Check if filter was actually activated
-                if ($filterLogs -match "FilterOpen") {
-                    Write-Host ""
-                    Write-Host "      VIDEO FILTER: ACTIVATED" -ForegroundColor Green
-                } else {
-                    Write-Host ""
-                    Write-Host "      VIDEO FILTER: NOT ACTIVATED" -ForegroundColor Yellow
-                    Write-Host "      The filter is registered but VLC didn't activate it for this video." -ForegroundColor DarkGray
-                }
-            } else {
-                Write-Host "        (no plugin logs captured)" -ForegroundColor DarkGray
-
-                # Check for any filter-related messages
-                $filterMentions = $filterLogs -split "`n" | Where-Object { $_ -match "dotnet|overlay" } | Select-Object -First 5
-                if ($filterMentions.Count -gt 0) {
-                    Write-Host ""
-                    Write-Host "      Filter mentions in VLC logs:" -ForegroundColor DarkGray
-                    $filterMentions | ForEach-Object {
-                        Write-Host "        $_" -ForegroundColor DarkGray
-                    }
-                }
-            }
-        } catch {
-            Write-Host "      ERROR: Failed to run filter test: $_" -ForegroundColor Red
+        } else {
+            Write-Host "        (no plugin logs captured)" -ForegroundColor DarkGray
         }
 
         Write-Host ""
-    } else {
-        Write-Host "No test video found at: $VideoPath" -ForegroundColor DarkGray
-        Write-Host "To test the filter visually, run:" -ForegroundColor White
-        Write-Host "  .\build-and-test.ps1 -VideoPath `"<path-to-video>`"" -ForegroundColor Cyan
+        Write-Host "========================================" -ForegroundColor Cyan
+        Write-Host " Filter Integration Test Assertions" -ForegroundColor Cyan
+        Write-Host "========================================" -ForegroundColor Cyan
+        Write-Host ""
+
+        # Required log patterns - ALL must be present to prove callbacks are invoked
+        $assertions = @(
+            @{ Name = "FilterOpen called"; Pattern = "\[VideoOverlay\] FilterOpen:" },
+            @{ Name = "FilterOpen succeeded"; Pattern = "\[VideoOverlay\] FilterOpen completed successfully" },
+            @{ Name = "FilterState initialized"; Pattern = "\[VideoOverlay\] FilterState initialized:" },
+            @{ Name = "FilterClose called"; Pattern = "\[VideoOverlay\] FilterClose called" },
+            @{ Name = "Frames processed"; Pattern = "\[VideoOverlay\] FilterState cleanup, processed (\d+) frames" }
+        )
+
+        foreach ($assertion in $assertions) {
+            if ($filterLogs -match $assertion.Pattern) {
+                Write-Host "[PASS] $($assertion.Name)" -ForegroundColor Green
+
+                # Special check for frame count
+                if ($assertion.Name -eq "Frames processed") {
+                    $frameCount = [int]$Matches[1]
+                    if ($frameCount -eq 0) {
+                        Write-Host "       Frame count is 0 - filter callbacks not processing frames" -ForegroundColor Red
+                        $integrationTestPassed = $false
+                        $integrationTestError = "Frame count is 0"
+                    } else {
+                        Write-Host "       Processed $frameCount frames" -ForegroundColor Cyan
+                    }
+                }
+            } else {
+                Write-Host "[FAIL] $($assertion.Name)" -ForegroundColor Red
+                $integrationTestPassed = $false
+                if (-not $integrationTestError) {
+                    $integrationTestError = "Missing: $($assertion.Name)"
+                }
+            }
+        }
+
+        Write-Host ""
+
+    } catch {
+        Write-Host "      ERROR: Failed to run filter test: $_" -ForegroundColor Red
+        $integrationTestPassed = $false
+        $integrationTestError = $_.Exception.Message
     }
 
-    exit 0
-} else {
-    Write-Host "PLUGIN LOAD: UNCERTAIN" -ForegroundColor Yellow
-    Write-Host "Could not definitively verify plugin loading." -ForegroundColor Yellow
-    Write-Host "The plugin was deployed but VLC log analysis was inconclusive." -ForegroundColor DarkGray
-    Write-Host ""
-    Write-Host "Try running manually with verbose output:" -ForegroundColor White
-    Write-Host "  & `"$vlcExe`" -vvv --list 2>&1 | Select-String dotnet" -ForegroundColor Cyan
-    exit 0
-}
+    if ($integrationTestPassed) {
+        Write-Host "FILTER INTEGRATION TEST: PASSED" -ForegroundColor Green
+        Write-Host ""
+        exit 0
+    } else {
+        Write-Host "FILTER INTEGRATION TEST: FAILED" -ForegroundColor Red
+        Write-Host "Error: $integrationTestError" -ForegroundColor Red
+        Write-Host ""
+        exit 1
+    }
