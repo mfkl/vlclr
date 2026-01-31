@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  VLC_URL: https://artifacts.videolan.org/vlc/nightly-win64-llvm/20260127-0438/vlc-4.0.0-dev-win64-2deb1c14.7z
+  VLC_SDK_URL: https://artifacts.videolan.org/vlc/nightly-win64-llvm/20260127-0438/vlc-4.0.0-dev-win64-2deb1c14.7z
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Download and extract VLC SDK
         run: |
-          Invoke-WebRequest -Uri "$env:VLC_URL" -OutFile vlc.7z
+          Invoke-WebRequest -Uri "$env:VLC_SDK_URL" -OutFile vlc.7z
           7z x vlc.7z -ovlc-download
           # Move the inner folder to vlc-sdk
           $innerFolder = Get-ChildItem vlc-download | Select-Object -First 1
@@ -52,6 +52,27 @@ jobs:
         with:
           name: test-results
           path: TestResults/*.trx
+
+      - name: Deploy plugin to VLC
+        run: |
+          $pluginSrc = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"
+          $pluginDst = "vlc-sdk/plugins/video_filter/"
+          New-Item -ItemType Directory -Force -Path $pluginDst
+          Copy-Item $pluginSrc $pluginDst
+          Write-Host "Plugin deployed to $pluginDst"
+
+      - name: Regenerate VLC plugin cache
+        run: |
+          & "vlc-sdk/vlc-cache-gen.exe" "vlc-sdk/plugins"
+
+      - name: Run filter integration test
+        run: |
+          ./build-and-test.ps1 `
+            -SkipBuild `
+            -SkipCacheRegen `
+            -VlcBinaryPath "vlc-sdk" `
+            -VideoPath "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" `
+            -TestTimeout 30
 
       - name: Upload plugin
         uses: actions/upload-artifact@v4
