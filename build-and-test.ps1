@@ -108,7 +108,7 @@ Write-Host "      Running: vlc.exe -I dummy --list (without our plugin)" -Foregr
 $baselineStdout = Join-Path $env:TEMP "vlc_baseline_stdout.txt"
 $baselineStderr = Join-Path $env:TEMP "vlc_baseline_stderr.txt"
 
-$baselineProcess = Start-Process -FilePath $vlcExe -ArgumentList "-I","dummy","--list" -PassThru -NoNewWindow -RedirectStandardOutput $baselineStdout -RedirectStandardError $baselineStderr
+$baselineProcess = Start-Process -FilePath $vlcExe -ArgumentList "-I","dummy","--ignore-config","--list" -PassThru -NoNewWindow -RedirectStandardOutput $baselineStdout -RedirectStandardError $baselineStderr
 $baselineCompleted = $baselineProcess.WaitForExit(15000)
 
 if (-not $baselineCompleted) {
@@ -202,7 +202,7 @@ Write-Host "      Running: vlc.exe -I dummy --list" -ForegroundColor DarkGray
 $listStdout = Join-Path $env:TEMP "vlc_list_stdout.txt"
 $listStderr = Join-Path $env:TEMP "vlc_list_stderr.txt"
 
-$listProcess = Start-Process -FilePath $vlcExe -ArgumentList "-I","dummy","--list" -PassThru -NoNewWindow -RedirectStandardOutput $listStdout -RedirectStandardError $listStderr
+$listProcess = Start-Process -FilePath $vlcExe -ArgumentList "-I","dummy","--ignore-config","--list" -PassThru -NoNewWindow -RedirectStandardOutput $listStdout -RedirectStandardError $listStderr
 $listCompleted = $listProcess.WaitForExit(10000)
 
 if (-not $listCompleted) {
