@@ -60,19 +60,12 @@ jobs:
           New-Item -ItemType Directory -Force -Path $pluginDst
           Copy-Item $pluginSrc $pluginDst
           Write-Host "Plugin deployed to $pluginDst"
-
-      - name: Regenerate VLC plugin cache
-        run: |
-          & "vlc-sdk/vlc-cache-gen.exe" "vlc-sdk/plugins"
+          # Remove plugin cache so libvlc rescans plugins directory
+          Remove-Item "vlc-sdk/plugins/plugins.dat" -ErrorAction SilentlyContinue
 
       - name: Run filter integration test
         run: |
-          ./build-and-test.ps1 `
-            -SkipBuild `
-            -SkipCacheRegen `
-            -VlcBinaryPath "vlc-sdk" `
-            -VideoPath "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" `
-            -TestTimeout 30
+          dotnet run --project tests/IntegrationTest -- vlc-sdk "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 10
 
       - name: Upload plugin
         uses: actions/upload-artifact@v4

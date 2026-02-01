@@ -48,12 +48,12 @@ public static class FilterState
     /// </summary>
     public static void Cleanup()
     {
+        Console.Error.WriteLine($"[VideoOverlay] FilterState cleanup, processed {_frameCount} frames");
+
         _renderer?.Dispose();
         _renderer = null;
         _initialized = false;
         _filterPtr = nint.Zero;
-
-        Console.Error.WriteLine($"[VideoOverlay] FilterState cleanup, processed {_frameCount} frames");
     }
 
     /// <summary>
