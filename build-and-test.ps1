@@ -154,10 +154,10 @@ Write-Host "[3b/5] Testing plugin load with headless VLC..." -ForegroundColor Ye
 # Run VLC headless with verbose logging to see plugin loading
 $headlessArgs = @(
     "-vvv",
-    "--intf", "none",
+    "-I", "dummy",
     "--no-interact",
-    "--no-video",
-    "--no-audio",
+    "--vout=dummy",
+    "--aout=dummy",
     "--no-playlist-autostart",
     "--play-and-exit",
     "--run-time=1"
@@ -378,8 +378,9 @@ Write-Host ""
     }
 
     $filterArgs = @(
-        "--intf", "none",
+        "-I", "dummy",
         "--no-interact",
+        "--vout=dummy",
         "--video-filter=dotnet_overlay",
         "--no-hw-dec",
         "--start-time=30",
