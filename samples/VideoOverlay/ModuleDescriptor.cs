@@ -78,14 +78,7 @@ public static unsafe class ModuleDescriptor
             uint width = filter.FormatIn.Video.Width;
             uint height = filter.FormatIn.Video.Height;
 
-            Console.Error.WriteLine($"[.NET Video Overlay] FilterOpen: {width}x{height} chroma=0x{chroma:X8}");
-
-            // Log fourcc as characters
-            char c1 = (char)(chroma & 0xFF);
-            char c2 = (char)((chroma >> 8) & 0xFF);
-            char c3 = (char)((chroma >> 16) & 0xFF);
-            char c4 = (char)((chroma >> 24) & 0xFF);
-            Console.Error.WriteLine($"[.NET Video Overlay] Chroma fourcc: {c1}{c2}{c3}{c4}");
+            Console.Error.WriteLine($"[.NET Video Overlay] FilterOpen: {width}x{height} chroma={VLCFourCC.ToString(chroma)} (0x{chroma:X8})");
 
             // Initialize filter state
             FilterState.Initialize(filterPtr, (int)width, (int)height, chroma);

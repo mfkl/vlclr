@@ -1,3 +1,5 @@
+using VLCLR.Native;
+
 namespace VideoOverlay;
 
 /// <summary>
@@ -78,13 +80,13 @@ public static class FilterState
         byte* framePtr = (byte*)pixels;
 
         // Determine bytes per pixel based on chroma
-        int bytesPerPixel = GetBytesPerPixel(chroma);
+        int bytesPerPixel = VLCFourCC.GetBytesPerPixel(chroma);
         if (bytesPerPixel == 0)
         {
             // Unknown format - log once and skip
             if (_frameCount == 1)
             {
-                Console.Error.WriteLine($"[.NET Video Overlay] Unknown chroma format: 0x{chroma:X8}");
+                Console.Error.WriteLine($"[.NET Video Overlay] Unknown chroma format: {VLCFourCC.ToString(chroma)} (0x{chroma:X8})");
             }
             return;
         }
@@ -104,8 +106,8 @@ public static class FilterState
             return;
 
         // Composite based on format
-        bool isBgra = IsBgraFormat(chroma);
-        bool hasAlpha = HasAlphaChannel(chroma);
+        bool isBgra = VLCFourCC.IsBgraFormat(chroma);
+        bool hasAlpha = VLCFourCC.HasAlphaChannel(chroma);
 
         for (int y = 0; y < maxOverlayHeight; y++)
         {
@@ -245,79 +247,4 @@ public static class FilterState
         }
     }
 
-    /// <summary>
-    /// Get bytes per pixel for a VLC chroma format.
-    /// </summary>
-    private static int GetBytesPerPixel(uint chroma)
-    {
-        // VLC chroma codes are fourcc values
-        // Common formats:
-        // RV32 = 0x32335652 = "RV32" (32-bit RGB, actually BGRX)
-        // RV24 = 0x34325652 = "RV24" (24-bit RGB, actually BGR)
-        // RGBA = 0x41424752 = "RGBA"
-        // BGRA = 0x41524742 = "BGRA"
-        // I420 = 0x30323449 = "I420" (YUV 4:2:0 planar)
-
-        // For simplicity, map known formats
-        return chroma switch
-        {
-            0x32335652 => 4, // RV32
-            0x34325652 => 3, // RV24
-            0x41424752 => 4, // RGBA
-            0x41524742 => 4, // BGRA
-            0x30323449 => 1, // I420 (Y plane only)
-            0x32315659 => 1, // YV12 (Y plane only)
-            _ => GuessFromFourcc(chroma)
-        };
-    }
-
-    private static int GuessFromFourcc(uint chroma)
-    {
-        // Try to guess from fourcc pattern
-        char c1 = (char)(chroma & 0xFF);
-        char c2 = (char)((chroma >> 8) & 0xFF);
-        char c3 = (char)((chroma >> 16) & 0xFF);
-        char c4 = (char)((chroma >> 24) & 0xFF);
-
-        string fourcc = $"{c1}{c2}{c3}{c4}";
-
-        // Log for debugging
-        if (_frameCount == 1)
-        {
-            Console.Error.WriteLine($"[.NET Video Overlay] Chroma fourcc: {fourcc}");
-        }
-
-        // Patterns
-        if (fourcc.Contains("32") || fourcc.Contains("RGBA") || fourcc.Contains("BGRA") || fourcc.Contains("ARGB"))
-            return 4;
-        if (fourcc.Contains("24") || fourcc.Contains("RGB"))
-            return 3;
-        if (fourcc.StartsWith("I4") || fourcc.StartsWith("YV") || fourcc.StartsWith("NV"))
-            return 1; // Planar YUV - Y plane is 1 byte per pixel
-
-        return 0; // Unknown
-    }
-
-    private static bool IsBgraFormat(uint chroma)
-    {
-        // RV32 and RV24 are actually BGR(A) in VLC
-        // BGRA is obviously BGRA
-        return chroma switch
-        {
-            0x32335652 => true,  // RV32 (BGRX)
-            0x34325652 => true,  // RV24 (BGR)
-            0x41524742 => true,  // BGRA
-            _ => false
-        };
-    }
-
-    private static bool HasAlphaChannel(uint chroma)
-    {
-        return chroma switch
-        {
-            0x41424752 => true, // RGBA
-            0x41524742 => true, // BGRA
-            _ => false
-        };
-    }
 }
