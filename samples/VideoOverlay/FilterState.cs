@@ -40,7 +40,7 @@ public static class FilterState
 
         _initialized = true;
 
-        Console.Error.WriteLine($"[VideoOverlay] FilterState initialized: {width}x{height}");
+        Console.Error.WriteLine($"[.NET Video Overlay] FilterState initialized: {width}x{height}");
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public static class FilterState
     /// </summary>
     public static void Cleanup()
     {
-        Console.Error.WriteLine($"[VideoOverlay] FilterState cleanup, processed {_frameCount} frames");
+        Console.Error.WriteLine($"[.NET Video Overlay] FilterState cleanup, processed {_frameCount} frames");
 
         _renderer?.Dispose();
         _renderer = null;
@@ -84,7 +84,7 @@ public static class FilterState
             // Unknown format - log once and skip
             if (_frameCount == 1)
             {
-                Console.Error.WriteLine($"[VideoOverlay] Unknown chroma format: 0x{chroma:X8}");
+                Console.Error.WriteLine($"[.NET Video Overlay] Unknown chroma format: 0x{chroma:X8}");
             }
             return;
         }
@@ -234,12 +234,12 @@ public static class FilterState
 
                 // Save just the overlay for now (simpler verification)
                 _renderer.SaveOverlayToFile(DebugFramePath);
-                Console.Error.WriteLine($"[VideoOverlay] Saved debug overlay to: {DebugFramePath}");
+                Console.Error.WriteLine($"[.NET Video Overlay] Saved debug overlay to: {DebugFramePath}");
                 _savedDebugFrame = true;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[VideoOverlay] Failed to save debug frame: {ex.Message}");
+                Console.Error.WriteLine($"[.NET Video Overlay] Failed to save debug frame: {ex.Message}");
                 _savedDebugFrame = true; // Don't try again
             }
         }
@@ -284,7 +284,7 @@ public static class FilterState
         // Log for debugging
         if (_frameCount == 1)
         {
-            Console.Error.WriteLine($"[VideoOverlay] Chroma fourcc: {fourcc}");
+            Console.Error.WriteLine($"[.NET Video Overlay] Chroma fourcc: {fourcc}");
         }
 
         // Patterns

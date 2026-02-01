@@ -78,14 +78,14 @@ public static unsafe class ModuleDescriptor
             uint width = filter.FormatIn.Video.Width;
             uint height = filter.FormatIn.Video.Height;
 
-            Console.Error.WriteLine($"[VideoOverlay] FilterOpen: {width}x{height} chroma=0x{chroma:X8}");
+            Console.Error.WriteLine($"[.NET Video Overlay] FilterOpen: {width}x{height} chroma=0x{chroma:X8}");
 
             // Log fourcc as characters
             char c1 = (char)(chroma & 0xFF);
             char c2 = (char)((chroma >> 8) & 0xFF);
             char c3 = (char)((chroma >> 16) & 0xFF);
             char c4 = (char)((chroma >> 24) & 0xFF);
-            Console.Error.WriteLine($"[VideoOverlay] Chroma fourcc: {c1}{c2}{c3}{c4}");
+            Console.Error.WriteLine($"[.NET Video Overlay] Chroma fourcc: {c1}{c2}{c3}{c4}");
 
             // Initialize filter state
             FilterState.Initialize(filterPtr, (int)width, (int)height, chroma);
@@ -93,13 +93,13 @@ public static unsafe class ModuleDescriptor
             // Set filter->ops to our operations structure
             filter.Operations = s_filterOpsPtr;
 
-            Console.Error.WriteLine("[VideoOverlay] FilterOpen completed successfully");
+            Console.Error.WriteLine("[.NET Video Overlay] FilterOpen completed successfully");
             return 0; // VLC_SUCCESS
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[VideoOverlay] FilterOpen failed: {ex.Message}");
-            Console.Error.WriteLine($"[VideoOverlay] Stack trace: {ex.StackTrace}");
+            Console.Error.WriteLine($"[.NET Video Overlay] FilterOpen failed: {ex.Message}");
+            Console.Error.WriteLine($"[.NET Video Overlay] Stack trace: {ex.StackTrace}");
             return -1; // VLC_EGENERIC
         }
     }
@@ -189,7 +189,7 @@ public static unsafe class ModuleDescriptor
             // Log errors only occasionally to avoid spam
             if (FilterState.FrameCount % 300 == 0)
             {
-                Console.Error.WriteLine($"[VideoOverlay] FilterVideo error: {ex.Message}");
+                Console.Error.WriteLine($"[.NET Video Overlay] FilterVideo error: {ex.Message}");
             }
             // Return input picture unchanged on error
             return picturePtr;
@@ -204,7 +204,7 @@ public static unsafe class ModuleDescriptor
     {
         try
         {
-            Console.Error.WriteLine("[VideoOverlay] FilterClose called");
+            Console.Error.WriteLine("[.NET Video Overlay] FilterClose called");
             FilterState.Cleanup();
         }
         catch
