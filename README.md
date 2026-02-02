@@ -51,20 +51,31 @@ dotnet test src/VLCLR.Tests
 
 ## Usage
 
-1. Copy the plugin DLL to VLC's plugin directory:
+### Testing with LibVLCSharp
+
+The easiest way to test the plugin is using the IntegrationTest sample:
+
 ```bash
-cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll <vlc-path>/plugins/video_filter/
+# Build the plugin
+dotnet publish samples/VideoOverlay -c Release -r win-x64
+
+# Copy to VLC SDK plugin directory
+cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll <vlc-sdk-path>/plugins/video_filter/
+
+# Regenerate plugin cache
+<vlc-sdk-path>/vlc-cache-gen.exe <vlc-sdk-path>/plugins
+
+# Run integration test
+cd tests/IntegrationTest
+dotnet run <vlc-sdk-path> <video-url>
 ```
 
-2. Regenerate the plugin cache:
+Example:
 ```bash
-vlc-cache-gen.exe <vlc-path>/plugins
+dotnet run ./vlc-sdk file:///C:/path/to/video.mp4
 ```
 
-3. Run VLC with the video filter:
-```bash
-vlc.exe --video-filter=dotnet_overlay --no-hw-dec video.mp4
-```
+The integration test uses LibVLCSharp to programmatically load and test the plugin, verifying that the video filter loads and processes frames successfully.
 
 ## Creating Your Own Plugin
 
