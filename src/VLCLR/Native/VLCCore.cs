@@ -483,6 +483,147 @@ public static partial class VLCCore
     public static partial nint FourccGetChromaDescription(uint fourcc);
 
     #endregion
+
+    #region Subpicture Region Management
+
+    /// <summary>
+    /// Create a new subpicture region.
+    /// You must use subpicture_region_Delete to destroy it.
+    /// </summary>
+    /// <param name="format">Pointer to video_format_t structure</param>
+    /// <returns>Pointer to subpicture_region_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_New")]
+    public static partial nint SubpictureRegionNew(nint format);
+
+    /// <summary>
+    /// Create a new text subpicture region.
+    /// You must use subpicture_region_Delete to destroy it.
+    /// </summary>
+    /// <returns>Pointer to subpicture_region_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_NewText")]
+    public static partial nint SubpictureRegionNewText();
+
+    /// <summary>
+    /// Create a subpicture region containing the picture.
+    /// A reference will be added to the picture on success.
+    /// You must use subpicture_region_Delete to destroy it.
+    /// </summary>
+    /// <param name="picture">Pointer to picture_t</param>
+    /// <returns>Pointer to subpicture_region_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_ForPicture")]
+    public static partial nint SubpictureRegionForPicture(nint picture);
+
+    /// <summary>
+    /// Delete a subpicture region.
+    /// You may give it NULL.
+    /// </summary>
+    /// <param name="region">Pointer to subpicture_region_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_Delete")]
+    public static partial void SubpictureRegionDelete(nint region);
+
+    #endregion
+
+    #region Text Style Management
+
+    /// <summary>
+    /// Create a default text style with sensible defaults.
+    /// </summary>
+    /// <returns>Pointer to text_style_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_style_New")]
+    public static partial nint TextStyleNew();
+
+    /// <summary>
+    /// Create a text style.
+    /// Pass STYLE_NO_DEFAULTS (0) for zero-filled object,
+    /// or any other value for sensible defaults.
+    /// </summary>
+    /// <param name="features">Feature flags (STYLE_NO_DEFAULTS or other)</param>
+    /// <returns>Pointer to text_style_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_style_Create")]
+    public static partial nint TextStyleCreate(int features);
+
+    /// <summary>
+    /// Copy a text style into another.
+    /// </summary>
+    /// <param name="dst">Destination text_style_t pointer</param>
+    /// <param name="src">Source text_style_t pointer</param>
+    /// <returns>Pointer to destination text_style_t</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_style_Copy")]
+    public static partial nint TextStyleCopy(nint dst, nint src);
+
+    /// <summary>
+    /// Duplicate a text style.
+    /// </summary>
+    /// <param name="style">Pointer to text_style_t to duplicate</param>
+    /// <returns>Pointer to new text_style_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_style_Duplicate")]
+    public static partial nint TextStyleDuplicate(nint style);
+
+    /// <summary>
+    /// Merge two styles using non-default values.
+    /// </summary>
+    /// <param name="dst">Destination text_style_t pointer</param>
+    /// <param name="src">Source text_style_t pointer</param>
+    /// <param name="override_">True to also overwrite non-defaults</param>
+    [LibraryImport(LibraryName, EntryPoint = "text_style_Merge")]
+    public static partial void TextStyleMerge(nint dst, nint src, [MarshalAs(UnmanagedType.U1)] bool override_);
+
+    /// <summary>
+    /// Delete a text style.
+    /// </summary>
+    /// <param name="style">Pointer to text_style_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "text_style_Delete")]
+    public static partial void TextStyleDelete(nint style);
+
+    #endregion
+
+    #region Text Segment Management
+
+    /// <summary>
+    /// Create a new text segment.
+    /// This duplicates the string passed as argument.
+    /// Use text_segment_ChainDelete to destroy the chain, or text_segment_Delete for a single segment.
+    /// </summary>
+    /// <param name="text">Text string for the segment (will be duplicated)</param>
+    /// <returns>Pointer to text_segment_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_segment_New", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial nint TextSegmentNew(string? text);
+
+    /// <summary>
+    /// Create a new text segment with style inherited from the given style.
+    /// This doesn't initialize the text.
+    /// </summary>
+    /// <param name="style">Pointer to text_style_t to inherit from</param>
+    /// <returns>Pointer to text_segment_t, or IntPtr.Zero on failure</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_segment_NewInheritStyle")]
+    public static partial nint TextSegmentNewInheritStyle(nint style);
+
+    /// <summary>
+    /// Delete a single text segment and its content.
+    /// This assumes the segment is not part of a chain.
+    /// </summary>
+    /// <param name="segment">Pointer to text_segment_t</param>
+    [LibraryImport(LibraryName, EntryPoint = "text_segment_Delete")]
+    public static partial void TextSegmentDelete(nint segment);
+
+    /// <summary>
+    /// Delete a list of text segments (chain).
+    /// You may pass it NULL.
+    /// </summary>
+    /// <param name="segment">Pointer to first text_segment_t in chain</param>
+    [LibraryImport(LibraryName, EntryPoint = "text_segment_ChainDelete")]
+    public static partial void TextSegmentChainDelete(nint segment);
+
+    /// <summary>
+    /// Copy a text_segment and its chain into a new one.
+    /// You may give it NULL, but it will return NULL.
+    /// </summary>
+    /// <param name="segment">Pointer to text_segment_t to copy</param>
+    /// <returns>Pointer to new text_segment_t chain, or IntPtr.Zero if input was NULL</returns>
+    [LibraryImport(LibraryName, EntryPoint = "text_segment_Copy")]
+    public static partial nint TextSegmentCopy(nint segment);
+
+    #endregion
 }
 
 /// <summary>
