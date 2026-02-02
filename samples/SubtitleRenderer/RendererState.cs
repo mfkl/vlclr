@@ -54,13 +54,28 @@ public static class RendererState
 
         _renderCount++;
 
+        // Parse text segments from the region
+        var segments = TextSegmentParser.Parse(regionPtr);
+
         // Log first few render calls for debugging
         if (_renderCount <= 5)
         {
-            Console.Error.WriteLine($"[.NET Subtitle] Render #{_renderCount}: regionPtr=0x{regionPtr:X}, chromaListPtr=0x{chromaListPtr:X}");
+            string description = TextSegmentParser.ParseAndDescribe(regionPtr);
+            Console.Error.WriteLine($"[.NET Subtitle] Render #{_renderCount}: {description}");
+
+            // Log individual segment details
+            foreach (var segment in segments)
+            {
+                Console.Error.WriteLine($"[.NET Subtitle]   Segment: {segment}");
+            }
         }
 
-        // TODO: Phase 6 will implement text segment parsing
+        // Skip empty text
+        if (segments.Count == 0 || segments.TrueForAll(s => s.IsEmpty))
+        {
+            return nint.Zero;
+        }
+
         // TODO: Phase 7 will implement ImageSharp rendering
         // TODO: Phase 8 will connect parsing + rendering + VLC picture creation
 
