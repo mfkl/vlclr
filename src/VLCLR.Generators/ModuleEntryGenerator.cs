@@ -262,33 +262,21 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine("    // Multi-instance support: each filter instance stores its GCHandle in filter->p_sys");
         sb.AppendLine();
 
-        // vlc_entry_api_version - pinned "4.0.6" string
-        sb.AppendLine("    private static readonly byte[] __apiVersion = new byte[] { 0x34, 0x2E, 0x30, 0x2E, 0x36, 0x00 }; // \"4.0.6\\0\"");
-        sb.AppendLine("    private static GCHandle __apiVersionHandle;");
-        sb.AppendLine();
+        // vlc_entry_api_version - returns pointer to "4.0.6" string
+        // Using unsafe fixed buffer for reliable Native AOT export
         sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry_api_version\")]");
-        sb.AppendLine("    public static nint VlcEntryApiVersion()");
+        sb.AppendLine("    public static unsafe byte* VlcEntryApiVersion()");
         sb.AppendLine("    {");
-        sb.AppendLine("        if (!__apiVersionHandle.IsAllocated)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            __apiVersionHandle = GCHandle.Alloc(__apiVersion, GCHandleType.Pinned);");
-        sb.AppendLine("        }");
-        sb.AppendLine("        return __apiVersionHandle.AddrOfPinnedObject();");
+        sb.AppendLine("        // \"4.0.6\" as null-terminated UTF-8");
+        sb.AppendLine("        return (byte*)System.Runtime.CompilerServices.Unsafe.AsPointer(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(\"4.0.6\\0\"u8));");
         sb.AppendLine("    }");
         sb.AppendLine();
 
-        // vlc_entry_copyright - pinned copyright string
-        sb.AppendLine("    private static readonly byte[] __copyright = System.Text.Encoding.UTF8.GetBytes(\"VLCLR\\0\");");
-        sb.AppendLine("    private static GCHandle __copyrightHandle;");
-        sb.AppendLine();
+        // vlc_entry_copyright - returns pointer to copyright string
         sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry_copyright\")]");
-        sb.AppendLine("    public static nint VlcEntryCopyright()");
+        sb.AppendLine("    public static unsafe byte* VlcEntryCopyright()");
         sb.AppendLine("    {");
-        sb.AppendLine("        if (!__copyrightHandle.IsAllocated)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            __copyrightHandle = GCHandle.Alloc(__copyright, GCHandleType.Pinned);");
-        sb.AppendLine("        }");
-        sb.AppendLine("        return __copyrightHandle.AddrOfPinnedObject();");
+        sb.AppendLine("        return (byte*)System.Runtime.CompilerServices.Unsafe.AsPointer(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(\"VLCLR\\0\"u8));");
         sb.AppendLine("    }");
         sb.AppendLine();
 
