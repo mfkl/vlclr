@@ -1,0 +1,39 @@
+1
+00:00:01,000 --> 00:00:03,000
+{\an1}Bottom-left subtitle text
+
+2
+00:00:04,000 --> 00:00:06,000
+{\an2}Bottom-center subtitle text
+
+3
+00:00:07,000 --> 00:00:09,000
+{\an3}Bottom-right subtitle text
+
+4
+00:00:10,000 --> 00:00:12,000
+{\an4}Middle-left subtitle text
+
+5
+00:00:13,000 --> 00:00:15,000
+{\an5}Centered subtitle text
+
+6
+00:00:16,000 --> 00:00:18,000
+{\an6}Middle-right subtitle text
+
+7
+00:00:19,000 --> 00:00:21,000
+{\an7}Top-left subtitle text
+
+8
+00:00:22,000 --> 00:00:24,000
+{\an8}Top-center subtitle text
+
+9
+00:00:25,000 --> 00:00:27,000
+{\an9}Top-right subtitle text
+
+10
+00:00:28,000 --> 00:00:30,000
+No special positioning - default placement
