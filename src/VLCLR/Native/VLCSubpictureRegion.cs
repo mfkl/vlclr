@@ -121,6 +121,34 @@ public static class VLCSubpictureAlign
 
     /// <summary>Mask for all alignment flags</summary>
     public const int Mask = Left | Right | Top | Bottom;
+
+    /// <summary>
+    /// Converts VLC alignment flags to horizontal TextAlignment enum.
+    /// </summary>
+    /// <param name="vlcAlign">VLC alignment bitmask.</param>
+    /// <returns>Corresponding TextAlignment value.</returns>
+    public static Rendering.TextAlignment ToTextAlignment(int vlcAlign)
+    {
+        if ((vlcAlign & Left) != 0)
+            return Rendering.TextAlignment.Left;
+        if ((vlcAlign & Right) != 0)
+            return Rendering.TextAlignment.Right;
+        return Rendering.TextAlignment.Center;
+    }
+
+    /// <summary>
+    /// Converts VLC alignment flags to vertical TextVerticalPosition enum.
+    /// </summary>
+    /// <param name="vlcAlign">VLC alignment bitmask.</param>
+    /// <returns>Corresponding TextVerticalPosition value.</returns>
+    public static Rendering.TextVerticalPosition ToVerticalPosition(int vlcAlign)
+    {
+        if ((vlcAlign & Top) != 0)
+            return Rendering.TextVerticalPosition.Top;
+        if ((vlcAlign & Bottom) != 0)
+            return Rendering.TextVerticalPosition.Bottom;
+        return Rendering.TextVerticalPosition.Center;
+    }
 }
 
 /// <summary>
