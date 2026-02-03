@@ -9,6 +9,21 @@ using VLCLR.Text;
 namespace SubtitleRenderer;
 
 /// <summary>
+/// A parsed text segment containing text and its associated style.
+/// </summary>
+/// <param name="Text">The UTF-8 text content of the segment.</param>
+/// <param name="Style">The styling applied to this segment.</param>
+public readonly record struct ParsedSegment(string Text, SubtitleStyle Style)
+{
+    /// <summary>
+    /// Returns true if this segment has no text or only whitespace.
+    /// </summary>
+    public bool IsEmpty => string.IsNullOrWhiteSpace(Text);
+
+    public override string ToString() => $"\"{Text}\" {Style}";
+}
+
+/// <summary>
 /// Wrapper class for VLC's text_style_t structure.
 /// Provides easy access to text styling properties with sensible defaults.
 /// </summary>
