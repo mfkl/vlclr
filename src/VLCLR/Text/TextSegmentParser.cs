@@ -30,6 +30,37 @@ public readonly record struct ParsedTextSegment(string Text, TextStyleWrapper St
 public static class TextSegmentParser
 {
     /// <summary>
+    /// Parses a text segment linked list and returns the combined text.
+    /// </summary>
+    /// <param name="textPtr">Pointer to first VLCTextSegment in chain.</param>
+    /// <returns>Combined text from all segments, or empty string if no text found.</returns>
+    public static unsafe string ParseText(nint textPtr)
+    {
+        if (textPtr == nint.Zero)
+        {
+            return string.Empty;
+        }
+
+        var builder = new System.Text.StringBuilder();
+        nint segmentPtr = textPtr;
+
+        while (segmentPtr != nint.Zero)
+        {
+            ref VLCTextSegment segment = ref Unsafe.AsRef<VLCTextSegment>((void*)segmentPtr);
+
+            if (segment.Text != nint.Zero)
+            {
+                string text = Marshal.PtrToStringUTF8(segment.Text) ?? string.Empty;
+                builder.Append(text);
+            }
+
+            segmentPtr = segment.Next;
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
     /// Parses a subpicture region to extract all text segments.
     /// </summary>
     /// <param name="regionPtr">Pointer to VLCSubpictureRegion.</param>
