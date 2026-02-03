@@ -76,6 +76,8 @@ public static class RendererState
     /// <returns>Pointer to rendered subpicture_region_t, or nint.Zero on failure.</returns>
     public static unsafe nint Render(nint filterPtr, nint regionPtr, nint chromaListPtr)
     {
+        Console.Error.WriteLine($"[.NET Subtitle] Render method entered, initialized={_initialized}, debugEnabled={_debugOutputEnabled}");
+        
         if (!_initialized)
         {
             return nint.Zero;
@@ -92,10 +94,12 @@ public static class RendererState
             string description = TextSegmentParser.ParseAndDescribe(regionPtr);
             Console.Error.WriteLine($"[.NET Subtitle] Render #{_renderCount}: {description}");
 
-            // Log individual segment details
+            // Log individual segment details with ACTUAL rendered style (post-conversion)
             foreach (var segment in segments)
             {
-                Console.Error.WriteLine($"[.NET Subtitle]   Segment: {segment}");
+                var style = segment.Style;
+                Console.Error.WriteLine($"[.NET Subtitle]   Segment: \"{segment.Text}\"");
+                Console.Error.WriteLine($"[.NET Subtitle]   Style: FG=#{style.ForegroundColor:X6}, Outline={style.HasOutline}, Width={style.OutlineWidth}px");
             }
         }
 
@@ -108,10 +112,15 @@ public static class RendererState
         // Extract region information for positioning and sizing
         ref VLCSubpictureRegion region = ref Unsafe.AsRef<VLCSubpictureRegion>((void*)regionPtr);
 
-        // Determine canvas dimensions
-        // Use max_width/max_height if specified, otherwise use defaults
-        int canvasWidth = region.MaxWidth > 0 ? region.MaxWidth : DefaultWidth;
-        int canvasHeight = region.MaxHeight > 0 ? region.MaxHeight : DefaultHeight;
+        // Get actual video dimensions from filter's format - this is crucial!
+        // The region's MaxWidth/MaxHeight may be larger than the actual video
+        ref VLCFilter filter = ref Unsafe.AsRef<VLCFilter>((void*)filterPtr);
+        uint videoWidth = filter.FormatOut.Video.Width > 0 ? filter.FormatOut.Video.Width : (uint)DefaultWidth;
+        uint videoHeight = filter.FormatOut.Video.Height > 0 ? filter.FormatOut.Video.Height : (uint)DefaultHeight;
+        
+        // Use video dimensions for canvas (not region MaxWidth/MaxHeight)
+        int canvasWidth = (int)videoWidth;
+        int canvasHeight = (int)videoHeight;
 
         // Ensure minimum dimensions
         canvasWidth = Math.Max(canvasWidth, 320);
@@ -135,10 +144,11 @@ public static class RendererState
         _canvas.Render(segments, alignment);
 
         // Save debug image on first successful render
-        if (_debugOutputEnabled && !_firstRenderSaved && _canvas.GetImage() != null)
+        if (_debugOutputEnabled && !_firstRenderSaved)
         {
             try
             {
+                Console.Error.WriteLine("[.NET Subtitle] Attempting debug save...");
                 _canvas.SaveDebugImage(_debugOutputPath!);
                 Console.Error.WriteLine($"[.NET Subtitle] Saved debug image to: {_debugOutputPath}");
                 _firstRenderSaved = true;
