@@ -113,16 +113,23 @@ public sealed class SubtitleStyle
         // Extract style flags
         ushort flags = style.StyleFlags;
 
+        // Force white text if VLC passes black (black on dark video is invisible)
+        var fgColor = style.FontColor == 0x000000 ? 0xFFFFFF : style.FontColor;
+        
+        // Always enable outline for visibility with thicker width
+        var hasOutline = true;
+        var outlineWidth = 3;
+
         return new SubtitleStyle
         {
             FontName = fontName,
             FontSize = style.FontSize > 0 ? style.FontSize : DefaultFontSize,
             FontRelativeSize = style.FontRelativeSize,
-            ForegroundColor = style.FontColor,
+            ForegroundColor = fgColor,
             ForegroundAlpha = style.FontAlpha > 0 ? style.FontAlpha : DefaultFontAlpha,
             OutlineColor = style.OutlineColor,
             OutlineAlpha = style.OutlineAlpha > 0 ? style.OutlineAlpha : DefaultFontAlpha,
-            OutlineWidth = style.OutlineWidth > 0 ? style.OutlineWidth : DefaultOutlineWidth,
+            OutlineWidth = outlineWidth,
             ShadowColor = style.ShadowColor,
             ShadowAlpha = style.ShadowAlpha > 0 ? style.ShadowAlpha : DefaultFontAlpha,
             ShadowOffset = style.ShadowWidth > 0 ? style.ShadowWidth : DefaultShadowOffset,
@@ -132,7 +139,7 @@ public sealed class SubtitleStyle
             IsItalic = (flags & VLCTextStyleFlags.Italic) != 0,
             IsUnderline = (flags & VLCTextStyleFlags.Underline) != 0,
             IsStrikeout = (flags & VLCTextStyleFlags.Strikeout) != 0,
-            HasOutline = (flags & VLCTextStyleFlags.Outline) != 0,
+            HasOutline = hasOutline,
             HasShadow = (flags & VLCTextStyleFlags.Shadow) != 0,
             HasBackground = (flags & VLCTextStyleFlags.Background) != 0
         };
