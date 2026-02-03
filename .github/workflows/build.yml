@@ -68,6 +68,19 @@ jobs:
           name: test-results
           path: TestResults/*.trx
 
+      - name: Check VLC API version
+        run: |
+          Write-Host "=== VLC SDK API Version ==="
+          $header = Get-ChildItem -Recurse vlc-sdk -Filter "vlc_plugin.h" | Select-Object -First 1
+          if ($header) {
+            Write-Host "Found: $($header.FullName)"
+            Get-Content $header.FullName | Select-String "VLC_API_VERSION_STRING"
+          } else {
+            Write-Host "WARNING: vlc_plugin.h not found in vlc-sdk"
+            Write-Host "Listing vlc-sdk structure:"
+            Get-ChildItem vlc-sdk -Recurse -Directory | Select-Object -First 20 | ForEach-Object { Write-Host $_.FullName }
+          }
+
       - name: Deploy plugin to VLC
         run: |
           $pluginSrc = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"
