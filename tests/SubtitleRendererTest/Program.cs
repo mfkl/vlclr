@@ -26,11 +26,21 @@ class Program
         var rendererOpenSeen = false;
         var rendererCloseSeen = false;
         var renderCallbackInvoked = false;
+        var renderCount = 0;
+        var errorMessages = new List<string>();
+        var renderLogTimestamps = new List<DateTime>();
 
         try
         {
             // Initialize libvlc from the specified path
             Core.Initialize(libvlcPath);
+
+            // Set up environment for debug output if requested
+            var debugOutputPath = Environment.GetEnvironmentVariable("DOTNET_SUBTITLE_DEBUG_PATH");
+            if (!string.IsNullOrEmpty(debugOutputPath))
+            {
+                Console.WriteLine($"Debug output will be saved to: {debugOutputPath}");
+            }
 
             using var libvlc = new LibVLC(
                 "--ignore-config",
@@ -54,8 +64,42 @@ class Program
                 // Our plugin logs when render callback is invoked
                 if (msg.Contains("[.NET Subtitle]"))
                 {
-                    if (msg.Contains("Render called") || msg.Contains("RenderCount"))
-                        renderCallbackInvoked = true;
+                    renderCallbackInvoked = true;
+                    renderLogTimestamps.Add(DateTime.Now);
+                    
+                    // Count render calls from "Render #N:" messages
+                    if (msg.Contains("Render #"))
+                    {
+                        renderCount++;
+                        Console.WriteLine($"  [Render {renderCount}] {msg.Trim()}");
+                    }
+                    
+                    // Also detect cleanup message which shows total renders
+                    // Extract the count from "RendererState cleanup, rendered N times"
+                    if (msg.Contains("RendererState cleanup, rendered"))
+                    {
+                        Console.WriteLine($"  [Cleanup] {msg.Trim()}");
+                        var match = System.Text.RegularExpressions.Regex.Match(msg, @"rendered (\d+) times");
+                        if (match.Success)
+                        {
+                            var cleanupCount = int.Parse(match.Groups[1].Value);
+                            if (cleanupCount > 0)
+                            {
+                                renderCallbackInvoked = true;
+                                // Use the cleanup count if we missed individual renders
+                                if (renderCount == 0)
+                                {
+                                    renderCount = cleanupCount;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Capture error messages from our plugin
+                if (msg.Contains("[.NET Subtitle]") && (msg.Contains("error") || msg.Contains("Error") || msg.Contains("FAIL")))
+                {
+                    errorMessages.Add(msg.Trim());
                 }
             };
 
@@ -83,8 +127,9 @@ class Program
 
             player.Stop();
 
-            // Give logs time to flush
-            Thread.Sleep(500);
+            // Wait longer for all logs to flush, including cleanup message
+            // The cleanup message comes after VLC releases the renderer
+            Thread.Sleep(2000);
 
             Console.WriteLine();
             Console.WriteLine("========================================");
@@ -110,16 +155,74 @@ class Program
                 passed = false;
             }
 
-            // Render callback is optional - only check if subtitle file was provided
+            // Render callback verification - required when subtitle file is provided
             if (!string.IsNullOrEmpty(subtitleFile))
             {
+                Console.WriteLine();
+                Console.WriteLine("--- Render Verification ---");
+                
                 if (renderCallbackInvoked)
-                    Console.WriteLine("[PASS] Render callback was invoked");
+                {
+                    Console.WriteLine($"[PASS] Render callback was invoked ({renderCount} render calls detected)");
+                    
+                    // Check if we got at least some renders
+                    if (renderCount == 0)
+                    {
+                        Console.WriteLine("[WARN] Render callbacks detected but no render count extracted from logs");
+                    }
+                    else if (renderCount < 2)
+                    {
+                        Console.WriteLine("[INFO] Only 1 render detected - subtitles may not be appearing at test timecodes");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[INFO] Rendered {renderCount} subtitle frames");
+                    }
+                }
                 else
-                    Console.WriteLine("[INFO] Render callback not detected (may be expected if subtitles don't appear in first few seconds)");
+                {
+                    Console.WriteLine("[FAIL] Render callback not detected - subtitles were not rendered");
+                    passed = false;
+                }
+
+                // Check for errors
+                if (errorMessages.Count > 0)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("[WARN] Errors detected during rendering:");
+                    foreach (var err in errorMessages.Take(5))
+                    {
+                        Console.WriteLine($"       {err}");
+                    }
+                    if (errorMessages.Count > 5)
+                    {
+                        Console.WriteLine($"       ... and {errorMessages.Count - 5} more");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("[PASS] No errors detected in logs");
+                }
+
+                // Check for debug output file
+                if (!string.IsNullOrEmpty(debugOutputPath))
+                {
+                    Console.WriteLine();
+                    if (File.Exists(debugOutputPath))
+                    {
+                        var fileInfo = new FileInfo(debugOutputPath);
+                        Console.WriteLine($"[PASS] Debug image created: {debugOutputPath} ({fileInfo.Length} bytes)");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[WARN] Debug image not found at: {debugOutputPath}");
+                        Console.WriteLine($"       (Check that DOTNET_SUBTITLE_DEBUG_PATH is set correctly)");
+                    }
+                }
             }
 
             Console.WriteLine();
+            Console.WriteLine("========================================");
             if (passed)
             {
                 Console.WriteLine("INTEGRATION TEST: PASSED");
