@@ -19,8 +19,8 @@ public static class RendererState
     private static long _renderCount;
     private static bool _initialized;
 
-    // Reusable canvas instance for rendering
-    private static SubtitleCanvas? _canvas;
+    // Reusable canvas instance for rendering (using framework TextCanvas)
+    private static TextCanvas? _canvas;
 
     // Default canvas dimensions (used if region doesn't specify)
     private const int DefaultWidth = 1920;
@@ -97,18 +97,19 @@ public static class RendererState
         _renderCount++;
 
         // Parse text segments from the region - use framework's parser with visibility optimization
-        var frameworkSegments = VLCLR.Text.TextSegmentParser.ParseWithVisibility(regionPtr, forceWhiteText: true, forceOutline: true, outlineWidth: 3);
-        
-        // Convert to local types for rendering
-        var segments = frameworkSegments.Select(s => new ParsedSegment(s.Text, SubtitleStyle.FromWrapper(s.Style))).ToList();
+        var segments = TextSegmentParser.ParseWithVisibility(
+            regionPtr, 
+            forceWhiteText: true, 
+            forceOutline: true, 
+            outlineWidth: 3);
 
         // Log first few render calls for debugging
         if (_renderCount <= 5)
         {
-            string description = VLCLR.Text.TextSegmentParser.ParseAndDescribe(regionPtr);
+            string description = TextSegmentParser.ParseAndDescribe(regionPtr);
             Console.Error.WriteLine($"[.NET Subtitle] Render #{_renderCount}: {description}");
 
-            // Log individual segment details with ACTUAL rendered style (post-conversion)
+            // Log individual segment details
             foreach (var segment in segments)
             {
                 var style = segment.Style;
@@ -117,7 +118,7 @@ public static class RendererState
             }
         }
 
-        // Skip empty text (handles Phase 8.2)
+        // Skip empty text
         if (segments.Count == 0 || segments.TrueForAll(s => s.IsEmpty))
         {
             return nint.Zero;
@@ -126,13 +127,12 @@ public static class RendererState
         // Extract region information for positioning and sizing
         ref VLCSubpictureRegion region = ref Unsafe.AsRef<VLCSubpictureRegion>((void*)regionPtr);
 
-        // Get actual video dimensions from filter's format - this is crucial!
-        // The region's MaxWidth/MaxHeight may be larger than the actual video
+        // Get actual video dimensions from filter's format
         ref VLCFilter filter = ref Unsafe.AsRef<VLCFilter>((void*)filterPtr);
         uint videoWidth = filter.FormatOut.Video.Width > 0 ? filter.FormatOut.Video.Width : (uint)DefaultWidth;
         uint videoHeight = filter.FormatOut.Video.Height > 0 ? filter.FormatOut.Video.Height : (uint)DefaultHeight;
         
-        // Use video dimensions for canvas (not region MaxWidth/MaxHeight)
+        // Use video dimensions for canvas
         int canvasWidth = (int)videoWidth;
         int canvasHeight = (int)videoHeight;
 
@@ -143,18 +143,17 @@ public static class RendererState
         // Create or resize canvas
         if (_canvas == null)
         {
-            _canvas = new SubtitleCanvas(canvasWidth, canvasHeight);
+            _canvas = new TextCanvas(canvasWidth, canvasHeight);
         }
-        else if (_canvas.Width != canvasWidth || _canvas.Height != canvasHeight)
+        else
         {
-            _canvas.Dispose();
-            _canvas = new SubtitleCanvas(canvasWidth, canvasHeight);
+            _canvas.EnsureSize(canvasWidth, canvasHeight);
         }
 
         // Determine text alignment based on region's alignment flags
-        SubtitleAlignment alignment = GetAlignment(region.Align);
+        TextAlignment alignment = VLCSubpictureAlign.ToTextAlignment(region.Align);
 
-        // Render text segments to canvas
+        // Render text segments to canvas using framework's TextCanvas
         _canvas.Render(segments, alignment);
 
         // Save debug image on first successful render
@@ -191,22 +190,4 @@ public static class RendererState
         return outputRegionPtr;
     }
 
-    /// <summary>
-    /// Converts VLC alignment flags to SubtitleAlignment enum.
-    /// </summary>
-    private static SubtitleAlignment GetAlignment(int vlcAlign)
-    {
-        // VLC uses bitmask for alignment
-        // Left = 0x1, Right = 0x2, Top = 0x4, Bottom = 0x8
-        if ((vlcAlign & VLCSubpictureAlign.Left) != 0)
-        {
-            return SubtitleAlignment.Left;
-        }
-        if ((vlcAlign & VLCSubpictureAlign.Right) != 0)
-        {
-            return SubtitleAlignment.Right;
-        }
-        // Default to center for horizontal alignment
-        return SubtitleAlignment.Center;
-    }
 }
