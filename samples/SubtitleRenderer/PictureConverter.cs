@@ -82,6 +82,14 @@ public static class PictureConverter
             return nint.Zero;
         }
 
+        // Set region position - required or VLC will assert fail with INT_MAX
+        // Position is relative to alignment point (0,0 = aligned position)
+        ref VLCSubpictureRegion region = ref Unsafe.AsRef<VLCSubpictureRegion>((void*)regionPtr);
+        region.X = 0;
+        region.Y = 0;
+        region.Align = VLCSubpictureAlign.Bottom; // Default to bottom center
+        region.Alpha = 255; // Fully opaque - IMPORTANT or subtitle is invisible!
+
         return regionPtr;
     }
 
