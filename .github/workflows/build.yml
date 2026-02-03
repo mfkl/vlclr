@@ -37,11 +37,26 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Build VLCLR.Generators
+        run: dotnet build src/VLCLR.Generators -c Release
+
       - name: Build VLCLR framework
         run: dotnet build src/VLCLR -c Release
 
       - name: Build VideoOverlay sample (Native AOT)
-        run: dotnet publish samples/VideoOverlay -c Release -r win-x64
+        run: |
+          dotnet publish samples/VideoOverlay -c Release -r win-x64
+          # List generated files to verify source generator ran
+          Write-Host "=== Generated source files ==="
+          Get-ChildItem -Recurse samples/VideoOverlay/obj -Filter "*.g.cs" | ForEach-Object { Write-Host $_.FullName }
+          # Show the generated entry point code
+          $genFile = Get-ChildItem -Recurse samples/VideoOverlay/obj -Filter "VideoOverlayFilter.g.cs" | Select-Object -First 1
+          if ($genFile) {
+            Write-Host "=== Generated code ==="
+            Get-Content $genFile.FullName
+          } else {
+            Write-Host "WARNING: No generated file found!"
+          }
 
       - name: Run tests
         run: dotnet test src/VLCLR.Tests -c Release --logger trx --results-directory TestResults
@@ -62,6 +77,17 @@ jobs:
           Write-Host "Plugin deployed to $pluginDst"
           # Remove plugin cache so libvlc rescans plugins directory
           Remove-Item "vlc-sdk/plugins/plugins.dat" -ErrorAction SilentlyContinue
+
+      - name: Verify plugin was built
+        run: |
+          $plugin = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"
+          if (Test-Path $plugin) {
+            Write-Host "Plugin built successfully: $plugin"
+            Write-Host "Size: $((Get-Item $plugin).Length) bytes"
+          } else {
+            Write-Host "ERROR: Plugin not found!"
+            exit 1
+          }
 
       - name: Run filter integration test
         run: |
