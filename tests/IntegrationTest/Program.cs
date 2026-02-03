@@ -37,6 +37,8 @@ class Program
                 "-vvv"
             );
 
+            var pluginErrors = new List<string>();
+
             // Set up log handler to capture filter output
             libvlc.Log += (sender, e) =>
             {
@@ -47,6 +49,12 @@ class Program
                     filterOpenSeen = true;
                 if (msg.Contains("removing") && msg.Contains("video filter") && msg.Contains("dotnet_overlay"))
                     filterCloseSeen = true;
+
+                // Capture any errors related to our plugin or filters
+                if (msg.Contains("dotnet") || msg.Contains("error") || msg.Contains("cannot"))
+                {
+                    pluginErrors.Add(msg);
+                }
             };
 
             using var media = new Media(new Uri(videoUrl));
@@ -88,6 +96,21 @@ class Program
             {
                 Console.WriteLine("[FAIL] Filter not unloaded");
                 passed = false;
+            }
+
+            // Show any plugin-related errors/messages
+            if (pluginErrors.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("--- Plugin-related log messages ---");
+                foreach (var err in pluginErrors.Take(20))
+                {
+                    Console.WriteLine(err);
+                }
+                if (pluginErrors.Count > 20)
+                {
+                    Console.WriteLine($"... and {pluginErrors.Count - 20} more");
+                }
             }
 
             Console.WriteLine();
