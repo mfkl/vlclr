@@ -19,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\VLCLR\VLCLR.csproj" />
+    <!-- Source generator for VLC entry points -->
+    <ProjectReference Include="..\..\src\VLCLR.Generators\VLCLR.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
