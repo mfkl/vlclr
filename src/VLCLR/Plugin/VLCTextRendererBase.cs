@@ -76,7 +76,7 @@ public abstract class VLCTextRendererBase : IDisposable
     /// <param name="render">Function pointer for Render callback</param>
     /// <param name="close">Function pointer for Close callback</param>
     /// <returns>0 on success, non-zero on failure</returns>
-    internal unsafe int InternalOpen(nint filterPtr, delegate* unmanaged<nint, nint, nint, nint> render,
+    public unsafe int InternalOpen(nint filterPtr, delegate* unmanaged<nint, nint, nint, nint> render,
         delegate* unmanaged<nint, void> close)
     {
         try
@@ -131,7 +131,7 @@ public abstract class VLCTextRendererBase : IDisposable
     /// <param name="regionPtr">Pointer to input subpicture_region_t with text</param>
     /// <param name="chromaListPtr">Pointer to NULL-terminated chroma array</param>
     /// <returns>Pointer to output subpicture_region_t, or 0 on failure</returns>
-    internal nint InternalRender(nint filterPtr, nint regionPtr, nint chromaListPtr)
+    public nint InternalRender(nint filterPtr, nint regionPtr, nint chromaListPtr)
     {
         try
         {
@@ -169,7 +169,7 @@ public abstract class VLCTextRendererBase : IDisposable
     /// Internal: Called by the Close callback to clean up.
     /// </summary>
     /// <param name="filterPtr">Pointer to filter_t</param>
-    internal void InternalClose(nint filterPtr)
+    public void InternalClose(nint filterPtr)
     {
         try
         {

@@ -150,7 +150,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
                     var shortcut = attribute.ConstructorArguments[0].Value as string;
                     if (!string.IsNullOrEmpty(shortcut))
                     {
-                        shortcuts.Add(shortcut);
+                        shortcuts.Add(shortcut!);
                     }
                 }
             }
@@ -213,7 +213,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
 
         var configOption = new ConfigOption
         {
-            Name = name,
+            Name = name!,
             Type = (ConfigType)(int)typeValue
         };
 
@@ -251,6 +251,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine("#nullable enable");
         sb.AppendLine();
         sb.AppendLine("using System;");
+        sb.AppendLine("using System.Runtime.CompilerServices;");
         sb.AppendLine("using System.Runtime.InteropServices;");
         sb.AppendLine("using VLCLR.Module;");
         sb.AppendLine("using VLCLR.Plugin;");
@@ -428,7 +429,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // FilterOpen - creates instance, stores GCHandle in filter->p_sys
-        sb.AppendLine("    [UnmanagedCallersOnly]");
+        sb.AppendLine("    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]");
         sb.AppendLine("    private static unsafe int FilterOpen(nint filterPtr)");
         sb.AppendLine("    {");
         sb.AppendLine($"        var instance = new {info.ClassName}();");
@@ -492,7 +493,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // FilterOpen - creates instance, stores GCHandle in filter->p_sys
-        sb.AppendLine("    [UnmanagedCallersOnly]");
+        sb.AppendLine("    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]");
         sb.AppendLine("    private static unsafe int FilterOpen(nint filterPtr)");
         sb.AppendLine("    {");
         sb.AppendLine($"        var instance = new {info.ClassName}();");
