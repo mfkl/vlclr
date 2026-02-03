@@ -97,8 +97,8 @@ public sealed class SubtitleCanvas : IDisposable
         // Get style from first segment (or use defaults)
         var primaryStyle = segments[0].Style;
 
-        // Combine text from all segments
-        string fullText = TextSegmentParser.GetCombinedText(segments);
+        // Combine text from all segments (use local helper since types differ)
+        string fullText = GetCombinedTextLocal(segments);
         if (string.IsNullOrWhiteSpace(fullText))
         {
             return;
@@ -290,5 +290,17 @@ public sealed class SubtitleCanvas : IDisposable
         _canvas = null;
         _pixelBuffer = null;
         _disposed = true;
+    }
+
+    /// <summary>
+    /// Gets combined text from all segments (local helper for local types).
+    /// </summary>
+    private static string GetCombinedTextLocal(IReadOnlyList<ParsedSegment> segments)
+    {
+        if (segments.Count == 0)
+            return string.Empty;
+        if (segments.Count == 1)
+            return segments[0].Text;
+        return string.Join("", segments.Select(s => s.Text));
     }
 }
