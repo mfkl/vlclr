@@ -1,6 +1,6 @@
 # SubtitleRenderer Sample
 
-A VLC 4.x text renderer plugin written in C# using Native AOT compilation. This sample demonstrates how to build a subtitle renderer that receives parsed subtitle text with styling from VLC and renders it to pixels using ImageSharp.
+A VLC 4.x text renderer plugin written in C# using Native AOT compilation. This sample demonstrates how to build a subtitle renderer that receives parsed subtitle text with styling from VLC and renders it to pixels using ImageSharp, leveraging the VLCLR framework's base classes and source generator.
 
 ## What It Does
 
@@ -10,17 +10,19 @@ This plugin:
 - Parses text styling information from `text_style_t` (fonts, colors, outlines, shadows)
 - Renders styled text to pixels using ImageSharp
 - Returns a rendered `picture_t` to VLC for compositing onto video
+- Demonstrates the `VLCTextRendererBase` pattern with automatic entry point generation
 
 ## Features
 
+- **Zero Boilerplate**: Uses `[VLCModule]` attribute and source generator - no manual entry points
 - **Native AOT Compilation**: Compiles to a native DLL with no .NET runtime dependency
 - **VLC 4.x Plugin**: Uses the VLC 4.0.6 plugin API
-- **Text Renderer**: Implements VLC's text renderer interface
+- **Base Class Pattern**: Extends `VLCTextRendererBase` for automatic lifecycle management
+- **Configuration Options**: Demonstrates `[VLCConfig]` attribute for VLC settings
 - **Styled Subtitles**: Supports fonts, colors, bold, italic, outline, shadow, background box
 - **ImageSharp Integration**: Uses SixLabors.ImageSharp for text rendering
 - **Embedded Fonts**: Includes JetBrains Mono font as an embedded resource
-- **Font Caching**: Efficient font loading and caching by name/size/style
-- **Canvas Reuse**: Reuses rendering canvas for performance
+- **Multi-instance Support**: Each renderer instance maintains separate state
 
 ## Building
 
@@ -85,87 +87,107 @@ vlc-binaries/vlc-4.0.0-dev/vlc.exe --text-renderer dotnet_subtitle --sub-file su
 - `--no-hw-dec` - Disables hardware decoding (optional, for debugging)
 - `--vvv` - Verbose logging (optional, for debugging)
 
-### Example with URL
+### Configuration Options
 
+The plugin registers these VLC configuration options:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dotnet-subtitle-force-outline` | Bool | true | Always render text outline |
+| `dotnet-subtitle-outline-width` | Integer | 3 | Outline width in pixels (1-10) |
+| `dotnet-subtitle-force-white` | Bool | true | Force white text when VLC sends black |
+
+Example with custom settings:
 ```bash
-vlc.exe --text-renderer dotnet_subtitle --sub-file "C:/path/to/subtitles.srt" "file:///C:/path/to/video.mp4"
+vlc.exe --text-renderer dotnet_subtitle --dotnet-subtitle-outline-width 5 --sub-file test.srt video.mp4
 ```
 
 ## Implementation Details
 
-### Module Registration
+### Plugin Declaration
 
-The plugin exports three entry points:
-- `vlc_entry` - Main entry point for module registration
-- `vlc_entry_api_version` - VLC API version (4.0.6)
-- `vlc_entry_copyright` - Copyright information
-
-Module registration uses VLCLR's fluent API:
+The entire plugin is declared using attributes:
 
 ```csharp
-ModuleBuilder.Create(vlcSetPtr, opaque)
-    .WithName("dotnet_subtitle")
-    .WithShortName(".NET Subtitle")
-    .WithDescription(".NET Native AOT Text Renderer for Subtitles")
-    .WithCapability("text renderer")
-    .WithScore(100)  // Higher score to be preferred
-    .WithOpenCallback(&FilterOpen)
-    .Register();
+[VLCModule("dotnet_subtitle")]
+[VLCCapability("text renderer", Score = 100)]
+[VLCDescription(".NET Native AOT Text Renderer for Subtitles")]
+[VLCConfig("dotnet-subtitle-force-outline", VLCConfigType.Bool, Default = true,
+    Description = "Force text outline")]
+[VLCConfig("dotnet-subtitle-outline-width", VLCConfigType.Integer, Default = 3, Min = 1, Max = 10,
+    Description = "Outline width")]
+public partial class SubtitleTextRenderer : VLCTextRendererBase
+{
+    protected override nint RenderText(VLCTextRequest request)
+    {
+        // Text rendering logic
+    }
+}
 ```
+
+The source generator automatically creates:
+- `vlc_entry` - Module registration
+- `vlc_entry_api_version` - API version string
+- `vlc_entry_copyright` - Copyright string
+- Renderer callbacks (Render, Close)
+- GCHandle management for multi-instance support
 
 ### Renderer Lifecycle
 
-1. **Open** (`FilterOpen`): 
-   - Initializes renderer state
-   - Sets up the renderer operations structure
-   - Returns 0 for success
+1. **OnOpen** (optional override):
+   - Called when VLC activates the renderer
+   - Initialize fonts, canvas, resources
+   - Return `false` to fail initialization
 
-2. **Render** (`RenderCallback`):
+2. **RenderText** (required override):
    - Called for each subtitle that needs rendering
-   - Receives text segments with styling from VLC
-   - Renders text to an ImageSharp canvas
-   - Converts canvas to VLC picture format
-   - Returns subpicture region for VLC to composite
+   - Receives `VLCTextRequest` with text and style
+   - Access `RegionPtr` for raw segment parsing
+   - Access `ChromaListPtr` for output format selection
+   - Return pointer to rendered `subpicture_region_t`
 
-3. **Close** (`CloseCallback`):
-   - Cleans up renderer resources
-   - Called when the renderer is deactivated
+3. **OnClose** (optional override):
+   - Called when VLC deactivates the renderer
+   - Clean up resources
+
+### VLCTextRequest API
+
+The `VLCTextRequest` wrapper provides access to text data:
+
+```csharp
+protected override nint RenderText(VLCTextRequest request)
+{
+    // Text content
+    string text = request.Text;
+    bool hasText = request.HasText;
+
+    // Style information
+    int fontSize = request.FontSize;
+    uint color = request.FontColorArgb;
+    bool bold = request.IsBold;
+    bool italic = request.IsItalic;
+
+    // Alignment
+    TextAlignment alignment = request.HorizontalAlignment;
+    TextVerticalPosition vpos = request.VerticalPosition;
+
+    // For advanced segment parsing:
+    var segments = TextSegmentParser.ParseWithVisibility(RegionPtr);
+}
+```
 
 ### Text Rendering Pipeline
 
-1. **Parse**: Extract text and style from VLC's text segment linked list
-2. **Style**: Convert VLC `text_style_t` to `SubtitleStyle` with C# properties
-3. **Layout**: Calculate text position based on alignment (left/center/right)
-4. **Render** (in order):
-   - Background box (if enabled)
-   - Drop shadow (if enabled)
-   - Text outline (if enabled)
-   - Foreground text
-5. **Convert**: Copy RGBA pixels to VLC picture in appropriate chroma format
-6. **Return**: Subpicture region for VLC compositing
-
-### Styling Support
-
-The renderer supports these styling features from VLC:
-- **Font**: Family name, size, bold, italic
-- **Color**: Foreground RGB, alpha transparency
-- **Outline**: Color, alpha, width in pixels
-- **Shadow**: Color, alpha, offset in pixels
-- **Background**: Color, alpha (semi-transparent box behind text)
-
-**Note**: If VLC passes black text color (0x000000), the renderer forces white text
-with outline for visibility on dark videos.
-
-### Output Formats
-
-The renderer outputs RGBA or BGRA format depending on VLC's supported chromas:
-- Prefers RGBA (native ImageSharp format)
-- Falls back to BGRA with pixel swizzling if needed
+1. **Parse**: Extract text and style from `RegionPtr` using `TextSegmentParser`
+2. **Style**: Apply visibility optimizations (force white text, force outline)
+3. **Layout**: Calculate text position based on alignment
+4. **Render**: Draw background → shadow → outline → foreground text
+5. **Convert**: Convert ImageSharp image to VLC picture using `PictureConverter`
+6. **Return**: Subpicture region pointer for VLC compositing
 
 ### Debug Output
 
-Set the `DOTNET_SUBTITLE_DEBUG_PATH` environment variable to save the first
-rendered subtitle as a PNG file:
+Set the `DOTNET_SUBTITLE_DEBUG_PATH` environment variable to save the first rendered subtitle as a PNG file:
 
 ```bash
 # Bash/Git Bash
@@ -182,16 +204,12 @@ vlc.exe --text-renderer dotnet_subtitle --sub-file test.srt video.mp4
 ```
 SubtitleRenderer/
 ├── SubtitleRenderer.csproj      # Project file with Native AOT settings
-├── ModuleDescriptor.cs          # VLC entry points and renderer callbacks
-├── RendererState.cs             # Renderer state management and render loop
-├── SubtitleStyle.cs             # VLC text_style_t wrapper with C# properties
-├── TextSegmentParser.cs         # Parses VLC text segment linked lists
-├── FontManager.cs               # Font loading and caching
-├── SubtitleCanvas.cs            # ImageSharp canvas for rendering text
-├── PictureConverter.cs          # Converts ImageSharp to VLC picture
+├── SubtitleTextRenderer.cs      # Main renderer class (single file!)
 └── Resources/
     └── JetBrainsMono-Regular.ttf # Embedded default font
 ```
+
+Note: The implementation is now a single file thanks to the base class and source generator!
 
 ## Dependencies
 
@@ -234,43 +252,23 @@ ls vlc-binaries/vlc-4.0.0-dev/plugins/spu/ | grep dotnet
 - Check that .NET 10.0 SDK is installed: `dotnet --version`
 - Verify `vswhere.exe` is in PATH (required for Native AOT)
 
-## Testing
-
-### Integration Test
-
-```bash
-# Run the integration test with a test subtitle file
-dotnet run --project tests/SubtitleRendererTest -- \
-  vlc-binaries/vlc-4.0.0-dev \
-  "C:/path/to/video.mp4" \
-  "tests/SubtitleRendererTest/fixtures/test.srt" \
-  10
-```
-
-### Test Subtitle Files
-
-The test fixtures include:
-- `test.srt` - Basic SRT subtitles (5 entries, 1-15 seconds)
-- `styled.ass` - ASS subtitles with multiple styles (bold, italic, colors)
-- `positioned.srt` - SRT with alignment tags
-
 ## Performance Notes
 
-- **Font Caching**: Fonts are cached by name/size/style combination (max 32 entries)
 - **Canvas Reuse**: The rendering canvas is reused across render calls
 - **Memory**: All allocations happen during first render; subsequent renders reuse buffers
 - **Native AOT**: No JIT compilation overhead; excellent frame-to-frame consistency
+- **Multi-instance**: Each renderer instance maintains its own canvas and state
 
 ## Notes
 
-- **Use Git Bash**: Windows Terminal/PowerShell may hang when running VLC interactively
-- **Debug Output**: The renderer writes debug info to stderr with `[.NET Subtitle]` prefix
+- **Multi-instance Support**: Each renderer instance has its own state (via GCHandle in filter->p_sys)
+- **Debug Output**: The renderer writes debug info to VLC's logger with `[SubtitleTextRenderer]` prefix
 - **Thread Safety**: All rendering is done on VLC's video output thread
 - **Fallback**: If rendering fails, returns null (VLC will use fallback renderer or skip subtitle)
 
 ## Learn More
 
-- See `../../src/VLCLR/README.md` for framework documentation
+- See `../../README.md` for framework documentation
 - See `../VideoOverlay/README.md` for video filter example
 - VLC headers: `../../vlc/include/vlc/vlc_text_style.h`, `vlc_subpicture.h`
 - VLC 4.x plugin guide: https://www.videolan.org/developers/vlc.html
