@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using VLCLR.Native;
+using VLCLR.Text;
 
 namespace SubtitleRenderer;
 
@@ -142,6 +143,38 @@ public sealed class SubtitleStyle
             HasOutline = hasOutline,
             HasShadow = (flags & VLCTextStyleFlags.Shadow) != 0,
             HasBackground = (flags & VLCTextStyleFlags.Background) != 0
+        };
+    }
+
+    /// <summary>
+    /// Creates a SubtitleStyle from a framework TextStyleWrapper.
+    /// </summary>
+    /// <param name="wrapper">Framework text style wrapper.</param>
+    /// <returns>SubtitleStyle with values from the wrapper.</returns>
+    public static SubtitleStyle FromWrapper(TextStyleWrapper wrapper)
+    {
+        return new SubtitleStyle
+        {
+            FontName = wrapper.FontName,
+            FontSize = wrapper.FontSize,
+            FontRelativeSize = wrapper.FontRelativeSize,
+            ForegroundColor = wrapper.ForegroundColor,
+            ForegroundAlpha = wrapper.ForegroundAlpha,
+            OutlineColor = wrapper.OutlineColor,
+            OutlineAlpha = wrapper.OutlineAlpha,
+            OutlineWidth = wrapper.OutlineWidth,
+            ShadowColor = wrapper.ShadowColor,
+            ShadowAlpha = wrapper.ShadowAlpha,
+            ShadowOffset = wrapper.ShadowOffset,
+            BackgroundColor = wrapper.BackgroundColor,
+            BackgroundAlpha = wrapper.BackgroundAlpha,
+            IsBold = wrapper.IsBold,
+            IsItalic = wrapper.IsItalic,
+            IsUnderline = wrapper.IsUnderline,
+            IsStrikeout = wrapper.IsStrikeout,
+            HasOutline = wrapper.HasOutline,
+            HasShadow = wrapper.HasShadow,
+            HasBackground = wrapper.HasBackground
         };
     }
 

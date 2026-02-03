@@ -1,7 +1,9 @@
 using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using VLCLR.Imaging;
 using VLCLR.Native;
+using VLCLR.Text;
 
 namespace SubtitleRenderer;
 
@@ -85,13 +87,16 @@ public static class RendererState
 
         _renderCount++;
 
-        // Parse text segments from the region
-        var segments = TextSegmentParser.Parse(regionPtr);
+        // Parse text segments from the region - use framework's parser with visibility optimization
+        var frameworkSegments = VLCLR.Text.TextSegmentParser.ParseWithVisibility(regionPtr, forceWhiteText: true, forceOutline: true, outlineWidth: 3);
+        
+        // Convert to local types for rendering
+        var segments = frameworkSegments.Select(s => new ParsedSegment(s.Text, SubtitleStyle.FromWrapper(s.Style))).ToList();
 
         // Log first few render calls for debugging
         if (_renderCount <= 5)
         {
-            string description = TextSegmentParser.ParseAndDescribe(regionPtr);
+            string description = VLCLR.Text.TextSegmentParser.ParseAndDescribe(regionPtr);
             Console.Error.WriteLine($"[.NET Subtitle] Render #{_renderCount}: {description}");
 
             // Log individual segment details with ACTUAL rendered style (post-conversion)
