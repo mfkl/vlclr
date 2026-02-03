@@ -78,7 +78,7 @@ public abstract class VLCVideoFilterBase : IDisposable
     /// <param name="close">Function pointer for Close callback</param>
     /// <param name="flush">Optional function pointer for Flush callback</param>
     /// <returns>0 on success, non-zero on failure</returns>
-    internal unsafe int InternalOpen(nint filterPtr, delegate* unmanaged<nint, nint, nint> filterVideo,
+    public unsafe int InternalOpen(nint filterPtr, delegate* unmanaged<nint, nint, nint> filterVideo,
         delegate* unmanaged<nint, void> close, delegate* unmanaged<nint, void> flush = null)
     {
         try
@@ -135,7 +135,7 @@ public abstract class VLCVideoFilterBase : IDisposable
     /// <param name="filterPtr">Pointer to filter_t</param>
     /// <param name="picturePtr">Pointer to picture_t</param>
     /// <returns>The picture pointer (same as input for in-place filters)</returns>
-    internal nint InternalFilterVideo(nint filterPtr, nint picturePtr)
+    public nint InternalFilterVideo(nint filterPtr, nint picturePtr)
     {
         try
         {
@@ -178,7 +178,7 @@ public abstract class VLCVideoFilterBase : IDisposable
     /// Internal: Called by the Close callback to clean up.
     /// </summary>
     /// <param name="filterPtr">Pointer to filter_t</param>
-    internal void InternalClose(nint filterPtr)
+    public void InternalClose(nint filterPtr)
     {
         try
         {
@@ -211,7 +211,7 @@ public abstract class VLCVideoFilterBase : IDisposable
     /// Internal: Called by the Flush callback.
     /// </summary>
     /// <param name="filterPtr">Pointer to filter_t</param>
-    internal void InternalFlush(nint filterPtr)
+    public void InternalFlush(nint filterPtr)
     {
         try
         {
