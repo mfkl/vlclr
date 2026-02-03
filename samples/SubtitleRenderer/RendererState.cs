@@ -1,8 +1,10 @@
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using VLCLR.Imaging;
 using VLCLR.Native;
+using VLCLR.Rendering;
 using VLCLR.Text;
 
 namespace SubtitleRenderer;
@@ -43,6 +45,13 @@ public static class RendererState
         _renderCount = 0;
         _initialized = true;
         _firstRenderSaved = false;
+
+        // Initialize font manager with embedded JetBrains Mono font
+        var assembly = Assembly.GetExecutingAssembly();
+        FontManager.LoadEmbeddedFont(
+            assembly,
+            "SubtitleRenderer.Resources.JetBrainsMono-Regular.ttf",
+            setAsDefault: true);
 
         // Check for debug output environment variable
         _debugOutputPath = Environment.GetEnvironmentVariable("DOTNET_SUBTITLE_DEBUG_PATH");
