@@ -135,17 +135,27 @@ The source generator produces:
 
 ## Usage
 
-### Testing with LibVLCSharp
+### Integration Tests (LibVLCSharp)
+
+```bash
+# Run VideoOverlay integration test
+cd tests/IntegrationTest && dotnet run -- ../../vlc-sdk path/to/video.mp4
+
+# Run SubtitleRenderer integration test
+cd tests/SubtitleRendererTest && dotnet run -- ../../vlc-sdk path/to/video.mp4 path/to/subtitles.srt
+```
+
+### Manual Testing with VLC
 
 ```bash
 # Build the plugin
 dotnet publish samples/VideoOverlay -c Release -r win-x64
 
-# Copy to VLC SDK plugin directory
-cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll <vlc-sdk-path>/plugins/video_filter/
+# Copy to VLC plugin directory
+cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll <vlc-path>/plugins/video_filter/
 
 # Regenerate plugin cache
-<vlc-sdk-path>/vlc-cache-gen.exe <vlc-sdk-path>/plugins
+<vlc-path>/vlc-cache-gen.exe <vlc-path>/plugins
 
 # Run with VLC
 vlc.exe --video-filter dotnet_overlay --no-hw-dec video.mp4
