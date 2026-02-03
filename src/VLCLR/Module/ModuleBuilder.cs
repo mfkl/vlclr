@@ -113,6 +113,258 @@ public unsafe ref struct ModuleBuilder
     }
 
     /// <summary>
+    /// Adds an integer configuration option.
+    /// </summary>
+    /// <param name="name">The config option name (used with --option=value)</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="description">Human-readable description</param>
+    /// <param name="longDescription">Optional detailed help text</param>
+    public ModuleBuilder AddIntegerConfig(string name, long defaultValue, string description, string? longDescription = null)
+    {
+        if (_result != 0) return this;
+
+        // Create config item
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_INTEGER, &configOut);
+        if (_result != 0) return this;
+
+        // Set name
+        SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
+        if (_result != 0) return this;
+
+        // Set default value
+        SetConfigLong(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
+        if (_result != 0) return this;
+
+        // Set description
+        SetConfigDesc(configOut, description, longDescription);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an integer configuration option with range constraints.
+    /// </summary>
+    public ModuleBuilder AddIntegerConfig(string name, long defaultValue, long min, long max, string description, string? longDescription = null)
+    {
+        AddIntegerConfig(name, defaultValue, description, longDescription);
+        if (_result != 0) return this;
+
+        // Set range - requires passing min and max as two int64 values
+        // Note: VLC_CONFIG_RANGE expects (min, max) as two separate int64 arguments
+        var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, long, long, int>)_vlcSetPtr;
+        _result = vlcSetRange(_opaque, _module, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a float configuration option.
+    /// </summary>
+    /// <param name="name">The config option name</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="description">Human-readable description</param>
+    /// <param name="longDescription">Optional detailed help text</param>
+    public ModuleBuilder AddFloatConfig(string name, double defaultValue, string description, string? longDescription = null)
+    {
+        if (_result != 0) return this;
+
+        // Create config item
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_FLOAT, &configOut);
+        if (_result != 0) return this;
+
+        // Set name
+        SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
+        if (_result != 0) return this;
+
+        // Set default value (as double)
+        SetConfigDouble(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
+        if (_result != 0) return this;
+
+        // Set description
+        SetConfigDesc(configOut, description, longDescription);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a float configuration option with range constraints.
+    /// </summary>
+    public ModuleBuilder AddFloatConfig(string name, double defaultValue, double min, double max, string description, string? longDescription = null)
+    {
+        AddFloatConfig(name, defaultValue, description, longDescription);
+        if (_result != 0) return this;
+
+        // Set range
+        var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, double, double, int>)_vlcSetPtr;
+        _result = vlcSetRange(_opaque, _module, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a boolean configuration option.
+    /// </summary>
+    /// <param name="name">The config option name</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="description">Human-readable description</param>
+    /// <param name="longDescription">Optional detailed help text</param>
+    public ModuleBuilder AddBoolConfig(string name, bool defaultValue, string description, string? longDescription = null)
+    {
+        if (_result != 0) return this;
+
+        // Create config item
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_BOOL, &configOut);
+        if (_result != 0) return this;
+
+        // Set name
+        SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
+        if (_result != 0) return this;
+
+        // Set default value (as int64: 1 or 0)
+        SetConfigLong(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue ? 1 : 0);
+        if (_result != 0) return this;
+
+        // Set description
+        SetConfigDesc(configOut, description, longDescription);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a string configuration option.
+    /// </summary>
+    /// <param name="name">The config option name</param>
+    /// <param name="defaultValue">Default value</param>
+    /// <param name="description">Human-readable description</param>
+    /// <param name="longDescription">Optional detailed help text</param>
+    public ModuleBuilder AddStringConfig(string name, string? defaultValue, string description, string? longDescription = null)
+    {
+        if (_result != 0) return this;
+
+        // Create config item
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_STRING, &configOut);
+        if (_result != 0) return this;
+
+        // Set name
+        SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
+        if (_result != 0) return this;
+
+        // Set default value
+        if (defaultValue != null)
+        {
+            SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
+            if (_result != 0) return this;
+        }
+
+        // Set description
+        SetConfigDesc(configOut, description, longDescription);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a file path configuration option.
+    /// </summary>
+    public ModuleBuilder AddFileConfig(string name, string? defaultValue, string description, string? longDescription = null)
+    {
+        if (_result != 0) return this;
+
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_LOADFILE, &configOut);
+        if (_result != 0) return this;
+
+        SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
+        if (_result != 0) return this;
+
+        if (defaultValue != null)
+        {
+            SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
+            if (_result != 0) return this;
+        }
+
+        SetConfigDesc(configOut, description, longDescription);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a directory path configuration option.
+    /// </summary>
+    public ModuleBuilder AddDirectoryConfig(string name, string? defaultValue, string description, string? longDescription = null)
+    {
+        if (_result != 0) return this;
+
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_DIRECTORY, &configOut);
+        if (_result != 0) return this;
+
+        SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
+        if (_result != 0) return this;
+
+        if (defaultValue != null)
+        {
+            SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
+            if (_result != 0) return this;
+        }
+
+        SetConfigDesc(configOut, description, longDescription);
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the subcategory for subsequent config items.
+    /// </summary>
+    public ModuleBuilder WithSubcategory(int subcategory)
+    {
+        if (_result != 0) return this;
+
+        nint configOut = 0;
+        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
+        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_SUBCATEGORY, &configOut);
+        if (_result != 0) return this;
+
+        // Set the subcategory value
+        SetConfigLong(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, subcategory);
+        return this;
+    }
+
+    private void SetConfigString(nint config, int key, string value)
+    {
+        nint ptr = PinString(value);
+        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, int>)_vlcSetPtr;
+        _result = vlcSet(_opaque, config, key, ptr);
+    }
+
+    private void SetConfigLong(nint config, int key, long value)
+    {
+        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, long, int>)_vlcSetPtr;
+        _result = vlcSet(_opaque, config, key, value);
+    }
+
+    private void SetConfigDouble(nint config, int key, double value)
+    {
+        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, double, int>)_vlcSetPtr;
+        _result = vlcSet(_opaque, config, key, value);
+    }
+
+    private void SetConfigDesc(nint config, string description, string? longDescription)
+    {
+        nint descPtr = PinString(description);
+        nint longDescPtr = longDescription != null ? PinString(longDescription) : 0;
+        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)_vlcSetPtr;
+        _result = vlcSet(_opaque, config, VLCModuleConstants.VLC_CONFIG_DESC, descPtr, longDescPtr);
+    }
+
+    /// <summary>
     /// Completes the module registration and returns the result.
     /// </summary>
     /// <returns>0 on success, non-zero on failure</returns>
