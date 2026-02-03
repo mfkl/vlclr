@@ -154,7 +154,7 @@ public static class FontManager
     private static FontFamily LoadEmbeddedFont(FontCollection collection)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "libdotnet_subtitle_plugin.Resources.JetBrainsMono-Regular.ttf";
+        var resourceName = "SubtitleRenderer.Resources.JetBrainsMono-Regular.ttf";
 
         using var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)

@@ -30,10 +30,9 @@ The framework provides:
 
 ### VideoOverlay Sample
 
-A working video filter that renders a text overlay showing:
-- .NET runtime version
-- Frame counter
-- GC statistics
+A working video filter that renders a text overlay showing frame counter and timestamp.
+
+See [`samples/VideoOverlay/README.md`](samples/VideoOverlay/README.md) for detailed documentation, build instructions, and usage.
 
 ## Building
 
