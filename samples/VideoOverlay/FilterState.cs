@@ -1,3 +1,4 @@
+using VLCLR.Imaging;
 using VLCLR.Native;
 
 namespace VideoOverlay;
@@ -76,150 +77,24 @@ public static class FilterState
         int overlayWidth = _renderer.OverlayWidth;
         int overlayHeight = _renderer.OverlayHeight;
 
-        // Composite overlay onto frame
-        byte* framePtr = (byte*)pixels;
+        // Use framework's FrameCompositor to blend overlay onto frame
+        // Position overlay at top-left with 10px padding
+        bool success = FrameCompositor.Composite(
+            pixels,
+            pitch,
+            visiblePitch,
+            visibleLines,
+            chroma,
+            overlay,
+            overlayWidth,
+            overlayHeight,
+            offsetX: 10,
+            offsetY: 10);
 
-        // Determine bytes per pixel based on chroma
-        int bytesPerPixel = VLCFourCC.GetBytesPerPixel(chroma);
-        if (bytesPerPixel == 0)
+        // Log format issues on first frame only
+        if (!success && _frameCount == 1)
         {
-            // Unknown format - log once and skip
-            if (_frameCount == 1)
-            {
-                Console.Error.WriteLine($"[.NET Video Overlay] Unknown chroma format: {VLCFourCC.ToString(chroma)} (0x{chroma:X8})");
-            }
-            return;
-        }
-
-        // Position for overlay (top-left with padding)
-        int offsetX = 10;
-        int offsetY = 10;
-
-        // Calculate frame width from visible pitch
-        int frameWidth = visiblePitch / bytesPerPixel;
-
-        // Ensure overlay fits within frame
-        int maxOverlayWidth = Math.Min(overlayWidth, frameWidth - offsetX);
-        int maxOverlayHeight = Math.Min(overlayHeight, visibleLines - offsetY);
-
-        if (maxOverlayWidth <= 0 || maxOverlayHeight <= 0)
-            return;
-
-        // Composite based on format
-        bool isBgra = VLCFourCC.IsBgraFormat(chroma);
-        bool hasAlpha = VLCFourCC.HasAlphaChannel(chroma);
-
-        for (int y = 0; y < maxOverlayHeight; y++)
-        {
-            int frameY = offsetY + y;
-            byte* rowPtr = framePtr + (frameY * pitch) + (offsetX * bytesPerPixel);
-
-            for (int x = 0; x < maxOverlayWidth; x++)
-            {
-                int overlayIdx = (y * overlayWidth + x) * 4; // RGBA
-                byte r = overlay[overlayIdx];
-                byte g = overlay[overlayIdx + 1];
-                byte b = overlay[overlayIdx + 2];
-                byte a = overlay[overlayIdx + 3];
-
-                if (a == 0)
-                {
-                    // Fully transparent - skip
-                    rowPtr += bytesPerPixel;
-                    continue;
-                }
-
-                if (bytesPerPixel == 4)
-                {
-                    // 32-bit format (RGBA or BGRA)
-                    if (a == 255)
-                    {
-                        // Fully opaque - direct copy
-                        if (isBgra)
-                        {
-                            rowPtr[0] = b;
-                            rowPtr[1] = g;
-                            rowPtr[2] = r;
-                            if (hasAlpha) rowPtr[3] = a;
-                        }
-                        else
-                        {
-                            rowPtr[0] = r;
-                            rowPtr[1] = g;
-                            rowPtr[2] = b;
-                            if (hasAlpha) rowPtr[3] = a;
-                        }
-                    }
-                    else
-                    {
-                        // Alpha blend
-                        int invAlpha = 255 - a;
-                        if (isBgra)
-                        {
-                            rowPtr[0] = (byte)((b * a + rowPtr[0] * invAlpha) / 255);
-                            rowPtr[1] = (byte)((g * a + rowPtr[1] * invAlpha) / 255);
-                            rowPtr[2] = (byte)((r * a + rowPtr[2] * invAlpha) / 255);
-                        }
-                        else
-                        {
-                            rowPtr[0] = (byte)((r * a + rowPtr[0] * invAlpha) / 255);
-                            rowPtr[1] = (byte)((g * a + rowPtr[1] * invAlpha) / 255);
-                            rowPtr[2] = (byte)((b * a + rowPtr[2] * invAlpha) / 255);
-                        }
-                    }
-                }
-                else if (bytesPerPixel == 3)
-                {
-                    // 24-bit RGB
-                    if (a == 255)
-                    {
-                        if (isBgra)
-                        {
-                            rowPtr[0] = b;
-                            rowPtr[1] = g;
-                            rowPtr[2] = r;
-                        }
-                        else
-                        {
-                            rowPtr[0] = r;
-                            rowPtr[1] = g;
-                            rowPtr[2] = b;
-                        }
-                    }
-                    else
-                    {
-                        int invAlpha = 255 - a;
-                        if (isBgra)
-                        {
-                            rowPtr[0] = (byte)((b * a + rowPtr[0] * invAlpha) / 255);
-                            rowPtr[1] = (byte)((g * a + rowPtr[1] * invAlpha) / 255);
-                            rowPtr[2] = (byte)((r * a + rowPtr[2] * invAlpha) / 255);
-                        }
-                        else
-                        {
-                            rowPtr[0] = (byte)((r * a + rowPtr[0] * invAlpha) / 255);
-                            rowPtr[1] = (byte)((g * a + rowPtr[1] * invAlpha) / 255);
-                            rowPtr[2] = (byte)((b * a + rowPtr[2] * invAlpha) / 255);
-                        }
-                    }
-                }
-                else if (bytesPerPixel == 1)
-                {
-                    // YUV Y plane - overlay as grayscale
-                    byte gray = (byte)((r * 77 + g * 150 + b * 29) >> 8);
-                    if (a == 255)
-                    {
-                        rowPtr[0] = gray;
-                    }
-                    else
-                    {
-                        int invAlpha = 255 - a;
-                        rowPtr[0] = (byte)((gray * a + rowPtr[0] * invAlpha) / 255);
-                    }
-                }
-
-                rowPtr += bytesPerPixel;
-            }
+            Console.Error.WriteLine($"[.NET Video Overlay] Compositing failed for chroma: {VLCFourCC.ToString(chroma)} (0x{chroma:X8})");
         }
 
         // Save first frame to disk for verification
