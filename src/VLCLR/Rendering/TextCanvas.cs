@@ -182,33 +182,37 @@ public sealed class TextCanvas : IDisposable
         // Measure text to calculate layout
         FontRectangle textBounds = TextMeasurer.MeasureSize(text, new TextOptions(font));
 
+        // Account for stroke extending beyond measured glyph bounds
+        float outlineExtra = style.HasOutline ? style.OutlineWidth : 0;
+        float effectiveMargin = _options.CanvasMargin + outlineExtra;
+
         // Calculate position based on alignment
         float textX = alignment switch
         {
-            TextAlignment.Left => _options.CanvasMargin,
-            TextAlignment.Right => _width - textBounds.Width - _options.CanvasMargin,
+            TextAlignment.Left => effectiveMargin,
+            TextAlignment.Right => _width - textBounds.Width - effectiveMargin,
             _ => (_width - textBounds.Width) / 2 // Center
         };
 
         // Calculate vertical position
         float textY = _options.VerticalPosition switch
         {
-            TextVerticalPosition.Top => _options.CanvasMargin + _options.BackgroundPadding,
+            TextVerticalPosition.Top => effectiveMargin + _options.BackgroundPadding,
             TextVerticalPosition.Center => (_height - textBounds.Height) / 2,
-            TextVerticalPosition.Bottom => _height - textBounds.Height - _options.CanvasMargin - _options.BackgroundPadding,
+            TextVerticalPosition.Bottom => _height - textBounds.Height - effectiveMargin - _options.BackgroundPadding,
             TextVerticalPosition.Custom => (_height * _options.CustomVerticalPosition) - (textBounds.Height / 2),
-            _ => _height - textBounds.Height - _options.CanvasMargin - _options.BackgroundPadding
+            _ => _height - textBounds.Height - effectiveMargin - _options.BackgroundPadding
         };
 
         // Clamp to canvas bounds
-        textX = Math.Max(_options.CanvasMargin, Math.Min(textX, _width - textBounds.Width - _options.CanvasMargin));
-        textY = Math.Max(_options.CanvasMargin, Math.Min(textY, _height - textBounds.Height - _options.CanvasMargin));
+        textX = Math.Max(effectiveMargin, Math.Min(textX, _width - textBounds.Width - effectiveMargin));
+        textY = Math.Max(effectiveMargin, Math.Min(textY, _height - textBounds.Height - effectiveMargin));
 
         // Create render options
         var textOptions = new RichTextOptions(font)
         {
             Origin = new PointF(textX, textY),
-            WrappingLength = _width - (_options.CanvasMargin * 2),
+            WrappingLength = _width - (effectiveMargin * 2),
             WordBreaking = WordBreaking.Standard
         };
 
@@ -221,11 +225,6 @@ public sealed class TextCanvas : IDisposable
         if (style.HasShadow)
         {
             DrawShadow(textOptions, text, style);
-        }
-
-        if (style.HasOutline)
-        {
-            DrawOutline(textOptions, text, font, style);
         }
 
         DrawForeground(textOptions, text, style);
@@ -265,50 +264,45 @@ public sealed class TextCanvas : IDisposable
     }
 
     /// <summary>
-    /// Draws an outline/stroke around the text.
-    /// Uses multiple offset draws to simulate stroke effect.
-    /// </summary>
-    private void DrawOutline(RichTextOptions baseOptions, string text, Font font, TextStyleWrapper style)
-    {
-        var outlineColor = ColorFromRgbAlpha(style.OutlineColor, style.OutlineAlpha);
-        int outlineWidth = style.OutlineWidth;
-
-        // Draw text at multiple offsets to create outline effect
-        for (int dx = -outlineWidth; dx <= outlineWidth; dx++)
-        {
-            for (int dy = -outlineWidth; dy <= outlineWidth; dy++)
-            {
-                // Skip center (that's where the fill goes)
-                if (dx == 0 && dy == 0)
-                {
-                    continue;
-                }
-
-                // Only draw at outline distance (rough circle approximation)
-                if (Math.Abs(dx) + Math.Abs(dy) > outlineWidth * 2)
-                {
-                    continue;
-                }
-
-                var offsetOptions = new RichTextOptions(font)
-                {
-                    Origin = new PointF(baseOptions.Origin.X + dx, baseOptions.Origin.Y + dy),
-                    WrappingLength = baseOptions.WrappingLength,
-                    WordBreaking = baseOptions.WordBreaking
-                };
-
-                _canvas!.Mutate(ctx => ctx.DrawText(offsetOptions, text, outlineColor));
-            }
-        }
-    }
-
-    /// <summary>
     /// Draws the foreground text with the specified style.
+    /// When outline is enabled, draws text at 8 offsets (cardinal + diagonal)
+    /// then the fill on top.
     /// </summary>
     private void DrawForeground(RichTextOptions options, string text, TextStyleWrapper style)
     {
         var textColor = ColorFromRgbAlpha(style.ForegroundColor, style.ForegroundAlpha);
-        _canvas!.Mutate(ctx => ctx.DrawText(options, text, textColor));
+        var brush = new SolidBrush(textColor);
+
+        if (style.HasOutline)
+        {
+            var outlineColor = ColorFromRgbAlpha(style.OutlineColor, style.OutlineAlpha);
+            int w = style.OutlineWidth;
+            _canvas!.Mutate(ctx =>
+            {
+                // Draw outline at cardinal and diagonal offsets
+                foreach (var (dx, dy) in new (int, int)[]
+                {
+                    (-w, 0), (w, 0), (0, -w), (0, w),
+                    (-w, -w), (-w, w), (w, -w), (w, w)
+                })
+                {
+                    var outlineOptions = new RichTextOptions(options.Font)
+                    {
+                        Origin = new PointF(options.Origin.X + dx, options.Origin.Y + dy),
+                        WrappingLength = options.WrappingLength,
+                        WordBreaking = options.WordBreaking
+                    };
+                    ctx.DrawText(outlineOptions, text, outlineColor);
+                }
+
+                // Fill on top
+                ctx.DrawText(options, text, brush);
+            });
+        }
+        else
+        {
+            _canvas!.Mutate(ctx => ctx.DrawText(options, text, brush));
+        }
     }
 
     /// <summary>
