@@ -1,5 +1,7 @@
 # VLCLR
 
+> ⚠︎ **This is an experimental project. Do not use in production.**
+
 **VLC + CLR = VLCLR** - A framework for building VLC 4.x plugins in C# using Native AOT compilation.
 
 ## Overview
