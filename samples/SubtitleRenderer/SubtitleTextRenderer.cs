@@ -36,9 +36,11 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
     private const int DefaultHeight = 1080;
 
     // Debug output control
+#if DEBUG
     private bool _debugOutputEnabled;
     private string? _debugOutputPath;
     private bool _firstRenderSaved;
+#endif
     private long _renderCount;
 
     /// <summary>
@@ -57,6 +59,7 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
                 "SubtitleRenderer.Resources.JetBrainsMono-Regular.ttf",
                 setAsDefault: true);
 
+#if DEBUG
             // Check for debug output environment variable
             _debugOutputPath = Environment.GetEnvironmentVariable("DOTNET_SUBTITLE_DEBUG_PATH");
             _debugOutputEnabled = !string.IsNullOrEmpty(_debugOutputPath);
@@ -65,6 +68,7 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
             {
                 context.Logger.Info($"[SubtitleTextRenderer] Debug output enabled: {_debugOutputPath}");
             }
+#endif
 
             context.Logger.Info("[SubtitleTextRenderer] Text renderer initialized");
             return true;
@@ -151,6 +155,7 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
         // Render text segments to canvas using framework's TextCanvas
         _canvas.Render(segments, alignment);
 
+#if DEBUG
         // Save debug image on first successful render
         if (_debugOutputEnabled && !_firstRenderSaved)
         {
@@ -166,6 +171,7 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
                 _firstRenderSaved = true; // Don't try again
             }
         }
+#endif
 
         // Get the rendered image
         Image<Rgba32>? image = _canvas.GetImage();
