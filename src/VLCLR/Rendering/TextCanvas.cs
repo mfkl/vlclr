@@ -4,7 +4,9 @@
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
+#if DEBUG
 using SixLabors.ImageSharp.Formats.Png;
+#endif
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using VLCLR.Text;
@@ -343,11 +345,15 @@ public sealed class TextCanvas : IDisposable
 
     /// <summary>
     /// Saves the current canvas to a PNG file for debugging.
+    /// Only available in Debug builds to avoid linking the PNG encoder in Release.
     /// </summary>
     /// <param name="path">File path to save to.</param>
+    [System.Diagnostics.Conditional("DEBUG")]
     public void SaveDebugImage(string path)
     {
+#if DEBUG
         _canvas?.Save(path, new PngEncoder());
+#endif
     }
 
     /// <summary>
