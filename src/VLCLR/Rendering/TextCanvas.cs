@@ -4,6 +4,7 @@
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using VLCLR.Text;
@@ -72,6 +73,11 @@ public enum TextVerticalPosition
 /// </remarks>
 public sealed class TextCanvas : IDisposable
 {
+    // Minimal ImageSharp configuration with no format decoders/encoders registered.
+    // This allows the trimmer to strip all image codec code (PNG, JPEG, GIF, BMP, TIFF, etc.)
+    // since we only create blank images, draw on them, and copy raw pixels out.
+    private static readonly Configuration s_minimalConfig = new();
+
     private Image<Rgba32>? _canvas;
     private int _width;
     private int _height;
@@ -124,7 +130,7 @@ public sealed class TextCanvas : IDisposable
         _canvas?.Dispose();
         _width = width;
         _height = height;
-        _canvas = new Image<Rgba32>(width, height);
+        _canvas = new Image<Rgba32>(s_minimalConfig, width, height);
         _pixelBuffer = new byte[width * height * 4];
     }
 
@@ -341,7 +347,7 @@ public sealed class TextCanvas : IDisposable
     /// <param name="path">File path to save to.</param>
     public void SaveDebugImage(string path)
     {
-        _canvas?.SaveAsPng(path);
+        _canvas?.Save(path, new PngEncoder());
     }
 
     /// <summary>
