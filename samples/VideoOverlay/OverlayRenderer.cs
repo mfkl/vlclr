@@ -127,6 +127,7 @@ public class OverlayRenderer : IDisposable
         return _pixelBuffer;
     }
 
+#if DEBUG
     /// <summary>
     /// Save the current overlay to a file for debugging.
     /// </summary>
@@ -134,6 +135,7 @@ public class OverlayRenderer : IDisposable
     {
         _overlay.SaveAsPng(path);
     }
+#endif
 
     public void Dispose()
     {
