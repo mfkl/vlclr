@@ -25,8 +25,10 @@ namespace VideoOverlay;
 public partial class VideoOverlayFilter : VLCVideoFilterBase
 {
     private OverlayRenderer? _renderer;
+#if DEBUG
     private bool _savedDebugFrame;
     private const string DebugFramePath = "overlay_test.png";
+#endif
 
     /// <summary>
     /// Called when the filter opens. Initializes the overlay renderer.
@@ -102,6 +104,7 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
             Context.Logger.Warning($"[VideoOverlay] Compositing failed for chroma: {VLCFourCC.ToString(frame.Chroma)}");
         }
 
+#if DEBUG
         // Save first frame to disk for verification
         if (!_savedDebugFrame && FrameCount == 1)
         {
@@ -123,5 +126,6 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
                 _savedDebugFrame = true; // Don't try again
             }
         }
+#endif
     }
 }
