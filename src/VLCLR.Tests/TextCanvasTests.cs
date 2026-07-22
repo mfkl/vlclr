@@ -183,6 +183,46 @@ public class TextCanvasTests
     }
 
     [Fact]
+    public void RenderText_WithOutline_PreservesForegroundFill()
+    {
+        using var canvas = new TextCanvas(400, 160);
+        var style = new TextStyleWrapper
+        {
+            FontSize = 48,
+            ForegroundColor = 0xFFFFFF,
+            ForegroundAlpha = 255,
+            HasOutline = true,
+            OutlineColor = 0x000000,
+            OutlineAlpha = 255,
+            OutlineWidth = 3
+        };
+
+        canvas.RenderText("Outlined text", style);
+        var pixels = canvas.GetPixels();
+        int opaquePixels = 0;
+        int lightPixels = 0;
+
+        for (int i = 0; i < pixels.Length; i += 4)
+        {
+            if (pixels[i + 3] == 0)
+            {
+                continue;
+            }
+
+            opaquePixels++;
+            if (pixels[i] + pixels[i + 1] + pixels[i + 2] > 384)
+            {
+                lightPixels++;
+            }
+        }
+
+        Assert.True(opaquePixels > 0);
+        Assert.True(
+            lightPixels > opaquePixels / 10,
+            $"Only {lightPixels:N0} of {opaquePixels:N0} rendered pixels retained the foreground fill");
+    }
+
+    [Fact]
     public void Dispose_ClearsResources()
     {
         // Arrange
