@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.27.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\samples\SubtitleTranslator\ITranslationEngine.cs" Link="ITranslationEngine.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\ModelManifest.cs" Link="ModelManifest.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\OnnxSessionFactory.cs" Link="OnnxSessionFactory.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\OnnxTranslator.cs" Link="OnnxTranslator.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\SimpleTokenizer.cs" Link="SimpleTokenizer.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\TranslationCache.cs" Link="TranslationCache.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\TranslationTextNormalizer.cs" Link="TranslationTextNormalizer.cs" />
+  </ItemGroup>
+
+</Project>
