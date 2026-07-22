@@ -34,9 +34,8 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
     private int _outlineWidth = 3;
     private bool _forceWhite = true;
 
-    // Default canvas dimensions (used if region doesn't specify)
+    // Default video width (used if the output format doesn't specify one)
     private const int DefaultWidth = 1920;
-    private const int DefaultHeight = 1080;
 
     // Debug output control
 #if DEBUG
@@ -137,31 +136,25 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
         // Get video dimensions from filter's format
         ref VLCFilter filter = ref Unsafe.AsRef<VLCFilter>((void*)Context.NativePtr);
         uint videoWidth = filter.FormatOut.Video.Width > 0 ? filter.FormatOut.Video.Width : (uint)DefaultWidth;
-        uint videoHeight = filter.FormatOut.Video.Height > 0 ? filter.FormatOut.Video.Height : (uint)DefaultHeight;
+        int viewportWidth = Math.Max((int)videoWidth, 320);
+        int maximumRegionWidth = request.MaxWidth > 0
+            ? Math.Min(request.MaxWidth, viewportWidth)
+            : (int)(viewportWidth * 0.9f);
 
-        // Use video dimensions for canvas
-        int canvasWidth = (int)videoWidth;
-        int canvasHeight = (int)videoHeight;
-
-        // Ensure minimum dimensions
-        canvasWidth = Math.Max(canvasWidth, 320);
-        canvasHeight = Math.Max(canvasHeight, 240);
-
-        // Create or resize canvas
+        // VLC positions this tightly-sized image using the source alignment.
         if (_canvas == null)
         {
-            _canvas = new TextCanvas(canvasWidth, canvasHeight);
-        }
-        else
-        {
-            _canvas.EnsureSize(canvasWidth, canvasHeight);
+            _canvas = new TextCanvas(1, 1);
         }
 
         // Determine text alignment based on request
         TextAlignment alignment = request.HorizontalAlignment;
 
-        // Render text segments to canvas using framework's TextCanvas
-        _canvas.Render(segments, alignment);
+        Image<Rgba32>? image = _canvas.RenderRegion(segments, maximumRegionWidth, alignment);
+        if (image == null)
+        {
+            return 0;
+        }
 
 #if DEBUG
         // Save debug image on first successful render
@@ -181,19 +174,15 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
         }
 #endif
 
-        // Get the rendered image
-        Image<Rgba32>? image = _canvas.GetImage();
-        if (image == null)
-        {
-            return 0;
-        }
-
         // Convert to VLC subpicture region using the chroma list from VLC
-        nint outputRegionPtr = PictureConverter.ToSubpictureRegion(image, ChromaListPtr);
+        nint outputRegionPtr = PictureConverter.ToSubpictureRegion(
+            image,
+            ChromaListPtr,
+            request.Alignment);
 
         if (outputRegionPtr != 0 && _renderCount <= 5)
         {
-            Context.Logger.Info($"[SubtitleTextRenderer] Created region {canvasWidth}x{canvasHeight}, alignment={alignment}");
+            Context.Logger.Info($"[SubtitleTextRenderer] Created compact region {image.Width}x{image.Height}, alignment={alignment}");
         }
 
         return outputRegionPtr;
