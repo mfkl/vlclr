@@ -6,7 +6,7 @@
   "tokenizerType": "SentencePiece Unigram (Hugging Face tokenizer.json)",
   "maximumSourceTokens": 128,
   "maximumOutputTokens": 128,
-  "onnxRuntimeVersion": "1.20.1",
+  "onnxRuntimeVersion": "1.27.1",
   "source": {
     "repository": "https://huggingface.co/onnx-community/opus-mt-en-fr",
     "revision": "main",
