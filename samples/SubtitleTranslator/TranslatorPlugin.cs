@@ -10,92 +10,154 @@ using VLCLR.Text;
 
 namespace SubtitleTranslator;
 
-/// <summary>
-/// AI-powered live subtitle translator using ONNX MarianMT models.
-/// Translates subtitle text in real-time, fully offline.
-/// </summary>
 [VLCModule("dotnet_subtitle_translator")]
 [VLCCapability("text renderer", Score = 1)]
-[VLCDescription("AI-powered live subtitle translator (.NET AOT + ONNX)")]
+[VLCDescription("Offline subtitle translator (.NET Native AOT + ONNX Runtime)")]
 [VLCConfig("translator-source-lang", VLCConfigType.String, Default = "en",
-    Description = "Source language", LongDescription = "Source language ISO code (e.g. en, de, es)")]
+    Description = "Source language", LongDescription = "Source language ISO code")]
 [VLCConfig("translator-target-lang", VLCConfigType.String, Default = "fr",
-    Description = "Target language", LongDescription = "Target language ISO code (e.g. fr, de, es)")]
+    Description = "Target language", LongDescription = "Target language ISO code")]
 [VLCConfig("translator-model-path", VLCConfigType.Directory, Default = "",
-    Description = "Model directory", LongDescription = "Path to ONNX model directory (auto-detected if empty)")]
+    Description = "Model directory", LongDescription = "Manifest-based ONNX model directory; auto-detected when empty")]
+[VLCConfig("translator-provider", VLCConfigType.String, Default = "cpu",
+    Description = "Inference provider", LongDescription = "Inference provider; the shipping implementation supports cpu")]
+[VLCConfig("translator-threads", VLCConfigType.Integer, Default = 4, Min = 1, Max = 64,
+    Description = "ONNX CPU threads", LongDescription = "ONNX Runtime intra-op CPU thread count")]
+[VLCConfig("translator-max-source-tokens", VLCConfigType.Integer, Default = 128, Min = 1, Max = 512,
+    Description = "Maximum source tokens", LongDescription = "Reject cues with more source tokens")]
+[VLCConfig("translator-max-output-tokens", VLCConfigType.Integer, Default = 128, Min = 1, Max = 512,
+    Description = "Maximum output tokens", LongDescription = "Stop generation after this many tokens")]
+[VLCConfig("translator-deadline-ms", VLCConfigType.Integer, Default = 500, Min = 1, Max = 5000,
+    Description = "Translation deadline", LongDescription = "Maximum time the renderer waits for a cache miss")]
+[VLCConfig("translator-cache-size", VLCConfigType.Integer, Default = 512, Min = 1, Max = 8192,
+    Description = "Translation cache size", LongDescription = "Maximum number of translated cues retained in memory")]
+[VLCConfig("translator-show-original-on-timeout", VLCConfigType.Bool, Default = true,
+    Description = "Show original on timeout", LongDescription = "Render the original cue when translation misses its deadline")]
 public partial class TranslatorPlugin : VLCTextRendererBase
 {
-    private OnnxTranslator? _translator;
-    private TranslationCache? _cache;
+    private const int DefaultWidth = 1920;
+    private TranslationServiceLease? _serviceLease;
     private TextCanvas? _canvas;
+    private string _sourceLanguage = "en";
+    private string _targetLanguage = "fr";
+    private int _deadlineMilliseconds = 500;
+    private bool _showOriginalOnTimeout = true;
+    private string? _initializationFailure;
     private long _renderCount;
 
-    private const int DefaultWidth = 1920;
     protected override bool OnOpen(VLCRendererContext context)
     {
         context.Logger.Info("[SubtitleTranslator] Opening translator plugin");
 
         try
         {
-            // Preload onnxruntime native DLL before any ONNX types are used
-            context.Logger.Info("[SubtitleTranslator] Loading ONNX Runtime native library...");
-            var resolverDiag = OnnxNativeResolver.EnsureLoaded();
-            foreach (var line in resolverDiag.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-                context.Logger.Info($"[SubtitleTranslator] Loading resolver: {line.Trim()}");
-            context.Logger.Info($"[SubtitleTranslator] Loading result: {OnnxNativeResolver.LoadedFrom ?? "FAILED"}");
-
-            // Initialize font manager with embedded JetBrains Mono font
-            var assembly = Assembly.GetExecutingAssembly();
             FontManager.LoadEmbeddedFont(
-                assembly,
+                Assembly.GetExecutingAssembly(),
                 "SubtitleTranslator.Resources.JetBrainsMono-Regular.ttf",
                 setAsDefault: true);
 
-            // Resolve model path
-            var modelPath = ResolveModelPath();
-            if (modelPath == null)
+            var config = Config;
+            _sourceLanguage = NormalizeLanguage(config.TranslatorSourceLang, "en");
+            _targetLanguage = NormalizeLanguage(config.TranslatorTargetLang, "fr");
+            string provider = (config.TranslatorProvider ?? "cpu").Trim().ToLowerInvariant();
+            int threads = (int)Math.Clamp(config.TranslatorThreads, 1, Environment.ProcessorCount);
+            int maximumSourceTokens = (int)Math.Clamp(config.TranslatorMaxSourceTokens, 1, 512);
+            int maximumOutputTokens = (int)Math.Clamp(config.TranslatorMaxOutputTokens, 1, 512);
+            _deadlineMilliseconds = (int)Math.Clamp(config.TranslatorDeadlineMs, 1, 5000);
+            int cacheCapacity = (int)Math.Clamp(config.TranslatorCacheSize, 1, 8192);
+            _showOriginalOnTimeout = config.TranslatorShowOriginalOnTimeout;
+
+            if (!string.Equals(provider, "cpu", StringComparison.Ordinal))
             {
-                context.Logger.Error("[SubtitleTranslator] Could not find ONNX models. " +
-                    "Set SUBTITLE_TRANSLATOR_MODEL_PATH or run download-model.ps1");
-                return false;
+                _initializationFailure = $"unsupported-provider-{provider}";
+                context.Logger.Warning(
+                    $"[SubtitleTranslator] Provider '{provider}' is not available; original subtitles will be rendered.");
+                return true;
             }
 
-            var config = Config;
-            string sourceLang = config.TranslatorSourceLang ?? "en";
-            string targetLang = config.TranslatorTargetLang ?? "fr";
+            string? modelDirectory = ResolveModelPath(
+                config.TranslatorModelPath,
+                _sourceLanguage,
+                _targetLanguage);
+            if (modelDirectory == null)
+            {
+                _initializationFailure = "model-not-found";
+                context.Logger.Warning(
+                    "[SubtitleTranslator] Model bundle not found; original subtitles will be rendered. " +
+                    "Set --translator-model-path to a directory containing model-manifest.json.");
+                return true;
+            }
 
-            context.Logger.Info($"[SubtitleTranslator] Loading ONNX models from: {modelPath}");
-            context.Logger.Info($"[SubtitleTranslator] Translation: {sourceLang} -> {targetLang}");
+            NativeLoadResult nativeLoad = OnnxNativeResolver.EnsureLoadedResult(modelDirectory);
+            foreach (string line in nativeLoad.Diagnostics.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                context.Logger.Info($"[SubtitleTranslator] resolver {line.Trim()}");
+            if (!nativeLoad.Success)
+            {
+                _initializationFailure = "onnxruntime-load-failed";
+                context.Logger.Warning("[SubtitleTranslator] ONNX Runtime unavailable; original subtitles will be rendered.");
+                return true;
+            }
 
-            _translator = new OnnxTranslator(modelPath, sourceLang, targetLang);
-            _cache = new TranslationCache(capacity: 256);
+            int queueCapacity = Math.Clamp(cacheCapacity / 64, 2, 16);
+            var serviceKey = new TranslationServiceKey(
+                modelDirectory,
+                _sourceLanguage,
+                _targetLanguage,
+                provider,
+                threads,
+                maximumSourceTokens,
+                maximumOutputTokens,
+                cacheCapacity,
+                queueCapacity);
+            _serviceLease = TranslationServiceRegistry.Acquire(
+                serviceKey,
+                () => new OnnxTranslator(
+                    modelDirectory,
+                    _sourceLanguage,
+                    _targetLanguage,
+                    new OnnxTranslatorOptions
+                    {
+                        IntraOpThreads = threads,
+                        MaximumSourceTokens = maximumSourceTokens,
+                        MaximumOutputTokens = maximumOutputTokens,
+                        UseDecoderCache = true,
+                        VerifyModelHashes = true
+                    }));
 
-            // Pre-warm the model to avoid first-subtitle latency
-            context.Logger.Info("[SubtitleTranslator] Pre-warming model...");
-            _translator.Warmup();
-            context.Logger.Info("[SubtitleTranslator] Model ready");
+            TranslationResponse warmup = _serviceLease.Service.Translate("Hello", TimeSpan.FromSeconds(10));
+            if (!warmup.IsSuccess)
+            {
+                _serviceLease.Dispose();
+                _serviceLease = null;
+                _initializationFailure = $"warmup-{warmup.Outcome.ToString().ToLowerInvariant()}";
+                context.Logger.Warning(
+                    $"[SubtitleTranslator] Model warm-up failed ({warmup.Outcome}); original subtitles will be rendered.");
+                return true;
+            }
 
+            context.Logger.Info(
+                $"[SubtitleTranslator] Model ready source={_sourceLanguage} target={_targetLanguage} " +
+                $"provider=cpu threads={threads} runtime={nativeLoad.Version ?? "unknown"} " +
+                $"shared_services={TranslationServiceRegistry.ActiveServiceCount}");
             return true;
         }
         catch (Exception ex)
         {
-            context.Logger.Error($"[SubtitleTranslator] Failed to initialize: {ex.Message}");
-            // Log inner exceptions for TypeInitializationException
-            var inner = ex.InnerException;
-            while (inner != null)
-            {
-                context.Logger.Error($"[SubtitleTranslator]   Inner: {inner.GetType().Name}: {inner.Message}");
-                inner = inner.InnerException;
-            }
-            context.Logger.Error($"[SubtitleTranslator]   Stack: {ex.StackTrace}");
-            return false;
+            _serviceLease?.Dispose();
+            _serviceLease = null;
+            _initializationFailure = ex.GetType().Name;
+            context.Logger.Error(
+                $"[SubtitleTranslator] Initialization failed ({ex.GetType().Name}): {ex.Message}. " +
+                "Original subtitles will be rendered.");
+            return true;
         }
     }
 
     protected override void OnClose()
     {
-        Context.Logger.Info($"[SubtitleTranslator] Closing, rendered {_renderCount} subtitles");
-        _translator?.Dispose();
+        Context.Logger.Info($"[SubtitleTranslator] Closing rendered={_renderCount}");
+        _serviceLease?.Dispose();
+        _serviceLease = null;
         _canvas?.Dispose();
         _canvas = null;
     }
@@ -103,93 +165,126 @@ public partial class TranslatorPlugin : VLCTextRendererBase
     protected override unsafe nint RenderText(VLCTextRequest request)
     {
         _renderCount++;
-
-        // Parse text segments from the region
         var segments = TextSegmentParser.ParseWithVisibility(
             RegionPtr,
             forceWhiteText: true,
             forceOutline: true,
             outlineWidth: 3);
-
-        if (segments.Count == 0 || segments.TrueForAll(s => s.IsEmpty))
+        if (segments.Count == 0 || segments.TrueForAll(segment => segment.IsEmpty))
             return 0;
 
-        // Get the combined text for translation
         string originalText = TextSegmentParser.GetCombinedText(segments);
         if (string.IsNullOrWhiteSpace(originalText))
             return 0;
 
-        // Translate (with caching)
-        string translatedText;
-        try
+        TranslationResponse? response = null;
+        string renderedText = originalText;
+        string renderedOutcome = "fallback";
+        if (_serviceLease != null)
         {
-            translatedText = _cache!.GetOrTranslate(originalText, _translator!);
-        }
-        catch (Exception ex)
-        {
-            // Fallback: render original text if translation fails
-            if (_renderCount <= 5)
-                Context.Logger.Warning($"[SubtitleTranslator] Translation failed: {ex.Message}");
-            translatedText = originalText;
+            response = _serviceLease.Service.Translate(
+                originalText,
+                TimeSpan.FromMilliseconds(_deadlineMilliseconds));
+            if (response.Value.IsSuccess)
+            {
+                renderedText = response.Value.Text;
+                renderedOutcome = "translated";
+            }
+            else if (response.Value.Outcome == TranslationOutcome.DeadlineExceeded && !_showOriginalOnTimeout)
+            {
+                LogTranslationEvent(originalText, response, "suppressed");
+                return 0;
+            }
         }
 
-        if (_renderCount <= 5)
-        {
-            Context.Logger.Info($"[SubtitleTranslator] #{_renderCount}: \"{originalText}\" -> \"{translatedText}\"");
-        }
+        LogTranslationEvent(originalText, response, renderedOutcome);
 
-        // Get video dimensions from filter's format
         ref VLCFilter filter = ref Unsafe.AsRef<VLCFilter>((void*)Context.NativePtr);
-        uint videoWidth = filter.FormatOut.Video.Width > 0 ? filter.FormatOut.Video.Width : (uint)DefaultWidth;
+        uint videoWidth = filter.FormatOut.Video.Width > 0 ? filter.FormatOut.Video.Width : DefaultWidth;
         int viewportWidth = Math.Max((int)videoWidth, 320);
         int maximumRegionWidth = request.MaxWidth > 0
             ? Math.Min(request.MaxWidth, viewportWidth)
             : (int)(viewportWidth * 0.9f);
 
-        // VLC positions this tightly-sized image using the source alignment.
-        if (_canvas == null)
-            _canvas = new TextCanvas(1, 1);
-
-        // Use the style from the first segment for the translated text
-        var style = segments[0].Style;
+        _canvas ??= new TextCanvas(1, 1);
         TextAlignment alignment = request.HorizontalAlignment;
-
         Image<Rgba32>? image = _canvas.RenderTextRegion(
-            translatedText,
-            style,
+            renderedText,
+            segments[0].Style,
             maximumRegionWidth,
             alignment);
         if (image == null)
             return 0;
 
-        // Convert to a compact VLC region while preserving source positioning.
-        return PictureConverter.ToSubpictureRegion(image, ChromaListPtr, request.Alignment);
-    }
-
-    /// <summary>
-    /// Try to find the ONNX model directory.
-    /// Priority: typed VLC option > relative to DLL > relative to CWD.
-    /// </summary>
-    private string? ResolveModelPath()
-    {
-        // 1. Typed VLC configuration option.
-        var configuredPath = Config.TranslatorModelPath;
-        if (!string.IsNullOrWhiteSpace(configuredPath) && Directory.Exists(configuredPath))
-            return Path.GetFullPath(configuredPath);
-
-        // 2. Relative to app base directory
-        var baseDir = AppContext.BaseDirectory;
-        if (!string.IsNullOrEmpty(baseDir))
+        nint outputRegion = PictureConverter.ToSubpictureRegion(
+            image,
+            ChromaListPtr,
+            request.Alignment);
+        if (outputRegion != 0 && _renderCount <= 5)
         {
-            var relPath = Path.Combine(baseDir, "models");
-            if (Directory.Exists(relPath))
-                return relPath;
+            Context.Logger.Info(
+                $"[SubtitleTranslator] Created compact region {image.Width}x{image.Height} alignment={alignment}");
         }
 
-        // 3. Relative to current working directory
-        var cwdPath = Path.Combine(Directory.GetCurrentDirectory(), "models");
-        if (Directory.Exists(cwdPath))
-            return cwdPath;
+        return outputRegion;
+    }
+
+    private void LogTranslationEvent(
+        string originalText,
+        TranslationResponse? response,
+        string renderedOutcome)
+    {
+        TranslationResponse value = response ?? new TranslationResponse(
+            TranslationOutcome.Failed,
+            originalText,
+            false,
+            null,
+            TimeSpan.Zero,
+            TimeSpan.Zero,
+            _initializationFailure ?? "service-unavailable");
+        TranslationResult? details = value.Details;
+        string deadline = value.Outcome == TranslationOutcome.DeadlineExceeded ? "missed" : "met";
+        Context.Logger.Info(
+            $"[SubtitleTranslator] event cue={TranslationTextNormalizer.ComputeCueHash(originalText)} " +
+            $"cache={(value.CacheHit ? "hit" : "miss")} source={_sourceLanguage} target={_targetLanguage} " +
+            $"source_tokens={details?.SourceTokenCount ?? 0} output_tokens={details?.OutputTokenCount ?? 0} " +
+            $"queue_ms={value.QueueDuration.TotalMilliseconds:F1} " +
+            $"inference_ms={details?.InferenceDuration.TotalMilliseconds ?? 0:F1} " +
+            $"deadline={deadline} service_outcome={value.Outcome.ToString().ToLowerInvariant()} " +
+            $"rendered={renderedOutcome} error={value.ErrorType ?? "none"}");
+    }
+
+    private static string NormalizeLanguage(string? value, string fallback) =>
+        string.IsNullOrWhiteSpace(value) ? fallback : value.Trim().ToLowerInvariant();
+
+    private static string? ResolveModelPath(
+        string? configuredPath,
+        string sourceLanguage,
+        string targetLanguage)
+    {
+        string pairName = $"opus-mt-{sourceLanguage}-{targetLanguage}";
+        var candidates = new List<string>();
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+            candidates.Add(configuredPath);
+        candidates.Add(Path.Combine(AppContext.BaseDirectory, "models", pairName));
+        candidates.Add(Path.Combine(AppContext.BaseDirectory, "models"));
+        candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "models", pairName));
+        candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "models"));
+
+        foreach (string candidate in candidates)
+        {
+            try
+            {
+                if (!Directory.Exists(candidate))
+                    continue;
+                string resolved = ModelManifest.ResolveModelDirectory(candidate, sourceLanguage, targetLanguage);
+                if (File.Exists(Path.Combine(resolved, "model-manifest.json")))
+                    return resolved;
+            }
+            catch
+            {
+            }
+        }
 
         return null;
     }
