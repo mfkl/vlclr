@@ -1,0 +1,88 @@
+{
+  "Label": "optimized-38b06db",
+  "TimestampUtc": "2026-07-22T12:11:47.8038448+00:00",
+  "Commit": "38b06db",
+  "Runtime": ".NET 10.0.10",
+  "OperatingSystem": "Microsoft Windows 10.0.19045",
+  "Architecture": "X64",
+  "ProcessorCount": 8,
+  "Width": 1920,
+  "Height": 1080,
+  "CompactWidth": 1189,
+  "CompactHeight": 123,
+  "Subtitle": "Where we\u0027re going, we don\u0027t need roads.\nReal-time subtitles in managed code.",
+  "WarmupIterations": 5,
+  "MeasurementIterations": 30,
+  "Results": [
+    {
+      "Name": "RenderFullFrame",
+      "MedianMilliseconds": 133.04410000000001,
+      "P95Milliseconds": 263.8972249999998,
+      "MedianAllocatedBytes": 13964248,
+      "P95AllocatedBytes": 13971176,
+      "Gen0Collections": 66,
+      "Gen1Collections": 38,
+      "Gen2Collections": 0
+    },
+    {
+      "Name": "StageFullFramePixels",
+      "MedianMilliseconds": 5.3476,
+      "P95Milliseconds": 11.364049999999995,
+      "MedianAllocatedBytes": 8294424,
+      "P95AllocatedBytes": 8295312,
+      "Gen0Collections": 11,
+      "Gen1Collections": 11,
+      "Gen2Collections": 11
+    },
+    {
+      "Name": "RenderAndStageFullFrame",
+      "MedianMilliseconds": 51.35695,
+      "P95Milliseconds": 74.13136999999999,
+      "MedianAllocatedBytes": 22260832,
+      "P95AllocatedBytes": 22267953,
+      "Gen0Collections": 94,
+      "Gen1Collections": 66,
+      "Gen2Collections": 28
+    },
+    {
+      "Name": "CopyFullFrameDirectToPlane",
+      "MedianMilliseconds": 0.8855500000000001,
+      "P95Milliseconds": 1.46155,
+      "MedianAllocatedBytes": 112,
+      "P95AllocatedBytes": 112,
+      "Gen0Collections": 0,
+      "Gen1Collections": 0,
+      "Gen2Collections": 0
+    },
+    {
+      "Name": "RenderCompactRegion",
+      "MedianMilliseconds": 35.22255,
+      "P95Milliseconds": 47.14456999999998,
+      "MedianAllocatedBytes": 13525072,
+      "P95AllocatedBytes": 13525232,
+      "Gen0Collections": 64,
+      "Gen1Collections": 35,
+      "Gen2Collections": 0
+    },
+    {
+      "Name": "CopyCompactRegionToPlane",
+      "MedianMilliseconds": 0.021949999999999997,
+      "P95Milliseconds": 0.03181,
+      "MedianAllocatedBytes": 112,
+      "P95AllocatedBytes": 112,
+      "Gen0Collections": 0,
+      "Gen1Collections": 0,
+      "Gen2Collections": 0
+    },
+    {
+      "Name": "RenderAndCopyCompactRegion",
+      "MedianMilliseconds": 31.6837,
+      "P95Milliseconds": 39.92377,
+      "MedianAllocatedBytes": 13525120,
+      "P95AllocatedBytes": 13525396,
+      "Gen0Collections": 64,
+      "Gen1Collections": 36,
+      "Gen2Collections": 0
+    }
+  ]
+}

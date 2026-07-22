@@ -5,6 +5,9 @@ using System.Text;
 using System.Text.Json;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using VLCLR.Imaging;
+using VLCLR.Native;
 using VLCLR.Rendering;
 using VLCLR.Text;
 
@@ -39,20 +42,42 @@ var style = new TextStyleWrapper
 
 using var canvas = new TextCanvas(Width, Height);
 canvas.RenderText(Subtitle, style);
+using var compactCanvas = new TextCanvas(1, 1);
+var compactImage = compactCanvas.RenderTextRegion(
+    Subtitle,
+    style,
+    maximumWidth: (int)(Width * 0.9f))!;
 
 var imagePath = Path.Combine(outputDirectory, $"imagesharp-{arguments.Label}.png");
-var referencePixels = GC.AllocateUninitializedArray<byte>(Width * Height * 4);
-canvas.GetImage()!.CopyPixelDataTo(referencePixels);
-using (var referenceImage = Image.LoadPixelData<Rgba32>(referencePixels, Width, Height))
+var compactPixels = GC.AllocateUninitializedArray<byte>(compactImage.Width * compactImage.Height * 4);
+compactImage.CopyPixelDataTo(compactPixels);
+using (var compactReference = Image.LoadPixelData<Rgba32>(
+           compactPixels,
+           compactImage.Width,
+           compactImage.Height))
+using (var referenceImage = new Image<Rgba32>(Width, Height, Color.Transparent))
 {
+    int x = (Width - compactReference.Width) / 2;
+    int y = Height - compactReference.Height;
+    referenceImage.Mutate(context => context.DrawImage(compactReference, new Point(x, y), 1f));
     referenceImage.SaveAsPng(imagePath);
+}
+
+nint nativeDestination;
+unsafe
+{
+    nativeDestination = (nint)NativeMemory.Alloc((nuint)(Width * Height * 4));
 }
 
 var results = new List<BenchmarkResult>
 {
     Measure("RenderFullFrame", RenderFullFrame),
     Measure("StageFullFramePixels", StageFullFramePixels),
-    Measure("RenderAndStageFullFrame", RenderAndStageFullFrame)
+    Measure("RenderAndStageFullFrame", RenderAndStageFullFrame),
+    Measure("CopyFullFrameDirectToPlane", CopyFullFrameDirectToPlane),
+    Measure("RenderCompactRegion", RenderCompactRegion),
+    Measure("CopyCompactRegionToPlane", CopyCompactRegionToPlane),
+    Measure("RenderAndCopyCompactRegion", RenderAndCopyCompactRegion)
 };
 
 var report = new BenchmarkReport(
@@ -65,6 +90,8 @@ var report = new BenchmarkReport(
     ProcessorCount: Environment.ProcessorCount,
     Width: Width,
     Height: Height,
+    CompactWidth: compactImage.Width,
+    CompactHeight: compactImage.Height,
     Subtitle: Subtitle,
     WarmupIterations: arguments.Warmups,
     MeasurementIterations: arguments.Iterations,
@@ -80,6 +107,11 @@ File.WriteAllText(markdownPath, ToMarkdown(report, Path.GetFileName(imagePath)))
 Console.WriteLine(ToMarkdown(report, Path.GetFileName(imagePath)));
 Console.WriteLine($"JSON: {jsonPath}");
 Console.WriteLine($"PNG:  {imagePath}");
+
+unsafe
+{
+    NativeMemory.Free((void*)nativeDestination);
+}
 
 return;
 
@@ -101,6 +133,50 @@ void RenderAndStageFullFrame()
 {
     RenderFullFrame();
     StageFullFramePixels();
+}
+
+void RenderCompactRegion()
+{
+    compactCanvas.RenderTextRegion(Subtitle, style, maximumWidth: (int)(Width * 0.9f));
+}
+
+void CopyFullFrameDirectToPlane()
+{
+    CopyImageDirectToPlane(canvas.GetImage()!);
+}
+
+void CopyCompactRegionToPlane()
+{
+    CopyImageDirectToPlane(compactCanvas.GetImage()!);
+}
+
+void RenderAndCopyCompactRegion()
+{
+    RenderCompactRegion();
+    CopyCompactRegionToPlane();
+}
+
+unsafe void CopyImageDirectToPlane(Image<Rgba32> image)
+{
+    int pitch = image.Width * 4;
+    var picture = new VLCPicture
+    {
+        PlaneCount = 1,
+        Plane0 = new VLCPlane
+        {
+            Pixels = nativeDestination,
+            Lines = image.Height,
+            Pitch = pitch,
+            PixelPitch = 4,
+            VisibleLines = image.Height,
+            VisiblePitch = pitch
+        }
+    };
+
+    if (!PictureConverter.CopyPixelsToPicture(image, (nint)(&picture), VLCFourCC.RGBA))
+    {
+        throw new InvalidOperationException("Could not copy the rendered image to the benchmark plane.");
+    }
 }
 
 BenchmarkResult Measure(string name, Action operation)
@@ -210,9 +286,10 @@ static string ToMarkdown(BenchmarkReport report, string imageFileName)
     builder.AppendLine($"- Architecture: `{report.Architecture}`");
     builder.AppendLine($"- Logical processors available: `{report.ProcessorCount}`");
     builder.AppendLine($"- Canvas: `{report.Width}x{report.Height}` RGBA");
+    builder.AppendLine($"- Compact region: `{report.CompactWidth}x{report.CompactHeight}` RGBA");
     builder.AppendLine($"- Warmups / measurements: `{report.WarmupIterations} / {report.MeasurementIterations}`");
     builder.AppendLine();
-    builder.AppendLine("| Scenario | Median CPU | P95 CPU | Median allocated | P95 allocated | GC (0/1/2) |");
+    builder.AppendLine("| Scenario | Median elapsed | P95 elapsed | Median allocated | P95 allocated | GC (0/1/2) |");
     builder.AppendLine("| --- | ---: | ---: | ---: | ---: | ---: |");
     foreach (var result in report.Results)
     {
@@ -277,6 +354,8 @@ internal sealed record BenchmarkReport(
     int ProcessorCount,
     int Width,
     int Height,
+    int CompactWidth,
+    int CompactHeight,
     string Subtitle,
     int WarmupIterations,
     int MeasurementIterations,

@@ -9,7 +9,7 @@
 - Canvas: `1920x1080` RGBA
 - Warmups / measurements: `3 / 15`
 
-| Scenario | Median CPU | P95 CPU | Median allocated | P95 allocated | GC (0/1/2) |
+| Scenario | Median elapsed | P95 elapsed | Median allocated | P95 allocated | GC (0/1/2) |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | RenderFullFrame | 140.99 ms | 352.86 ms | 36.09 MiB | 36.10 MiB | 90/37/0 |
 | StageFullFramePixels | 3.08 ms | 5.17 ms | 7.91 MiB | 7.91 MiB | 2/2/2 |
