@@ -289,6 +289,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine($"            .WithName(\"{EscapeString(info.ModuleName)}\")");
         sb.AppendLine($"            .WithCapability(\"{EscapeString(info.Capability)}\")");
         sb.AppendLine($"            .WithScore({info.Score})");
+        sb.AppendLine("            .WithNoUnload()");
         if (!string.IsNullOrEmpty(info.Description))
         {
             sb.AppendLine($"            .WithDescription(\"{EscapeString(info.Description)}\")");
