@@ -19,6 +19,7 @@
     <Compile Include="..\..\samples\SubtitleTranslator\OnnxSessionFactory.cs" Link="OnnxSessionFactory.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\OnnxTranslator.cs" Link="OnnxTranslator.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationCache.cs" Link="TranslationCache.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\TranslationTextNormalizer.cs" Link="TranslationTextNormalizer.cs" />
   </ItemGroup>
 
 </Project>

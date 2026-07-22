@@ -4,7 +4,8 @@ using LibVLCSharp;
 if (args.Length < 4)
 {
     Console.Error.WriteLine(
-        "Usage: SubtitleFrameCapture <vlc-path> <video-url-or-path> <subtitle-file> <output.png> [capture-ms]");
+        "Usage: SubtitleFrameCapture <vlc-path> <video-url-or-path> <subtitle-file> <output.png> " +
+        "[capture-ms] [renderer-module] [expected-rendered]");
     return 1;
 }
 
@@ -13,6 +14,8 @@ string video = args[1];
 string subtitlePath = Path.GetFullPath(args[2]);
 string outputPath = Path.GetFullPath(args[3]);
 long captureMilliseconds = args.Length > 4 ? long.Parse(args[4]) : 2000;
+string rendererModule = args.Length > 5 ? args[5] : "dotnet_subtitle";
+string expectedRendered = args.Length > 6 ? args[6] : "any";
 
 Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 if (File.Exists(outputPath))
@@ -24,18 +27,26 @@ Core.Initialize(vlcPath);
 using var libVlc = new LibVLC(
     "--ignore-config",
     "--aout=dummy",
-    "--text-renderer=dotnet_subtitle",
+    $"--text-renderer={rendererModule}",
     "--no-hw-dec",
     "--no-video-title-show",
     "-vv");
 
 bool rendererOpened = false;
 bool compactRegionCreated = false;
+bool expectedRenderSeen = expectedRendered == "any";
 libVlc.Log += (_, eventArgs) =>
 {
     string message = eventArgs.FormattedLog;
-    rendererOpened |= message.Contains("[SubtitleTextRenderer] Opening text renderer", StringComparison.Ordinal);
+    rendererOpened |=
+        (message.Contains("using text renderer module", StringComparison.Ordinal) &&
+         message.Contains(rendererModule, StringComparison.Ordinal)) ||
+        message.Contains("[SubtitleTextRenderer] Opening text renderer", StringComparison.Ordinal) ||
+        message.Contains("[SubtitleTranslator] Opening translator plugin", StringComparison.Ordinal);
     compactRegionCreated |= message.Contains("Created compact region", StringComparison.Ordinal);
+    expectedRenderSeen |=
+        message.Contains("[SubtitleTranslator] event", StringComparison.Ordinal) &&
+        message.Contains($"rendered={expectedRendered}", StringComparison.Ordinal);
 };
 
 using var media = new Media(ToMediaUri(video));
@@ -76,10 +87,11 @@ var output = new FileInfo(outputPath);
 Console.WriteLine($"Snapshot: {output.FullName} ({output.Length:N0} bytes)");
 Console.WriteLine($"Renderer opened: {rendererOpened}");
 Console.WriteLine($"Compact region logged: {compactRegionCreated}");
+Console.WriteLine($"Expected rendered outcome ({expectedRendered}): {expectedRenderSeen}");
 
 player.Stop();
 
-return rendererOpened && compactRegionCreated ? 0 : 6;
+return rendererOpened && compactRegionCreated && expectedRenderSeen ? 0 : 6;
 
 static Uri ToMediaUri(string input)
 {
