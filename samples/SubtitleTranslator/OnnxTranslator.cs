@@ -13,6 +13,8 @@ public sealed class OnnxTranslator : IDisposable
     private readonly InferenceSession _decoderSession;
     private readonly SimpleTokenizer _tokenizer;
     private readonly int _maxLength;
+    private readonly int _maxSourceLength;
+    private readonly ModelManifest _manifest;
 
     // Decoder input metadata (discovered at load time)
     private readonly HashSet<string> _decoderInputNames;
@@ -20,30 +22,43 @@ public sealed class OnnxTranslator : IDisposable
     private readonly List<(string Name, int[] Shape)> _cacheInputs;
 
     public SimpleTokenizer Tokenizer => _tokenizer;
+    public ModelManifest Manifest => _manifest;
 
-    public OnnxTranslator(string modelDir, string sourceLang, string targetLang, int maxLength = 128)
+    public OnnxTranslator(
+        string modelDir,
+        string sourceLang,
+        string targetLang,
+        int maxLength = 128,
+        int intraOpThreads = 4,
+        bool verifyModelHashes = true)
     {
-        var pairDir = Path.Combine(modelDir, $"opus-mt-{sourceLang}-{targetLang}");
-        if (!Directory.Exists(pairDir))
-            pairDir = modelDir; // Allow passing the pair dir directly
+        string pairDir = ModelManifest.ResolveModelDirectory(modelDir, sourceLang, targetLang);
+        _manifest = ModelManifest.LoadAndValidate(pairDir, sourceLang, targetLang, verifyModelHashes);
 
-        _maxLength = maxLength;
+        _maxLength = Math.Clamp(maxLength, 1, _manifest.MaximumOutputTokens);
+        _maxSourceLength = _manifest.MaximumSourceTokens;
 
-        var options = new SessionOptions
+        using var options = new SessionOptions
         {
             GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL,
             InterOpNumThreads = 1,
-            IntraOpNumThreads = Environment.ProcessorCount
+            IntraOpNumThreads = Math.Clamp(intraOpThreads, 1, Environment.ProcessorCount)
         };
 
         // Load encoder and decoder sessions
         _encoderSession = new InferenceSession(
-            Path.Combine(pairDir, "encoder_model_quantized.onnx"), options);
+            _manifest.GetFilePath(pairDir, "encoder"), options);
         _decoderSession = new InferenceSession(
-            Path.Combine(pairDir, "decoder_model_merged_quantized.onnx"), options);
+            _manifest.GetFilePath(pairDir, "decoder"), options);
 
         // Load tokenizer
-        _tokenizer = new SimpleTokenizer(Path.Combine(pairDir, "tokenizer.json"));
+        _tokenizer = new SimpleTokenizer(_manifest.GetFilePath(pairDir, "tokenizer"));
+
+        _manifest.ValidateTensorNames(
+            _encoderSession.InputMetadata.Keys,
+            _encoderSession.OutputMetadata.Keys,
+            _decoderSession.InputMetadata.Keys,
+            _decoderSession.OutputMetadata.Keys);
 
         // Discover decoder input structure
         _decoderInputNames = new HashSet<string>(_decoderSession.InputMetadata.Keys);
@@ -61,6 +76,12 @@ public sealed class OnnxTranslator : IDisposable
 
         // 1. Tokenize
         var inputIds = _tokenizer.Encode(text);
+        if (inputIds.Length > _maxSourceLength)
+        {
+            throw new ArgumentException(
+                $"Source cue contains {inputIds.Length} tokens; maximum is {_maxSourceLength}.",
+                nameof(text));
+        }
 
         // 2. Run encoder
         var (encoderOutput, encoderDims) = RunEncoder(inputIds);

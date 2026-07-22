@@ -1,0 +1,119 @@
+{
+  "formatVersion": 1,
+  "sourceLanguage": "en",
+  "targetLanguage": "fr",
+  "modelFamily": "Helsinki-NLP/OPUS-MT Marian",
+  "tokenizerType": "SentencePiece Unigram (Hugging Face tokenizer.json)",
+  "maximumSourceTokens": 128,
+  "maximumOutputTokens": 128,
+  "onnxRuntimeVersion": "1.20.1",
+  "source": {
+    "repository": "https://huggingface.co/onnx-community/opus-mt-en-fr",
+    "revision": "main",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://www.apache.org/licenses/LICENSE-2.0"
+  },
+  "tensors": {
+    "encoderInputs": [
+      "input_ids",
+      "attention_mask"
+    ],
+    "encoderOutputs": [
+      "last_hidden_state"
+    ],
+    "decoderInputs": [
+      "encoder_attention_mask",
+      "input_ids",
+      "encoder_hidden_states",
+      "past_key_values.0.decoder.key",
+      "past_key_values.0.decoder.value",
+      "past_key_values.0.encoder.key",
+      "past_key_values.0.encoder.value",
+      "past_key_values.1.decoder.key",
+      "past_key_values.1.decoder.value",
+      "past_key_values.1.encoder.key",
+      "past_key_values.1.encoder.value",
+      "past_key_values.2.decoder.key",
+      "past_key_values.2.decoder.value",
+      "past_key_values.2.encoder.key",
+      "past_key_values.2.encoder.value",
+      "past_key_values.3.decoder.key",
+      "past_key_values.3.decoder.value",
+      "past_key_values.3.encoder.key",
+      "past_key_values.3.encoder.value",
+      "past_key_values.4.decoder.key",
+      "past_key_values.4.decoder.value",
+      "past_key_values.4.encoder.key",
+      "past_key_values.4.encoder.value",
+      "past_key_values.5.decoder.key",
+      "past_key_values.5.decoder.value",
+      "past_key_values.5.encoder.key",
+      "past_key_values.5.encoder.value",
+      "use_cache_branch"
+    ],
+    "decoderOutputs": [
+      "logits",
+      "present.0.decoder.key",
+      "present.0.decoder.value",
+      "present.0.encoder.key",
+      "present.0.encoder.value",
+      "present.1.decoder.key",
+      "present.1.decoder.value",
+      "present.1.encoder.key",
+      "present.1.encoder.value",
+      "present.2.decoder.key",
+      "present.2.decoder.value",
+      "present.2.encoder.key",
+      "present.2.encoder.value",
+      "present.3.decoder.key",
+      "present.3.decoder.value",
+      "present.3.encoder.key",
+      "present.3.encoder.value",
+      "present.4.decoder.key",
+      "present.4.decoder.value",
+      "present.4.encoder.key",
+      "present.4.encoder.value",
+      "present.5.decoder.key",
+      "present.5.decoder.value",
+      "present.5.encoder.key",
+      "present.5.encoder.value"
+    ]
+  },
+  "files": [
+    {
+      "role": "encoder",
+      "fileName": "encoder_model_quantized.onnx",
+      "size": 50065734,
+      "sha256": "b6190be92972c9674abb94561dcffc12d89463269748be0db459974037319b79",
+      "sourcePath": "onnx/encoder_model_quantized.onnx"
+    },
+    {
+      "role": "decoder",
+      "fileName": "decoder_model_merged_quantized.onnx",
+      "size": 179221556,
+      "sha256": "6e95be4cb0e4243202a6ab6ad77db65a419eea13cfda7b05735c3cf1306de2f8",
+      "sourcePath": "onnx/decoder_model_merged_quantized.onnx"
+    },
+    {
+      "role": "tokenizer",
+      "fileName": "tokenizer.json",
+      "size": 5637839,
+      "sha256": "8391785c1a2139e7af4678571ccd8dc654ecbb72e4be186940f65d7c604f0246",
+      "sourcePath": "tokenizer.json"
+    },
+    {
+      "role": "source-tokenizer-model",
+      "fileName": "source.spm",
+      "size": 778395,
+      "sha256": "173e9f493a668fe396d599e28d414a201193094e6ffd7a4678e5aab0f6d3d838",
+      "sourcePath": "source.spm"
+    },
+    {
+      "role": "target-tokenizer-model",
+      "fileName": "target.spm",
+      "size": 802397,
+      "sha256": "78d0e717c77053f1c4b856d8661d9cb87c64f083a35418c087b9146300e4f585",
+      "sourcePath": "target.spm"
+    }
+  ]
+}

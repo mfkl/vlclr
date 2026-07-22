@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -5,185 +6,270 @@ using System.Text;
 namespace SubtitleTranslator;
 
 /// <summary>
-/// Ensures onnxruntime native DLL is loadable when running as a VLC plugin.
-/// The system may have a different onnxruntime.dll (e.g., in System32), so we
-/// must load from the correct path before any ONNX Runtime P/Invoke runs.
+/// Loads the exact ONNX Runtime native library before the managed wrapper makes
+/// its first P/Invoke. Failed attempts are retryable.
 /// </summary>
 internal static class OnnxNativeResolver
 {
-    private static bool _initialized;
+    private const uint LoadLibrarySearchDllLoadDir = 0x00000100;
+    private const uint LoadLibrarySearchDefaultDirs = 0x00001000;
+    private static readonly object Sync = new();
     private static nint _onnxruntimeHandle;
     private static string? _loadedFrom;
+    private static string? _loadedVersion;
 
-    public static string? LoadedFrom => _loadedFrom;
+    public static string? LoadedFrom
+    {
+        get { lock (Sync) return _loadedFrom; }
+    }
+
+    public static string? LoadedVersion
+    {
+        get { lock (Sync) return _loadedVersion; }
+    }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern nint LoadLibraryW(string lpFileName);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern nint GetModuleHandleW(string lpModuleName);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern int GetModuleFileNameW(nint hModule, StringBuilder lpFilename, int nSize);
+    private static extern nint LoadLibraryExW(string fileName, nint file, uint flags);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern nint GetProcAddress(nint hModule, [MarshalAs(UnmanagedType.LPStr)] string lpProcName);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FreeLibrary(nint module);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern int AddDllDirectory(string newDirectory);
+    private static extern nint GetModuleHandleW(string moduleName);
 
-    /// <summary>
-    /// Load onnxruntime.dll from the correct location. Must be called before
-    /// any Microsoft.ML.OnnxRuntime types are used.
-    /// </summary>
-    public static string EnsureLoaded()
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern int GetModuleFileNameW(nint module, StringBuilder filename, int size);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern nint GetProcAddress(nint module, [MarshalAs(UnmanagedType.LPStr)] string procedureName);
+
+    public static string EnsureLoaded(string? modelDirectory = null) =>
+        EnsureLoadedResult(modelDirectory).Diagnostics;
+
+    public static NativeLoadResult EnsureLoadedResult(string? modelDirectory = null)
     {
-        if (_initialized)
-            return $"Already loaded from: {_loadedFrom ?? "unknown"}";
-        _initialized = true;
-
-        var diag = new StringBuilder();
-
-        // Try loading from known paths using explicit full paths
-        foreach (var dir in GetSearchPaths(diag))
+        lock (Sync)
         {
-            var dllPath = Path.Combine(dir, "onnxruntime.dll");
-            if (!File.Exists(dllPath))
-                continue;
-
-            diag.AppendLine($"Trying: {dllPath}");
-
-            // Add directory so transitive deps are found
-            try { AddDllDirectory(dir); } catch { }
-
-            var handle = LoadLibraryW(dllPath);
-            if (handle != 0)
+            if (_onnxruntimeHandle != 0)
             {
-                // Verify it has the right export
-                var proc = GetProcAddress(handle, "OrtGetApiBase");
-                if (proc != 0)
+                return new NativeLoadResult(
+                    true,
+                    _loadedFrom,
+                    _loadedVersion,
+                    $"Already loaded ONNX Runtime {_loadedVersion ?? "unknown"} from: {_loadedFrom}");
+            }
+
+            var diagnostics = new StringBuilder();
+            string expectedVersion = GetManagedRuntimeVersion();
+            diagnostics.AppendLine($"Managed ONNX Runtime version: {expectedVersion}");
+
+            foreach (string directory in GetSearchPaths(modelDirectory, diagnostics))
+            {
+                string dllPath = Path.Combine(directory, "onnxruntime.dll");
+                if (!File.Exists(dllPath))
+                    continue;
+
+                string canonicalPath;
+                try
                 {
-                    _onnxruntimeHandle = handle;
-                    _loadedFrom = dllPath;
-                    diag.AppendLine($"Loaded OK, OrtGetApiBase at 0x{proc:X}");
-                    RegisterResolver();
-                    return diag.ToString();
+                    canonicalPath = Path.GetFullPath(dllPath);
                 }
-                diag.AppendLine($"Loaded but OrtGetApiBase missing - wrong DLL version");
-            }
-            else
-            {
-                diag.AppendLine($"LoadLibraryW failed: error {Marshal.GetLastWin32Error()}");
-            }
-        }
+                catch (Exception ex)
+                {
+                    diagnostics.AppendLine($"Ignoring invalid path '{dllPath}': {ex.Message}");
+                    continue;
+                }
 
-        diag.AppendLine("FAILED: Could not load onnxruntime.dll with OrtGetApiBase export");
-        return diag.ToString();
+                string? nativeVersion = GetNativeFileVersion(canonicalPath);
+                diagnostics.AppendLine($"Trying: {canonicalPath} (file version {nativeVersion ?? "unknown"})");
+                if (nativeVersion != null && !VersionsMatch(expectedVersion, nativeVersion))
+                {
+                    diagnostics.AppendLine(
+                        $"Rejected version mismatch: managed {expectedVersion}, native {nativeVersion}.");
+                    continue;
+                }
+
+                nint handle = LoadLibraryExW(
+                    canonicalPath,
+                    0,
+                    LoadLibrarySearchDllLoadDir | LoadLibrarySearchDefaultDirs);
+                if (handle == 0)
+                {
+                    int error = Marshal.GetLastWin32Error();
+                    diagnostics.AppendLine(
+                        $"LoadLibraryExW failed with Win32 error {error}. " +
+                        "Install the matching Microsoft Visual C++ runtime and verify DLL architecture.");
+                    continue;
+                }
+
+                nint apiBase = GetProcAddress(handle, "OrtGetApiBase");
+                if (apiBase == 0)
+                {
+                    diagnostics.AppendLine("Rejected DLL because OrtGetApiBase is missing.");
+                    _ = FreeLibrary(handle);
+                    continue;
+                }
+
+                _onnxruntimeHandle = handle;
+                _loadedFrom = canonicalPath;
+                _loadedVersion = nativeVersion;
+                RegisterResolver();
+                diagnostics.AppendLine($"Loaded ONNX Runtime from {canonicalPath}.");
+                return new NativeLoadResult(true, canonicalPath, nativeVersion, diagnostics.ToString());
+            }
+
+            diagnostics.AppendLine(
+                "ONNX Runtime could not be loaded. Place the matching onnxruntime.dll in the VLC root " +
+                "or set ONNXRUNTIME_PATH to an explicit file/directory. A later call may retry.");
+            return new NativeLoadResult(false, null, null, diagnostics.ToString());
+        }
     }
 
     private static void RegisterResolver()
     {
-        try
-        {
-            var onnxAssembly = typeof(Microsoft.ML.OnnxRuntime.SessionOptions).Assembly;
-            NativeLibrary.SetDllImportResolver(onnxAssembly, ResolveDllImport);
-        }
-        catch { }
-
-        try
-        {
-            var selfAssembly = typeof(OnnxNativeResolver).Assembly;
-            NativeLibrary.SetDllImportResolver(selfAssembly, ResolveDllImport);
-        }
-        catch { }
+        TryRegisterResolver(typeof(Microsoft.ML.OnnxRuntime.SessionOptions).Assembly);
+        TryRegisterResolver(typeof(OnnxNativeResolver).Assembly);
     }
 
-    private static nint ResolveDllImport(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    private static void TryRegisterResolver(Assembly assembly)
     {
-        if (libraryName == "onnxruntime" && _onnxruntimeHandle != 0)
-            return _onnxruntimeHandle;
-        return 0;
+        try
+        {
+            NativeLibrary.SetDllImportResolver(assembly, ResolveDllImport);
+        }
+        catch (InvalidOperationException)
+        {
+            // A resolver may already be registered by the hosting application.
+        }
     }
 
-    private static IEnumerable<string> GetSearchPaths(StringBuilder diag)
+    private static nint ResolveDllImport(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) =>
+        string.Equals(libraryName, "onnxruntime", StringComparison.OrdinalIgnoreCase)
+            ? _onnxruntimeHandle
+            : 0;
+
+    private static IEnumerable<string> GetSearchPaths(string? modelDirectory, StringBuilder diagnostics)
     {
-        // 1. Environment variable override
-        var envPath = Environment.GetEnvironmentVariable("ONNXRUNTIME_PATH");
-        if (!string.IsNullOrEmpty(envPath))
-        {
-            if (File.Exists(envPath))
-                yield return Path.GetDirectoryName(envPath)!;
-            else if (Directory.Exists(envPath))
-                yield return envPath;
-        }
+        var unique = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // 2. Same directory as our own plugin DLL (using GetModuleFileName)
-        var pluginDir = GetPluginDirectory(diag);
-        if (pluginDir != null)
-            yield return pluginDir;
-
-        // 3. AppContext.BaseDirectory (works for non-plugin scenarios)
-        var baseDir = AppContext.BaseDirectory;
-        if (!string.IsNullOrEmpty(baseDir))
+        foreach (string candidate in CandidatePaths(modelDirectory, diagnostics))
         {
-            yield return baseDir;
-            // Parent directories (plugins/ and VLC root)
-            var trimmed = baseDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            var parent = Path.GetDirectoryName(trimmed);
-            if (parent != null)
+            string? directory = candidate;
+            try
             {
-                yield return parent;
-                var grandparent = Path.GetDirectoryName(parent);
-                if (grandparent != null)
-                    yield return grandparent;
+                if (File.Exists(candidate))
+                    directory = Path.GetDirectoryName(candidate);
+                if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+                    continue;
+                directory = Path.TrimEndingDirectorySeparator(Path.GetFullPath(directory));
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (unique.Add(directory))
+                yield return directory;
+        }
+    }
+
+    private static IEnumerable<string> CandidatePaths(string? modelDirectory, StringBuilder diagnostics)
+    {
+        string? explicitPath = Environment.GetEnvironmentVariable("ONNXRUNTIME_PATH");
+        if (!string.IsNullOrWhiteSpace(explicitPath))
+            yield return explicitPath;
+
+        string? pluginDirectory = GetPluginDirectory(diagnostics);
+        if (pluginDirectory != null)
+        {
+            yield return pluginDirectory;
+            string? pluginsDirectory = Path.GetDirectoryName(pluginDirectory);
+            if (pluginsDirectory != null)
+            {
+                yield return pluginsDirectory;
+                string? vlcRoot = Path.GetDirectoryName(pluginsDirectory);
+                if (vlcRoot != null)
+                    yield return vlcRoot;
             }
         }
 
-        // 4. Current working directory
+        if (!string.IsNullOrWhiteSpace(AppContext.BaseDirectory))
+            yield return AppContext.BaseDirectory;
         yield return Directory.GetCurrentDirectory();
 
-        // 5. Model directory (onnxruntime.dll might be placed alongside models)
-        var modelPath = Environment.GetEnvironmentVariable("SUBTITLE_TRANSLATOR_MODEL_PATH");
-        if (!string.IsNullOrEmpty(modelPath) && Directory.Exists(modelPath))
-            yield return modelPath;
+        if (!string.IsNullOrWhiteSpace(modelDirectory))
+        {
+            yield return modelDirectory;
+            string? modelsDirectory = Path.GetDirectoryName(Path.GetFullPath(modelDirectory));
+            if (modelsDirectory != null)
+            {
+                yield return modelsDirectory;
+                string? root = Path.GetDirectoryName(modelsDirectory);
+                if (root != null)
+                    yield return root;
+            }
+        }
     }
 
-    /// <summary>
-    /// Find the directory of our plugin DLL using Win32 GetModuleFileName.
-    /// </summary>
-    private static string? GetPluginDirectory(StringBuilder diag)
+    private static string? GetPluginDirectory(StringBuilder diagnostics)
     {
         try
         {
-            // Get handle to our own DLL
-            var handle = GetModuleHandleW("libdotnet_subtitle_translator_plugin");
+            nint handle = GetModuleHandleW("libdotnet_subtitle_translator_plugin.dll");
             if (handle == 0)
-            {
-                // Try with .dll extension
-                handle = GetModuleHandleW("libdotnet_subtitle_translator_plugin.dll");
-            }
+                return null;
 
-            if (handle != 0)
-            {
-                var sb = new StringBuilder(1024);
-                var len = GetModuleFileNameW(handle, sb, sb.Capacity);
-                if (len > 0)
-                {
-                    var pluginPath = sb.ToString();
-                    var dir = Path.GetDirectoryName(pluginPath);
-                    diag.AppendLine($"Plugin DLL at: {pluginPath}");
-                    return dir;
-                }
-            }
-            else
-            {
-                diag.AppendLine("GetModuleHandleW for plugin DLL returned null");
-            }
+            var buffer = new StringBuilder(1024);
+            int length = GetModuleFileNameW(handle, buffer, buffer.Capacity);
+            if (length <= 0)
+                return null;
+
+            string pluginPath = buffer.ToString();
+            diagnostics.AppendLine($"Plugin DLL: {pluginPath}");
+            return Path.GetDirectoryName(pluginPath);
         }
         catch (Exception ex)
         {
-            diag.AppendLine($"GetPluginDirectory error: {ex.Message}");
+            diagnostics.AppendLine($"Could not resolve plugin path: {ex.Message}");
+            return null;
         }
-        return null;
+    }
+
+    private static string GetManagedRuntimeVersion()
+    {
+        Version? version = typeof(Microsoft.ML.OnnxRuntime.SessionOptions).Assembly.GetName().Version;
+        return version == null ? "unknown" : $"{version.Major}.{version.Minor}.{version.Build}";
+    }
+
+    private static string? GetNativeFileVersion(string path)
+    {
+        try
+        {
+            FileVersionInfo info = FileVersionInfo.GetVersionInfo(path);
+            return string.IsNullOrWhiteSpace(info.FileVersion) ? null : info.FileVersion;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool VersionsMatch(string managed, string native)
+    {
+        static string Normalize(string value)
+        {
+            string numericPrefix = new(value.TakeWhile(character => char.IsDigit(character) || character == '.').ToArray());
+            string[] components = numericPrefix.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            return string.Join('.', components.Take(3));
+        }
+
+        return managed == "unknown" || string.Equals(Normalize(managed), Normalize(native), StringComparison.Ordinal);
     }
 }
+
+internal sealed record NativeLoadResult(
+    bool Success,
+    string? LoadedFrom,
+    string? Version,
+    string Diagnostics);
