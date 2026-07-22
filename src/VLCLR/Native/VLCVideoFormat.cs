@@ -21,8 +21,8 @@ namespace VLCLR.Native;
 /// - offset 92-107: viewpoint pose (4 floats)
 /// - offset 108-131: mastering (primaries + white_point + luminance)
 /// - offset 132-135: lighting (MaxCLL + MaxFALL)
-/// - offset 136-139: dovi (version + bitfields)
-/// - offset 140-143: i_cubemap_padding
+/// - offset 136-143: dovi (version bytes, alignment, unsigned bitfields)
+/// - offset 144-147: i_cubemap_padding
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct VLCVideoFormat
@@ -123,14 +123,12 @@ public struct VLCVideoFormat
     // Dolby Vision info
     public byte DoviVersionMajor;         // offset 136
     public byte DoviVersionMinor;         // offset 137
-    public ushort DoviFlags;              // offset 138 (bitfields packed as 16 bits)
+    private ushort _padBeforeDoviFlags;   // offset 138
+    public uint DoviFlags;                // offset 140 (unsigned bitfield storage unit)
 
     /// <summary>Cubemap padding</summary>
-    public uint CubemapPadding;           // offset 140
+    public uint CubemapPadding;           // offset 144
 
-    // Additional padding to reach 152 bytes (discovered via memory scanning)
-    // VLC 4.x video_format_t is 152 bytes, not 144
-    private uint _endPad1;                // offset 144
-    private uint _endPad2;                // offset 148
-    // Total: 152 bytes (actual VLC 4.x video_format_t size)
+    // Tail padding to the structure's 8-byte alignment.
+    private uint _endPad;                 // offset 148
 }
