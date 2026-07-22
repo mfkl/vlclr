@@ -261,28 +261,29 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine($"partial class {info.ClassName}");
         sb.AppendLine("{");
         sb.AppendLine("    // Multi-instance support: each filter instance stores its GCHandle in filter->p_sys");
+        sb.AppendLine("    // VLC retains these metadata pointers, so keep them in unmanaged storage for process lifetime.");
+        sb.AppendLine("    private static readonly nint s_vlcApiVersion = Marshal.StringToCoTaskMemUTF8(\"4.0.6\");");
+        sb.AppendLine("    private static readonly nint s_vlcCopyright = Marshal.StringToCoTaskMemUTF8(\"VLCLR\");");
         sb.AppendLine();
 
         // vlc_entry_api_version - returns pointer to "4.0.6" string
-        // Using unsafe fixed buffer for reliable Native AOT export
-        sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry_api_version\")]");
+        sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry_api_version\", CallConvs = new[] { typeof(CallConvCdecl) })]");
         sb.AppendLine("    public static unsafe byte* VlcEntryApiVersion()");
         sb.AppendLine("    {");
-        sb.AppendLine("        // \"4.0.6\" as null-terminated UTF-8");
-        sb.AppendLine("        return (byte*)System.Runtime.CompilerServices.Unsafe.AsPointer(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(\"4.0.6\\0\"u8));");
+        sb.AppendLine("        return (byte*)s_vlcApiVersion;");
         sb.AppendLine("    }");
         sb.AppendLine();
 
         // vlc_entry_copyright - returns pointer to copyright string
-        sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry_copyright\")]");
+        sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry_copyright\", CallConvs = new[] { typeof(CallConvCdecl) })]");
         sb.AppendLine("    public static unsafe byte* VlcEntryCopyright()");
         sb.AppendLine("    {");
-        sb.AppendLine("        return (byte*)System.Runtime.CompilerServices.Unsafe.AsPointer(ref System.Runtime.InteropServices.MemoryMarshal.GetReference(\"VLCLR\\0\"u8));");
+        sb.AppendLine("        return (byte*)s_vlcCopyright;");
         sb.AppendLine("    }");
         sb.AppendLine();
 
         // vlc_entry - main entry point
-        sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry\")]");
+        sb.AppendLine("    [UnmanagedCallersOnly(EntryPoint = \"vlc_entry\", CallConvs = new[] { typeof(CallConvCdecl) })]");
         sb.AppendLine("    public static unsafe int VlcEntry(nint vlcSetPtr, nint opaque)");
         sb.AppendLine("    {");
         sb.AppendLine("        var builder = ModuleBuilder.Create(vlcSetPtr, opaque)");

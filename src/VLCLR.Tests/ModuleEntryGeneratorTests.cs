@@ -16,6 +16,9 @@ public class ModuleEntryGeneratorTests
         var generated = Generate(baseType, implementation);
 
         Assert.Contains(".WithNoUnload()", generated);
+        Assert.Contains("private static readonly nint s_vlcApiVersion = Marshal.StringToCoTaskMemUTF8(\"4.0.6\");", generated);
+        Assert.Contains("return (byte*)s_vlcApiVersion;", generated);
+        Assert.Contains("EntryPoint = \"vlc_entry\", CallConvs", generated);
         Assert.Contains("var opened = false;", generated);
         Assert.Contains("if (!opened)", generated);
         Assert.Contains("try { context.SetSys(0); context.SetOperations(0); } catch { }", generated);

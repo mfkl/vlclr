@@ -128,26 +128,32 @@ public unsafe ref struct ModuleBuilder
     /// <param name="longDescription">Optional detailed help text</param>
     public ModuleBuilder AddIntegerConfig(string name, long defaultValue, string description, string? longDescription = null)
     {
-        if (_result != 0) return this;
+        AddIntegerConfigCore(name, defaultValue, description, longDescription);
+        return this;
+    }
+
+    private nint AddIntegerConfigCore(string name, long defaultValue, string description, string? longDescription)
+    {
+        if (_result != 0) return 0;
 
         // Create config item
         nint configOut = 0;
         var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
         _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_INTEGER, &configOut);
-        if (_result != 0) return this;
+        if (_result != 0) return 0;
 
         // Set name
         SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
-        if (_result != 0) return this;
+        if (_result != 0) return 0;
 
         // Set default value
         SetConfigLong(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
-        if (_result != 0) return this;
+        if (_result != 0) return 0;
 
         // Set description
         SetConfigDesc(configOut, description, longDescription);
 
-        return this;
+        return _result == 0 ? configOut : 0;
     }
 
     /// <summary>
@@ -155,13 +161,13 @@ public unsafe ref struct ModuleBuilder
     /// </summary>
     public ModuleBuilder AddIntegerConfig(string name, long defaultValue, long min, long max, string description, string? longDescription = null)
     {
-        AddIntegerConfig(name, defaultValue, description, longDescription);
+        nint config = AddIntegerConfigCore(name, defaultValue, description, longDescription);
         if (_result != 0) return this;
 
         // Set range - requires passing min and max as two int64 values
         // Note: VLC_CONFIG_RANGE expects (min, max) as two separate int64 arguments
         var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, long, long, int>)_vlcSetPtr;
-        _result = vlcSetRange(_opaque, _module, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+        _result = vlcSetRange(_opaque, config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
 
         return this;
     }
@@ -175,26 +181,32 @@ public unsafe ref struct ModuleBuilder
     /// <param name="longDescription">Optional detailed help text</param>
     public ModuleBuilder AddFloatConfig(string name, double defaultValue, string description, string? longDescription = null)
     {
-        if (_result != 0) return this;
+        AddFloatConfigCore(name, defaultValue, description, longDescription);
+        return this;
+    }
+
+    private nint AddFloatConfigCore(string name, double defaultValue, string description, string? longDescription)
+    {
+        if (_result != 0) return 0;
 
         // Create config item
         nint configOut = 0;
         var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
         _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_FLOAT, &configOut);
-        if (_result != 0) return this;
+        if (_result != 0) return 0;
 
         // Set name
         SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
-        if (_result != 0) return this;
+        if (_result != 0) return 0;
 
         // Set default value (as double)
         SetConfigDouble(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
-        if (_result != 0) return this;
+        if (_result != 0) return 0;
 
         // Set description
         SetConfigDesc(configOut, description, longDescription);
 
-        return this;
+        return _result == 0 ? configOut : 0;
     }
 
     /// <summary>
@@ -202,12 +214,12 @@ public unsafe ref struct ModuleBuilder
     /// </summary>
     public ModuleBuilder AddFloatConfig(string name, double defaultValue, double min, double max, string description, string? longDescription = null)
     {
-        AddFloatConfig(name, defaultValue, description, longDescription);
+        nint config = AddFloatConfigCore(name, defaultValue, description, longDescription);
         if (_result != 0) return this;
 
         // Set range
         var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, double, double, int>)_vlcSetPtr;
-        _result = vlcSetRange(_opaque, _module, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+        _result = vlcSetRange(_opaque, config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
 
         return this;
     }
