@@ -14,7 +14,9 @@
   <!-- Include source files from SubtitleTranslator directly (avoids RID conflicts) -->
   <ItemGroup>
     <Compile Include="..\..\samples\SubtitleTranslator\SimpleTokenizer.cs" Link="SimpleTokenizer.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\ITranslationEngine.cs" Link="ITranslationEngine.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\ModelManifest.cs" Link="ModelManifest.cs" />
+    <Compile Include="..\..\samples\SubtitleTranslator\OnnxSessionFactory.cs" Link="OnnxSessionFactory.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\OnnxTranslator.cs" Link="OnnxTranslator.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationCache.cs" Link="TranslationCache.cs" />
   </ItemGroup>

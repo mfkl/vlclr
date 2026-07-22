@@ -153,7 +153,15 @@ catch (Exception ex)
 Console.WriteLine("\n=== CHECKPOINT 6: Full Translation Pipeline ===");
 try
 {
-    var translator = new OnnxTranslator(modelDir, "en", "fr");
+    var translator = new OnnxTranslator(
+        modelDir,
+        "en",
+        "fr",
+        new OnnxTranslatorOptions
+        {
+            UseDecoderCache = true,
+            IntraOpThreads = 4
+        });
 
     var testPairs = new (string Input, string[] ExpectedContains)[]
     {
@@ -166,13 +174,16 @@ try
 
     int passed = 0;
     var times = new List<long>();
+    var cachedDecoderResults = new Dictionary<string, TranslationResult>(StringComparer.Ordinal);
 
     foreach (var (input, expectedContains) in testPairs)
     {
         var sw = Stopwatch.StartNew();
-        var result = translator.Translate(input);
+        TranslationResult detailedResult = translator.TranslateDetailed(input);
+        string result = detailedResult.Text;
         sw.Stop();
         times.Add(sw.ElapsedMilliseconds);
+        cachedDecoderResults[input] = detailedResult;
 
         bool containsExpected = expectedContains.Any(e =>
             result.Contains(e, StringComparison.OrdinalIgnoreCase));
@@ -240,7 +251,55 @@ try
     Console.WriteLine("CHECKPOINT 8 PASSED: Cache hit/miss/eviction works");
     checkpointsPassed++;
 
+    string malformedUnicode = new(new[] { '\ud800', 'X' });
+    string[] parityCorpus =
+    [
+        "Wait... what?",
+        "I'm ready.",
+        "Café déjà vu",
+        "SPEAKER:\nWhere are you?",
+        "Numbers: 12, 34.5, and 2026.",
+        "Emoji 😀 and unknown symbols ∑.",
+        malformedUnicode
+    ];
+    foreach (string input in parityCorpus)
+        cachedDecoderResults[input] = translator.TranslateDetailed(input);
+
+    Require(translator.Translate("") == "", "Empty text was not preserved.");
+    try
+    {
+        _ = translator.Translate(string.Join(' ', Enumerable.Repeat("subtitle", 300)));
+        throw new InvalidOperationException("An over-limit source cue was accepted.");
+    }
+    catch (TranslationInputException)
+    {
+        // Expected independent source-token limit.
+    }
+
     translator.Dispose();
+
+    Console.WriteLine("\n=== CHECKPOINT 9: Cached/Uncached Decoder Parity ===");
+    using var uncachedTranslator = new OnnxTranslator(
+        modelDir,
+        "en",
+        "fr",
+        new OnnxTranslatorOptions
+        {
+            UseDecoderCache = false,
+            VerifyModelHashes = false,
+            IntraOpThreads = 4
+        });
+    foreach (var (input, cachedResult) in cachedDecoderResults)
+    {
+        TranslationResult uncachedResult = uncachedTranslator.TranslateDetailed(input);
+        string label = input == malformedUnicode ? "<malformed-unicode>" : input.Replace('\n', ' ');
+        Console.WriteLine($"  \"{label}\": cached=\"{cachedResult.Text}\", uncached=\"{uncachedResult.Text}\"");
+        Require(cachedResult.OutputTokenIds.SequenceEqual(uncachedResult.OutputTokenIds),
+            $"Cached decoder tokens differ for '{label}': " +
+            $"[{string.Join(",", cachedResult.OutputTokenIds)}] vs " +
+            $"[{string.Join(",", uncachedResult.OutputTokenIds)}].");
+    }
+    checkpointsPassed++;
 }
 catch (Exception ex)
 {
@@ -253,10 +312,10 @@ catch (Exception ex)
 // Summary
 // ============================================================
 Console.WriteLine($"\n{'=',-50}");
-Console.WriteLine($"RESULTS: {checkpointsPassed}/6 checkpoints passed");
+Console.WriteLine($"RESULTS: {checkpointsPassed}/7 checkpoints passed");
 Console.WriteLine($"{'=',-50}");
 
-return checkpointsPassed >= 5 ? 0 : 1;
+return checkpointsPassed == 7 ? 0 : 1;
 
 static void Require(bool condition, string message)
 {
