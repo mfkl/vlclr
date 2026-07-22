@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp" Version="4.0.0-alpha-20260130-9619" />
+    <PackageReference Include="LibVLCSharp" Version="4.0.0-alpha-20260721-10160" />
   </ItemGroup>
 
 </Project>
