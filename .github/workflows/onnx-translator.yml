@@ -1,0 +1,105 @@
+name: ONNX subtitle translator
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "samples/SubtitleTranslator/**"
+      - "tests/TranslatorTest/**"
+      - "tests/TranslatorIntegrationTest/**"
+      - "tests/SubtitleTranslator.UnitTests/**"
+      - "tests/NativeAotSmoke.ps1"
+      - "benchmarks/SubtitleTranslator.Benchmarks/**"
+      - ".github/workflows/onnx-translator.yml"
+  pull_request:
+    paths:
+      - "samples/SubtitleTranslator/**"
+      - "tests/TranslatorTest/**"
+      - "tests/TranslatorIntegrationTest/**"
+      - "tests/SubtitleTranslator.UnitTests/**"
+      - "tests/NativeAotSmoke.ps1"
+      - "benchmarks/SubtitleTranslator.Benchmarks/**"
+      - ".github/workflows/onnx-translator.yml"
+  workflow_dispatch:
+    inputs:
+      run_model_tests:
+        description: "Download the verified 225.6 MiB model and run correctness tests"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build-and-unit-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore vlclr.sln
+
+      - name: Build solution
+        run: dotnet build vlclr.sln -c Release --no-restore
+
+      - name: Framework tests
+        run: dotnet test src/VLCLR.Tests -c Release --no-build --no-restore
+
+      - name: Translator unit tests (no model)
+        run: dotnet test tests/SubtitleTranslator.UnitTests -c Release --no-build --no-restore
+
+      - name: Native AOT publish
+        run: dotnet publish samples/SubtitleTranslator -c Release -r win-x64 --no-restore
+
+      - name: Native AOT exports and runtime smoke
+        shell: pwsh
+        run: pwsh tests/NativeAotSmoke.ps1
+
+      - name: Upload plugin without model pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: subtitle-translator-win-x64
+          path: |
+            samples/SubtitleTranslator/bin/Release/net10.0/win-x64/publish/libdotnet_subtitle_translator_plugin.dll
+            samples/SubtitleTranslator/bin/Release/net10.0/win-x64/publish/onnxruntime.dll
+            samples/SubtitleTranslator/bin/Release/net10.0/win-x64/publish/onnxruntime_providers_shared.dll
+            samples/SubtitleTranslator/models/opus-mt-en-fr/model-manifest.json
+
+  model-correctness:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_model_tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Cache verified model bundle
+        uses: actions/cache@v4
+        with:
+          path: samples/SubtitleTranslator/models/opus-mt-en-fr
+          key: opus-mt-en-fr-${{ hashFiles('samples/SubtitleTranslator/models/opus-mt-en-fr/model-manifest.json') }}
+
+      - name: Download and verify model
+        shell: pwsh
+        run: pwsh samples/SubtitleTranslator/download-model.ps1
+
+      - name: Golden translations and cached/uncached parity
+        run: >-
+          dotnet run --project tests/TranslatorTest -c Release --
+          samples/SubtitleTranslator/models/opus-mt-en-fr
+
+      - name: Quick raw benchmark
+        run: >-
+          dotnet run --project benchmarks/SubtitleTranslator.Benchmarks -c Release --
+          samples/SubtitleTranslator/models/opus-mt-en-fr benchmark-output
+          --iterations 1 --threads 4 --decoders hybrid,uncached
+
+      - name: Upload benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: subtitle-translator-benchmark
+          path: benchmark-output

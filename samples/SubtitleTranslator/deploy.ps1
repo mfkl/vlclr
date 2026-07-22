@@ -28,7 +28,8 @@ if (-not $SkipPublish) {
 
 $pluginPath = Join-Path $publishDirectory "libdotnet_subtitle_translator_plugin.dll"
 $runtimePath = Join-Path $publishDirectory "onnxruntime.dll"
-foreach ($requiredPath in @($pluginPath, $runtimePath, (Join-Path $modelRoot "model-manifest.json"))) {
+$providersPath = Join-Path $publishDirectory "onnxruntime_providers_shared.dll"
+foreach ($requiredPath in @($pluginPath, $runtimePath, $providersPath, (Join-Path $modelRoot "model-manifest.json"))) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required deployment file not found: $requiredPath"
     }
@@ -56,6 +57,7 @@ New-Item -ItemType Directory -Force -Path $deployedModelDirectory | Out-Null
 
 Copy-Item -LiteralPath $pluginPath -Destination (Join-Path $pluginDirectory (Split-Path $pluginPath -Leaf)) -Force
 Copy-Item -LiteralPath $runtimePath -Destination (Join-Path $vlcRoot "onnxruntime.dll") -Force
+Copy-Item -LiteralPath $providersPath -Destination (Join-Path $vlcRoot "onnxruntime_providers_shared.dll") -Force
 Copy-Item -LiteralPath (Join-Path $modelRoot "model-manifest.json") -Destination $deployedModelDirectory -Force
 foreach ($file in $manifest.files) {
     Copy-Item -LiteralPath (Join-Path $modelRoot $file.fileName) -Destination $deployedModelDirectory -Force

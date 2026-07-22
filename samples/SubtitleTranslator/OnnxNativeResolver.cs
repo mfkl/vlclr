@@ -81,12 +81,12 @@ internal static class OnnxNativeResolver
                     continue;
                 }
 
-                string? nativeVersion = GetNativeFileVersion(canonicalPath);
-                diagnostics.AppendLine($"Trying: {canonicalPath} (file version {nativeVersion ?? "unknown"})");
-                if (nativeVersion != null && !VersionsMatch(expectedVersion, nativeVersion))
+                string? nativeFileVersion = GetNativeFileVersion(canonicalPath);
+                diagnostics.AppendLine($"Trying: {canonicalPath} (file version {nativeFileVersion ?? "unknown"})");
+                if (nativeFileVersion != null && !MajorMinorVersionsMatch(expectedVersion, nativeFileVersion))
                 {
                     diagnostics.AppendLine(
-                        $"Rejected version mismatch: managed {expectedVersion}, native {nativeVersion}.");
+                        $"Rejected version mismatch: managed {expectedVersion}, native file {nativeFileVersion}.");
                     continue;
                 }
 
@@ -111,6 +111,15 @@ internal static class OnnxNativeResolver
                     continue;
                 }
 
+                string? nativeVersion = GetNativeRuntimeVersion(apiBase);
+                if (nativeVersion != null && !SemanticVersionsMatch(expectedVersion, nativeVersion))
+                {
+                    diagnostics.AppendLine(
+                        $"Rejected runtime API version mismatch: managed {expectedVersion}, native {nativeVersion}.");
+                    _ = FreeLibrary(handle);
+                    continue;
+                }
+
                 _onnxruntimeHandle = handle;
                 _loadedFrom = canonicalPath;
                 _loadedVersion = nativeVersion;
@@ -124,6 +133,15 @@ internal static class OnnxNativeResolver
                 "or set ONNXRUNTIME_PATH to an explicit file/directory. A later call may retry.");
             return new NativeLoadResult(false, null, null, diagnostics.ToString());
         }
+    }
+
+    /// <summary>Returns the VLC root inferred from plugins/spu/&lt;plugin&gt;.dll.</summary>
+    public static string? GetHostRootDirectory()
+    {
+        var diagnostics = new StringBuilder();
+        string? pluginDirectory = GetPluginDirectory(diagnostics);
+        string? pluginsDirectory = pluginDirectory == null ? null : Path.GetDirectoryName(pluginDirectory);
+        return pluginsDirectory == null ? null : Path.GetDirectoryName(pluginsDirectory);
     }
 
     private static void RegisterResolver()
@@ -255,16 +273,48 @@ internal static class OnnxNativeResolver
         }
     }
 
-    private static bool VersionsMatch(string managed, string native)
+    private static unsafe string? GetNativeRuntimeVersion(nint ortGetApiBaseAddress)
     {
-        static string Normalize(string value)
+        try
         {
-            string numericPrefix = new(value.TakeWhile(character => char.IsDigit(character) || character == '.').ToArray());
-            string[] components = numericPrefix.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            return string.Join('.', components.Take(3));
-        }
+            var getApiBase = (delegate* unmanaged<nint>)ortGetApiBaseAddress;
+            nint apiBase = getApiBase();
+            if (apiBase == 0)
+                return null;
 
-        return managed == "unknown" || string.Equals(Normalize(managed), Normalize(native), StringComparison.Ordinal);
+            nint getVersionStringAddress = Marshal.ReadIntPtr(apiBase, IntPtr.Size);
+            if (getVersionStringAddress == 0)
+                return null;
+
+            var getVersionString = (delegate* unmanaged<nint>)getVersionStringAddress;
+            return Marshal.PtrToStringUTF8(getVersionString());
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool SemanticVersionsMatch(string managed, string native) =>
+        managed == "unknown" || string.Equals(
+            NormalizeSemanticVersion(managed),
+            NormalizeSemanticVersion(native),
+            StringComparison.Ordinal);
+
+    private static bool MajorMinorVersionsMatch(string managed, string native)
+    {
+        string[] managedParts = NormalizeSemanticVersion(managed).Split('.');
+        string[] nativeParts = NormalizeSemanticVersion(native).Split('.');
+        return managed == "unknown" ||
+            (managedParts.Length >= 2 && nativeParts.Length >= 2 &&
+             managedParts[0] == nativeParts[0] && managedParts[1] == nativeParts[1]);
+    }
+
+    private static string NormalizeSemanticVersion(string value)
+    {
+        string numericPrefix = new(value.TakeWhile(character => char.IsDigit(character) || character == '.').ToArray());
+        string[] components = numericPrefix.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        return string.Join('.', components.Take(3));
     }
 }
 

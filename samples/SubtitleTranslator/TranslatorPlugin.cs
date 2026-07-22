@@ -265,11 +265,22 @@ public partial class TranslatorPlugin : VLCTextRendererBase
         string pairName = $"opus-mt-{sourceLanguage}-{targetLanguage}";
         var candidates = new List<string>();
         if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
             candidates.Add(configuredPath);
-        candidates.Add(Path.Combine(AppContext.BaseDirectory, "models", pairName));
-        candidates.Add(Path.Combine(AppContext.BaseDirectory, "models"));
-        candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "models", pairName));
-        candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "models"));
+        }
+        else
+        {
+            string? hostRoot = OnnxNativeResolver.GetHostRootDirectory();
+            if (!string.IsNullOrWhiteSpace(hostRoot))
+            {
+                candidates.Add(Path.Combine(hostRoot, "models", pairName));
+                candidates.Add(Path.Combine(hostRoot, "models"));
+            }
+            candidates.Add(Path.Combine(AppContext.BaseDirectory, "models", pairName));
+            candidates.Add(Path.Combine(AppContext.BaseDirectory, "models"));
+            candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "models", pairName));
+            candidates.Add(Path.Combine(Directory.GetCurrentDirectory(), "models"));
+        }
 
         foreach (string candidate in candidates)
         {

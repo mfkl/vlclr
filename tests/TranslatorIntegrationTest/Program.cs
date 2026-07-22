@@ -4,7 +4,7 @@ if (args.Length < 2)
 {
     Console.Error.WriteLine(
         "Usage: TranslatorIntegrationTest <vlc-path> <video-url> [subtitle-file] [timeout-seconds] " +
-        "[expected-rendered:translated|fallback]");
+        "[expected-rendered:translated|fallback] [model-path]");
     return 1;
 }
 
@@ -13,6 +13,7 @@ string videoUrl = args[1];
 string? subtitleFile = args.Length > 2 ? args[2] : null;
 int timeoutSeconds = args.Length > 3 ? int.Parse(args[3]) : 20;
 string expectedRendered = args.Length > 4 ? args[4].ToLowerInvariant() : "translated";
+string? modelPath = args.Length > 5 ? Path.GetFullPath(args[5]) : null;
 if (expectedRendered is not ("translated" or "fallback"))
 {
     Console.Error.WriteLine("expected-rendered must be 'translated' or 'fallback'.");
@@ -29,13 +30,18 @@ var errorMessages = new List<string>();
 try
 {
     Core.Initialize(libVlcPath);
-    using var libVlc = new LibVLC(
+    var libVlcOptions = new List<string>
+    {
         "--ignore-config",
         "--aout=dummy",
         "--text-renderer=dotnet_subtitle_translator",
         "--no-hw-dec",
         "--no-video-title-show",
-        "-vvv");
+        "-vvv"
+    };
+    if (modelPath != null)
+        libVlcOptions.Add($"--translator-model-path={modelPath}");
+    using var libVlc = new LibVLC(libVlcOptions.ToArray());
 
     libVlc.Log += (_, eventArgs) =>
     {
