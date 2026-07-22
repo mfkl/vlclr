@@ -223,6 +223,106 @@ public class TextCanvasTests
     }
 
     [Fact]
+    public void RenderRegion_CreatesCompactSubtitleSurface()
+    {
+        using var canvas = new TextCanvas(1920, 1080);
+        var style = new TextStyleWrapper
+        {
+            FontSize = 48,
+            HasOutline = true,
+            OutlineWidth = 3,
+            HasShadow = true,
+            ShadowOffset = 3
+        };
+        var segments = new List<ParsedTextSegment>
+        {
+            new("A representative subtitle line", style)
+        };
+
+        var image = canvas.RenderRegion(segments, maximumWidth: 1728);
+
+        Assert.NotNull(image);
+        Assert.InRange(image.Width, 1, 1728);
+        Assert.InRange(image.Height, 1, 200);
+        Assert.Equal(image.Width, canvas.Width);
+        Assert.Equal(image.Height, canvas.Height);
+    }
+
+    [Fact]
+    public void RenderTextRegion_WrapsWithinMaximumWidth()
+    {
+        using var canvas = new TextCanvas(1, 1);
+        var style = new TextStyleWrapper
+        {
+            FontSize = 32,
+            HasOutline = true,
+            OutlineWidth = 2
+        };
+
+        var image = canvas.RenderTextRegion(
+            "This intentionally long subtitle should wrap over multiple lines inside a narrow region.",
+            style,
+            maximumWidth: 360);
+
+        Assert.NotNull(image);
+        Assert.InRange(image.Width, 1, 360);
+        Assert.True(image.Height > 60, $"Expected wrapped text, got a {image.Width}x{image.Height} region");
+    }
+
+    [Fact]
+    public void RenderTextRegion_CenteredTextIsNotClippedAtRegionEdges()
+    {
+        using var canvas = new TextCanvas(1, 1);
+        var style = new TextStyleWrapper
+        {
+            FontSize = 48,
+            HasOutline = true,
+            OutlineWidth = 3,
+            HasShadow = true,
+            ShadowOffset = 3
+        };
+
+        var image = canvas.RenderTextRegion(
+            "Where we're going, we don't need roads.",
+            style,
+            maximumWidth: 1728,
+            TextAlignment.Center);
+
+        Assert.NotNull(image);
+        var pixels = canvas.GetPixels();
+        int minimumX = image.Width;
+        int maximumX = -1;
+
+        for (int y = 0; y < image.Height; y++)
+        {
+            for (int x = 0; x < image.Width; x++)
+            {
+                if (pixels[((y * image.Width) + x) * 4 + 3] == 0)
+                {
+                    continue;
+                }
+
+                minimumX = Math.Min(minimumX, x);
+                maximumX = Math.Max(maximumX, x);
+            }
+        }
+
+        Assert.True(minimumX > 0, $"Rendered pixels touched the left edge at x={minimumX}");
+        Assert.True(maximumX < image.Width - 1, $"Rendered pixels touched the right edge at x={maximumX}");
+        Assert.True(image.Height < 100, $"A fitting single line unexpectedly wrapped to {image.Height}px high");
+    }
+
+    [Fact]
+    public void RenderRegion_WithEmptySegments_ReturnsNull()
+    {
+        using var canvas = new TextCanvas(100, 100);
+
+        var image = canvas.RenderRegion([], maximumWidth: 100);
+
+        Assert.Null(image);
+    }
+
+    [Fact]
     public void Dispose_ClearsResources()
     {
         // Arrange

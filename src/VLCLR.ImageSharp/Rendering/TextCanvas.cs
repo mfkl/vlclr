@@ -138,6 +138,108 @@ public sealed class TextCanvas : IDisposable
     }
 
     /// <summary>
+    /// Renders parsed text into a tightly-sized image no wider than
+    /// <paramref name="maximumWidth"/>.
+    /// </summary>
+    /// <remarks>
+    /// The returned image is owned by this canvas and remains valid until the
+    /// next render, resize, or disposal. This path is intended for VLC
+    /// subpicture regions, where VLC positions the compact image on the video.
+    /// </remarks>
+    public Image<Rgba32>? RenderRegion(
+        IReadOnlyList<ParsedTextSegment> segments,
+        int maximumWidth,
+        TextAlignment alignment = TextAlignment.Center)
+    {
+        if (segments.Count == 0)
+        {
+            Clear();
+            return null;
+        }
+
+        string fullText = TextSegmentParser.GetCombinedText(segments);
+        if (string.IsNullOrWhiteSpace(fullText))
+        {
+            Clear();
+            return null;
+        }
+
+        return RenderTextRegion(fullText, segments[0].Style, maximumWidth, alignment);
+    }
+
+    /// <summary>
+    /// Renders text into a tightly-sized image no wider than
+    /// <paramref name="maximumWidth"/>.
+    /// </summary>
+    /// <remarks>
+    /// The returned image is owned by this canvas and remains valid until the
+    /// next render, resize, or disposal.
+    /// </remarks>
+    public Image<Rgba32>? RenderTextRegion(
+        string text,
+        TextStyleWrapper style,
+        int maximumWidth,
+        TextAlignment alignment = TextAlignment.Center)
+    {
+        if (string.IsNullOrWhiteSpace(text) || maximumWidth <= 0)
+        {
+            Clear();
+            return null;
+        }
+
+        Font font = GetFont(style);
+        int outlinePadding = style.HasOutline ? style.OutlineWidth : 0;
+        int backgroundPadding = style.HasBackground ? _options.BackgroundPadding : 0;
+        int effectPadding = outlinePadding + backgroundPadding;
+        int shadowOffset = style.HasShadow ? style.ShadowOffset : 0;
+
+        int leftPadding = _options.CanvasMargin + effectPadding + Math.Max(0, -shadowOffset);
+        int topPadding = _options.CanvasMargin + effectPadding + Math.Max(0, -shadowOffset);
+        int rightPadding = _options.CanvasMargin + effectPadding + Math.Max(0, shadowOffset);
+        int bottomPadding = _options.CanvasMargin + effectPadding + Math.Max(0, shadowOffset);
+        int contentLimit = Math.Max(1, maximumWidth - leftPadding - rightPadding);
+
+        var measureOptions = new TextOptions(font)
+        {
+            WrappingLength = contentLimit,
+            WordBreaking = WordBreaking.Standard
+        };
+        FontRectangle textBounds = TextMeasurer.MeasureSize(text, measureOptions);
+        // MeasureSize reports glyph bounds while wrapping uses advance width.
+        // Keep one em of slack so a final word is not wrapped by that difference.
+        int layoutSlack = Math.Max(2, style.FontSize);
+        int contentWidth = Math.Clamp(
+            (int)Math.Ceiling(textBounds.Width) + layoutSlack,
+            1,
+            contentLimit);
+
+        // Measure once more at the actual width so the reported height includes
+        // any wrapping caused by rounding to the compact region.
+        measureOptions.WrappingLength = contentWidth;
+        textBounds = TextMeasurer.MeasureSize(text, measureOptions);
+
+        int regionWidth = Math.Min(maximumWidth, contentWidth + leftPadding + rightPadding);
+        int regionHeight = Math.Max(1, (int)Math.Ceiling(textBounds.Height) + topPadding + bottomPadding);
+        EnsureSize(regionWidth, regionHeight);
+
+        var textOptions = new RichTextOptions(font)
+        {
+            Origin = new PointF(leftPadding, topPadding),
+            WrappingLength = contentWidth,
+            WordBreaking = WordBreaking.Standard,
+            TextAlignment = alignment switch
+            {
+                TextAlignment.Left => SixLabors.Fonts.TextAlignment.Start,
+                TextAlignment.Right => SixLabors.Fonts.TextAlignment.End,
+                _ => SixLabors.Fonts.TextAlignment.Center
+            }
+        };
+
+        DrawText(text, style, textOptions, leftPadding, topPadding, textBounds);
+        return _canvas;
+    }
+
+    /// <summary>
     /// Renders text with the specified style wrapper.
     /// </summary>
     /// <param name="text">Text to render.</param>
@@ -150,12 +252,7 @@ public sealed class TextCanvas : IDisposable
             return;
         }
 
-        // Get font for rendering
-        Font font = FontManager.GetFont(
-            style.FontName,
-            style.FontSize,
-            style.IsBold,
-            style.IsItalic);
+        Font font = GetFont(style);
 
         // Measure text to calculate layout
         FontRectangle textBounds = TextMeasurer.MeasureSize(text, new TextOptions(font));
@@ -194,19 +291,34 @@ public sealed class TextCanvas : IDisposable
             WordBreaking = WordBreaking.Standard
         };
 
+        DrawText(text, style, textOptions, textX, textY, textBounds);
+    }
+
+    private static Font GetFont(TextStyleWrapper style) => FontManager.GetFont(
+        style.FontName,
+        style.FontSize,
+        style.IsBold,
+        style.IsItalic);
+
+    private void DrawText(
+        string text,
+        TextStyleWrapper style,
+        RichTextOptions textOptions,
+        float backgroundX,
+        float backgroundY,
+        FontRectangle textBounds)
+    {
         Color backgroundColor = ColorFromRgbAlpha(style.BackgroundColor, style.BackgroundAlpha);
         var bgRect = new RectangleF(
-            textX - _options.BackgroundPadding,
-            textY - _options.BackgroundPadding,
+            backgroundX - _options.BackgroundPadding,
+            backgroundY - _options.BackgroundPadding,
             textBounds.Width + (_options.BackgroundPadding * 2),
             textBounds.Height + (_options.BackgroundPadding * 2));
 
         Color shadowColor = ColorFromRgbAlpha(style.ShadowColor, style.ShadowAlpha);
-        var shadowOptions = new RichTextOptions(font)
+        var shadowOptions = new RichTextOptions(textOptions)
         {
-            Origin = new PointF(textOptions.Origin.X + style.ShadowOffset, textOptions.Origin.Y + style.ShadowOffset),
-            WrappingLength = textOptions.WrappingLength,
-            WordBreaking = textOptions.WordBreaking
+            Origin = new PointF(textOptions.Origin.X + style.ShadowOffset, textOptions.Origin.Y + style.ShadowOffset)
         };
 
         var textBrush = new SolidBrush(ColorFromRgbAlpha(style.ForegroundColor, style.ForegroundAlpha));
@@ -217,7 +329,7 @@ public sealed class TextCanvas : IDisposable
         // Queue every operation on one processing context. Drawing the outline
         // once and then restoring the fill produces the same outward outline
         // width as the former eight offset rasterizations with far less work.
-        _canvas.Mutate(ctx =>
+        _canvas!.Mutate(ctx =>
         {
             ctx.Clear(Color.Transparent);
 
