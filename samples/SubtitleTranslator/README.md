@@ -18,6 +18,10 @@ The manifest records exact file sizes, SHA-256 hashes, tensor names, language
 pair, model source, and license. Tests never download the model implicitly;
 pass its directory explicitly.
 
+The managed and native ONNX Runtime packages are pinned together at version
+1.27.1. Do not deploy an `onnxruntime.dll` from a different release; the plugin
+resolver rejects version mismatches before session creation.
+
 ## Build and validate
 
 ```powershell
