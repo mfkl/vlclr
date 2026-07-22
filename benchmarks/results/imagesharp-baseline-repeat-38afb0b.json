@@ -1,0 +1,46 @@
+{
+  "Label": "baseline-repeat-38afb0b",
+  "TimestampUtc": "2026-07-22T12:14:02.1222819+00:00",
+  "Commit": "38afb0b",
+  "Runtime": ".NET 10.0.10",
+  "OperatingSystem": "Microsoft Windows 10.0.19045",
+  "Architecture": "X64",
+  "ProcessorCount": 8,
+  "Width": 1920,
+  "Height": 1080,
+  "Subtitle": "Where we\u0027re going, we don\u0027t need roads.\nReal-time subtitles in managed code.",
+  "WarmupIterations": 5,
+  "MeasurementIterations": 30,
+  "Results": [
+    {
+      "Name": "RenderFullFrame",
+      "MedianMilliseconds": 81.21645000000001,
+      "P95Milliseconds": 179.48174999999998,
+      "MedianAllocatedBytes": 37837340,
+      "P95AllocatedBytes": 37848000,
+      "Gen0Collections": 181,
+      "Gen1Collections": 83,
+      "Gen2Collections": 0
+    },
+    {
+      "Name": "StageFullFramePixels",
+      "MedianMilliseconds": 0.6794,
+      "P95Milliseconds": 4.1002849999999995,
+      "MedianAllocatedBytes": 8294424,
+      "P95AllocatedBytes": 8295312,
+      "Gen0Collections": 5,
+      "Gen1Collections": 5,
+      "Gen2Collections": 5
+    },
+    {
+      "Name": "RenderAndStageFullFrame",
+      "MedianMilliseconds": 76.49414999999999,
+      "P95Milliseconds": 123.51068499999988,
+      "MedianAllocatedBytes": 46131872,
+      "P95AllocatedBytes": 46137495,
+      "Gen0Collections": 191,
+      "Gen1Collections": 93,
+      "Gen2Collections": 10
+    }
+  ]
+}
