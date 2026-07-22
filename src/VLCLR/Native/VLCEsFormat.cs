@@ -55,6 +55,25 @@ public unsafe struct VLCEsFormat
     /// <summary>Video format (in union with audio and subs) - starts at offset 56</summary>
     public VLCVideoFormat Video;
 
+    /// <summary>
+    /// Gets the audio-format view of the ES format union.
+    /// Only valid when the ES format represents audio. VLC audio-filter chains
+    /// can leave <see cref="Category"/> as unknown while still populating it.
+    /// </summary>
+    public VLCAudioFormat Audio
+    {
+        readonly get
+        {
+            fixed (VLCVideoFormat* union = &Video)
+                return *(VLCAudioFormat*)union;
+        }
+        set
+        {
+            fixed (VLCVideoFormat* union = &Video)
+                *(VLCAudioFormat*)union = value;
+        }
+    }
+
     /// <summary>Bitrate (i_bitrate)</summary>
     public uint Bitrate;
 

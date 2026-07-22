@@ -26,6 +26,7 @@
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationCache.cs" Link="TranslationCache.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationService.cs" Link="TranslationService.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationTextNormalizer.cs" Link="TranslationTextNormalizer.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\StreamingAudioSegmenter.cs" Link="StreamingAudioSegmenter.cs" />
   </ItemGroup>
 
 </Project>
