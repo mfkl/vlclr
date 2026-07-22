@@ -14,16 +14,6 @@ using VLCLR.Text;
 namespace VLCLR.Rendering;
 
 /// <summary>
-/// Horizontal alignment for rendered text.
-/// </summary>
-public enum TextAlignment
-{
-    Left,
-    Center,
-    Right
-}
-
-/// <summary>
 /// Configuration options for text canvas rendering.
 /// </summary>
 public sealed class TextCanvasOptions
@@ -47,21 +37,6 @@ public sealed class TextCanvasOptions
     /// Custom Y position (0.0 = top, 1.0 = bottom) when VerticalPosition is Custom.
     /// </summary>
     public float CustomVerticalPosition { get; init; } = 0.9f;
-}
-
-/// <summary>
-/// Vertical positioning mode for rendered text.
-/// </summary>
-public enum TextVerticalPosition
-{
-    /// <summary>Text positioned near top of canvas.</summary>
-    Top,
-    /// <summary>Text positioned in center of canvas.</summary>
-    Center,
-    /// <summary>Text positioned near bottom of canvas (typical for subtitles).</summary>
-    Bottom,
-    /// <summary>Text positioned at custom vertical position.</summary>
-    Custom
 }
 
 /// <summary>
