@@ -43,6 +43,9 @@ jobs:
       - name: Build VLCLR framework
         run: dotnet build src/VLCLR -c Release
 
+      - name: Build optional ImageSharp integration
+        run: dotnet build src/VLCLR.ImageSharp -c Release
+
       - name: Build VideoOverlay sample (Native AOT)
         run: |
           dotnet publish samples/VideoOverlay -c Release -r win-x64
@@ -57,6 +60,9 @@ jobs:
           } else {
             Write-Host "WARNING: No generated file found!"
           }
+
+      - name: Build SubtitleRenderer sample (Native AOT)
+        run: dotnet publish samples/SubtitleRenderer -c Release -r win-x64
 
       - name: Run tests
         run: dotnet test src/VLCLR.Tests -c Release --logger trx --results-directory TestResults
@@ -92,34 +98,40 @@ jobs:
             exit $LASTEXITCODE
           }
 
-      - name: Deploy plugin to VLC
+      - name: Deploy plugins to VLC
         run: |
-          $pluginSrc = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"
-          $pluginDst = "vlc-sdk/plugins/video_filter/"
-          New-Item -ItemType Directory -Force -Path $pluginDst
-          Copy-Item $pluginSrc $pluginDst
-          Write-Host "Plugin deployed to $pluginDst"
+          $overlaySrc = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"
+          $subtitleSrc = "samples/SubtitleRenderer/bin/Release/net10.0/win-x64/native/libdotnet_subtitle_plugin.dll"
+          New-Item -ItemType Directory -Force -Path "vlc-sdk/plugins/video_filter/"
+          New-Item -ItemType Directory -Force -Path "vlc-sdk/plugins/spu/"
+          Copy-Item $overlaySrc "vlc-sdk/plugins/video_filter/"
+          Copy-Item $subtitleSrc "vlc-sdk/plugins/spu/"
+          Write-Host "Stable plugins deployed to VLC"
           # Remove plugin cache so libvlc rescans plugins directory
           Remove-Item "vlc-sdk/plugins/plugins.dat" -ErrorAction SilentlyContinue
 
-      - name: Verify plugin was built
+      - name: Verify plugins were built
         run: |
-          $plugin = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"
-          if (Test-Path $plugin) {
+          $plugins = @(
+            "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll",
+            "samples/SubtitleRenderer/bin/Release/net10.0/win-x64/native/libdotnet_subtitle_plugin.dll"
+          )
+          foreach ($plugin in $plugins) {
+            if (-not (Test-Path $plugin)) {
+              throw "Plugin not found: $plugin"
+            }
             Write-Host "Plugin built successfully: $plugin"
             Write-Host "Size: $((Get-Item $plugin).Length) bytes"
-          } else {
-            Write-Host "ERROR: Plugin not found!"
-            exit 1
           }
 
       - name: Run filter integration test
         run: |
           dotnet run --project tests/IntegrationTest -- vlc-sdk "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 10
 
-      - name: Upload plugin
+      - name: Upload plugins
         uses: actions/upload-artifact@v4
         with:
           name: plugins
           path: |
             samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll
+            samples/SubtitleRenderer/bin/Release/net10.0/win-x64/native/libdotnet_subtitle_plugin.dll
