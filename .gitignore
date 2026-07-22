@@ -16,6 +16,12 @@ project.lock.json
 *.pdb
 *.exp
 
+# Offline translation models are downloaded separately (225+ MiB).
+# Keep only the small, versioned provenance manifest in Git.
+samples/SubtitleTranslator/models/**/*
+!samples/SubtitleTranslator/models/**/
+!samples/SubtitleTranslator/models/**/model-manifest.json
+
 # Ignore generated .lib files except VLC SDK import libraries in lib/
 *.lib
 !lib/*.lib
