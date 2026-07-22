@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>libdotnet_subtitle_translator_plugin</AssemblyName>
+    <!-- Optimization settings -->
+    <OptimizationPreference>Size</OptimizationPreference>
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <StackTraceSupport>true</StackTraceSupport>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+    <!-- Additional size reduction -->
+    <DebuggerSupport>false</DebuggerSupport>
+    <StripSymbols>true</StripSymbols>
+    <EventSourceSupport>false</EventSourceSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <UseSystemResourceKeys>false</UseSystemResourceKeys>
+    <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+    <IlcTrimMetadata>true</IlcTrimMetadata>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VLCLR\VLCLR.csproj" />
+    <ProjectReference Include="..\..\src\VLCLR.ImageSharp\VLCLR.ImageSharp.csproj" />
+    <!-- Source generator for VLC entry points -->
+    <ProjectReference Include="..\..\src\VLCLR.Generators\VLCLR.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DirectPInvoke Include="libvlccore" />
+    <NativeLibrary Include="..\..\lib\libvlccore.lib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\JetBrainsMono-Regular.ttf" />
+  </ItemGroup>
+
+</Project>
