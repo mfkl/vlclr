@@ -108,7 +108,7 @@ public sealed class TextCanvas : IDisposable
         _width = width;
         _height = height;
         _canvas = new Image<Rgba32>(s_minimalConfig, width, height);
-        _pixelBuffer = new byte[width * height * 4];
+        _pixelBuffer = null;
     }
 
     /// <summary>
@@ -123,9 +123,6 @@ public sealed class TextCanvas : IDisposable
             return;
         }
 
-        // Clear canvas to transparent
-        _canvas.Mutate(ctx => ctx.Clear(Color.Transparent));
-
         // Get style from first segment (or use defaults)
         var primaryStyle = segments[0].Style;
 
@@ -133,6 +130,7 @@ public sealed class TextCanvas : IDisposable
         string fullText = TextSegmentParser.GetCombinedText(segments);
         if (string.IsNullOrWhiteSpace(fullText))
         {
+            Clear();
             return;
         }
 
@@ -304,9 +302,15 @@ public sealed class TextCanvas : IDisposable
     /// </summary>
     public byte[] GetPixels()
     {
-        if (_canvas == null || _pixelBuffer == null)
+        if (_canvas == null)
         {
             return Array.Empty<byte>();
+        }
+
+        int requiredLength = checked(_width * _height * 4);
+        if (_pixelBuffer == null || _pixelBuffer.Length != requiredLength)
+        {
+            _pixelBuffer = GC.AllocateUninitializedArray<byte>(requiredLength);
         }
 
         _canvas.CopyPixelDataTo(_pixelBuffer);

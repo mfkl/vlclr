@@ -298,5 +298,108 @@ public class PictureConverterTests
         Assert.Equal(255, pixels[7]); // A
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public unsafe void CopyPixelsToPicture_CopiesRowsAndRespectsPitch(bool bgra)
+    {
+        using var image = new Image<Rgba32>(2, 2);
+        image[0, 0] = new Rgba32(10, 20, 30, 40);
+        image[1, 0] = new Rgba32(50, 60, 70, 80);
+        image[0, 1] = new Rgba32(90, 100, 110, 120);
+        image[1, 1] = new Rgba32(130, 140, 150, 160);
+
+        const int pitch = 12;
+        byte* destination = stackalloc byte[pitch * 2];
+        new Span<byte>(destination, pitch * 2).Fill(0xCC);
+
+        var picture = CreatePicture(destination, pitch, visiblePitch: 8, visibleLines: 2);
+        uint chroma = bgra ? VLCFourCC.BGRA : VLCFourCC.RGBA;
+
+        bool copied = PictureConverter.CopyPixelsToPicture(image, (nint)(&picture), chroma);
+
+        Assert.True(copied);
+        Assert.Equal(
+            bgra
+                ? new byte[] { 30, 20, 10, 40, 70, 60, 50, 80 }
+                : new byte[] { 10, 20, 30, 40, 50, 60, 70, 80 },
+            new Span<byte>(destination, 8).ToArray());
+        Assert.Equal(
+            bgra
+                ? new byte[] { 110, 100, 90, 120, 150, 140, 130, 160 }
+                : new byte[] { 90, 100, 110, 120, 130, 140, 150, 160 },
+            new Span<byte>(destination + pitch, 8).ToArray());
+        Assert.All(new Span<byte>(destination + 8, 4).ToArray(), value => Assert.Equal(0xCC, value));
+        Assert.All(new Span<byte>(destination + pitch + 8, 4).ToArray(), value => Assert.Equal(0xCC, value));
+    }
+
+    [Fact]
+    public unsafe void CopyPixelsToPicture_RejectsUndersizedPlane()
+    {
+        using var image = new Image<Rgba32>(2, 2);
+        byte* destination = stackalloc byte[16];
+        var picture = CreatePicture(destination, pitch: 8, visiblePitch: 4, visibleLines: 2);
+
+        bool copied = PictureConverter.CopyPixelsToPicture(
+            image,
+            (nint)(&picture),
+            VLCFourCC.RGBA);
+
+        Assert.False(copied);
+    }
+
+    [Fact]
+    public unsafe void CopyPixelsToPicture_DoesNotAllocateAFrameSizedBuffer()
+    {
+        const int width = 1920;
+        const int height = 1080;
+        const int pitch = width * 4;
+        using var image = new Image<Rgba32>(width, height);
+        void* destination = NativeMemory.Alloc((nuint)(pitch * height));
+
+        try
+        {
+            var picture = CreatePicture((byte*)destination, pitch, pitch, height);
+            PictureConverter.CopyPixelsToPicture(image, (nint)(&picture), VLCFourCC.RGBA);
+
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.True(PictureConverter.CopyPixelsToPicture(
+                    image,
+                    (nint)(&picture),
+                    VLCFourCC.RGBA));
+            }
+            long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+            Assert.True(allocated < 1024 * 1024, $"Copy allocated {allocated:N0} bytes");
+        }
+        finally
+        {
+            NativeMemory.Free(destination);
+        }
+    }
+
+    private static unsafe VLCPicture CreatePicture(
+        byte* pixels,
+        int pitch,
+        int visiblePitch,
+        int visibleLines)
+    {
+        return new VLCPicture
+        {
+            PlaneCount = 1,
+            Plane0 = new VLCPlane
+            {
+                Pixels = (nint)pixels,
+                Lines = visibleLines,
+                Pitch = pitch,
+                PixelPitch = 4,
+                VisibleLines = visibleLines,
+                VisiblePitch = visiblePitch
+            }
+        };
+    }
+
     #endregion
 }

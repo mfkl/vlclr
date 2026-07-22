@@ -96,6 +96,23 @@ public class TextCanvasTests
     }
 
     [Fact]
+    public void Constructor_DoesNotAllocateAnEagerPixelMirror()
+    {
+        // Warm ImageSharp initialization before measuring the canvas allocation.
+        using (var warmup = new TextCanvas(1, 1))
+        {
+        }
+
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        using var canvas = new TextCanvas(1920, 1080);
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        // One RGBA image is expected; the old implementation allocated a second
+        // 7.91 MiB byte[] mirror eagerly.
+        Assert.True(allocated < 1024 * 1024, $"Constructor allocated {allocated:N0} managed bytes");
+    }
+
+    [Fact]
     public void Clear_MakesCanvasTransparent()
     {
         // Arrange

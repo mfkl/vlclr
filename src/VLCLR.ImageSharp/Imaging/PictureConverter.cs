@@ -207,46 +207,43 @@ public static class PictureConverter
         int width = image.Width;
         int height = image.Height;
         int pitch = plane.Pitch;
-        int visiblePitch = plane.VisiblePitch;
         bool needSwizzle = (chroma == VLCFourCC.BGRA);
+        int rowBytes = checked(width * 4);
 
-        // Get pixel data from ImageSharp
-        byte[] pixelData = new byte[width * height * 4];
-        image.CopyPixelDataTo(pixelData);
-
-        byte* dstPtr = (byte*)plane.Pixels;
-
-        // Copy row by row, respecting pitch
-        for (int y = 0; y < height; y++)
+        if (pitch < rowBytes || plane.VisiblePitch < rowBytes || plane.VisibleLines < height)
         {
-            int srcOffset = y * width * 4;
-            byte* dstRow = dstPtr + (y * pitch);
-
-            if (needSwizzle)
-            {
-                // Convert RGBA to BGRA
-                for (int x = 0; x < width; x++)
-                {
-                    int srcIdx = srcOffset + (x * 4);
-                    int dstIdx = x * 4;
-
-                    // RGBA -> BGRA (swap R and B)
-                    dstRow[dstIdx + 0] = pixelData[srcIdx + 2]; // B from R
-                    dstRow[dstIdx + 1] = pixelData[srcIdx + 1]; // G
-                    dstRow[dstIdx + 2] = pixelData[srcIdx + 0]; // R from B
-                    dstRow[dstIdx + 3] = pixelData[srcIdx + 3]; // A
-                }
-            }
-            else
-            {
-                // Direct copy for RGBA
-                int copyBytes = Math.Min(width * 4, visiblePitch);
-                fixed (byte* srcRow = &pixelData[srcOffset])
-                {
-                    Buffer.MemoryCopy(srcRow, dstRow, copyBytes, copyBytes);
-                }
-            }
+            return false;
         }
+
+        nint destination = plane.Pixels;
+        image.ProcessPixelRows(accessor =>
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Span<Rgba32> sourceRow = accessor.GetRowSpan(y);
+                byte* destinationRow = (byte*)destination + (y * pitch);
+
+                if (needSwizzle)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        Rgba32 pixel = sourceRow[x];
+                        int destinationOffset = x * 4;
+                        destinationRow[destinationOffset] = pixel.B;
+                        destinationRow[destinationOffset + 1] = pixel.G;
+                        destinationRow[destinationOffset + 2] = pixel.R;
+                        destinationRow[destinationOffset + 3] = pixel.A;
+                    }
+                }
+                else
+                {
+                    fixed (Rgba32* sourcePointer = sourceRow)
+                    {
+                        Buffer.MemoryCopy(sourcePointer, destinationRow, pitch, rowBytes);
+                    }
+                }
+            }
+        });
 
         return true;
     }
