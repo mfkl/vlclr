@@ -13,13 +13,13 @@ public class VLCSubpictureTests
     #region Struct Size Tests
 
     [Fact]
-    public void VLCSubpicture_Size_Is104Bytes()
+    public void VLCSubpicture_Size_Is96Bytes()
     {
-        // subpicture_t is 104 bytes on 64-bit
+        // subpicture_t is 96 bytes on 64-bit
         // i_channel (8) + i_order (8) + p_next (8) + regions (16) + i_start (8) + i_stop (8)
-        // + 3 bytes flags + 1 padding + width (4) + height (4) + alpha (4) + 4 padding
-        // + updater sys/ops (16) + p_private (8) = 104 bytes
-        Assert.Equal(104, Marshal.SizeOf<VLCSubpicture>());
+        // + 3 bytes flags + 1 padding + width (4) + height (4) + alpha (4)
+        // + updater sys/ops (16) + p_private (8) = 96 bytes
+        Assert.Equal(96, Marshal.SizeOf<VLCSubpicture>());
     }
 
     [Fact]
@@ -159,31 +159,31 @@ public class VLCSubpictureTests
     }
 
     [Fact]
-    public unsafe void VLCSubpicture_UpdaterSys_IsAtOffset80()
+    public unsafe void VLCSubpicture_UpdaterSys_IsAtOffset72()
     {
-        // After Alpha (68 + 4 = 72), padded to 8-byte alignment = 80 (or 76 + 4 padding)
+        // Alpha ends at 72, which is already aligned to an 8-byte boundary.
         VLCSubpicture subpic = default;
         byte* basePtr = (byte*)&subpic;
         byte* fieldPtr = (byte*)&subpic.UpdaterSys;
-        Assert.Equal(80, (int)(fieldPtr - basePtr));
+        Assert.Equal(72, (int)(fieldPtr - basePtr));
     }
 
     [Fact]
-    public unsafe void VLCSubpicture_UpdaterOps_IsAtOffset88()
+    public unsafe void VLCSubpicture_UpdaterOps_IsAtOffset80()
     {
         VLCSubpicture subpic = default;
         byte* basePtr = (byte*)&subpic;
         byte* fieldPtr = (byte*)&subpic.UpdaterOps;
-        Assert.Equal(88, (int)(fieldPtr - basePtr));
+        Assert.Equal(80, (int)(fieldPtr - basePtr));
     }
 
     [Fact]
-    public unsafe void VLCSubpicture_Private_IsAtOffset96()
+    public unsafe void VLCSubpicture_Private_IsAtOffset88()
     {
         VLCSubpicture subpic = default;
         byte* basePtr = (byte*)&subpic;
         byte* fieldPtr = (byte*)&subpic.Private;
-        Assert.Equal(96, (int)(fieldPtr - basePtr));
+        Assert.Equal(88, (int)(fieldPtr - basePtr));
     }
 
     #endregion

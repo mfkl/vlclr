@@ -204,12 +204,12 @@ public class VLCFilterTypesTests
     }
 
     [Fact]
-    public unsafe void VLCVideoFormat_CubemapPadding_IsAtOffset140()
+    public unsafe void VLCVideoFormat_CubemapPadding_IsAtOffset144()
     {
         VLCVideoFormat fmt = default;
         byte* basePtr = (byte*)&fmt;
         byte* fieldPtr = (byte*)&fmt.CubemapPadding;
-        Assert.Equal(140, (int)(fieldPtr - basePtr));
+        Assert.Equal(144, (int)(fieldPtr - basePtr));
     }
 
     #endregion

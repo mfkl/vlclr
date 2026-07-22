@@ -81,6 +81,17 @@ jobs:
             Get-ChildItem vlc-sdk -Recurse -Directory | Select-Object -First 20 | ForEach-Object { Write-Host $_.FullName }
           }
 
+      - name: Validate managed layouts against VLC headers
+        run: |
+          $header = Get-ChildItem -Recurse vlc-sdk -Filter "vlc_common.h" | Select-Object -First 1
+          if (-not $header) {
+            throw "vlc_common.h was not found in the downloaded VLC SDK"
+          }
+          & tests\AbiValidation\verify-vlc-abi.cmd $header.Directory.FullName
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
       - name: Deploy plugin to VLC
         run: |
           $pluginSrc = "samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll"

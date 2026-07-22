@@ -23,12 +23,11 @@ namespace VLCLR.Native;
 /// - i_original_picture_width: 4 bytes at offset 60
 /// - i_original_picture_height: 4 bytes at offset 64
 /// - i_alpha: 4 bytes at offset 68
-/// - 4 bytes padding at offset 72
-/// - updater (subpicture_updater_t): 16 bytes at offset 76 (needs 8-byte alignment, so offset 80)
-/// - p_private: 8 bytes at offset 96
-/// Total: 104 bytes
+/// - updater (subpicture_updater_t): 16 bytes at offset 72
+/// - p_private: 8 bytes at offset 88
+/// Total: 96 bytes
 /// </remarks>
-[StructLayout(LayoutKind.Explicit, Size = 104)]
+[StructLayout(LayoutKind.Explicit, Size = 96)]
 public struct VLCSubpicture
 {
     /// <summary>Subpicture channel ID (i_channel)</summary>
@@ -85,18 +84,16 @@ public struct VLCSubpicture
     [FieldOffset(68)]
     public int Alpha;
 
-    // 4 bytes padding at 72-75 for 8-byte alignment
-
     /// <summary>Updater private data pointer (updater.sys)</summary>
-    [FieldOffset(80)]
+    [FieldOffset(72)]
     public nint UpdaterSys;
 
     /// <summary>Updater operations pointer (updater.ops)</summary>
-    [FieldOffset(88)]
+    [FieldOffset(80)]
     public nint UpdaterOps;
 
     /// <summary>Reserved to the core (p_private)</summary>
-    [FieldOffset(96)]
+    [FieldOffset(88)]
     public nint Private;
 }
 
