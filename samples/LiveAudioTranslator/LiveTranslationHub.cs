@@ -10,26 +10,27 @@ namespace LiveAudioTranslator;
 
 internal readonly record struct TranslatedCue(string Text, int DurationMilliseconds);
 
+internal readonly record struct PendingUtterance(float[] Samples, int Generation);
+
 /// <summary>
 /// Shared, non-blocking audio-to-subtitle pipeline used by the audio-filter and
 /// sub-source modules exported from this DLL.
 /// </summary>
-internal sealed class LiveTranslationHub : IDisposable
+internal sealed class LiveTranslationHub
 {
     private readonly LiveAudioTranslationOptions _options;
     private readonly object _ingestSync = new();
     private readonly StreamingAudioSegmenter _segmenter;
-    private readonly Channel<float[]> _utterances;
+    private readonly Channel<PendingUtterance> _utterances;
     private readonly ConcurrentQueue<TranslatedCue> _cues = new();
     private readonly ConcurrentQueue<string> _status = new();
-    private readonly CancellationTokenSource _shutdown = new();
     private readonly Task _worker;
-    private int _disposed;
+    private int _generation;
 
     public LiveTranslationHub(LiveAudioTranslationOptions options)
     {
         _options = options;
-        _utterances = Channel.CreateBounded<float[]>(new BoundedChannelOptions(2)
+        _utterances = Channel.CreateBounded<PendingUtterance>(new BoundedChannelOptions(2)
         {
             FullMode = BoundedChannelFullMode.Wait,
             SingleReader = true,
@@ -46,16 +47,12 @@ internal sealed class LiveTranslationHub : IDisposable
 
     public void PushFloat32(ReadOnlySpan<float> samples, int sampleRate, int channels)
     {
-        if (Volatile.Read(ref _disposed) != 0)
-            return;
         lock (_ingestSync)
             _segmenter.PushFloat32(samples, sampleRate, channels);
     }
 
     public void PushPcm16(ReadOnlySpan<short> samples, int sampleRate, int channels)
     {
-        if (Volatile.Read(ref _disposed) != 0)
-            return;
         lock (_ingestSync)
             _segmenter.PushPcm16(samples, sampleRate, channels);
     }
@@ -63,11 +60,21 @@ internal sealed class LiveTranslationHub : IDisposable
     public void ResetAudio()
     {
         lock (_ingestSync)
+        {
+            Interlocked.Increment(ref _generation);
             _segmenter.Reset();
+        }
         while (_utterances.Reader.TryRead(out _))
         {
         }
+        while (_cues.TryDequeue(out _))
+        {
+        }
     }
+
+    public void BeginSession() => ResetAudio();
+
+    public void EndSession() => ResetAudio();
 
     public bool TryTakeCue(out TranslatedCue cue) => _cues.TryDequeue(out cue);
 
@@ -75,7 +82,8 @@ internal sealed class LiveTranslationHub : IDisposable
 
     private void QueueUtterance(float[] samples)
     {
-        if (!_utterances.Writer.TryWrite(samples))
+        var utterance = new PendingUtterance(samples, Volatile.Read(ref _generation));
+        if (!_utterances.Writer.TryWrite(utterance))
             _status.Enqueue("event=audio_queue_full outcome=dropped");
     }
 
@@ -127,10 +135,12 @@ internal sealed class LiveTranslationHub : IDisposable
                 $"source={_options.SourceLanguage} target={_options.TargetLanguage} " +
                 $"whisper_threads={_options.WhisperThreads} translation_threads={_options.TranslationThreads}");
 
-            await foreach (float[] utterance in _utterances.Reader.ReadAllAsync(_shutdown.Token))
+            await foreach (PendingUtterance pending in _utterances.Reader.ReadAllAsync())
             {
                 var total = Stopwatch.StartNew();
-                string english = await TranscribeAsync(whisper, utterance, _shutdown.Token);
+                string english = await TranscribeAsync(whisper, pending.Samples, CancellationToken.None);
+                if (pending.Generation != Volatile.Read(ref _generation))
+                    continue;
                 if (english.Length == 0)
                 {
                     _status.Enqueue("event=utterance outcome=no-speech");
@@ -141,6 +151,8 @@ internal sealed class LiveTranslationHub : IDisposable
                 string french = cache.GetOrTranslate(english, translator);
                 translationTimer.Stop();
                 total.Stop();
+                if (pending.Generation != Volatile.Read(ref _generation))
+                    continue;
 
                 int duration = Math.Clamp(
                     Math.Max(_options.SubtitleDurationMilliseconds, french.Length * 65),
@@ -152,13 +164,10 @@ internal sealed class LiveTranslationHub : IDisposable
                 _cues.Enqueue(new TranslatedCue(french, duration));
                 _status.Enqueue(
                     $"event=translated cue={TranslationTextNormalizer.ComputeCueHash(english)} " +
-                    $"audio_ms={utterance.Length * 1_000 / StreamingAudioSegmenter.OutputSampleRate} " +
+                    $"audio_ms={pending.Samples.Length * 1_000 / StreamingAudioSegmenter.OutputSampleRate} " +
                     $"translation_ms={translationTimer.Elapsed.TotalMilliseconds:F1} " +
                     $"total_ms={total.Elapsed.TotalMilliseconds:F1} outcome=queued");
             }
-        }
-        catch (OperationCanceledException) when (_shutdown.IsCancellationRequested)
-        {
         }
         catch (Exception ex)
         {
@@ -205,22 +214,6 @@ internal sealed class LiveTranslationHub : IDisposable
         return value.Replace('\r', ' ').Replace('\n', ' ').Replace(' ', '-');
     }
 
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-            return;
-
-        _utterances.Writer.TryComplete();
-        _shutdown.Cancel();
-        try
-        {
-            _worker.Wait(TimeSpan.FromSeconds(5));
-        }
-        catch
-        {
-        }
-        _shutdown.Dispose();
-    }
 }
 
 internal static class LiveTranslationHubRegistry
@@ -242,9 +235,11 @@ internal static class LiveTranslationHubRegistry
             else if (_options != options)
             {
                 throw new InvalidOperationException(
-                    "Live translator modules resolved different configurations in the same VLC process.");
+                    "Live translator configuration changed. Restart VLC before using the new configuration.");
             }
 
+            if (_references == 0)
+                _hub.BeginSession();
             _references++;
             return new LiveTranslationHubLease(_hub);
         }
@@ -252,19 +247,13 @@ internal static class LiveTranslationHubRegistry
 
     public static void Release()
     {
-        LiveTranslationHub? dispose = null;
         lock (Sync)
         {
             if (_references > 0)
                 _references--;
             if (_references == 0)
-            {
-                dispose = _hub;
-                _hub = null;
-                _options = null;
-            }
+                _hub?.EndSession();
         }
-        dispose?.Dispose();
     }
 }
 

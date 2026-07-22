@@ -60,6 +60,10 @@ few seconds after speech. The bundled `tiny` multilingual Whisper model favors
 speed; a larger multilingual GGML model can be selected with
 `--live-translator-whisper-model=C:/path/to/model.bin`.
 
+The native Whisper and ONNX sessions remain loaded until VLC exits. This avoids
+tearing down an in-flight native inference when playback stops and also makes a
+second video in the same VLC process start faster.
+
 ## Validate
 
 The fast tests do not load either model:
