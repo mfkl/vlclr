@@ -160,6 +160,7 @@ try
         new OnnxTranslatorOptions
         {
             UseDecoderCache = true,
+            CacheActivationTokenCount = 1,
             IntraOpThreads = 4
         });
 

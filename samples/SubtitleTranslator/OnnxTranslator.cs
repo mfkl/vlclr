@@ -23,6 +23,7 @@ public sealed class OnnxTranslator : ITranslationEngine
     private readonly SimpleTokenizer _tokenizer;
     private readonly ModelManifest _manifest;
     private readonly bool _useDecoderCache;
+    private readonly int _cacheActivationTokenCount;
     private readonly bool _verifyDecoderCache;
     private readonly float _cacheParityGuardMargin;
     private readonly int _maxSourceLength;
@@ -32,6 +33,7 @@ public sealed class OnnxTranslator : ITranslationEngine
     private readonly OrtValue[] _encoderInputValues;
     private readonly string[] _decoderInputNames;
     private readonly string[] _decoderOutputNames;
+    private readonly string[] _logitsOutputNames = [LogitsName];
     private readonly OrtValue[] _decoderInputValues;
     private readonly int _decoderInputIdsIndex;
     private readonly int _encoderAttentionMaskIndex;
@@ -94,6 +96,7 @@ public sealed class OnnxTranslator : ITranslationEngine
             1,
             _manifest.MaximumOutputTokens);
         _useDecoderCache = options.UseDecoderCache;
+        _cacheActivationTokenCount = Math.Clamp(options.CacheActivationTokenCount, 1, _maxOutputLength);
         _verifyDecoderCache = options.VerifyDecoderCache;
         _cacheParityGuardMargin = Math.Max(0, options.CacheParityGuardMargin);
 
@@ -230,7 +233,8 @@ public sealed class OnnxTranslator : ITranslationEngine
         {
             for (int step = 0; step < _maxOutputLength; step++)
             {
-                bool useCacheBranch = _useDecoderCache && step > 0;
+                bool useCacheBranch = _useDecoderCache && step >= _cacheActivationTokenCount;
+                bool seedCache = _useDecoderCache && step == _cacheActivationTokenCount - 1;
                 int decoderSequenceLength = useCacheBranch ? 1 : generatedCount + 1;
                 if (useCacheBranch)
                     _decoderTokenBuffer[0] = generated[generatedCount - 1];
@@ -251,6 +255,9 @@ public sealed class OnnxTranslator : ITranslationEngine
                     latestDecoderOutputs,
                     useCacheBranch);
 
+                IReadOnlyCollection<string> requestedOutputs = useCacheBranch || seedCache
+                    ? _decoderOutputNames
+                    : _logitsOutputNames;
                 IDisposableReadOnlyCollection<OrtValue> currentOutputs;
                 try
                 {
@@ -258,7 +265,7 @@ public sealed class OnnxTranslator : ITranslationEngine
                         _runOptions,
                         _decoderInputNames,
                         _decoderInputValues,
-                        _decoderOutputNames);
+                        requestedOutputs);
                 }
                 catch (OnnxRuntimeException ex) when (useCacheBranch && latestDecoderOutputs != null)
                 {
@@ -267,21 +274,21 @@ public sealed class OnnxTranslator : ITranslationEngine
                         ex);
                 }
 
-                if (initialCacheOutputs == null)
+                if (seedCache)
                 {
-                    // Cross-attention present tensors are emitted only by the no-cache
-                    // branch. Keep this first result collection alive for every step.
+                    // Keep the full-prefix seed alive for cross-attention caches.
                     initialCacheOutputs = currentOutputs;
                     latestDecoderOutputs = currentOutputs;
                 }
-                else
+                else if (useCacheBranch)
                 {
                     if (!ReferenceEquals(latestDecoderOutputs, initialCacheOutputs))
                         latestDecoderOutputs?.Dispose();
                     latestDecoderOutputs = currentOutputs;
                 }
 
-                TokenDecision cachedDecision = ArgMaxLastToken(currentOutputs[_logitsOutputIndex]);
+                int logitsIndex = useCacheBranch || seedCache ? _logitsOutputIndex : 0;
+                TokenDecision cachedDecision = ArgMaxLastToken(currentOutputs[logitsIndex]);
                 int bestId = cachedDecision.TokenId;
                 if (useCacheBranch &&
                     (_verifyDecoderCache || cachedDecision.Margin <= _cacheParityGuardMargin))
@@ -307,10 +314,16 @@ public sealed class OnnxTranslator : ITranslationEngine
                     }
                 }
                 if (bestId == _tokenizer.EosTokenId)
+                {
+                    if (!useCacheBranch && !seedCache)
+                        currentOutputs.Dispose();
                     break;
+                }
 
                 generated[generatedCount++] = bestId;
                 _decoderPrefixBuffer[generatedCount] = bestId;
+                if (!useCacheBranch && !seedCache)
+                    currentOutputs.Dispose();
             }
         }
         finally
@@ -344,8 +357,8 @@ public sealed class OnnxTranslator : ITranslationEngine
             _runOptions,
             _decoderInputNames,
             _decoderInputValues,
-            _decoderOutputNames);
-        return ArgMaxLastToken(outputs[_logitsOutputIndex]);
+            _logitsOutputNames);
+        return ArgMaxLastToken(outputs[0]);
     }
 
     private void PopulateDecoderInputs(
