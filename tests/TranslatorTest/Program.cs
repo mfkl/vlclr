@@ -20,6 +20,20 @@ if (!Directory.Exists(modelDir))
 
 int checkpointsPassed = 0;
 
+Console.WriteLine("\n=== CHECKPOINT 2: Native Runtime Version Parity ===");
+string packagedRuntime = Path.Combine(
+    AppContext.BaseDirectory,
+    "runtimes",
+    "win-x64",
+    "native",
+    "onnxruntime.dll");
+NativeLoadResult nativeLoad = OnnxNativeResolver.EnsureLoadedResult(packagedRuntime);
+Require(nativeLoad.Success, nativeLoad.Diagnostics);
+Require(nativeLoad.Version == "1.27.1",
+    $"Native ONNX Runtime version is '{nativeLoad.Version}', expected '1.27.1'.");
+Console.WriteLine($"Loaded native runtime {nativeLoad.Version} from {nativeLoad.LoadedFrom}");
+checkpointsPassed++;
+
 // ============================================================
 // CHECKPOINT 3: ONNX Sessions Load
 // ============================================================
@@ -313,10 +327,10 @@ catch (Exception ex)
 // Summary
 // ============================================================
 Console.WriteLine($"\n{'=',-50}");
-Console.WriteLine($"RESULTS: {checkpointsPassed}/7 checkpoints passed");
+Console.WriteLine($"RESULTS: {checkpointsPassed}/8 checkpoints passed");
 Console.WriteLine($"{'=',-50}");
 
-return checkpointsPassed == 7 ? 0 : 1;
+return checkpointsPassed == 8 ? 0 : 1;
 
 static void Require(bool condition, string message)
 {

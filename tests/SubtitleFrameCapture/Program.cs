@@ -62,10 +62,23 @@ if (!player.Play())
 }
 
 Console.WriteLine($"Waiting {captureMilliseconds:N0} ms for the subtitle cue...");
-Thread.Sleep(checked((int)captureMilliseconds + 250));
+var playbackTimeout = Stopwatch.StartNew();
+TimeSpan maximumPlaybackWait = TimeSpan.FromSeconds(30);
+while (player.Time < captureMilliseconds &&
+       playbackTimeout.Elapsed < maximumPlaybackWait &&
+       !failed.IsSet)
+{
+    Thread.Sleep(50);
+}
 if (failed.IsSet)
 {
     Console.Error.WriteLine("VLC reported a playback error.");
+    return 4;
+}
+if (player.Time < captureMilliseconds)
+{
+    Console.Error.WriteLine(
+        $"Playback did not reach {captureMilliseconds:N0} ms before the {maximumPlaybackWait.TotalSeconds:N0} second timeout.");
     return 4;
 }
 

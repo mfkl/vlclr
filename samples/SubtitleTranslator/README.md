@@ -41,6 +41,7 @@ The script validates the model and creates this layout:
 ```text
 vlc-4.0.0-dev/
 |-- onnxruntime.dll
+|-- onnxruntime_providers_shared.dll
 |-- models/opus-mt-en-fr/
 |   |-- model-manifest.json
 |   |-- encoder_model_quantized.onnx
