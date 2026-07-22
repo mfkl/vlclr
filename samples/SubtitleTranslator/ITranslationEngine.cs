@@ -28,6 +28,7 @@ public sealed record OnnxTranslatorOptions
     public int MaximumSourceTokens { get; init; } = 128;
     public int MaximumOutputTokens { get; init; } = 128;
     public bool UseDecoderCache { get; init; } = true;
+    public int CacheActivationTokenCount { get; init; } = 32;
     public bool VerifyDecoderCache { get; init; }
     public float CacheParityGuardMargin { get; init; } = 0.1f;
     public bool VerifyModelHashes { get; init; } = true;
