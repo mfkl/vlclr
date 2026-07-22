@@ -90,6 +90,13 @@ public unsafe ref struct ModuleBuilder
     public ModuleBuilder WithScore(int score) => SetInt(VLCModuleConstants.VLC_MODULE_SCORE, score);
 
     /// <summary>
+    /// Prevents VLC from unloading the plugin library while the process is running.
+    /// Native AOT libraries do not support unloading, so generated VLCLR plugins
+    /// must set this flag during registration.
+    /// </summary>
+    public ModuleBuilder WithNoUnload() => SetFlag(VLCModuleConstants.VLC_MODULE_NO_UNLOAD);
+
+    /// <summary>
     /// Sets the module open callback. Called when VLC activates the module.
     /// </summary>
     /// <param name="cb">Function pointer to the open callback. Must be decorated with
@@ -414,6 +421,16 @@ public unsafe ref struct ModuleBuilder
         {
             var vlcSetInt = (delegate* unmanaged[Cdecl]<nint, nint, int, int, int>)_vlcSetPtr;
             _result = vlcSetInt(_opaque, _module, key, value);
+        }
+        return this;
+    }
+
+    private ModuleBuilder SetFlag(int key)
+    {
+        if (_result == 0)
+        {
+            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, int>)_vlcSetPtr;
+            _result = vlcSet(_opaque, _module, key);
         }
         return this;
     }
