@@ -3,7 +3,7 @@
 
 param(
     [switch]$SkipBuild,
-    [string]$VideoPath = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    [string]$VideoPath = "https://archive.org/download/BigBuckBunny_328/BigBuckBunny.avi",
     [int]$TestTimeout = 10,
     [string]$VlcSdkPath,
     [string]$SubtitleFile,

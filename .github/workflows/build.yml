@@ -154,7 +154,7 @@ jobs:
 
       - name: Run filter integration test
         run: |
-          dotnet run --project tests/IntegrationTest -- vlc-sdk "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 10
+          dotnet run --project tests/IntegrationTest -- vlc-sdk "https://archive.org/download/BigBuckBunny_328/BigBuckBunny.avi" 10
 
       - name: Upload plugins
         uses: actions/upload-artifact@v4
