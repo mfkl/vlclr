@@ -150,9 +150,6 @@ public sealed class TextCanvas : IDisposable
             return;
         }
 
-        // Clear canvas to transparent
-        _canvas.Mutate(ctx => ctx.Clear(Color.Transparent));
-
         // Get font for rendering
         Font font = FontManager.GetFont(
             style.FontName,
@@ -197,93 +194,53 @@ public sealed class TextCanvas : IDisposable
             WordBreaking = WordBreaking.Standard
         };
 
-        // Render in correct order: background → shadow → outline → text
-        if (style.HasBackground)
-        {
-            DrawBackground(textX, textY, textBounds, style);
-        }
-
-        if (style.HasShadow)
-        {
-            DrawShadow(textOptions, text, style);
-        }
-
-        DrawForeground(textOptions, text, style);
-    }
-
-    /// <summary>
-    /// Draws a semi-transparent background box behind the text.
-    /// </summary>
-    private void DrawBackground(float textX, float textY, FontRectangle textBounds, TextStyleWrapper style)
-    {
-        var bgColor = ColorFromRgbAlpha(style.BackgroundColor, style.BackgroundAlpha);
+        Color backgroundColor = ColorFromRgbAlpha(style.BackgroundColor, style.BackgroundAlpha);
         var bgRect = new RectangleF(
             textX - _options.BackgroundPadding,
             textY - _options.BackgroundPadding,
             textBounds.Width + (_options.BackgroundPadding * 2),
             textBounds.Height + (_options.BackgroundPadding * 2));
 
-        _canvas!.Mutate(ctx => ctx.Fill(bgColor, bgRect));
-    }
-
-    /// <summary>
-    /// Draws a drop shadow offset from the text.
-    /// </summary>
-    private void DrawShadow(RichTextOptions baseOptions, string text, TextStyleWrapper style)
-    {
-        var shadowColor = ColorFromRgbAlpha(style.ShadowColor, style.ShadowAlpha);
-        int offset = style.ShadowOffset;
-
-        var shadowOptions = new RichTextOptions(baseOptions.Font)
+        Color shadowColor = ColorFromRgbAlpha(style.ShadowColor, style.ShadowAlpha);
+        var shadowOptions = new RichTextOptions(font)
         {
-            Origin = new PointF(baseOptions.Origin.X + offset, baseOptions.Origin.Y + offset),
-            WrappingLength = baseOptions.WrappingLength,
-            WordBreaking = baseOptions.WordBreaking
+            Origin = new PointF(textOptions.Origin.X + style.ShadowOffset, textOptions.Origin.Y + style.ShadowOffset),
+            WrappingLength = textOptions.WrappingLength,
+            WordBreaking = textOptions.WordBreaking
         };
 
-        _canvas!.Mutate(ctx => ctx.DrawText(shadowOptions, text, shadowColor));
-    }
+        var textBrush = new SolidBrush(ColorFromRgbAlpha(style.ForegroundColor, style.ForegroundAlpha));
+        var outlinePen = new SolidPen(
+            ColorFromRgbAlpha(style.OutlineColor, style.OutlineAlpha),
+            Math.Max(1f, style.OutlineWidth * 2f));
 
-    /// <summary>
-    /// Draws the foreground text with the specified style.
-    /// When outline is enabled, draws text at 8 offsets (cardinal + diagonal)
-    /// then the fill on top.
-    /// </summary>
-    private void DrawForeground(RichTextOptions options, string text, TextStyleWrapper style)
-    {
-        var textColor = ColorFromRgbAlpha(style.ForegroundColor, style.ForegroundAlpha);
-        var brush = new SolidBrush(textColor);
-
-        if (style.HasOutline)
+        // Queue every operation on one processing context. Drawing the outline
+        // once and then restoring the fill produces the same outward outline
+        // width as the former eight offset rasterizations with far less work.
+        _canvas.Mutate(ctx =>
         {
-            var outlineColor = ColorFromRgbAlpha(style.OutlineColor, style.OutlineAlpha);
-            int w = style.OutlineWidth;
-            _canvas!.Mutate(ctx =>
+            ctx.Clear(Color.Transparent);
+
+            if (style.HasBackground)
             {
-                // Draw outline at cardinal and diagonal offsets
-                foreach (var (dx, dy) in new (int, int)[]
-                {
-                    (-w, 0), (w, 0), (0, -w), (0, w),
-                    (-w, -w), (-w, w), (w, -w), (w, w)
-                })
-                {
-                    var outlineOptions = new RichTextOptions(options.Font)
-                    {
-                        Origin = new PointF(options.Origin.X + dx, options.Origin.Y + dy),
-                        WrappingLength = options.WrappingLength,
-                        WordBreaking = options.WordBreaking
-                    };
-                    ctx.DrawText(outlineOptions, text, outlineColor);
-                }
+                ctx.Fill(backgroundColor, bgRect);
+            }
 
-                // Fill on top
-                ctx.DrawText(options, text, brush);
-            });
-        }
-        else
-        {
-            _canvas!.Mutate(ctx => ctx.DrawText(options, text, brush));
-        }
+            if (style.HasShadow)
+            {
+                ctx.DrawText(shadowOptions, text, shadowColor);
+            }
+
+            if (style.HasOutline)
+            {
+                ctx.DrawText(textOptions, text, outlinePen);
+                ctx.DrawText(textOptions, text, textBrush);
+            }
+            else
+            {
+                ctx.DrawText(textOptions, text, textBrush);
+            }
+        });
     }
 
     /// <summary>
