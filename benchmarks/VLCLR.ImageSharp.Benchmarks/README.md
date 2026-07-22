@@ -3,6 +3,8 @@
 This dependency-free harness measures the subtitle rendering hot path without
 requiring VLC to be running. It reports median and p95 elapsed time, managed
 allocations, and GC collections for a representative outlined 1080p subtitle.
+It retains the original full-frame staging scenario and also measures direct
+VLC-plane copies and the optimized compact-region pipeline.
 
 Run it from the repository root with a Release build:
 
