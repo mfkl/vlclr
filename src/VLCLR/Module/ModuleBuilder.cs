@@ -36,6 +36,8 @@ public unsafe ref struct ModuleBuilder
     // Stored callback pointers - must be set before vlc_set call
     private nint _openCallback;
     private nint _closeCallback;
+    private string _openCallbackName;
+    private string _closeCallbackName;
 
     private ModuleBuilder(nint vlcSetPtr, nint opaque)
     {
@@ -45,6 +47,8 @@ public unsafe ref struct ModuleBuilder
         _result = 0;
         _openCallback = 0;
         _closeCallback = 0;
+        _openCallbackName = "Open";
+        _closeCallbackName = "Close";
 
         // First call: VLC_MODULE_CREATE to get a module handle
         nint moduleOut = 0;
@@ -68,6 +72,29 @@ public unsafe ref struct ModuleBuilder
     /// Sets the module name (internal identifier used for --video-filter=name).
     /// </summary>
     public ModuleBuilder WithName(string name) => SetString(VLCModuleConstants.VLC_MODULE_NAME, name);
+
+    /// <summary>
+    /// Adds the name used to select this module explicitly from VLC options.
+    /// Submodules must use a shortcut because VLC_MODULE_NAME is only valid for
+    /// the first/root module in a plugin descriptor.
+    /// </summary>
+    public ModuleBuilder WithShortcut(string shortcut)
+    {
+        if (_result == 0)
+        {
+            nint shortcutPtr = PinString(shortcut);
+            nint* shortcuts = stackalloc nint[1];
+            shortcuts[0] = shortcutPtr;
+            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nuint, nint*, int>)_vlcSetPtr;
+            _result = vlcSet(
+                _opaque,
+                _module,
+                VLCModuleConstants.VLC_MODULE_SHORTCUT,
+                1,
+                shortcuts);
+        }
+        return this;
+    }
 
     /// <summary>
     /// Sets the module short name (display name in UI).
@@ -102,9 +129,17 @@ public unsafe ref struct ModuleBuilder
     /// <param name="cb">Function pointer to the open callback. Must be decorated with
     /// [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]</param>
     public ModuleBuilder WithOpenCallback(delegate* unmanaged[Cdecl]<nint, int> cb)
+        => WithOpenCallback(cb, "Open");
+
+    /// <summary>
+    /// Sets the module open callback and its plugin-wide symbol name. Use a
+    /// distinct name for each callback when one DLL contains submodules.
+    /// </summary>
+    public ModuleBuilder WithOpenCallback(delegate* unmanaged[Cdecl]<nint, int> cb, string name)
     {
         // Store callback pointer BEFORE calling vlc_set (required by VLC)
         _openCallback = (nint)cb;
+        _openCallbackName = name;
         return this;
     }
 
@@ -114,8 +149,15 @@ public unsafe ref struct ModuleBuilder
     /// <param name="cb">Function pointer to the close callback. Must be decorated with
     /// [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]</param>
     public ModuleBuilder WithCloseCallback(delegate* unmanaged[Cdecl]<nint, void> cb)
+        => WithCloseCallback(cb, "Close");
+
+    /// <summary>
+    /// Sets the module close callback and its plugin-wide symbol name.
+    /// </summary>
+    public ModuleBuilder WithCloseCallback(delegate* unmanaged[Cdecl]<nint, void> cb, string name)
     {
         _closeCallback = (nint)cb;
+        _closeCallbackName = name;
         return this;
     }
 
@@ -396,8 +438,7 @@ public unsafe ref struct ModuleBuilder
         if (_openCallback != 0)
         {
             var vlcSetCallback = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)_vlcSetPtr;
-            // VLC_MODULE_CB_OPEN requires a name string - use "Open" as default
-            nint namePtr = PinString("Open");
+            nint namePtr = PinString(_openCallbackName);
             _result = vlcSetCallback(_opaque, _module, VLCModuleConstants.VLC_MODULE_CB_OPEN, namePtr, _openCallback);
             if (_result != 0)
                 return _result;
@@ -407,7 +448,7 @@ public unsafe ref struct ModuleBuilder
         if (_closeCallback != 0)
         {
             var vlcSetCallback = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)_vlcSetPtr;
-            nint namePtr = PinString("Close");
+            nint namePtr = PinString(_closeCallbackName);
             _result = vlcSetCallback(_opaque, _module, VLCModuleConstants.VLC_MODULE_CB_CLOSE, namePtr, _closeCallback);
             if (_result != 0)
                 return _result;

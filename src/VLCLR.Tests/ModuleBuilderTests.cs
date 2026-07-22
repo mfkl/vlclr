@@ -28,6 +28,22 @@ public unsafe class ModuleBuilderTests
     }
 
     [Fact]
+    public void WithShortcut_SendsShortcutAfterModuleCreation()
+    {
+        s_properties.Clear();
+
+        var result = ModuleBuilder
+            .Create((nint)(delegate* unmanaged[Cdecl]<nint, nint, int, nint*, int>)&VlcSet, 123)
+            .WithShortcut("select-me")
+            .Register();
+
+        Assert.Equal(0, result);
+        Assert.Equal(
+            [VLCModuleConstants.VLC_MODULE_CREATE, VLCModuleConstants.VLC_MODULE_SHORTCUT],
+            s_properties);
+    }
+
+    [Fact]
     public void RangedConfigs_ApplyRangeToCreatedConfigItem()
     {
         s_rangeTargets.Clear();
