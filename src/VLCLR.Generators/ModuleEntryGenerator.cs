@@ -316,6 +316,11 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine("    }");
         sb.AppendLine();
 
+        if (info.ConfigOptions.Count > 0 && info.FilterType != FilterType.Unknown)
+        {
+            GenerateTypedConfiguration(sb, info);
+        }
+
         // Filter callbacks based on type
         if (info.FilterType == FilterType.VideoFilter)
         {
@@ -414,6 +419,88 @@ public class ModuleEntryGenerator : IIncrementalGenerator
                 sb.AppendLine($"            .AddStringConfig(\"{name}\", null, \"{desc}\", {longDesc})");
                 break;
         }
+    }
+
+    private static void GenerateTypedConfiguration(StringBuilder sb, ModuleInfo info)
+    {
+        sb.AppendLine("    /// <summary>Typed view of this module's inherited VLC configuration.</summary>");
+        sb.AppendLine("    protected PluginConfiguration Config => new(Context.NativePtr);");
+        sb.AppendLine();
+        sb.AppendLine("    protected readonly struct PluginConfiguration");
+        sb.AppendLine("    {");
+        sb.AppendLine("        private readonly VLCConfiguration _values;");
+        sb.AppendLine();
+        sb.AppendLine("        internal PluginConfiguration(nint objectPtr)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            _values = new VLCConfiguration(objectPtr);");
+        sb.AppendLine("        }");
+
+        foreach (var config in info.ConfigOptions)
+        {
+            var propertyName = GetConfigPropertyName(info.ModuleName, config.Name);
+            var optionName = EscapeString(config.Name);
+            sb.AppendLine();
+
+            switch (config.Type)
+            {
+                case ConfigType.Integer:
+                    var intDefault = Convert.ToInt64(config.DefaultValue ?? 0);
+                    sb.AppendLine($"        public long {propertyName} => _values.GetInteger(\"{optionName}\", {intDefault}L);");
+                    break;
+
+                case ConfigType.Float:
+                    var floatDefault = Convert.ToSingle(config.DefaultValue ?? 0f);
+                    var floatLiteral = floatDefault.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+                    if (!floatLiteral.Contains(".") && !floatLiteral.Contains("E") && !floatLiteral.Contains("e"))
+                        floatLiteral += ".0";
+                    sb.AppendLine($"        public float {propertyName} => _values.GetFloat(\"{optionName}\", {floatLiteral}f);");
+                    break;
+
+                case ConfigType.Bool:
+                    var boolDefault = config.DefaultValue is bool b && b;
+                    sb.AppendLine($"        public bool {propertyName} => _values.GetBool(\"{optionName}\", {(boolDefault ? "true" : "false")});");
+                    break;
+
+                default:
+                    var stringDefault = config.DefaultValue as string;
+                    var stringLiteral = stringDefault is null ? "null" : $"\"{EscapeString(stringDefault)}\"";
+                    sb.AppendLine($"        public string? {propertyName} => _values.GetString(\"{optionName}\", {stringLiteral});");
+                    break;
+            }
+        }
+
+        sb.AppendLine("    }");
+        sb.AppendLine();
+    }
+
+    private static string GetConfigPropertyName(string moduleName, string optionName)
+    {
+        var normalizedModuleName = moduleName.Replace('_', '-');
+        var prefix = normalizedModuleName + "-";
+        var candidate = optionName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            ? optionName.Substring(prefix.Length)
+            : optionName;
+
+        var result = new StringBuilder();
+        var capitalize = true;
+        foreach (var character in candidate)
+        {
+            if (!char.IsLetterOrDigit(character))
+            {
+                capitalize = true;
+                continue;
+            }
+
+            result.Append(capitalize ? char.ToUpperInvariant(character) : character);
+            capitalize = false;
+        }
+
+        if (result.Length == 0)
+            return "Option";
+        if (char.IsDigit(result[0]) || SyntaxFacts.GetKeywordKind(result.ToString()) != SyntaxKind.None)
+            result.Insert(0, "Option");
+
+        return result.ToString();
     }
 
     private static void GenerateVideoFilterCallbacks(StringBuilder sb, ModuleInfo info)

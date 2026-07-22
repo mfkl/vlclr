@@ -30,6 +30,9 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
 {
     // Reusable canvas instance for rendering (using framework TextCanvas)
     private TextCanvas? _canvas;
+    private bool _forceOutline = true;
+    private int _outlineWidth = 3;
+    private bool _forceWhite = true;
 
     // Default canvas dimensions (used if region doesn't specify)
     private const int DefaultWidth = 1920;
@@ -52,6 +55,11 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
 
         try
         {
+            var config = Config;
+            _forceOutline = config.ForceOutline;
+            _outlineWidth = (int)Math.Clamp(config.OutlineWidth, 1, 10);
+            _forceWhite = config.ForceWhite;
+
             // Initialize font manager with embedded JetBrains Mono font
             var assembly = Assembly.GetExecutingAssembly();
             FontManager.LoadEmbeddedFont(
@@ -70,7 +78,7 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
             }
 #endif
 
-            context.Logger.Info("[SubtitleTextRenderer] Text renderer initialized");
+            context.Logger.Info($"[SubtitleTextRenderer] Text renderer initialized (forceOutline={_forceOutline}, outlineWidth={_outlineWidth}, forceWhite={_forceWhite})");
             return true;
         }
         catch (Exception ex)
@@ -102,9 +110,9 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
         // Use RegionPtr to access the original region for styled segment parsing
         var segments = TextSegmentParser.ParseWithVisibility(
             RegionPtr,
-            forceWhiteText: true,
-            forceOutline: true,
-            outlineWidth: 3);
+            forceWhiteText: _forceWhite,
+            forceOutline: _forceOutline,
+            outlineWidth: _outlineWidth);
 
         // Log first few render calls for debugging
         if (_renderCount <= 5)

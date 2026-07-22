@@ -25,6 +25,10 @@ namespace VideoOverlay;
 public partial class VideoOverlayFilter : VLCVideoFilterBase
 {
     private OverlayRenderer? _renderer;
+    private bool _enabled = true;
+    private float _opacity = 1.0f;
+    private int _offsetX = 10;
+    private int _offsetY = 10;
 #if DEBUG
     private bool _savedDebugFrame;
     private const string DebugFramePath = "overlay_test.png";
@@ -39,8 +43,20 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
 
         try
         {
+            var config = Config;
+            _enabled = config.Enabled;
+            _opacity = Math.Clamp(config.Opacity, 0.0f, 1.0f);
+            _offsetX = (int)Math.Clamp(config.X, 0, 4096);
+            _offsetY = (int)Math.Clamp(config.Y, 0, 2160);
+
+            if (!_enabled)
+            {
+                context.Logger.Info("[VideoOverlay] Overlay disabled by configuration");
+                return true;
+            }
+
             _renderer = new OverlayRenderer();
-            context.Logger.Info("[VideoOverlay] Overlay renderer initialized");
+            context.Logger.Info($"[VideoOverlay] Overlay renderer initialized at ({_offsetX}, {_offsetY}), opacity={_opacity:F2}");
             return true;
         }
         catch (Exception ex)
@@ -73,7 +89,7 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
     /// </summary>
     protected override void ProcessFrame(VLCFrame frame)
     {
-        if (_renderer == null)
+        if (!_enabled || _renderer == null)
             return;
 
         // Render the overlay text
@@ -85,7 +101,6 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
         int overlayHeight = _renderer.OverlayHeight;
 
         // Use framework's FrameCompositor to blend overlay onto frame
-        // Position overlay at top-left with 10px padding
         bool success = FrameCompositor.Composite(
             frame.Pixels,
             frame.Pitch,
@@ -95,8 +110,9 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
             overlay,
             overlayWidth,
             overlayHeight,
-            offsetX: 10,
-            offsetY: 10);
+            offsetX: _offsetX,
+            offsetY: _offsetY,
+            opacity: _opacity);
 
         // Log format issues on first frame only
         if (!success && FrameCount == 1)

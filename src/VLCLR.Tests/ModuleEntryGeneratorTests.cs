@@ -45,7 +45,27 @@ public class ModuleEntryGeneratorTests
         Assert.Contains("catch { return 0; }", generated);
     }
 
-    private static string Generate(string baseType, string implementation)
+    [Fact]
+    public void GeneratedConfiguration_ExposesTypedPrefixTrimmedProperties()
+    {
+        var generated = Generate(
+            "VLCVideoFilterBase",
+            "protected override void ProcessFrame(VLCLR.VLCFrame frame) { }",
+            """
+            [VLCConfig("fixture-enabled", VLCConfigType.Bool, Default = true)]
+            [VLCConfig("fixture-count", VLCConfigType.Integer, Default = 42)]
+            [VLCConfig("fixture-opacity", VLCConfigType.Float, Default = 0.75f)]
+            [VLCConfig("fixture-name", VLCConfigType.String, Default = "demo")]
+            """);
+
+        Assert.Contains("protected PluginConfiguration Config => new(Context.NativePtr);", generated);
+        Assert.Contains("public bool Enabled => _values.GetBool(\"fixture-enabled\", true);", generated);
+        Assert.Contains("public long Count => _values.GetInteger(\"fixture-count\", 42L);", generated);
+        Assert.Contains("public float Opacity => _values.GetFloat(\"fixture-opacity\", 0.75f);", generated);
+        Assert.Contains("public string? Name => _values.GetString(\"fixture-name\", \"demo\");", generated);
+    }
+
+    private static string Generate(string baseType, string implementation, string attributes = "")
     {
         var source = $$"""
             using VLCLR.Plugin;
@@ -53,6 +73,7 @@ public class ModuleEntryGeneratorTests
             namespace GeneratorFixture;
 
             [VLCModule("fixture")]
+            {{attributes}}
             public partial class FixturePlugin : {{baseType}}
             {
                 {{implementation}}

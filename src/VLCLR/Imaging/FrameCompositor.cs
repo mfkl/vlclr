@@ -29,6 +29,7 @@ public static class FrameCompositor
     /// <param name="overlayHeight">Height of the overlay in pixels.</param>
     /// <param name="offsetX">X position to place the overlay (pixels from left).</param>
     /// <param name="offsetY">Y position to place the overlay (pixels from top).</param>
+    /// <param name="opacity">Global opacity multiplier in the range 0.0 to 1.0.</param>
     /// <returns>True if compositing was performed, false if format is unsupported.</returns>
     public static unsafe bool Composite(
         nint framePixels,
@@ -40,7 +41,8 @@ public static class FrameCompositor
         int overlayWidth,
         int overlayHeight,
         int offsetX = 0,
-        int offsetY = 0)
+        int offsetY = 0,
+        float opacity = 1.0f)
     {
         if (framePixels == nint.Zero || overlayPixels.IsEmpty)
             return false;
@@ -68,6 +70,7 @@ public static class FrameCompositor
         // Composite based on format
         bool isBgra = VLCFourCC.IsBgraFormat(chroma);
         bool hasAlpha = VLCFourCC.HasAlphaChannel(chroma);
+        int opacityScale = (int)(Math.Clamp(opacity, 0.0f, 1.0f) * 255.0f + 0.5f);
 
         fixed (byte* overlayPtr = overlayPixels)
         {
@@ -83,6 +86,8 @@ public static class FrameCompositor
                     byte g = overlayPtr[overlayIdx + 1];
                     byte b = overlayPtr[overlayIdx + 2];
                     byte a = overlayPtr[overlayIdx + 3];
+                    if (opacityScale != 255)
+                        a = (byte)((a * opacityScale + 127) / 255);
 
                     if (a == 0)
                     {
@@ -113,6 +118,7 @@ public static class FrameCompositor
     /// <param name="overlayHeight">Height of the overlay.</param>
     /// <param name="offsetX">X position for the overlay.</param>
     /// <param name="offsetY">Y position for the overlay.</param>
+    /// <param name="opacity">Global opacity multiplier in the range 0.0 to 1.0.</param>
     /// <returns>True if compositing was performed.</returns>
     public static bool Composite(
         nint framePixels,
@@ -124,12 +130,13 @@ public static class FrameCompositor
         int overlayWidth,
         int overlayHeight,
         int offsetX = 0,
-        int offsetY = 0)
+        int offsetY = 0,
+        float opacity = 1.0f)
     {
         return Composite(
             framePixels, framePitch, frameVisiblePitch, frameVisibleLines,
             chroma, overlayPixels.AsSpan(), overlayWidth, overlayHeight,
-            offsetX, offsetY);
+            offsetX, offsetY, opacity);
     }
 
     /// <summary>

@@ -79,6 +79,17 @@ public static partial class VLCCore
     [LibraryImport(LibraryName, EntryPoint = "var_GetChecked", StringMarshalling = StringMarshalling.Utf8)]
     public static partial int VarGetChecked(nint obj, string name, int type, out VLCValueNative value);
 
+    /// <summary>
+    /// Resolves a variable from the object, its parents, or the module configuration.
+    /// </summary>
+    /// <param name="obj">Pointer to vlc_object_t.</param>
+    /// <param name="name">Configuration/variable name.</param>
+    /// <param name="type">Expected VLC_VAR_* type.</param>
+    /// <param name="value">Receives the inherited value.</param>
+    /// <returns>0 on success, a VLC error code otherwise.</returns>
+    [LibraryImport(LibraryName, EntryPoint = "var_Inherit", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int VarInherit(nint obj, string name, int type, out VLCValueNative value);
+
     #endregion
 
     #region Interface/Playlist Access

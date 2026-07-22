@@ -210,6 +210,37 @@ public class FrameCompositorTests
     }
 
     [Fact]
+    public unsafe void Composite_GlobalOpacity_ScalesSourceAlpha()
+    {
+        nint framePtr = Marshal.AllocHGlobal(4);
+        try
+        {
+            for (int index = 0; index < 4; index++)
+                Marshal.WriteByte(framePtr, index, 0);
+
+            bool result = FrameCompositor.Composite(
+                framePtr,
+                framePitch: 4,
+                frameVisiblePitch: 4,
+                frameVisibleLines: 1,
+                chroma: VLCFourCC.RGBA,
+                overlayPixels: [255, 0, 0, 255],
+                overlayWidth: 1,
+                overlayHeight: 1,
+                opacity: 0.5f);
+
+            Assert.True(result);
+            Assert.InRange(((byte*)framePtr)[0], 127, 128);
+            Assert.Equal(0, ((byte*)framePtr)[1]);
+            Assert.Equal(0, ((byte*)framePtr)[2]);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(framePtr);
+        }
+    }
+
+    [Fact]
     public unsafe void Composite_RGBA_TransparentPixel_NoChange()
     {
         int width = 4;
