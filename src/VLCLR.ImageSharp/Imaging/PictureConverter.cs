@@ -25,7 +25,24 @@ public static class PictureConverter
     /// The returned region and its picture are owned by VLC after this call.
     /// VLC will free them when no longer needed.
     /// </remarks>
-    public static unsafe nint ToSubpictureRegion(Image<Rgba32> image, nint chromaListPtr)
+    public static nint ToSubpictureRegion(Image<Rgba32> image, nint chromaListPtr) =>
+        ToSubpictureRegion(image, chromaListPtr, VLCSubpictureAlign.Bottom, 0, 0);
+
+    /// <summary>
+    /// Converts an ImageSharp image to a positioned VLC subpicture region.
+    /// </summary>
+    /// <param name="image">The rendered image (RGBA format).</param>
+    /// <param name="chromaListPtr">Pointer to null-terminated array of supported chromas from VLC.</param>
+    /// <param name="alignment">VLC subpicture alignment flags.</param>
+    /// <param name="x">Horizontal offset relative to the alignment point.</param>
+    /// <param name="y">Vertical offset relative to the alignment point.</param>
+    /// <returns>Pointer to allocated subpicture_region_t, or nint.Zero on failure.</returns>
+    public static unsafe nint ToSubpictureRegion(
+        Image<Rgba32> image,
+        nint chromaListPtr,
+        int alignment,
+        int x = 0,
+        int y = 0)
     {
         if (image == null)
         {
@@ -85,9 +102,9 @@ public static class PictureConverter
         // Set region position - required or VLC will assert fail with INT_MAX
         // Position is relative to alignment point (0,0 = aligned position)
         ref VLCSubpictureRegion region = ref Unsafe.AsRef<VLCSubpictureRegion>((void*)regionPtr);
-        region.X = 0;
-        region.Y = 0;
-        region.Align = VLCSubpictureAlign.Bottom; // Default to bottom center
+        region.X = x;
+        region.Y = y;
+        region.Align = alignment & VLCSubpictureAlign.Mask;
         region.Alpha = 255; // Fully opaque - IMPORTANT or subtitle is invisible!
 
         return regionPtr;
