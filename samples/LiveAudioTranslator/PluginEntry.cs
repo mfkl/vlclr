@@ -257,6 +257,11 @@ public static unsafe class PluginEntry
         region->Format.SarNum = 1;
         region->Format.SarDen = 1;
         region->Align = VLCSubpictureAlign.Bottom;
+        // subpicture_region_NewText initializes relative coordinates to
+        // INT_MAX as an unset sentinel. Native sub-source modules such as
+        // marq always replace both values before returning the region.
+        region->X = 0;
+        region->Y = 0;
         region->IsAbsolute = 0;
         region->IsInWindow = 0;
         region->TextFlags = VLCSubpictureTextFlags.IsText | VLCSubpictureTextFlags.NoRegionBackground;
@@ -265,7 +270,10 @@ public static unsafe class PluginEntry
         subpicture->Start = date;
         subpicture->Stop = date + cue.DurationMilliseconds * VLCTick.Millisecond;
         subpicture->IsEphemer = 1;
-        subpicture->IsSubtitle = 1;
+        // A sub-source is called with VLC's system clock, just like the native
+        // marquee source. Marking this as an input-timestamped subtitle mixes
+        // clock domains and can trip VLC's debug-build subpicture assertions.
+        subpicture->IsSubtitle = 0;
         return subpicturePtr;
     }
 
