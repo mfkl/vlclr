@@ -135,7 +135,7 @@ internal static class OnnxNativeResolver
         }
     }
 
-    /// <summary>Returns the VLC root inferred from plugins/spu/&lt;plugin&gt;.dll.</summary>
+    /// <summary>Returns the VLC root inferred from plugins/&lt;capability&gt;/&lt;plugin&gt;.dll.</summary>
     public static string? GetHostRootDirectory()
     {
         var diagnostics = new StringBuilder();
@@ -234,7 +234,11 @@ internal static class OnnxNativeResolver
     {
         try
         {
-            nint handle = GetModuleHandleW("libdotnet_subtitle_translator_plugin.dll");
+            string assemblyName = typeof(OnnxNativeResolver).Assembly.GetName().Name ?? "";
+            if (assemblyName.Length == 0)
+                return null;
+
+            nint handle = GetModuleHandleW($"{assemblyName}.dll");
             if (handle == 0)
                 return null;
 

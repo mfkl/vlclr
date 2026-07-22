@@ -22,6 +22,11 @@ samples/SubtitleTranslator/models/**/*
 !samples/SubtitleTranslator/models/**/
 !samples/SubtitleTranslator/models/**/model-manifest.json
 
+# Multilingual Whisper GGML models are downloaded separately (75+ MiB).
+samples/LiveAudioTranslator/models/**/*
+!samples/LiveAudioTranslator/models/**/
+!samples/LiveAudioTranslator/models/**/model-manifest.json
+
 # Ignore generated .lib files except VLC SDK import libraries in lib/
 *.lib
 !lib/*.lib

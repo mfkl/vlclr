@@ -18,6 +18,10 @@ public static class VLCFourCC
     public const uint I420 = 0x30323449; // "I420" - YUV 4:2:0 planar
     public const uint YV12 = 0x32315659; // "YV12" - YUV 4:2:0 planar
 
+    // Common native little-endian audio formats on Windows.
+    public const uint F32L = 0x6C323366; // "f32l" - interleaved 32-bit float
+    public const uint S16L = 0x6C363173; // "s16l" - interleaved signed 16-bit PCM
+
     /// <summary>
     /// Convert a FourCC uint to its 4-character string representation.
     /// </summary>

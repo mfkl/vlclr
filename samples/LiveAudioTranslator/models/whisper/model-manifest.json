@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "modelFamily": "OpenAI Whisper",
+  "modelVariant": "tiny multilingual",
+  "runtime": "Whisper.net 1.9.1",
+  "source": {
+    "repository": "https://huggingface.co/ggerganov/whisper.cpp",
+    "revision": "main",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/ggerganov/whisper.cpp/blob/master/LICENSE"
+  },
+  "files": [
+    {
+      "role": "speech-to-english",
+      "fileName": "ggml-tiny.bin",
+      "size": 77691713,
+      "sha256": "be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21",
+      "sourcePath": "ggml-tiny.bin"
+    }
+  ]
+}

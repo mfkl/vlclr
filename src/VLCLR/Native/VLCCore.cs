@@ -532,6 +532,10 @@ public static partial class VLCCore
     [LibraryImport(LibraryName, EntryPoint = "subpicture_region_Delete")]
     public static partial void SubpictureRegionDelete(nint region);
 
+    /// <summary>Delete a subpicture created by VLC.</summary>
+    [LibraryImport(LibraryName, EntryPoint = "subpicture_Delete")]
+    public static partial void SubpictureDelete(nint subpicture);
+
     #endregion
 
     #region Text Style Management

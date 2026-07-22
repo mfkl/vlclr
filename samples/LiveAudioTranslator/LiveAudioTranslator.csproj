@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>libdotnet_live_audio_translator_plugin</AssemblyName>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <!-- Whisper's AVX runtime selection observes Native AOT's compiled instruction set. -->
+    <IlcInstructionSet>native</IlcInstructionSet>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <DebuggerSupport>false</DebuggerSupport>
+    <StripSymbols>true</StripSymbols>
+    <EventSourceSupport>false</EventSourceSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <!-- Whisper.net probes Assembly.Location and falls back to AppContext.BaseDirectory under AOT. -->
+    <NoWarn>$(NoWarn);IL3000</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VLCLR\VLCLR.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DirectPInvoke Include="libvlccore" />
+    <NativeLibrary Include="..\..\lib\libvlccore.lib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.27.1" />
+    <PackageReference Include="Whisper.net" Version="1.9.1" />
+    <PackageReference Include="Whisper.net.Runtime" Version="1.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SubtitleTranslator\ITranslationEngine.cs" Link="Translation\ITranslationEngine.cs" />
+    <Compile Include="..\SubtitleTranslator\ModelManifest.cs" Link="Translation\ModelManifest.cs" />
+    <Compile Include="..\SubtitleTranslator\OnnxNativeResolver.cs" Link="Translation\OnnxNativeResolver.cs" />
+    <Compile Include="..\SubtitleTranslator\OnnxSessionFactory.cs" Link="Translation\OnnxSessionFactory.cs" />
+    <Compile Include="..\SubtitleTranslator\OnnxTranslator.cs" Link="Translation\OnnxTranslator.cs" />
+    <Compile Include="..\SubtitleTranslator\SimpleTokenizer.cs" Link="Translation\SimpleTokenizer.cs" />
+    <Compile Include="..\SubtitleTranslator\TranslationCache.cs" Link="Translation\TranslationCache.cs" />
+    <Compile Include="..\SubtitleTranslator\TranslationTextNormalizer.cs" Link="Translation\TranslationTextNormalizer.cs" />
+  </ItemGroup>
+
+</Project>

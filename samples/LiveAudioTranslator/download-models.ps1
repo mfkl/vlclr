@@ -1,28 +1,33 @@
 [CmdletBinding()]
 param(
-    [string]$OutputDirectory = (Join-Path $PSScriptRoot "models/opus-mt-en-fr")
+    [string]$WhisperOutputDirectory = (Join-Path $PSScriptRoot "models/whisper"),
+    [string]$TranslationOutputDirectory = (Join-Path $PSScriptRoot "models/opus-mt-en-fr")
 )
 
 $ErrorActionPreference = "Stop"
-$manifestPath = Join-Path $PSScriptRoot "models/opus-mt-en-fr/model-manifest.json"
+
+$translationDownloader = Join-Path $PSScriptRoot "../SubtitleTranslator/download-model.ps1"
+& $translationDownloader -OutputDirectory $TranslationOutputDirectory
+
+$manifestPath = Join-Path $PSScriptRoot "models/whisper/model-manifest.json"
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
-    throw "Model manifest not found: $manifestPath"
+    throw "Whisper model manifest not found: $manifestPath"
 }
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 if ($manifest.formatVersion -ne 1) {
-    throw "Unsupported model manifest format: $($manifest.formatVersion)"
+    throw "Unsupported Whisper model manifest format: $($manifest.formatVersion)"
 }
 
 $repository = $manifest.source.repository.TrimEnd('/')
-$resolvedOutput = [System.IO.Path]::GetFullPath($OutputDirectory)
+$resolvedOutput = [System.IO.Path]::GetFullPath($WhisperOutputDirectory)
 New-Item -ItemType Directory -Force -Path $resolvedOutput | Out-Null
 
 foreach ($file in $manifest.files) {
     $outputPath = Join-Path $resolvedOutput $file.fileName
     $temporaryPath = "$outputPath.download"
-
     $isValid = $false
+
     if (Test-Path -LiteralPath $outputPath -PathType Leaf) {
         $existing = Get-Item -LiteralPath $outputPath
         if ($existing.Length -eq [long]$file.size) {
@@ -32,7 +37,7 @@ foreach ($file in $manifest.files) {
     }
 
     if ($isValid) {
-        Write-Host "Verified existing file: $($file.fileName)"
+        Write-Host "Verified existing Whisper model: $($file.fileName)"
         continue
     }
 
@@ -70,4 +75,5 @@ if (-not ([System.IO.Path]::GetFullPath($manifestPath)).Equals(
     [StringComparison]::OrdinalIgnoreCase)) {
     Copy-Item -LiteralPath $manifestPath -Destination $deployedManifestPath -Force
 }
-Write-Host "Model bundle ready: $resolvedOutput"
+Write-Host "Whisper model ready: $resolvedOutput"
+Write-Host "Translation model ready: $([System.IO.Path]::GetFullPath($TranslationOutputDirectory))"
