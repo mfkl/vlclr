@@ -27,6 +27,14 @@
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationService.cs" Link="TranslationService.cs" />
     <Compile Include="..\..\samples\SubtitleTranslator\TranslationTextNormalizer.cs" Link="TranslationTextNormalizer.cs" />
     <Compile Include="..\..\samples\LiveAudioTranslator\StreamingAudioSegmenter.cs" Link="StreamingAudioSegmenter.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\TimedCue.cs" Link="LiveAudioTranslator\TimedCue.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\TimedCueFile.cs" Link="LiveAudioTranslator\TimedCueFile.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\PlaybackClockMapper.cs" Link="LiveAudioTranslator\PlaybackClockMapper.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\CueScheduler.cs" Link="LiveAudioTranslator\CueScheduler.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\LeadPolicy.cs" Link="LiveAudioTranslator\LeadPolicy.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\TranscriptStitcher.cs" Link="LiveAudioTranslator\TranscriptStitcher.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator\LatestWorkQueue.cs" Link="LiveAudioTranslator\LatestWorkQueue.cs" />
+    <Compile Include="..\..\samples\LiveAudioTranslator.Prepare\WaveReader.cs" Link="LiveAudioTranslator\WaveReader.cs" />
   </ItemGroup>
 
 </Project>

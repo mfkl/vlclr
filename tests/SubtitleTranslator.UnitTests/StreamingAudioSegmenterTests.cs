@@ -66,6 +66,60 @@ public sealed class StreamingAudioSegmenterTests
         Assert.Empty(utterances);
     }
 
+    [Fact]
+    public void TimedSegmentsPreservePtsAcrossResamplingBoundaries()
+    {
+        var segments = new List<TimedAudioSegment>();
+        var segmenter = new StreamingAudioSegmenter(0.05f, 200, 2_500, segments.Add);
+        float[] first = InterleavedFloat(24_000, 2, 0.2f);
+        float[] second = InterleavedFloat(14_400, 2, 0f);
+
+        segmenter.PushFloat32(first, 48_000, 2, 5_000_000, 500_000);
+        segmenter.PushFloat32(second, 48_000, 2, 5_500_000, 300_000);
+
+        TimedAudioSegment segment = Assert.Single(segments);
+        Assert.InRange(segment.StartMediaTicks, 4_999_999, 5_000_001);
+        Assert.InRange(segment.EndMediaTicks, 5_499_999, 5_500_064);
+        Assert.False(segment.ForcedSplit);
+    }
+
+    [Fact]
+    public void ForcedSplitCarriesAtMostQuarterSecondOverlap()
+    {
+        var segments = new List<TimedAudioSegment>();
+        var segmenter = new StreamingAudioSegmenter(0.05f, 400, 1_000, segments.Add);
+        float[] speech = InterleavedFloat(32_000, 1, 0.2f);
+
+        segmenter.PushFloat32(speech, 16_000, 1, 2_000_000, 2_000_000);
+
+        Assert.True(segments.Count >= 2);
+        Assert.All(segments.Take(2), segment => Assert.True(segment.ForcedSplit));
+        long overlap = segments[0].EndMediaTicks - segments[1].StartMediaTicks;
+        Assert.InRange(overlap, 0, 250_001);
+    }
+
+    [Fact]
+    public void FractionalResamplingAcrossBlocksKeepsMonotonicMediaTime()
+    {
+        var segments = new List<TimedAudioSegment>();
+        var segmenter = new StreamingAudioSegmenter(0.05f, 200, 2_500, segments.Add);
+        for (int block = 0; block < 10; block++)
+        {
+            long start = 8_000_000 + block * 100_000L;
+            segmenter.PushFloat32(
+                InterleavedFloat(4_410, 1, 0.2f),
+                44_100,
+                1,
+                start,
+                100_000);
+        }
+        segmenter.PushFloat32(new float[13_230], 44_100, 1, 9_000_000, 300_000);
+
+        TimedAudioSegment segment = Assert.Single(segments);
+        Assert.InRange(segment.StartMediaTicks, 7_999_999, 8_000_001);
+        Assert.InRange(segment.EndMediaTicks, 8_999_900, 9_000_100);
+    }
+
     private static float[] InterleavedFloat(int frames, int channels, float value) =>
         Enumerable.Repeat(value, frames * channels).ToArray();
 }
