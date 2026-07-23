@@ -10,6 +10,10 @@ public static partial class VLCCore
 {
     private const string LibraryName = "libvlccore";
 
+    /// <summary>Returns VLC's monotonic system clock in microseconds.</summary>
+    [LibraryImport(LibraryName, EntryPoint = "vlc_tick_now")]
+    public static partial long TickNow();
+
     #region Logging
 
     /// <summary>
