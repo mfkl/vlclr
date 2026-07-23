@@ -29,9 +29,9 @@ var vlcArguments = new List<string>
     "--play-and-exit",
     "--aout=dummy",
     "--vout=dummy",
+    "--live-translator-mode=live",
     "--audio-filter=dotnet_audio_translator",
     "--sub-source=dotnet_live_subtitles",
-    "--no-hw-dec",
     "--no-video-title-show",
     "-vvv"
 };
@@ -72,6 +72,7 @@ string[] pipelineLines = output
 bool audioOpenSeen = Contains("Audio capture opened");
 bool subtitleOpenSeen = Contains("Live subtitle source opened");
 bool readySeen = Contains("event=ready");
+bool clockSeen = Contains("event=clock_anchor") && Contains("generation=");
 bool translationSeen = Contains("event=translated");
 bool renderedSeen = Contains("event=subtitle outcome=rendered");
 string[] failures = pipelineLines
@@ -87,12 +88,14 @@ bool passed =
     audioOpenSeen &&
     subtitleOpenSeen &&
     readySeen &&
+    clockSeen &&
     translationSeen &&
     renderedSeen;
 
 Console.WriteLine($"Audio filter opened: {audioOpenSeen}");
 Console.WriteLine($"Subtitle source opened: {subtitleOpenSeen}");
 Console.WriteLine($"Models ready: {readySeen}");
+Console.WriteLine($"PTS/generation metric seen: {clockSeen}");
 Console.WriteLine($"Translation queued: {translationSeen}");
 Console.WriteLine($"Subtitle rendered: {renderedSeen}");
 Console.WriteLine($"Playback error: {playbackError}");
