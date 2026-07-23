@@ -38,6 +38,16 @@ public static unsafe class PluginEntry
             .WithScore(100)
             .WithNoUnload()
             .WithSubcategory(VLCConfigSubcategory.SUBCAT_AUDIO_AFILTER)
+            .AddStringConfig(
+                "live-translator-mode",
+                "sync",
+                "Translation mode",
+                "sync reads prepared media-timed cues; live provides bounded-latency immediate captions")
+            .AddFileConfig(
+                "live-translator-cue-file",
+                null,
+                "Prepared timed-cue file",
+                "Versioned JSONL timeline produced by LiveAudioTranslator.Prepare")
             .AddFileConfig(
                 "live-translator-whisper-model",
                 null,
@@ -55,12 +65,15 @@ public static unsafe class PluginEntry
                 "Directory containing the validated OPUS-MT ONNX model bundle")
             .AddStringConfig("live-translator-source-language", "auto", "Spoken language", "auto or an ISO language code")
             .AddStringConfig("live-translator-target-language", "fr", "Subtitle language", "Target OPUS-MT language code")
-            .AddIntegerConfig("live-translator-whisper-threads", 4, 1, 16, "Whisper threads")
-            .AddIntegerConfig("live-translator-translation-threads", 4, 1, 16, "Translation threads")
+            .AddIntegerConfig("live-translator-whisper-threads", 2, 1, 8, "Whisper threads")
+            .AddIntegerConfig("live-translator-translation-threads", 1, 1, 8, "Translation threads")
             .AddFloatConfig("live-translator-vad-threshold", 0.012, 0.001, 0.25, "Speech energy threshold")
-            .AddIntegerConfig("live-translator-silence-ms", 650, 200, 3_000, "Silence ending an utterance")
-            .AddIntegerConfig("live-translator-max-utterance-ms", 6_000, 1_000, 20_000, "Maximum speech chunk")
-            .AddIntegerConfig("live-translator-subtitle-duration-ms", 3_500, 500, 10_000, "Minimum subtitle duration")
+            .AddIntegerConfig("live-translator-silence-ms", 400, 200, 1_000, "Silence ending an utterance")
+            .AddIntegerConfig("live-translator-max-utterance-ms", 2_500, 1_000, 4_000, "Maximum speech chunk")
+            .AddIntegerConfig("live-translator-subtitle-duration-ms", 2_500, 500, 5_000, "Live subtitle duration")
+            .AddIntegerConfig("live-translator-maximum-age-ms", 3_500, 500, 10_000, "Maximum live caption age")
+            .AddIntegerConfig("live-translator-early-tolerance-ms", 80, 0, 500, "Synchronized cue early tolerance")
+            .AddIntegerConfig("live-translator-stale-clock-ms", 2_000, 250, 10_000, "Maximum audio clock age")
             .WithOpenCallback(&OpenAudio, "OpenAudio")
             .Register();
         if (result != 0)
@@ -139,10 +152,9 @@ public static unsafe class PluginEntry
                 return blockPtr;
 
             var block = (VLCBlock*)blockPtr;
-            if ((block->Flags & VLCBlockFlags.Discontinuity) != 0)
-                instance.Hub.ResetAudio();
-            if ((block->Flags & VLCBlockFlags.Corrupted) == 0 && block->Buffer != 0)
-                instance.Push(block);
+            bool discontinuity = (block->Flags & VLCBlockFlags.Discontinuity) != 0;
+            if ((block->Flags & VLCBlockFlags.Corrupted) == 0)
+                instance.Push(block, discontinuity);
             instance.DrainStatus();
         }
         catch
@@ -205,8 +217,12 @@ public static unsafe class PluginEntry
             if (instance == null)
                 return 0;
             instance.DrainStatus();
-            if (!instance.Hub.TryTakeCue(out TranslatedCue cue))
+            if (!instance.Hub.TryTakeCue(date, out TranslatedCue cue))
+            {
+                instance.DrainStatus();
                 return 0;
+            }
+            instance.DrainStatus();
 
             nint subpicture = CreateTextSubpicture(filterPtr, date, cue);
             if (subpicture != 0)
@@ -269,7 +285,7 @@ public static unsafe class PluginEntry
 
         subpicture->Start = date;
         subpicture->Stop = date + cue.DurationMilliseconds * VLCTick.Millisecond;
-        subpicture->IsEphemer = 1;
+        subpicture->IsEphemer = 0;
         // A sub-source is called with VLC's system clock, just like the native
         // marquee source. Marking this as an input-timestamped subtitle mixes
         // clock domains and can trip VLC's debug-build subpicture assertions.
@@ -337,19 +353,44 @@ internal sealed unsafe class AudioFilterInstance(
 {
     public LiveTranslationHub Hub => lease.Hub;
 
-    public void Push(VLCBlock* block)
+    public void Push(VLCBlock* block, bool discontinuity)
     {
+        if (block->PresentationTimestamp == VLCTick.Invalid)
+        {
+            if (discontinuity)
+                Hub.ResetAudio();
+            return;
+        }
+
+        long blockDuration = block->Length > 0
+            ? block->Length
+            : block->SampleCount * VLCTick.Second / Math.Max(1, format.Rate);
+        long systemTick = VLCCore.TickNow();
+        Hub.ObserveAudio(block->PresentationTimestamp, blockDuration, systemTick, discontinuity);
+        if (Hub.Mode != LiveAudioTranslationMode.Live || block->Buffer == 0)
+            return;
+
         int channels = format.Channels;
         nuint requestedSamples = (nuint)block->SampleCount * (nuint)channels;
         if (format.Format == VLCFourCC.F32L)
         {
             int available = checked((int)Math.Min(block->BufferLength / sizeof(float), requestedSamples));
-            Hub.PushFloat32(new ReadOnlySpan<float>((void*)block->Buffer, available), (int)format.Rate, channels);
+            Hub.PushFloat32(
+                new ReadOnlySpan<float>((void*)block->Buffer, available),
+                (int)format.Rate,
+                channels,
+                block->PresentationTimestamp,
+                blockDuration);
         }
         else
         {
             int available = checked((int)Math.Min(block->BufferLength / sizeof(short), requestedSamples));
-            Hub.PushPcm16(new ReadOnlySpan<short>((void*)block->Buffer, available), (int)format.Rate, channels);
+            Hub.PushPcm16(
+                new ReadOnlySpan<short>((void*)block->Buffer, available),
+                (int)format.Rate,
+                channels,
+                block->PresentationTimestamp,
+                blockDuration);
         }
     }
 
@@ -379,7 +420,10 @@ internal sealed class SubSourceInstance(
     }
 
     public void ReportRendered(TranslatedCue cue) =>
-        logger.Info($"[LiveAudioTranslator] event=subtitle outcome=rendered duration_ms={cue.DurationMilliseconds}");
+        logger.Info(
+            $"[LiveAudioTranslator] event=subtitle outcome=rendered sequence={cue.Sequence} " +
+            $"duration_ms={cue.DurationMilliseconds} scheduling_error_ms={cue.SchedulingErrorTicks / 1000d:F1} " +
+            $"generation={cue.Generation}");
 
     public void Dispose()
     {
