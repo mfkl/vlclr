@@ -2,23 +2,41 @@
 set -euo pipefail
 
 mode=live-immediate
-case ${1:-} in
-    --prepared)
-        mode=prepared
-        shift
-        ;;
-    --live-immediate|--live)
-        mode=live-immediate
-        shift
-        ;;
-    --live-sync)
-        mode=live-sync
-        shift
+speech_device=cpu
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --prepared)
+            mode=prepared
+            shift
+            ;;
+        --live-immediate|--live)
+            mode=live-immediate
+            shift
+            ;;
+        --speech-device)
+            if [[ $# -lt 2 ]]; then
+                echo "Missing value for --speech-device (cpu, gpu, or auto)." >&2
+                exit 1
+            fi
+            speech_device=$2
+            shift 2
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+case $speech_device in
+    cpu|gpu|auto) ;;
+    *)
+        echo "Unknown speech device: $speech_device (use cpu, gpu, or auto)." >&2
+        exit 1
         ;;
 esac
 
 if [[ $# -lt 1 ]]; then
-    echo "Usage: samples/LiveAudioTranslator/run.sh [--prepared|--live-immediate|--live-sync] <media> [extra VLC options...]" >&2
+    echo "Usage: samples/LiveAudioTranslator/run.sh [--prepared|--live-immediate] [--speech-device cpu|gpu|auto] <media> [extra VLC options...]" >&2
     exit 1
 fi
 
@@ -53,6 +71,7 @@ runner_args=(
     --vlc-root "$(cygpath -aw "$vlc_dir")"
     --worker "$(cygpath -aw "$worker")"
     --catalog "$(cygpath -aw "$catalog")"
+    --speech-device "$speech_device"
     "$media"
 )
 if [[ $# -gt 0 ]]; then

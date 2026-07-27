@@ -7,6 +7,7 @@ internal sealed record WorkerCommandLine
     public required string CatalogPath { get; init; }
     public bool Benchmark { get; init; }
     public string BenchmarkOutputPath { get; init; } = "";
+    public string SpeechDeviceId { get; init; } = "cpu";
     public int FakeReadyDelayMilliseconds { get; init; }
 
     public static WorkerCommandLine Parse(string[] args)
@@ -38,7 +39,9 @@ internal sealed record WorkerCommandLine
                 CatalogPath = Path.GetFullPath(catalog),
                 Benchmark = true,
                 BenchmarkOutputPath = Path.GetFullPath(
-                    values.GetValueOrDefault("output", "provider-benchmark.json"))
+                    values.GetValueOrDefault("output", "provider-benchmark.json")),
+                SpeechDeviceId = ParseSpeechDevice(
+                    values.GetValueOrDefault("speech-device", "cpu"))
             };
         }
 
@@ -78,6 +81,15 @@ internal sealed record WorkerCommandLine
                 $"{argument} must be between {minimum} and {maximum} milliseconds.");
         }
         return parsed;
+    }
+
+    private static string ParseSpeechDevice(string value)
+    {
+        string normalized = value.Trim().ToLowerInvariant();
+        return normalized is "cpu" or "gpu" or "auto"
+            ? normalized
+            : throw new ArgumentException(
+                "--speech-device must be cpu, gpu, or auto.");
     }
 
     private static bool IsSafeIdentifier(string value) =>

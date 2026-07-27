@@ -36,7 +36,15 @@ internal static class PackagedProviders
 
 internal sealed class PackagedInferenceProviderFactory : IInferenceProviderFactory
 {
-    public PackagedInferenceProviderFactory(string providerId) => ProviderId = providerId;
+    private readonly IReadOnlyDictionary<string, string> _settings;
+
+    public PackagedInferenceProviderFactory(
+        string providerId,
+        IReadOnlyDictionary<string, string>? settings = null)
+    {
+        ProviderId = providerId;
+        _settings = settings ?? new Dictionary<string, string>(StringComparer.Ordinal);
+    }
 
     public string ProviderId { get; }
     public string RuntimeVersion =>
@@ -57,7 +65,7 @@ internal sealed class PackagedInferenceProviderFactory : IInferenceProviderFacto
             ProviderId,
             RuntimeVersion,
             AppContext.BaseDirectory,
-            new Dictionary<string, string>(StringComparer.Ordinal));
+            _settings);
     }
 }
 
@@ -103,13 +111,26 @@ internal sealed class WhisperSpeechRecognizerFactory : ISpeechRecognizerFactory
                 Path.GetExtension(asset.FileName),
                 ".xml",
                 StringComparison.OrdinalIgnoreCase)).FullPath;
-        builder = builder.WithOpenVinoEncoder(encoderManifest, "GPU", null);
+        string openVinoDevice = provider.Settings.TryGetValue("device", out string? requestedDevice)
+            ? NormalizeOpenVinoDevice(requestedDevice)
+            : "CPU";
+        builder = builder.WithOpenVinoEncoder(encoderManifest, openVinoDevice, null);
 #endif
         builder = string.Equals(sourceLanguage, "auto", StringComparison.Ordinal)
             ? builder.WithLanguageDetection()
             : builder.WithLanguage(sourceLanguage);
         return new WhisperSpeechRecognizer(factory, builder.Build());
     }
+
+    internal static string NormalizeOpenVinoDevice(string value) =>
+        value.ToLowerInvariant() switch
+        {
+            "cpu" => "CPU",
+            "gpu" => "GPU",
+            "auto" => "AUTO",
+            _ => throw new InvalidOperationException(
+                $"Unsupported OpenVINO speech device '{value}'.")
+        };
 }
 
 internal sealed class WhisperSpeechRecognizer(

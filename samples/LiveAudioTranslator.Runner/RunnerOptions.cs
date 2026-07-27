@@ -3,8 +3,7 @@ namespace LiveAudioTranslator.Runner;
 internal enum RunnerMode
 {
     Prepared,
-    LiveImmediate,
-    LiveSync
+    LiveImmediate
 }
 
 internal sealed record RunnerOptions
@@ -18,6 +17,7 @@ internal sealed record RunnerOptions
     public required string SpeechModelId { get; init; }
     public required string TranslationModelId { get; init; }
     public required string SpeechProviderId { get; init; }
+    public required string SpeechDeviceId { get; init; }
     public required string TranslationProviderId { get; init; }
     public required string SourceLanguage { get; init; }
     public required string TargetLanguage { get; init; }
@@ -89,7 +89,6 @@ internal sealed record RunnerOptions
             {
                 "prepared" => RunnerMode.Prepared,
                 "live-immediate" => RunnerMode.LiveImmediate,
-                "live-sync" => RunnerMode.LiveSync,
                 _ => throw new ArgumentException($"Unknown mode '{mode}'.")
             },
             Media = NormalizeMedia(media),
@@ -105,6 +104,8 @@ internal sealed record RunnerOptions
                 values.GetValueOrDefault("translation-model", "opus-mt-en-fr")),
             SpeechProviderId = NormalizeIdentifier(
                 values.GetValueOrDefault("speech-provider", "auto")),
+            SpeechDeviceId = NormalizeSpeechDevice(
+                values.GetValueOrDefault("speech-device", "cpu")),
             TranslationProviderId = NormalizeIdentifier(
                 values.GetValueOrDefault("translation-provider", "auto")),
             SourceLanguage = NormalizeIdentifier(values.GetValueOrDefault("source-language", "auto")),
@@ -160,6 +161,15 @@ internal sealed record RunnerOptions
             throw new ArgumentException($"Invalid identifier '{value}'.");
         }
         return normalized;
+    }
+
+    private static string NormalizeSpeechDevice(string value)
+    {
+        string normalized = NormalizeIdentifier(value);
+        return normalized is "cpu" or "gpu" or "auto"
+            ? normalized
+            : throw new ArgumentException(
+                $"Unknown speech device '{value}'. Use cpu, gpu, or auto.");
     }
 
     private static string FindRepositoryRoot(string start)

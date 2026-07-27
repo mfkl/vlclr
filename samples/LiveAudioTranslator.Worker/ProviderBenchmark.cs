@@ -16,6 +16,7 @@ internal static class ProviderBenchmark
             SpeechModelId = "whisper-tiny-multilingual",
             TranslationModelId = "opus-mt-en-fr",
             SpeechProviderId = PackagedProviders.Speech,
+            SpeechDeviceId = command.SpeechDeviceId,
             TranslationProviderId = PackagedProviders.Translation,
             SourceLanguage = "auto",
             TargetLanguage = "fr",
@@ -49,7 +50,8 @@ internal static class ProviderBenchmark
             HashFile(speechProfile.ManifestPath),
             HashFile(translationProfile.ManifestPath));
         string tuning =
-            $"{PackagedProviders.Speech}|{PackagedProviders.Translation}|2|1|" +
+            $"{PackagedProviders.Speech}|{command.SpeechDeviceId}|" +
+            $"{PackagedProviders.Translation}|2|1|" +
             $"Whisper.net-1.9.1|{PackagedProviders.TranslationRuntimeVersion}";
         string key = Convert.ToHexString(
             SHA256.HashData(
@@ -67,7 +69,12 @@ internal static class ProviderBenchmark
                 onnxRuntime = PackagedProviders.TranslationRuntimeVersion
             },
             modelManifestHashes = modelHashes,
-            tuning = new { speechThreads = 2, translationThreads = 1 },
+            tuning = new
+            {
+                speechThreads = 2,
+                speechDevice = command.SpeechDeviceId,
+                translationThreads = 1
+            },
             initializationAndWarmupMilliseconds = timer.ElapsedMilliseconds,
             totalRealTimeFactor = 0d,
             qualityAccepted = false,

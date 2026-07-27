@@ -78,6 +78,7 @@ internal sealed class WorkerSession : IAsyncDisposable
                 SpeechModelId = "whisper-tiny-multilingual",
                 TranslationModelId = "opus-mt-en-fr",
                 SpeechProviderId = "auto",
+                SpeechDeviceId = "cpu",
                 TranslationProviderId = "auto",
                 SourceLanguage = "auto",
                 TargetLanguage = "fr",

@@ -116,7 +116,12 @@ internal sealed class WorkerPipeline : IAsyncDisposable
             configuration,
             speechProvider,
             translationProvider);
-        var speechProviderFactory = new PackagedInferenceProviderFactory(speechProvider);
+        var speechProviderFactory = new PackagedInferenceProviderFactory(
+            speechProvider,
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["device"] = configuration.SpeechDeviceId
+            });
         InferenceProviderSelection speechSelection =
             speechProviderFactory.CreateSelection(speechProfile.Profile);
         var speechFactory = new WhisperSpeechRecognizerFactory();
