@@ -1,0 +1,129 @@
+name: Live audio translator
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "samples/LiveAudioTranslator/**"
+      - "samples/LiveAudioTranslator.ModelSetup/**"
+      - "samples/LiveAudioTranslator.Prepare/**"
+      - "samples/LiveAudioTranslator.Runner/**"
+      - "samples/LiveAudioTranslator.Worker/**"
+      - "samples/SubtitleTranslator/**"
+      - "src/VLCLR/**"
+      - "src/VLCLR.LiveTranslation/**"
+      - "tests/LiveAudioTranslator.ProtocolTests/**"
+      - "tests/LiveAudioTranslator.VisualTest/**"
+      - "tests/LiveAudioTranslatorIntegrationTest/**"
+      - "tests/SubtitleTranslator.UnitTests/**"
+      - "tests/LiveAudioTranslatorNativeAotSmoke.ps1"
+      - "tests/fixtures/create-live-sync-speech.ps1"
+      - "benchmarks/LiveAudioTranslator.Benchmarks/**"
+      - ".github/workflows/live-audio-translator.yml"
+      - "vlclr.sln"
+  pull_request:
+    paths:
+      - "samples/LiveAudioTranslator/**"
+      - "samples/LiveAudioTranslator.ModelSetup/**"
+      - "samples/LiveAudioTranslator.Prepare/**"
+      - "samples/LiveAudioTranslator.Runner/**"
+      - "samples/LiveAudioTranslator.Worker/**"
+      - "samples/SubtitleTranslator/**"
+      - "src/VLCLR/**"
+      - "src/VLCLR.LiveTranslation/**"
+      - "tests/LiveAudioTranslator.ProtocolTests/**"
+      - "tests/LiveAudioTranslator.VisualTest/**"
+      - "tests/LiveAudioTranslatorIntegrationTest/**"
+      - "tests/SubtitleTranslator.UnitTests/**"
+      - "tests/LiveAudioTranslatorNativeAotSmoke.ps1"
+      - "tests/fixtures/create-live-sync-speech.ps1"
+      - "benchmarks/LiveAudioTranslator.Benchmarks/**"
+      - ".github/workflows/live-audio-translator.yml"
+      - "vlclr.sln"
+  workflow_dispatch:
+
+env:
+  VLC_ARCHIVE_URL: https://artifacts.videolan.org/vlc/nightly-win64/20260726-0427/vlc-4.0.0-dev-win64-41e95b96.zip
+  VLC_ARCHIVE_SHA512: a4f4389a1ea48b1889adf1987820d9d13c671cede3aedd1caaa01220ec5f6548b29f7c02acfd1c5ede8fa29cd6e05d67a057f5575a819a32f6387a7261547db5
+
+jobs:
+  build-test-and-integrate:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore vlclr.sln
+
+      - name: Build solution
+        run: dotnet build vlclr.sln -c Release --no-restore
+
+      - name: Live protocol and lifecycle tests
+        run: >-
+          dotnet test tests/LiveAudioTranslator.ProtocolTests
+          -c Release --no-build --no-restore
+
+      - name: Shared translation unit tests
+        run: >-
+          dotnet test tests/SubtitleTranslator.UnitTests
+          -c Release --no-build --no-restore
+
+      - name: Publish Native AOT plugin
+        run: >-
+          dotnet publish samples/LiveAudioTranslator
+          -c Release -r win-x64 --no-restore
+
+      - name: Validate Native AOT exports
+        shell: pwsh
+        run: pwsh tests/LiveAudioTranslatorNativeAotSmoke.ps1
+
+      - name: Download verified VLC 4 nightly
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP "vlc-nightly.zip"
+          Invoke-WebRequest -Uri $env:VLC_ARCHIVE_URL -OutFile $archive
+          $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA512).Hash
+          if (-not $actual.Equals($env:VLC_ARCHIVE_SHA512, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "VLC archive checksum mismatch."
+          }
+          $destination = Join-Path $PWD "vlc-binaries"
+          Expand-Archive -LiteralPath $archive -DestinationPath $destination
+
+      - name: Create deterministic speech fixture
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg -y --no-progress
+          }
+          pwsh tests/fixtures/create-live-sync-speech.ps1
+
+      - name: Deploy plugin and regenerate cache
+        shell: pwsh
+        run: |
+          $vlc = Join-Path $PWD "vlc-binaries/vlc-4.0.0-dev"
+          $plugin = Join-Path $PWD "samples/LiveAudioTranslator/bin/Release/net10.0/win-x64/publish/libdotnet_live_audio_translator_plugin.dll"
+          Copy-Item -LiteralPath $plugin -Destination (Join-Path $vlc "plugins/audio_filter") -Force
+          & (Join-Path $vlc "vlc-cache-gen.exe") (Join-Path $vlc "plugins")
+          if ($LASTEXITCODE -ne 0) {
+            throw "vlc-cache-gen failed with exit code $LASTEXITCODE."
+          }
+
+      - name: VLC lifecycle integration
+        run: >-
+          dotnet run --project tests/LiveAudioTranslatorIntegrationTest
+          -c Release --no-build --
+          vlc-binaries/vlc-4.0.0-dev
+          tests/fixtures/live-sync-speech.mp4
+          12
+
+      - name: Upload Native AOT plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-audio-translator-win-x64
+          path: samples/LiveAudioTranslator/bin/Release/net10.0/win-x64/publish/libdotnet_live_audio_translator_plugin.dll
