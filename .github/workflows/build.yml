@@ -154,7 +154,13 @@ jobs:
 
       - name: Run filter integration test
         run: |
-          dotnet run --project tests/IntegrationTest -- vlc-sdk "https://archive.org/download/BigBuckBunny_328/BigBuckBunny.avi" 10
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg -y --no-progress
+          }
+          $fixture = Join-Path $PWD "tests/fixtures/filter-integration.mp4"
+          pwsh tests/fixtures/create-live-sync-speech.ps1 -OutputPath $fixture
+          $fixtureUri = [Uri]::new($fixture).AbsoluteUri
+          dotnet run --project tests/IntegrationTest -- vlc-sdk $fixtureUri 10
 
       - name: Upload plugins
         uses: actions/upload-artifact@v4
