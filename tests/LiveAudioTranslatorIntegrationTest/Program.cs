@@ -4,102 +4,169 @@ if (args.Length < 2)
 {
     Console.Error.WriteLine(
         "Usage: LiveAudioTranslatorIntegrationTest <vlc-path> <video-url> [timeout-seconds] " +
-        "[whisper-model-path] [translation-model-directory]");
+        "[worker-path] [catalog-path]");
     return 1;
 }
 
+string repositoryRoot = FindRepositoryRoot();
+string configuration = AppContext.BaseDirectory.Contains(
+    $"{Path.DirectorySeparatorChar}Release{Path.DirectorySeparatorChar}",
+    StringComparison.OrdinalIgnoreCase)
+    ? "Release"
+    : "Debug";
 string vlcRoot = Path.GetFullPath(args[0]);
-string vlcExecutable = Path.Combine(vlcRoot, "vlc.exe");
-string videoUri = ToMediaUri(args[1]).AbsoluteUri;
+string media = args[1];
 int timeoutSeconds = args.Length > 2 ? int.Parse(args[2]) : 45;
-string? whisperModelPath = args.Length > 3 ? Path.GetFullPath(args[3]) : null;
-string? translationModelPath = args.Length > 4 ? Path.GetFullPath(args[4]) : null;
-string gitBash = FindGitBash();
-
-if (!File.Exists(vlcExecutable))
+string workerPath = args.Length > 3
+    ? Path.GetFullPath(args[3])
+    : Path.Combine(
+        repositoryRoot,
+        "samples",
+        "LiveAudioTranslator.Worker",
+        "bin",
+        configuration,
+        "net10.0",
+        "win-x64",
+        "LiveAudioTranslator.Worker.exe");
+string catalogPath = args.Length > 4
+    ? Path.GetFullPath(args[4])
+    : Path.Combine(
+        repositoryRoot,
+        "samples",
+        "LiveAudioTranslator.Worker",
+        "bin",
+        configuration,
+        "net10.0",
+        "win-x64",
+        "models",
+        "model-profiles.json");
+string runnerPath = Path.Combine(
+    repositoryRoot,
+    "samples",
+    "LiveAudioTranslator.Runner",
+    "bin",
+    configuration,
+    "net10.0",
+    "win-x64",
+    "LiveAudioTranslator.Runner.exe");
+foreach (string required in new[]
+         {
+             Path.Combine(vlcRoot, "vlc.exe"),
+             runnerPath,
+             workerPath,
+             catalogPath
+         })
 {
-    Console.Error.WriteLine($"VLC executable not found: {vlcExecutable}");
-    return 2;
+    if (!File.Exists(required))
+    {
+        Console.Error.WriteLine($"Required integration-test file not found: {required}");
+        return 2;
+    }
 }
 
-var vlcArguments = new List<string>
-{
-    ToGitBashPath(vlcExecutable),
-    "-I", "dummy",
-    "--play-and-exit",
-    "--aout=dummy",
-    "--vout=dummy",
-    "--live-translator-mode=live",
-    "--audio-filter=dotnet_audio_translator",
-    "--sub-source=dotnet_live_subtitles",
-    "--no-video-title-show",
-    "-vvv"
-};
-if (whisperModelPath != null)
-    vlcArguments.Add($"--live-translator-whisper-model={whisperModelPath}");
-if (translationModelPath != null)
-    vlcArguments.Add($"--live-translator-translation-model={translationModelPath}");
-vlcArguments.Add(videoUri);
-
-string command = $"timeout {timeoutSeconds}s " + string.Join(' ', vlcArguments.Select(ShellQuote));
-var startInfo = new ProcessStartInfo(gitBash)
+var start = new ProcessStartInfo(runnerPath)
 {
     RedirectStandardOutput = true,
     RedirectStandardError = true,
     UseShellExecute = false,
     CreateNoWindow = true
 };
-startInfo.ArgumentList.Add("-lc");
-startInfo.ArgumentList.Add(command);
-
-using var process = Process.Start(startInfo);
-if (process == null)
+foreach (string argument in new[]
+         {
+             "--mode", "live-immediate",
+             "--fake",
+             "--fake-ready-delay-ms", "8000",
+             "--vlc-root", vlcRoot,
+             "--worker", workerPath,
+             "--cpu-worker", workerPath,
+             "--catalog", catalogPath,
+             media,
+             "--",
+             "-I", "dummy",
+             "--play-and-exit",
+             $"--stop-time={timeoutSeconds}",
+             "--aout=dummy",
+             "--vout=dummy",
+             "-vvv"
+         })
 {
-    Console.Error.WriteLine("Could not start Git Bash.");
+    start.ArgumentList.Add(argument);
+}
+
+using Process process = Process.Start(start)
+    ?? throw new InvalidOperationException("Could not start live translator runner.");
+Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
+Task<string> standardError = process.StandardError.ReadToEndAsync();
+using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds + 30));
+try
+{
+    await process.WaitForExitAsync(timeout.Token);
+}
+catch (OperationCanceledException)
+{
+    if (!process.HasExited)
+        process.Kill(entireProcessTree: true);
+    Console.Error.WriteLine("Integration test timed out.");
     return 3;
 }
 
-Task<string> standardOutput = process.StandardOutput.ReadToEndAsync();
-Task<string> standardError = process.StandardError.ReadToEndAsync();
-await process.WaitForExitAsync();
 string output = (await standardOutput) + Environment.NewLine + (await standardError);
 string[] pipelineLines = output
     .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-    .Where(line => line.Contains("[LiveAudioTranslator]", StringComparison.Ordinal))
+    .Where(line =>
+        line.Contains("[LiveAudioTranslator]", StringComparison.Ordinal) ||
+        line.Contains("event=worker_", StringComparison.Ordinal) ||
+        line.Contains("event=runner", StringComparison.Ordinal))
     .Distinct(StringComparer.Ordinal)
     .ToArray();
 
 bool audioOpenSeen = Contains("Audio capture opened");
 bool subtitleOpenSeen = Contains("Live subtitle source opened");
-bool readySeen = Contains("event=ready");
-bool clockSeen = Contains("event=clock_anchor") && Contains("generation=");
+bool readySeen = Contains("event=worker_ready");
+bool vlcStartedSeen = Contains("event=runner stage=vlc-started");
+bool transportSeen = Contains("event=transport outcome=ready");
+bool warmupDiscardSeen =
+    pipelineLines.Any(line =>
+        line.Contains("event=audio_gate outcome=ready", StringComparison.Ordinal) &&
+        !line.Contains("discarded_blocks=0 ", StringComparison.Ordinal));
+bool firstAcceptedSeen = Contains("event=audio_accept outcome=first");
 bool translationSeen = Contains("event=translated");
 bool renderedSeen = Contains("event=subtitle outcome=rendered");
-string[] failures = pipelineLines
-    .Where(line => line.Contains("event=failed", StringComparison.Ordinal))
-    .ToArray();
-bool playbackError =
-    output.Contains("cannot open input", StringComparison.OrdinalIgnoreCase) ||
-    output.Contains("Your input can't be opened", StringComparison.OrdinalIgnoreCase);
-
+bool cleanStop = Contains("event=runner outcome=stopped") && process.ExitCode == 0;
+bool failure = output.Contains("outcome=failed", StringComparison.Ordinal);
+int vlcStartedIndex = FindIndex("event=runner stage=vlc-started");
+int audioOpenIndex = FindIndex("Audio capture opened");
+int readyIndex = FindIndex("event=worker_ready");
+bool playbackBeforeReady =
+    vlcStartedIndex >= 0 &&
+    audioOpenIndex >= 0 &&
+    readyIndex >= 0 &&
+    vlcStartedIndex < readyIndex &&
+    audioOpenIndex < readyIndex;
 bool passed =
-    !playbackError &&
-    failures.Length == 0 &&
+    !failure &&
     audioOpenSeen &&
     subtitleOpenSeen &&
     readySeen &&
-    clockSeen &&
+    vlcStartedSeen &&
+    playbackBeforeReady &&
+    transportSeen &&
+    warmupDiscardSeen &&
+    firstAcceptedSeen &&
     translationSeen &&
-    renderedSeen;
+    renderedSeen &&
+    cleanStop;
 
 Console.WriteLine($"Audio filter opened: {audioOpenSeen}");
 Console.WriteLine($"Subtitle source opened: {subtitleOpenSeen}");
-Console.WriteLine($"Models ready: {readySeen}");
-Console.WriteLine($"PTS/generation metric seen: {clockSeen}");
+Console.WriteLine($"VLC started before worker READY: {playbackBeforeReady}");
+Console.WriteLine($"Worker became ready: {readySeen}");
+Console.WriteLine($"Transport ready: {transportSeen}");
+Console.WriteLine($"Warm-up audio discarded: {warmupDiscardSeen}");
+Console.WriteLine($"First post-ready audio accepted: {firstAcceptedSeen}");
 Console.WriteLine($"Translation queued: {translationSeen}");
 Console.WriteLine($"Subtitle rendered: {renderedSeen}");
-Console.WriteLine($"Playback error: {playbackError}");
-Console.WriteLine($"VLC exit code: {process.ExitCode}");
+Console.WriteLine($"Clean process lifecycle: {cleanStop}");
 foreach (string line in pipelineLines)
     Console.WriteLine($"[pipeline] {line}");
 Console.WriteLine(passed ? "INTEGRATION TEST: PASSED" : "INTEGRATION TEST: FAILED");
@@ -108,36 +175,19 @@ return passed ? 0 : 1;
 bool Contains(string value) =>
     pipelineLines.Any(line => line.Contains(value, StringComparison.Ordinal));
 
-static string FindGitBash()
-{
-    string? configured = Environment.GetEnvironmentVariable("GIT_BASH_PATH");
-    string[] candidates =
-    [
-        configured ?? "",
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Git", "bin", "bash.exe"),
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Git", "usr", "bin", "bash.exe")
-    ];
-    return candidates.FirstOrDefault(File.Exists) ??
-        throw new FileNotFoundException("Git Bash not found. Set GIT_BASH_PATH to bash.exe.");
-}
+int FindIndex(string value) =>
+    Array.FindIndex(
+        pipelineLines,
+        line => line.Contains(value, StringComparison.Ordinal));
 
-static string ToGitBashPath(string path)
+static string FindRepositoryRoot()
 {
-    string fullPath = Path.GetFullPath(path).Replace('\\', '/');
-    if (fullPath.Length >= 3 && fullPath[1] == ':' && fullPath[2] == '/')
-        return $"/{char.ToLowerInvariant(fullPath[0])}/{fullPath[3..]}";
-    return fullPath;
-}
-
-static string ShellQuote(string value) => $"'{value.Replace("'", "'\\''")}'";
-
-static Uri ToMediaUri(string input)
-{
-    if (Uri.TryCreate(input, UriKind.Absolute, out Uri? uri) &&
-        uri.Scheme is "http" or "https" or "file")
+    DirectoryInfo? directory = new(AppContext.BaseDirectory);
+    while (directory != null)
     {
-        return uri;
+        if (File.Exists(Path.Combine(directory.FullName, "vlclr.sln")))
+            return directory.FullName;
+        directory = directory.Parent;
     }
-
-    return new Uri(Path.GetFullPath(input));
+    throw new DirectoryNotFoundException("Could not locate vlclr.sln.");
 }

@@ -120,6 +120,36 @@ public sealed class StreamingAudioSegmenterTests
         Assert.InRange(segment.EndMediaTicks, 8_999_900, 9_000_100);
     }
 
+    [Fact]
+    public void EnergyGuardCannotBeSuppressedByStreamingDetectorWithoutCompletedSegment()
+    {
+        var segments = new List<TimedAudioSegment>();
+        using var detector = new AlwaysSilentDetector();
+        using var segmenter = new StreamingAudioSegmenter(
+            0.05f,
+            200,
+            1_000,
+            segments.Add,
+            detector);
+
+        segmenter.PushFloat32(
+            InterleavedFloat(16_000, 1, 0.2f),
+            16_000,
+            1,
+            2_000_000,
+            1_000_000);
+
+        Assert.Single(segments);
+        Assert.True(segments[0].ForcedSplit);
+    }
+
     private static float[] InterleavedFloat(int frames, int channels, float value) =>
         Enumerable.Repeat(value, frames * channels).ToArray();
+
+    private sealed class AlwaysSilentDetector : IStreamingSpeechDetector
+    {
+        public bool IsSpeech(ReadOnlySpan<float> frame) => false;
+        public void Reset() { }
+        public void Dispose() { }
+    }
 }
