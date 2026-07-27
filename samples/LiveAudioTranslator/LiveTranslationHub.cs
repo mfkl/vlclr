@@ -134,17 +134,13 @@ internal sealed class LiveTranslationHub
             _worker.ReportNotReadyAudio(blockDuration);
             return;
         }
-        byte[] bytes = MemoryMarshal.AsBytes(samples).ToArray();
         QueueAudio(
-            new LiveAudioMessage
-            {
-                Format = LiveAudioSampleFormat.Float32LittleEndian,
-                SampleRate = sampleRate,
-                Channels = checked((ushort)channels),
-                SourcePts = mediaPts,
-                DurationTicks = blockDuration,
-                AudioBytes = bytes
-            });
+            LiveAudioSampleFormat.Float32LittleEndian,
+            sampleRate,
+            checked((ushort)channels),
+            mediaPts,
+            blockDuration,
+            MemoryMarshal.AsBytes(samples));
     }
 
     public void PushPcm16(
@@ -161,17 +157,13 @@ internal sealed class LiveTranslationHub
             _worker.ReportNotReadyAudio(blockDuration);
             return;
         }
-        byte[] bytes = MemoryMarshal.AsBytes(samples).ToArray();
         QueueAudio(
-            new LiveAudioMessage
-            {
-                Format = LiveAudioSampleFormat.Pcm16LittleEndian,
-                SampleRate = sampleRate,
-                Channels = checked((ushort)channels),
-                SourcePts = mediaPts,
-                DurationTicks = blockDuration,
-                AudioBytes = bytes
-            });
+            LiveAudioSampleFormat.Pcm16LittleEndian,
+            sampleRate,
+            checked((ushort)channels),
+            mediaPts,
+            blockDuration,
+            MemoryMarshal.AsBytes(samples));
     }
 
     public void ResetAudio()
@@ -230,10 +222,24 @@ internal sealed class LiveTranslationHub
 
     public bool TryTakeStatus(out string message) => _status.TryDequeue(out message!);
 
-    private void QueueAudio(LiveAudioMessage audio)
+    private void QueueAudio(
+        LiveAudioSampleFormat format,
+        int sampleRate,
+        ushort channels,
+        long mediaPts,
+        long blockDuration,
+        ReadOnlySpan<byte> audioBytes)
     {
         long sequence = Interlocked.Increment(ref _audioSequence) - 1;
-        _worker!.TryQueueAudio(audio, _clock.Generation, sequence);
+        _worker!.TryQueueAudio(
+            format,
+            sampleRate,
+            channels,
+            mediaPts,
+            blockDuration,
+            audioBytes,
+            _clock.Generation,
+            sequence);
     }
 
     private bool TryTakePreparedCue(

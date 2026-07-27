@@ -22,7 +22,11 @@ internal sealed class LiveWorkerClient : IDisposable
     private long _firstAcceptedAudioPts = -1;
     private int _currentGeneration;
     private long _currentControlSequence;
-    private bool _ready;
+    private int _ready;
+    private int _pendingFirstAcceptedReport;
+    private int _firstAcceptedGeneration;
+    private long _pendingDroppedOldest;
+    private long _pendingDroppedOversized;
     private int _disposed;
 
     public LiveWorkerClient(
@@ -51,60 +55,58 @@ internal sealed class LiveWorkerClient : IDisposable
     public long DiscardedNotReadyAudioTicks => Interlocked.Read(ref _discardedNotReadyAudioTicks);
     public long FirstAcceptedAudioPts => Interlocked.Read(ref _firstAcceptedAudioPts);
 
-    public bool IsReady
-    {
-        get
-        {
-            lock (_stateSync)
-                return _ready;
-        }
-    }
+    public bool IsReady => Volatile.Read(ref _ready) != 0;
 
-    public bool TryQueueAudio(LiveAudioMessage audio, int generation, long sequence)
+    public bool TryQueueAudio(
+        LiveAudioSampleFormat format,
+        int sampleRate,
+        ushort channels,
+        long sourcePts,
+        long durationTicks,
+        ReadOnlySpan<byte> audioBytes,
+        int generation,
+        long sequence)
     {
         if (Volatile.Read(ref _disposed) != 0)
             return false;
 
-        bool reportFirstAccepted = false;
-        bool accepted;
-        int dropped;
-        lock (_stateSync)
+        if (Volatile.Read(ref _ready) == 0)
         {
-            if (!_ready)
-            {
-                Interlocked.Increment(ref _discardedNotReadyAudio);
-                Interlocked.Add(ref _discardedNotReadyAudioTicks, Math.Max(0, audio.DurationTicks));
-                return false;
-            }
-
-            accepted = _audioQueue.TryEnqueue(
-                new QueuedAudioFrame(audio, generation, sequence),
-                out dropped);
-            if (accepted && Interlocked.CompareExchange(
-                    ref _firstAcceptedAudioPts,
-                    audio.SourcePts,
-                    -1) == -1)
-            {
-                reportFirstAccepted = true;
-            }
+            Interlocked.Increment(ref _discardedNotReadyAudio);
+            Interlocked.Add(ref _discardedNotReadyAudioTicks, Math.Max(0, durationTicks));
+            return false;
         }
 
+        bool accepted = _audioQueue.TryEnqueue(
+            new QueuedAudioMetadata(
+                format,
+                sampleRate,
+                channels,
+                sourcePts,
+                durationTicks,
+                generation,
+                sequence),
+            audioBytes,
+            out int dropped);
         if (dropped > 0)
         {
-            long total = Interlocked.Add(ref _droppedAudio, dropped);
-            _onStatus($"event=audio_queue outcome=drop-oldest count={dropped} dropped_audio={total}");
+            Interlocked.Add(ref _droppedAudio, dropped);
+            Interlocked.Add(ref _pendingDroppedOldest, dropped);
         }
         if (!accepted)
         {
-            long total = Interlocked.Increment(ref _droppedAudio);
-            _onStatus($"event=audio_queue outcome=drop-oversized dropped_audio={total}");
+            Interlocked.Increment(ref _droppedAudio);
+            Interlocked.Increment(ref _pendingDroppedOversized);
+            _available.Release();
             return false;
         }
-        if (reportFirstAccepted)
+        if (Interlocked.CompareExchange(
+                ref _firstAcceptedAudioPts,
+                sourcePts,
+                -1) == -1)
         {
-            _onStatus(
-                $"event=audio_accept outcome=first source_pts={audio.SourcePts} " +
-                $"generation={generation}");
+            Volatile.Write(ref _firstAcceptedGeneration, generation);
+            Volatile.Write(ref _pendingFirstAcceptedReport, 1);
         }
         _available.Release();
         return true;
@@ -126,7 +128,7 @@ internal sealed class LiveWorkerClient : IDisposable
             int cleared = _audioQueue.Clear();
             if (cleared > 0)
                 Interlocked.Add(ref _droppedAudio, cleared);
-            signal = _ready;
+            signal = Volatile.Read(ref _ready) != 0;
             if (signal)
             {
                 _controlQueue.Enqueue(
@@ -217,7 +219,7 @@ internal sealed class LiveWorkerClient : IDisposable
     {
         lock (_stateSync)
         {
-            _ready = false;
+            Volatile.Write(ref _ready, 0);
             int cleared = _audioQueue.Clear();
             if (cleared > 0)
                 Interlocked.Add(ref _droppedAudio, cleared);
@@ -250,7 +252,7 @@ internal sealed class LiveWorkerClient : IDisposable
             {
                 if (generation != _currentGeneration || sequence != _currentControlSequence)
                     continue;
-                _ready = true;
+                Volatile.Write(ref _ready, 1);
                 break;
             }
         }
@@ -267,7 +269,7 @@ internal sealed class LiveWorkerClient : IDisposable
     {
         lock (_stateSync)
         {
-            _ready = false;
+            Volatile.Write(ref _ready, 0);
             int cleared = _audioQueue.Clear();
             if (cleared > 0)
                 Interlocked.Add(ref _droppedAudio, cleared);
@@ -282,21 +284,65 @@ internal sealed class LiveWorkerClient : IDisposable
         while (true)
         {
             await _available.WaitAsync(cancellationToken).ConfigureAwait(false);
+            ReportPendingAudioStatus();
             while (_controlQueue.TryDequeue(out LiveProtocolMessage? control))
                 await LiveProtocolStream.WriteAsync(pipe, control, cancellationToken).ConfigureAwait(false);
 
-            if (_audioQueue.TryDequeue(out QueuedAudioFrame frame))
+            if (_audioQueue.TryDequeue(
+                    out BoundedAudioTransportQueue.DequeuedAudioFrame frame))
             {
+                QueuedAudioMetadata metadata = frame.Metadata;
+                byte[] payload;
+                try
+                {
+                    payload = LiveProtocol.EncodeAudio(
+                        metadata.Format,
+                        metadata.SampleRate,
+                        metadata.Channels,
+                        metadata.SourcePts,
+                        metadata.DurationTicks,
+                        frame.AudioBytes);
+                }
+                finally
+                {
+                    frame.Dispose();
+                }
                 await LiveProtocolStream.WriteAsync(
                     pipe,
                     LiveProtocol.Create(
                         LiveMessageType.Audio,
                         _sessionId,
-                        frame.Generation,
-                        frame.Sequence,
-                        LiveProtocol.EncodeAudio(frame.Audio)),
+                        metadata.Generation,
+                        metadata.Sequence,
+                        payload),
                     cancellationToken).ConfigureAwait(false);
             }
+        }
+    }
+
+    private void ReportPendingAudioStatus()
+    {
+        if (Interlocked.Exchange(ref _pendingFirstAcceptedReport, 0) != 0)
+        {
+            _onStatus(
+                $"event=audio_accept outcome=first source_pts={FirstAcceptedAudioPts} " +
+                $"generation={Volatile.Read(ref _firstAcceptedGeneration)}");
+        }
+
+        long droppedOldest = Interlocked.Exchange(ref _pendingDroppedOldest, 0);
+        if (droppedOldest > 0)
+        {
+            _onStatus(
+                $"event=audio_queue outcome=drop-oldest count={droppedOldest} " +
+                $"dropped_audio={DroppedAudio}");
+        }
+
+        long droppedOversized = Interlocked.Exchange(ref _pendingDroppedOversized, 0);
+        if (droppedOversized > 0)
+        {
+            _onStatus(
+                $"event=audio_queue outcome=drop-oversized count={droppedOversized} " +
+                $"dropped_audio={DroppedAudio}");
         }
     }
 
