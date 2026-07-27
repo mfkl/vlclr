@@ -291,7 +291,10 @@ public static unsafe class PluginEntry
 
         subpicture->Start = date;
         subpicture->Stop = date + cue.DurationMilliseconds * VLCTick.Millisecond;
-        subpicture->IsEphemer = 0;
+        // A translated caption replaces the previous caption from this source.
+        // Without b_ephemer VLC keeps both subpictures active until their stop
+        // dates and moves the newer text above the older text.
+        subpicture->IsEphemer = 1;
         // A sub-source is called with VLC's system clock, just like the native
         // marquee source. Marking this as an input-timestamped subtitle mixes
         // clock domains and can trip VLC's debug-build subpicture assertions.
