@@ -1,0 +1,11 @@
+{
+  "formatVersion": 1,
+  "modelId": "silero-vad-v6.2.0",
+  "files": [
+    {
+      "fileName": "ggml-silero-v6.2.0.bin",
+      "size": 885098,
+      "sha256": "2aa269b785eeb53a82983a20501ddf7c1d9c48e33ab63a41391ac6c9f7fb6987"
+    }
+  ]
+}

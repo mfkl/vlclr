@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "profiles": [
+    {
+      "id": "whisper-tiny-multilingual",
+      "task": "speech-to-english",
+      "adapterId": "whisper.net",
+      "modelFamily": "OpenAI Whisper",
+      "manifestPath": "whisper/model-manifest.json",
+      "supportedLanguages": [ "*", "en" ],
+      "compatibleProviders": [ "cpu", "openvino", "vulkan" ],
+      "runtimeRequirements": [ "Whisper.net 1.9.1", "Windows x64" ],
+      "defaultTuning": {
+        "threads": "2",
+        "translate": "true",
+        "context": "false"
+      }
+    },
+    {
+      "id": "opus-mt-en-fr",
+      "task": "translation",
+      "adapterId": "marian-onnx",
+      "modelFamily": "Helsinki-NLP/OPUS-MT Marian",
+      "manifestPath": "opus-mt-en-fr/model-manifest.json",
+      "supportedLanguages": [ "en", "fr" ],
+      "compatibleProviders": [ "cpu", "directml", "openvino" ],
+      "runtimeRequirements": [
+        "ONNX Runtime CPU/OpenVINO 1.27.1 or DirectML 1.24.4",
+        "Windows x64"
+      ],
+      "defaultTuning": {
+        "threads": "1",
+        "executionMode": "sequential",
+        "decoderCache": "true"
+      }
+    }
+  ]
+}

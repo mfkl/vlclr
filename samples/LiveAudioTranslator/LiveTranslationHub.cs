@@ -1,10 +1,8 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Text;
-using SubtitleTranslator;
+using System.Runtime.InteropServices;
+using VLCLR.LiveTranslation.Metrics;
+using VLCLR.LiveTranslation.Protocol;
 using VLCLR.Native;
-using Whisper.net;
-using Whisper.net.LibraryLoader;
 
 namespace LiveAudioTranslator;
 
@@ -13,73 +11,86 @@ internal readonly record struct TranslatedCue(
     int DurationMilliseconds,
     long Sequence,
     long SchedulingErrorTicks,
+    long SemanticLatencyTicks,
     int Generation);
 
-internal readonly record struct PendingUtterance(
-    TimedAudioSegment Segment,
+internal readonly record struct WorkerCue(
+    TimedCue Cue,
     int Generation,
-    long EnqueuedSystemTicks);
-
-internal readonly record struct LiveCue(
-    string Text,
-    long SourceEndMediaTicks,
-    int RequestedDurationMilliseconds,
-    long Sequence,
-    int Generation,
-    long CompletedSystemTicks);
+    long CompletedSystemTicks,
+    long SemanticLatencyTicks);
 
 /// <summary>
-/// Shared state for the audio-filter and sub-source modules. Synchronized mode
-/// owns only a clock and an append-only cue reader. Native model inference is
-/// created exclusively for the explicitly requested immediate-live mode.
+/// State shared by the VLC audio-filter and sub-source modules. Prepared mode
+/// reads an append-only timeline. Both live modes only copy PCM and schedule
+/// worker results; all resampling, VAD, speech recognition, and translation are
+/// performed in the regular .NET worker process.
 /// </summary>
 internal sealed class LiveTranslationHub
 {
+    private const int MaximumBufferedCues = 512;
     private readonly LiveAudioTranslationOptions _options;
-    private readonly object _ingestSync = new();
     private readonly object _cueSync = new();
     private readonly PlaybackClockMapper _clock;
     private readonly ConcurrentQueue<string> _status = new();
     private readonly TimedCueFileReader? _timeline;
-    private readonly CueScheduler? _scheduler;
-    private readonly StreamingAudioSegmenter? _segmenter;
-    private readonly LatestWorkQueue<PendingUtterance>? _workQueue;
-    private readonly Task? _worker;
-    private LiveCue? _latestLiveCue;
-    private long _warmupAudioDrops;
-    private long _queueDrops;
-    private long _staleDrops;
-    private long _liveSequence;
+    private readonly CueScheduler _scheduler;
+    private readonly LatencyStatistics _schedulerErrors = new();
+    private readonly LiveWorkerClient? _worker;
+    private readonly List<WorkerCue> _workerCues = [];
+    private WorkerCue? _latestImmediateCue;
+    private long _audioSequence;
+    private long _controlSequence;
+    private long _staleCompletions;
     private long _lastClockMetricSystemTick;
     private long _lastClockMapMetricSystemTick;
     private long _lastClockWarningSystemTick;
     private long _lastUnderrunSystemTick;
     private string? _reportedTimelineError;
+    private bool _acceptingAudio = true;
+    private long _leadSampleCount;
+    private double _leadMean;
+    private double _leadM2;
+    private int _schedulerMetricGeneration = int.MinValue;
 
     public LiveTranslationHub(LiveAudioTranslationOptions options)
     {
         _options = options;
-        _clock = new PlaybackClockMapper(options.StaleClockMilliseconds * VLCTick.Millisecond);
-        if (options.Mode == LiveAudioTranslationMode.Synchronized)
+        long configuredDelayTicks = options.Mode == LiveAudioTranslationMode.LiveSync
+            ? options.InputDelayMilliseconds * VLCTick.Millisecond
+            : 0;
+        _clock = new PlaybackClockMapper(
+            options.StaleClockMilliseconds * VLCTick.Millisecond,
+            configuredInputDelayTicks: configuredDelayTicks,
+            leadToleranceTicks: options.ClockLeadToleranceMilliseconds * VLCTick.Millisecond);
+        _scheduler = new CueScheduler(options.EarlyCueToleranceMilliseconds * VLCTick.Millisecond);
+
+        if (options.Mode == LiveAudioTranslationMode.Prepared)
         {
             if (string.IsNullOrWhiteSpace(options.CueFilePath))
-                throw new InvalidOperationException("Synchronized mode requires --live-translator-cue-file.");
+                throw new InvalidOperationException("Prepared mode requires --live-translator-cue-file.");
             _timeline = new TimedCueFileReader(options.CueFilePath);
-            _scheduler = new CueScheduler(options.EarlyCueToleranceMilliseconds * VLCTick.Millisecond);
             _status.Enqueue(
-                $"event=ready mode=sync generation={_timeline.Manifest!.GenerationId} " +
+                $"event=ready mode=prepared generation={_timeline.Manifest!.GenerationId} " +
                 $"cues={_timeline.Cues.Count} duration_ticks={_timeline.Manifest.AudioDurationTicks}");
+            return;
         }
-        else
+
+        if (options.SessionId == Guid.Empty || string.IsNullOrWhiteSpace(options.PipeName))
         {
-            _workQueue = new LatestWorkQueue<PendingUtterance>();
-            _segmenter = new StreamingAudioSegmenter(
-                options.VadThreshold,
-                options.SilenceMilliseconds,
-                options.MaximumUtteranceMilliseconds,
-                QueueLatestUtterance);
-            _worker = Task.Run(ProcessLiveLoopAsync);
+            throw new InvalidOperationException(
+                $"{ModeName(options.Mode)} requires a worker session and pipe.");
         }
+        _worker = new LiveWorkerClient(
+            options.SessionId,
+            options.PipeName,
+            options.TransportQueueBudgetTicks,
+            HandleWorkerMessage,
+            message => _status.Enqueue(message));
+        _status.Enqueue(
+            $"event=ready mode={ModeName(options.Mode)} session={options.SessionId:N} " +
+            $"speech_model={options.SpeechModelId} translation_model={options.TranslationModelId} " +
+            $"speech_provider={options.SpeechProviderId} translation_provider={options.TranslationProviderId}");
     }
 
     public LiveAudioTranslationMode Mode => _options.Mode;
@@ -87,16 +98,25 @@ internal sealed class LiveTranslationHub
     public void ObserveAudio(long mediaPts, long blockDuration, long systemTick, bool discontinuity)
     {
         bool generationChanged = _clock.Observe(mediaPts, blockDuration, systemTick, discontinuity);
-        if (generationChanged && _options.Mode == LiveAudioTranslationMode.Live)
-            ClearLivePipeline();
+        if (generationChanged && _options.Mode != LiveAudioTranslationMode.Prepared)
+        {
+            ResetLeadStatistics();
+            ClearWorkerPipeline(sendFlush: true);
+        }
+        if (_clock.IsAnchored)
+            AddLeadSample(_clock.MeasuredDecodeLeadTicks);
 
         long last = Volatile.Read(ref _lastClockMetricSystemTick);
         if (systemTick - last >= 5 * VLCTick.Second &&
             Interlocked.CompareExchange(ref _lastClockMetricSystemTick, systemTick, last) == last)
         {
             _status.Enqueue(
-                $"event=clock_anchor media_pts={mediaPts} block_duration={blockDuration} " +
-                $"system_tick={systemTick} generation={_clock.Generation}");
+                $"event=clock_anchor decoded_pts={mediaPts} block_duration={blockDuration} " +
+                $"decode_lead={_clock.MeasuredDecodeLeadTicks} configured_delay=" +
+                $"{_options.InputDelayMilliseconds * VLCTick.Millisecond} anchored={_clock.IsAnchored} " +
+                $"lead_stddev={LeadStandardDeviation:F1} rate={_clock.EstimatedPlaybackRate:F3} " +
+                $"transport_queue={_worker?.QueueDepth ?? 0} dropped_audio={_worker?.DroppedAudio ?? 0} " +
+                $"generation={_clock.Generation}");
         }
     }
 
@@ -107,15 +127,24 @@ internal sealed class LiveTranslationHub
         long mediaPts,
         long blockDuration)
     {
-        if (_segmenter == null)
+        if (_worker == null || !_acceptingAudio || samples.IsEmpty)
             return;
-        if (!_workQueue!.IsReady)
+        if (!_worker.IsReady)
         {
-            ReportWarmupDrop();
+            _worker.ReportNotReadyAudio(blockDuration);
             return;
         }
-        lock (_ingestSync)
-            _segmenter.PushFloat32(samples, sampleRate, channels, mediaPts, blockDuration);
+        byte[] bytes = MemoryMarshal.AsBytes(samples).ToArray();
+        QueueAudio(
+            new LiveAudioMessage
+            {
+                Format = LiveAudioSampleFormat.Float32LittleEndian,
+                SampleRate = sampleRate,
+                Channels = checked((ushort)channels),
+                SourcePts = mediaPts,
+                DurationTicks = blockDuration,
+                AudioBytes = bytes
+            });
     }
 
     public void PushPcm16(
@@ -125,28 +154,41 @@ internal sealed class LiveTranslationHub
         long mediaPts,
         long blockDuration)
     {
-        if (_segmenter == null)
+        if (_worker == null || !_acceptingAudio || samples.IsEmpty)
             return;
-        if (!_workQueue!.IsReady)
+        if (!_worker.IsReady)
         {
-            ReportWarmupDrop();
+            _worker.ReportNotReadyAudio(blockDuration);
             return;
         }
-        lock (_ingestSync)
-            _segmenter.PushPcm16(samples, sampleRate, channels, mediaPts, blockDuration);
+        byte[] bytes = MemoryMarshal.AsBytes(samples).ToArray();
+        QueueAudio(
+            new LiveAudioMessage
+            {
+                Format = LiveAudioSampleFormat.Pcm16LittleEndian,
+                SampleRate = sampleRate,
+                Channels = checked((ushort)channels),
+                SourcePts = mediaPts,
+                DurationTicks = blockDuration,
+                AudioBytes = bytes
+            });
     }
 
     public void ResetAudio()
     {
         _clock.Reset();
-        if (_options.Mode == LiveAudioTranslationMode.Live)
-            ClearLivePipeline();
+        ResetLeadStatistics();
+        if (_options.Mode == LiveAudioTranslationMode.Prepared)
+        {
+            _scheduler.Reset();
+        }
         else
-            _scheduler?.Reset();
+        {
+            ClearWorkerPipeline(sendFlush: true);
+        }
     }
 
     public void BeginSession() => ResetAudio();
-
     public void EndSession() => ResetAudio();
 
     public bool TryTakeCue(long sourceSystemDate, out TranslatedCue cue)
@@ -170,18 +212,31 @@ internal sealed class LiveTranslationHub
                 lastMapMetric) == lastMapMetric)
         {
             _status.Enqueue(
-                $"event=clock_map source_date={sourceSystemDate} media_pts={currentMediaTicks} " +
-                $"generation={generation}");
+                $"event=clock_map source_date={sourceSystemDate} presented_media_pts={currentMediaTicks} " +
+                $"decode_lead={_clock.MeasuredDecodeLeadTicks} generation={generation}");
         }
 
-        return _options.Mode == LiveAudioTranslationMode.Synchronized
-            ? TryTakeSynchronizedCue(sourceSystemDate, currentMediaTicks, generation, out cue)
-            : TryTakeLiveCue(currentMediaTicks, generation, out cue);
+        return _options.Mode switch
+        {
+            LiveAudioTranslationMode.Prepared =>
+                TryTakePreparedCue(sourceSystemDate, currentMediaTicks, generation, out cue),
+            LiveAudioTranslationMode.LiveSync =>
+                TryTakeSynchronizedWorkerCue(currentMediaTicks, generation, out cue),
+            LiveAudioTranslationMode.LiveImmediate =>
+                TryTakeImmediateCue(currentMediaTicks, generation, out cue),
+            _ => false
+        };
     }
 
     public bool TryTakeStatus(out string message) => _status.TryDequeue(out message!);
 
-    private bool TryTakeSynchronizedCue(
+    private void QueueAudio(LiveAudioMessage audio)
+    {
+        long sequence = Interlocked.Increment(ref _audioSequence) - 1;
+        _worker!.TryQueueAudio(audio, _clock.Generation, sequence);
+    }
+
+    private bool TryTakePreparedCue(
         long sourceSystemDate,
         long currentMediaTicks,
         int generation,
@@ -194,28 +249,20 @@ internal sealed class LiveTranslationHub
             !string.Equals(_reportedTimelineError, timeline.LastError, StringComparison.Ordinal))
         {
             _reportedTimelineError = timeline.LastError;
-            _status.Enqueue($"event=cue_file outcome=record-rejected error={SanitizeValue(timeline.LastError)}");
+            _status.Enqueue($"event=cue_file outcome=record-rejected error={Sanitize(timeline.LastError)}");
         }
 
         TimedCueManifest manifest = timeline.Manifest!;
         long timelineTicks = currentMediaTicks - manifest.TimelineOffsetTicks;
-        if (_scheduler!.TrySchedule(
+        if (_scheduler.TrySchedule(
                 timeline.Cues,
                 timelineTicks,
                 generation,
                 manifest.GenerationId,
                 out ScheduledCue scheduled))
         {
-            long durationTicks = Math.Clamp(scheduled.RemainingTicks, 50_000, 30 * VLCTick.Second);
-            cue = new TranslatedCue(
-                scheduled.Cue.Text,
-                checked((int)Math.Max(50, durationTicks / VLCTick.Millisecond)),
-                scheduled.Cue.Sequence,
-                scheduled.SchedulingErrorTicks,
-                generation);
-            _status.Enqueue(
-                $"event=subtitle outcome=scheduled sequence={cue.Sequence} media_pts={timelineTicks} " +
-                $"error_ms={cue.SchedulingErrorTicks / 1000d:F1} generation={generation}");
+            cue = CreateTranslatedCue(scheduled, generation, semanticLatencyTicks: 0);
+            ReportScheduled(cue, timelineTicks);
             return true;
         }
 
@@ -231,229 +278,236 @@ internal sealed class LiveTranslationHub
         return false;
     }
 
-    private bool TryTakeLiveCue(long currentMediaTicks, int generation, out TranslatedCue cue)
+    private bool TryTakeSynchronizedWorkerCue(
+        long currentMediaTicks,
+        int generation,
+        out TranslatedCue cue)
     {
         cue = default;
-        LiveCue candidate;
         lock (_cueSync)
         {
-            if (_latestLiveCue is not { } value)
+            _workerCues.RemoveAll(candidate =>
+                candidate.Generation != generation ||
+                candidate.Cue.EndMediaTicks <= currentMediaTicks - VLCTick.Second);
+            if (_workerCues.Count == 0)
                 return false;
-            _latestLiveCue = null;
+
+            TimedCue[] timedCues = _workerCues.Select(candidate => candidate.Cue).ToArray();
+            if (!_scheduler.TrySchedule(
+                    timedCues,
+                    currentMediaTicks,
+                    generation,
+                    _options.SessionId.ToString("N"),
+                    out ScheduledCue scheduled))
+            {
+                return false;
+            }
+            WorkerCue metadata = _workerCues.First(candidate =>
+                candidate.Cue.Sequence == scheduled.Cue.Sequence);
+            cue = CreateTranslatedCue(scheduled, generation, metadata.SemanticLatencyTicks);
+        }
+        ReportScheduled(cue, currentMediaTicks);
+        return true;
+    }
+
+    private bool TryTakeImmediateCue(long currentMediaTicks, int generation, out TranslatedCue cue)
+    {
+        cue = default;
+        WorkerCue candidate;
+        lock (_cueSync)
+        {
+            if (_latestImmediateCue is not { } value)
+                return false;
             candidate = value;
         }
 
-        long ageTicks = currentMediaTicks - candidate.SourceEndMediaTicks;
+        long ageTicks = currentMediaTicks - candidate.Cue.EndMediaTicks;
         long maximumAgeTicks = _options.MaximumCaptionAgeMilliseconds * VLCTick.Millisecond;
-        if (candidate.Generation != generation || ageTicks < 0 || ageTicks > maximumAgeTicks)
+        if (candidate.Generation != generation || ageTicks > maximumAgeTicks)
         {
-            long dropped = Interlocked.Increment(ref _staleDrops);
+            ClearImmediateCue(candidate);
+            long dropped = Interlocked.Increment(ref _staleCompletions);
             _status.Enqueue(
                 $"event=caption_drop reason=stale age_ms={ageTicks / 1000d:F1} " +
-                $"generation={generation} stale_drops={dropped}");
+                $"generation={generation} stale_completions={dropped}");
             return false;
         }
+        if (ageTicks < 0)
+            return false;
+        if (!ClearImmediateCue(candidate))
+            return false;
 
-        long remainingAgeTicks = maximumAgeTicks - ageTicks;
-        int duration = checked((int)Math.Clamp(
-            Math.Min(candidate.RequestedDurationMilliseconds * VLCTick.Millisecond, remainingAgeTicks) /
-                VLCTick.Millisecond,
-            100,
-            _options.SubtitleDurationMilliseconds));
+        long durationTicks = Math.Min(
+            _options.SubtitleDurationMilliseconds * VLCTick.Millisecond,
+            maximumAgeTicks - ageTicks);
         cue = new TranslatedCue(
-            candidate.Text,
-            duration,
-            candidate.Sequence,
+            candidate.Cue.Text,
+            checked((int)Math.Clamp(durationTicks / VLCTick.Millisecond, 100, 5_000)),
+            candidate.Cue.Sequence,
             ageTicks,
+            candidate.SemanticLatencyTicks,
             generation);
         return true;
     }
 
-    private void QueueLatestUtterance(TimedAudioSegment segment)
+    private bool ClearImmediateCue(WorkerCue expected)
     {
-        var utterance = new PendingUtterance(segment, _clock.Generation, VLCCore.TickNow());
-        LatestWorkOfferResult result = _workQueue!.Offer(utterance);
-        if (result == LatestWorkOfferResult.Replaced)
+        lock (_cueSync)
         {
-            long drops = Interlocked.Increment(ref _queueDrops);
-            _status.Enqueue($"event=audio_queue outcome=replaced-oldest queue_drops={drops}");
+            if (_latestImmediateCue is not { } current ||
+                current.Generation != expected.Generation ||
+                current.Cue.Sequence != expected.Cue.Sequence)
+            {
+                return false;
+            }
+            _latestImmediateCue = null;
+            return true;
         }
     }
 
-    private async Task ProcessLiveLoopAsync()
+    private void HandleWorkerMessage(LiveProtocolMessage message)
     {
-        try
+        switch (message.Header.MessageType)
         {
-            var initialization = Stopwatch.StartNew();
-            ValidateLiveFiles();
-            NativeLoadResult nativeLoad = OnnxNativeResolver.EnsureLoadedResult(_options.TranslationModelPath);
-            if (!nativeLoad.Success)
-                throw new InvalidOperationException(nativeLoad.Diagnostics);
-
-            ConfigureWhisperRuntime();
-            using var whisperFactory = WhisperFactory.FromPath(_options.WhisperModelPath);
-            WhisperProcessorBuilder processorBuilder = whisperFactory.CreateBuilder()
-                .WithThreads(_options.WhisperThreads)
-                .WithTranslate()
-                .WithNoContext()
-                .WithSingleSegment();
-            processorBuilder = _options.SourceLanguage == "auto"
-                ? processorBuilder.WithLanguageDetection()
-                : processorBuilder.WithLanguage(_options.SourceLanguage);
-            using var whisper = processorBuilder.Build();
-            using var translator = new OnnxTranslator(
-                _options.TranslationModelPath,
-                "en",
-                _options.TargetLanguage,
-                new OnnxTranslatorOptions
-                {
-                    IntraOpThreads = _options.TranslationThreads,
-                    MaximumSourceTokens = 128,
-                    MaximumOutputTokens = 128,
-                    UseDecoderCache = true,
-                    CacheActivationTokenCount = 32,
-                    VerifyModelHashes = true
-                });
-
-            // Force native initialization and first-inference allocations
-            // before the audio segmenter is allowed to accept PCM.
-            _ = await TranscribeAsync(whisper, new float[8_000], CancellationToken.None);
-            _ = translator.Translate("model warm up");
-            initialization.Stop();
-            _workQueue!.MarkReady();
-            _status.Enqueue(
-                $"event=ready mode=live model_init_ms={initialization.Elapsed.TotalMilliseconds:F1} " +
-                $"source={_options.SourceLanguage} target={_options.TargetLanguage} " +
-                $"whisper_threads={_options.WhisperThreads} translation_threads={_options.TranslationThreads}");
-
-            var cache = new TranslationCache(512);
-            string previousEnglish = "";
-            bool previousForcedSplit = false;
-            int transcriptGeneration = int.MinValue;
-            while (true)
-            {
-                PendingUtterance work = await _workQueue.TakeAsync();
-                if (work.Generation != _clock.Generation || IsStale(work.Segment.EndMediaTicks))
-                {
-                    Interlocked.Increment(ref _staleDrops);
-                    continue;
-                }
-
-                if (transcriptGeneration != work.Generation)
-                {
-                    transcriptGeneration = work.Generation;
-                    previousEnglish = "";
-                    previousForcedSplit = false;
-                }
-
-                var total = Stopwatch.StartNew();
-                string rawEnglish = await TranscribeAsync(whisper, work.Segment.Samples, CancellationToken.None);
-                if (work.Generation != _clock.Generation || IsStale(work.Segment.EndMediaTicks))
-                {
-                    Interlocked.Increment(ref _staleDrops);
-                    continue;
-                }
-                string english = previousForcedSplit
-                    ? TranscriptStitcher.RemoveForcedSplitOverlap(previousEnglish, rawEnglish)
-                    : rawEnglish;
-                previousEnglish = rawEnglish;
-                previousForcedSplit = work.Segment.ForcedSplit;
-                if (english.Length == 0)
-                    continue;
-
-                var translationTimer = Stopwatch.StartNew();
-                string translated = TimedCueText.Normalize(cache.GetOrTranslate(english, translator));
-                translationTimer.Stop();
-                total.Stop();
-                if (translated.Length == 0 || work.Generation != _clock.Generation ||
-                    IsStale(work.Segment.EndMediaTicks))
-                {
-                    Interlocked.Increment(ref _staleDrops);
-                    continue;
-                }
-
-                long sequence = Interlocked.Increment(ref _liveSequence) - 1;
-                lock (_cueSync)
-                {
-                    _latestLiveCue = new LiveCue(
-                        translated,
-                        work.Segment.EndMediaTicks,
-                        _options.SubtitleDurationMilliseconds,
-                        sequence,
-                        work.Generation,
-                        VLCCore.TickNow());
-                }
+            case LiveMessageType.Cue:
+                HandleCue(message);
+                break;
+            case LiveMessageType.Metrics:
+                LiveMetricsMessage metrics = LiveProtocol.DecodeMetrics(message.Payload);
                 _status.Enqueue(
-                    $"event=translated mode=live cue={TranslationTextNormalizer.ComputeCueHash(english)} " +
-                    $"sequence={sequence} audio_start={work.Segment.StartMediaTicks} " +
-                    $"audio_end={work.Segment.EndMediaTicks} translation_ms={translationTimer.Elapsed.TotalMilliseconds:F1} " +
-                    $"total_ms={total.Elapsed.TotalMilliseconds:F1} outcome=latest");
+                    $"event=worker_metrics rolling_rtf={metrics.RollingRealTimeFactor:F3} " +
+                    $"total_rtf={metrics.TotalRealTimeFactor:F3} cue_p50={metrics.CueLatencyP50Ticks} " +
+                    $"cue_p95={metrics.CueLatencyP95Ticks} cue_p99={metrics.CueLatencyP99Ticks} " +
+                    $"worker_queue={metrics.QueueDepth} dropped_audio={metrics.DroppedAudio} " +
+                    $"dropped_utterances={metrics.DroppedUtterances} " +
+                    $"stale_completions={metrics.StaleCompletions} transport_queue={_worker?.QueueDepth ?? 0}");
+                break;
+            case LiveMessageType.Error:
+                LiveErrorMessage error = LiveProtocol.DecodeError(message.Payload);
+                if (error.Fatal)
+                    _acceptingAudio = false;
+                _status.Enqueue(
+                    $"event=worker_error code={Sanitize(error.Code)} fatal={error.Fatal} " +
+                    $"error={Sanitize(error.Message)}");
+                break;
+        }
+    }
+
+    private void HandleCue(LiveProtocolMessage message)
+    {
+        LiveCueMessage received = LiveProtocol.DecodeCue(message.Payload);
+        int currentGeneration = _clock.Generation;
+        if (message.Header.PlaybackGeneration != currentGeneration)
+        {
+            Interlocked.Increment(ref _staleCompletions);
+            return;
+        }
+
+        var candidate = new WorkerCue(
+            new TimedCue(
+                message.Header.Sequence,
+                received.SourceStartPts,
+                received.SourceEndPts,
+                TimedCueText.Normalize(received.Text)).NormalizeAndValidate(),
+            message.Header.PlaybackGeneration,
+            received.CompletedSystemTicks,
+            received.SemanticLatencyTicks);
+
+        // Discard obsolete work again immediately before cue delivery.
+        if (candidate.Generation != _clock.Generation)
+        {
+            Interlocked.Increment(ref _staleCompletions);
+            return;
+        }
+
+        lock (_cueSync)
+        {
+            if (_options.Mode == LiveAudioTranslationMode.LiveImmediate)
+            {
+                _latestImmediateCue = candidate;
+            }
+            else
+            {
+                int insertion = _workerCues.BinarySearch(
+                    candidate,
+                    WorkerCueStartComparer.Instance);
+                if (insertion < 0)
+                    insertion = ~insertion;
+                _workerCues.Insert(insertion, candidate);
+                if (_workerCues.Count > MaximumBufferedCues)
+                    _workerCues.RemoveAt(0);
             }
         }
-        catch (Exception ex)
-        {
-            _status.Enqueue($"event=failed mode=live error={SanitizeValue($"{ex.GetType().Name}:{ex.Message}")}");
-        }
+        _status.Enqueue(
+            $"event=translated sequence={candidate.Cue.Sequence} audio_start={candidate.Cue.StartMediaTicks} " +
+            $"audio_end={candidate.Cue.EndMediaTicks} semantic_latency={candidate.SemanticLatencyTicks} " +
+            $"generation={candidate.Generation} outcome=queued");
     }
 
-    private bool IsStale(long sourceEndMediaTicks)
+    private void ClearWorkerPipeline(bool sendFlush)
     {
-        if (!_clock.TryMap(VLCCore.TickNow(), out long currentMediaTicks, out _))
-            return true;
-        return currentMediaTicks - sourceEndMediaTicks >
-            _options.MaximumCaptionAgeMilliseconds * VLCTick.Millisecond;
-    }
-
-    private static async Task<string> TranscribeAsync(
-        WhisperProcessor processor,
-        float[] utterance,
-        CancellationToken cancellationToken)
-    {
-        var text = new StringBuilder();
-        await foreach (SegmentData segment in processor.ProcessAsync(utterance, cancellationToken))
-        {
-            string part = segment.Text.Trim();
-            if (part.Length == 0 || IsNonSpeechLabel(part))
-                continue;
-            if (text.Length > 0)
-                text.Append(' ');
-            text.Append(part);
-        }
-        return TranslationTextNormalizer.NormalizeCacheKey(text.ToString());
-    }
-
-    private void ConfigureWhisperRuntime()
-    {
-        string whisperRuntimeDirectory = Path.GetDirectoryName(_options.WhisperRuntimePath)!;
-        string runtimesDirectory = Path.GetDirectoryName(whisperRuntimeDirectory)!;
-        string whisperSearchRoot = Path.GetDirectoryName(runtimesDirectory)!;
-        RuntimeOptions.LibraryPath = Path.Combine(whisperSearchRoot, "whisper-loader-anchor.dll");
-    }
-
-    private void ValidateLiveFiles()
-    {
-        if (!File.Exists(_options.WhisperModelPath))
-            throw new FileNotFoundException("Whisper model not found", _options.WhisperModelPath);
-        if (!File.Exists(_options.WhisperRuntimePath))
-            throw new FileNotFoundException("Whisper runtime not found", _options.WhisperRuntimePath);
-        if (!Directory.Exists(_options.TranslationModelPath))
-            throw new DirectoryNotFoundException($"Translation model not found: {_options.TranslationModelPath}");
-    }
-
-    private void ClearLivePipeline()
-    {
-        lock (_ingestSync)
-            _segmenter?.Reset();
-        _workQueue?.Clear();
         lock (_cueSync)
-            _latestLiveCue = null;
+        {
+            _workerCues.Clear();
+            _latestImmediateCue = null;
+            _scheduler.Reset();
+        }
+        if (sendFlush)
+        {
+            long sequence = Interlocked.Increment(ref _controlSequence) - 1;
+            _worker?.Flush(_clock.Generation, sequence);
+        }
+        _acceptingAudio = true;
     }
 
-    private void ReportWarmupDrop()
+    private static TranslatedCue CreateTranslatedCue(
+        ScheduledCue scheduled,
+        int generation,
+        long semanticLatencyTicks)
     {
-        long drops = Interlocked.Increment(ref _warmupAudioDrops);
-        if (drops == 1 || drops % 100 == 0)
-            _status.Enqueue($"event=audio_drop reason=model-warmup warmup_drops={drops}");
+        long durationTicks = Math.Clamp(scheduled.RemainingTicks, 50_000, 30 * VLCTick.Second);
+        return new TranslatedCue(
+            scheduled.Cue.Text,
+            checked((int)Math.Max(50, durationTicks / VLCTick.Millisecond)),
+            scheduled.Cue.Sequence,
+            scheduled.SchedulingErrorTicks,
+            semanticLatencyTicks,
+            generation);
+    }
+
+    private void ReportScheduled(TranslatedCue cue, long mediaTicks)
+    {
+        bool resumeSample = cue.Generation != _schedulerMetricGeneration;
+        if (resumeSample)
+            _schedulerMetricGeneration = cue.Generation;
+        else
+            _schedulerErrors.Add(Math.Abs(cue.SchedulingErrorTicks));
+        (long p50, long p95, long p99) = _schedulerErrors.Snapshot();
+        _status.Enqueue(
+            $"event=subtitle outcome=scheduled sequence={cue.Sequence} media_pts={mediaTicks} " +
+            $"scheduler_error_ms={cue.SchedulingErrorTicks / 1000d:F1} " +
+            $"scheduler_sample={(resumeSample ? "resume-age" : "steady-state")} " +
+            $"scheduler_p50_ms={p50 / 1000d:F1} scheduler_p95_ms={p95 / 1000d:F1} " +
+            $"scheduler_p99_ms={p99 / 1000d:F1} " +
+            $"semantic_latency_ms={cue.SemanticLatencyTicks / 1000d:F1} generation={cue.Generation}");
+    }
+
+    private void AddLeadSample(long lead)
+    {
+        _leadSampleCount++;
+        double delta = lead - _leadMean;
+        _leadMean += delta / _leadSampleCount;
+        _leadM2 += delta * (lead - _leadMean);
+    }
+
+    private double LeadStandardDeviation =>
+        _leadSampleCount < 2 ? 0 : Math.Sqrt(_leadM2 / (_leadSampleCount - 1));
+
+    private void ResetLeadStatistics()
+    {
+        _leadSampleCount = 0;
+        _leadMean = 0;
+        _leadM2 = 0;
     }
 
     private void ReportClockFailure(long sourceSystemDate, PlaybackClockFailure failure)
@@ -467,12 +521,28 @@ internal sealed class LiveTranslationHub
         _status.Enqueue($"event=clock_unavailable reason={failure} outcome=no-subtitle");
     }
 
-    private static bool IsNonSpeechLabel(string text) =>
-        (text.StartsWith('[') && text.EndsWith(']')) ||
-        (text.StartsWith('(') && text.EndsWith(')'));
+    private static string ModeName(LiveAudioTranslationMode mode) =>
+        mode switch
+        {
+            LiveAudioTranslationMode.Prepared => "prepared",
+            LiveAudioTranslationMode.LiveImmediate => "live-immediate",
+            LiveAudioTranslationMode.LiveSync => "live-sync",
+            _ => "unknown"
+        };
 
-    private static string SanitizeValue(string value) =>
+    private static string Sanitize(string value) =>
         value.Replace('\r', ' ').Replace('\n', ' ').Replace(' ', '-');
+
+    private sealed class WorkerCueStartComparer : IComparer<WorkerCue>
+    {
+        public static WorkerCueStartComparer Instance { get; } = new();
+
+        public int Compare(WorkerCue left, WorkerCue right)
+        {
+            int start = left.Cue.StartMediaTicks.CompareTo(right.Cue.StartMediaTicks);
+            return start != 0 ? start : left.Cue.Sequence.CompareTo(right.Cue.Sequence);
+        }
+    }
 }
 
 internal static class LiveTranslationHubRegistry

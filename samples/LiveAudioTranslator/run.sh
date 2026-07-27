@@ -1,25 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mode=sync
-if [[ ${1:-} == "--live" ]]; then
-    mode=live
-    shift
-fi
+mode=live-immediate
+case ${1:-} in
+    --prepared)
+        mode=prepared
+        shift
+        ;;
+    --live-immediate|--live)
+        mode=live-immediate
+        shift
+        ;;
+    --live-sync)
+        mode=live-sync
+        shift
+        ;;
+esac
 
 if [[ $# -lt 1 ]]; then
-    echo "Usage: samples/LiveAudioTranslator/run.sh [--live] <video> [extra VLC options...]" >&2
+    echo "Usage: samples/LiveAudioTranslator/run.sh [--prepared|--live-immediate|--live-sync] <media> [extra VLC options...]" >&2
     exit 1
 fi
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 repo_root=$(cd -- "$script_dir/../.." && pwd)
 vlc_dir=${VLC_DIR:-"$repo_root/vlc-binaries/vlc-4.0.0-dev"}
-video=$1
+media=$1
 shift
 
-if [[ ! -f "$video" ]]; then
-    echo "Video not found: $video" >&2
+if [[ $media != *"://"* && ! -f "$media" ]]; then
+    echo "Media not found: $media" >&2
     exit 2
 fi
 if [[ ! -x "$vlc_dir/vlc.exe" ]]; then
@@ -27,34 +37,25 @@ if [[ ! -x "$vlc_dir/vlc.exe" ]]; then
     exit 3
 fi
 
-video_uri="file:///$(cygpath -am "$video")"
-if [[ $mode == live ]]; then
-    exec "$vlc_dir/vlc.exe" \
-        --live-translator-mode=live \
-        --audio-filter=dotnet_audio_translator \
-        --sub-source=dotnet_live_subtitles \
-        --no-video-title-show \
-        "$@" \
-        "$video_uri"
-fi
-
-if ! command -v pwsh >/dev/null 2>&1; then
-    echo "PowerShell 7 (pwsh) is required for synchronized preparation." >&2
+runner="$repo_root/samples/LiveAudioTranslator.Runner/bin/Release/net10.0/win-x64/LiveAudioTranslator.Runner.exe"
+worker="$repo_root/samples/LiveAudioTranslator.Worker/bin/Release/net10.0/win-x64/publish/LiveAudioTranslator.Worker.exe"
+catalog="$(dirname "$worker")/models/model-profiles.json"
+if [[ ! -x $runner ]]; then
+    echo "Runner not found. Build it with: dotnet build samples/LiveAudioTranslator.Runner -c Release -r win-x64" >&2
     exit 4
 fi
+if [[ $media != *"://"* ]]; then
+    media=$(cygpath -aw "$media")
+fi
 
-script_windows=$(cygpath -aw "$script_dir/prepare-and-run.ps1")
-video_windows=$(cygpath -aw "$video")
-vlc_windows=$(cygpath -aw "$vlc_dir")
-pwsh_args=(
-    -NoLogo -NoProfile -File "$script_windows"
-    -VideoPath "$video_windows"
-    -VlcDirectory "$vlc_windows"
+runner_args=(
+    --mode "$mode"
+    --vlc-root "$(cygpath -aw "$vlc_dir")"
+    --worker "$(cygpath -aw "$worker")"
+    --catalog "$(cygpath -aw "$catalog")"
+    "$media"
 )
-export VLCLR_EXTRA_VLC_ARGUMENT_COUNT=$#
-extra_index=0
-for extra_argument in "$@"; do
-    export "VLCLR_EXTRA_VLC_ARGUMENT_${extra_index}=$extra_argument"
-    ((extra_index += 1))
-done
-exec pwsh "${pwsh_args[@]}"
+if [[ $# -gt 0 ]]; then
+    runner_args+=(-- "$@")
+fi
+exec "$runner" "${runner_args[@]}"

@@ -82,6 +82,29 @@ function Start-ProcessWithArguments {
     return $process
 }
 
+function Read-SharedText {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $share = [System.IO.FileShare]::ReadWrite -bor [System.IO.FileShare]::Delete
+    $stream = [System.IO.FileStream]::new(
+        $Path,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        $share)
+    try {
+        $reader = [System.IO.StreamReader]::new($stream)
+        try {
+            return $reader.ReadToEnd()
+        }
+        finally {
+            $reader.Dispose()
+        }
+    }
+    finally {
+        $stream.Dispose()
+    }
+}
+
 try {
     $mediaUri = ([Uri]$video).AbsoluteUri
     $sout = "#transcode{acodec=s16l,channels=1,samplerate=16000}:std{access=file,mux=wav,dst='$audioPath'}"
@@ -142,7 +165,7 @@ try {
 
         if (Test-Path -LiteralPath $progressPath -PathType Leaf) {
             try {
-                $progress = [System.IO.File]::ReadAllText($progressPath) | ConvertFrom-Json
+                $progress = Read-SharedText -Path $progressPath | ConvertFrom-Json
                 $processedTicks = [long]$progress.processedAudioTicks
                 $durationTicks = [long]$progress.audioDurationTicks
                 $cueCount = [long]$progress.cueCount

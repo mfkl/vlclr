@@ -67,6 +67,7 @@ internal sealed record TimedCueRecord
 internal sealed class TimedCueFileWriter : IDisposable
 {
     private static readonly byte[] NewLine = [(byte)'\n'];
+    private const int ProgressReplacementAttempts = 20;
     private readonly FileStream _stream;
     private long _lastSequence = -1;
     private long _lastStart = -1;
@@ -119,7 +120,7 @@ internal sealed class TimedCueFileWriter : IDisposable
             stream.Write(json);
             stream.Flush(flushToDisk: true);
         }
-        File.Move(temporaryPath, ProgressPath, overwrite: true);
+        ReplaceProgressFile(temporaryPath);
     }
 
     public static string GetProgressPath(string cuePath) => cuePath + ".progress.json";
@@ -128,6 +129,28 @@ internal sealed class TimedCueFileWriter : IDisposable
     {
         _stream.Write(json);
         _stream.Write(NewLine);
+    }
+
+    private void ReplaceProgressFile(string temporaryPath)
+    {
+        for (int attempt = 0; ; attempt++)
+        {
+            try
+            {
+                File.Move(temporaryPath, ProgressPath, overwrite: true);
+                return;
+            }
+            catch (Exception ex) when (
+                ex is IOException or UnauthorizedAccessException &&
+                attempt + 1 < ProgressReplacementAttempts)
+            {
+                // File.Move(..., overwrite: true) needs delete sharing on the
+                // destination on Windows. A progress reader that opened the
+                // prior file without FileShare.Delete can therefore race this
+                // atomic replacement for a few milliseconds.
+                Thread.Sleep(Math.Min(10 * (attempt + 1), 100));
+            }
+        }
     }
 
     public void Dispose()
