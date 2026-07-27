@@ -61,3 +61,8 @@ ralph-playbook/
 IMPLEMENTATION_PLAN.md
 loop.sh
 specs/
+
+# Generated live-sync validation media and evidence.
+tests/fixtures/live-sync-speech.mp4
+artifacts/live-sync/
+artifacts/live-sync-real/
