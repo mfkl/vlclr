@@ -30,15 +30,11 @@ payload allocation, protocol encoding, and all named-pipe I/O.
 - `prepared` is the explicit synchronized local-file mode. It prepares a safe
   cue lead (or the complete timeline when RTF is at least 1.0) before launching
   VLC, then selects cues from the current media PTS.
-- `live-sync` is reserved for the delayed live path. Measurements on the
-  validated stock VLC build show that `file-caching` and `network-caching`
-  buffer compressed input but do not deliver decoded PCM ahead of
-  presentation. The request fails clearly instead of silently falling back to
-  prepared playback or displaying stale captions.
 
-The measured live-sync limitation needs a small generic VLC decoder-audio
-probe before that mode can be enabled for streams. The normal
-presentation-side audio filter cannot create recognition headroom by itself.
+Delayed `live-sync` is not exposed as a runner mode. Internal timing probes
+retain the groundwork, but stock VLC input caching does not deliver decoded
+PCM ahead of presentation. The normal presentation-side audio filter cannot
+create recognition headroom by itself.
 
 ## Build and deploy
 
@@ -62,6 +58,7 @@ The defaults remain:
 speech-model         = whisper-tiny-multilingual
 translation-model    = opus-mt-en-fr
 speech-provider      = auto
+speech-device        = cpu
 translation-provider = auto
 ```
 
@@ -81,8 +78,9 @@ samples/LiveAudioTranslator/run.sh \
 samples/LiveAudioTranslator/run.sh --prepared \
   "/c/Users/Martin/Videos/BigBuckBunny.mp4"
 
-# live-sync fails until the decoder-audio probe exists.
-samples/LiveAudioTranslator/run.sh --live-sync \
+# Explicit OpenVINO GPU inference. The runner disables VLC hardware decoding
+# so Whisper and the video decoder do not contend for the same GPU.
+samples/LiveAudioTranslator/run.sh --speech-device gpu \
   "/c/Users/Martin/Videos/BigBuckBunny.mp4"
 ```
 
@@ -92,8 +90,9 @@ Extra VLC options follow the media argument:
 samples/LiveAudioTranslator/run.sh video.mp4 -vvv
 ```
 
-Hardware video decoding remains enabled. Do not add `--no-hw-dec` to a live
-acceptance run.
+Hardware video decoding remains enabled for the contention-safe `cpu` speech
+device default. Selecting `gpu` or `auto` makes the runner add `--no-hw-dec`
+automatically so OpenVINO and VLC do not share the same GPU.
 
 For `live-immediate`, the runner creates a unique session and pipe, sends the
 worker configuration, and starts VLC without waiting for model `READY`.
@@ -103,10 +102,6 @@ is flushed before the readiness gate opens, so startup or reconnect cannot
 replay old PCM. A worker failure does not stop video playback; the runner
 reports the missing captions and returns a failure after VLC closes. Closing
 VLC closes or terminates the owned worker.
-
-The disabled live-sync implementation retains an 8–60-second delay policy and
-can select `p99 cue latency + safety margin` from a valid benchmark profile.
-It is not launched while the required decoded-audio lead is absent.
 
 ## Provider variants
 
@@ -134,6 +129,11 @@ dotnet publish samples/LiveAudioTranslator.Worker -c Release -r win-x64 `
   -o artifacts/workers/directml
 ```
 
+OpenVINO device selection is a separate runtime choice. `cpu` is the default.
+Use `--speech-device gpu` only with an OpenVINO worker; the runner then forces
+software video decoding. `auto` is also accepted and receives the same safe
+video-decoding policy because OpenVINO may choose the GPU.
+
 DirectML sessions are sequential and disable memory-pattern optimization.
 The current DirectML package line is 1.24.4; CPU/OpenVINO use ONNX Runtime
 1.27.1, and the provider/version is part of the benchmark profile key.
@@ -148,6 +148,7 @@ template with:
 ```powershell
 dotnet run --project samples/LiveAudioTranslator.Worker -c Release -- `
   --benchmark `
+  --speech-device cpu `
   --catalog samples/LiveAudioTranslator.Worker/bin/Release/net10.0/win-x64/models/model-profiles.json `
   --output artifacts/live-immediate/provider-benchmark.json
 ```
@@ -169,8 +170,7 @@ dotnet run --project benchmarks/LiveAudioTranslator.Benchmarks -c Release -- `
 ```
 
 The playback benchmark uses `live-immediate`, the supported worker-backed mode.
-It must not use `live-sync` because that request fails until the decoder-audio
-probe exists. The command runs normal Qt/hardware-decoded playback and records
+The command runs normal Qt playback and records
 worker startup, RTF and latency metrics, decode lead,
 drops, stale completions, restarts, process CPU/private memory, VLC
 late/dropped-frame log counts, and a metrics hash. GPU counters and quality

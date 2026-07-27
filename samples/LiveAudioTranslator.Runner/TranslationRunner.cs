@@ -15,13 +15,6 @@ internal static class TranslationRunner
 
         if (options.Mode == RunnerMode.Prepared)
             return await RunPreparedAsync(options).ConfigureAwait(false);
-        if (options.Mode == RunnerMode.LiveSync)
-        {
-            throw new InvalidOperationException(
-                "live-sync is unavailable on the validated stock VLC build: " +
-                "input caching buffers compressed media but does not deliver decoded PCM ahead " +
-                "of presentation. Use live-immediate until the generic decoder-audio probe is available.");
-        }
 
         BenchmarkDecision benchmark = BenchmarkDecision.Read(options.BenchmarkProfilePath);
         string initialWorkerPath =
@@ -126,6 +119,7 @@ internal static class TranslationRunner
                             $"speech_model={ready.SpeechModelId} " +
                             $"translation_model={ready.TranslationModelId} " +
                             $"speech_provider={ready.SpeechProviderId} " +
+                            $"speech_device={options.SpeechDeviceId} " +
                             $"translation_provider={ready.TranslationProviderId} " +
                             $"init_ms={ready.InitializationMilliseconds} " +
                             $"warmup_ms={ready.WarmupMilliseconds} " +
@@ -235,6 +229,7 @@ internal static class TranslationRunner
                 SpeechModelId = options.SpeechModelId,
                 TranslationModelId = options.TranslationModelId,
                 SpeechProviderId = forceCpu ? "cpu" : options.SpeechProviderId,
+                SpeechDeviceId = forceCpu ? "cpu" : options.SpeechDeviceId,
                 TranslationProviderId = forceCpu ? "cpu" : options.TranslationProviderId,
                 SourceLanguage = options.SourceLanguage,
                 TargetLanguage = options.TargetLanguage,
@@ -326,6 +321,13 @@ internal static class TranslationRunner
             "--sub-source=dotnet_live_subtitles",
             "--no-video-title-show"
         };
+        if (options.SpeechDeviceId is "gpu" or "auto" &&
+            !options.ExtraVlcArguments.Contains("--no-hw-dec", StringComparer.Ordinal))
+        {
+            arguments.Add("--no-hw-dec");
+            Console.WriteLine(
+                $"event=video_decode policy=software reason=speech-device-{options.SpeechDeviceId}");
+        }
         arguments.AddRange(options.ExtraVlcArguments);
         arguments.Add(options.Media);
         string command = "exec " + string.Join(' ', arguments.Select(ShellQuote));

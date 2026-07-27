@@ -43,6 +43,7 @@ public sealed record LiveConfigureMessage
     public required string SpeechModelId { get; init; }
     public required string TranslationModelId { get; init; }
     public required string SpeechProviderId { get; init; }
+    public required string SpeechDeviceId { get; init; }
     public required string TranslationProviderId { get; init; }
     public required string SourceLanguage { get; init; }
     public required string TargetLanguage { get; init; }
@@ -108,7 +109,7 @@ public sealed record LiveErrorMessage
 public static class LiveProtocol
 {
     public const uint Magic = 0x544C4C56; // "VLLT" in little-endian byte order.
-    public const ushort Version = 1;
+    public const ushort Version = 2;
     public const int HeaderSize = 40;
     public const int MaximumPayloadBytes = 1_048_576;
     public const int MaximumTextBytes = 8_192;
@@ -183,6 +184,7 @@ public static class LiveProtocol
         writer.WriteString(value.SpeechModelId);
         writer.WriteString(value.TranslationModelId);
         writer.WriteString(value.SpeechProviderId);
+        writer.WriteString(value.SpeechDeviceId);
         writer.WriteString(value.TranslationProviderId);
         writer.WriteString(value.SourceLanguage);
         writer.WriteString(value.TargetLanguage);
@@ -204,6 +206,7 @@ public static class LiveProtocol
             SpeechModelId = reader.ReadIdentifier(),
             TranslationModelId = reader.ReadIdentifier(),
             SpeechProviderId = reader.ReadIdentifier(),
+            SpeechDeviceId = reader.ReadIdentifier(),
             TranslationProviderId = reader.ReadIdentifier(),
             SourceLanguage = reader.ReadIdentifier(),
             TargetLanguage = reader.ReadIdentifier(),
@@ -408,6 +411,8 @@ public static class LiveProtocol
     {
         if (value.SpeechThreads is < 1 or > 64 || value.TranslationThreads is < 1 or > 64)
             throw new InvalidDataException("Inference thread count is invalid.");
+        if (value.SpeechDeviceId is not ("cpu" or "gpu" or "auto"))
+            throw new InvalidDataException("Speech device must be cpu, gpu, or auto.");
         if (value.InputDelayMilliseconds is < 0 or > 60_000)
             throw new InvalidDataException("Input delay is outside VLC's supported range.");
         if (value.VadSilenceMilliseconds is < 200 or > 2_000 ||

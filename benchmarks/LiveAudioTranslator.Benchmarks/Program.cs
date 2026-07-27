@@ -38,9 +38,10 @@ var report = new
         speechModel = "whisper-tiny-multilingual",
         translationModel = "opus-mt-en-fr",
         speechProvider = options.SpeechProvider,
+        speechDevice = options.SpeechDevice,
         translationProvider = options.TranslationProvider,
         inputDelayMilliseconds = 0,
-        hardwareVideoDecoding = true
+        hardwareVideoDecoding = options.SpeechDevice == "cpu"
     },
     samples = results,
     thresholds = new
@@ -76,6 +77,7 @@ static async Task<PlaybackBenchmarkResult> RunSampleAsync(
                  "--cpu-worker", options.CpuWorkerPath,
                  "--catalog", options.CatalogPath,
                  "--speech-provider", options.SpeechProvider,
+                 "--speech-device", options.SpeechDevice,
                  "--translation-provider", options.TranslationProvider,
                  sample.MediaPath,
                  "--",
@@ -193,6 +195,7 @@ internal sealed record BenchmarkOptions
     public required string CatalogPath { get; init; }
     public required string OutputPath { get; init; }
     public required string SpeechProvider { get; init; }
+    public required string SpeechDevice { get; init; }
     public required string TranslationProvider { get; init; }
     public required IReadOnlyList<BenchmarkSample> Samples { get; init; }
     public int DelayMilliseconds { get; init; }
@@ -247,6 +250,7 @@ internal sealed record BenchmarkOptions
                 "output",
                 Path.Combine(root, "artifacts", "live-immediate", "performance.json"))),
             SpeechProvider = values.GetValueOrDefault("speech-provider", "auto"),
+            SpeechDevice = ParseSpeechDevice(values.GetValueOrDefault("speech-device", "cpu")),
             TranslationProvider = values.GetValueOrDefault("translation-provider", "auto"),
             DelayMilliseconds = values.TryGetValue("delay-ms", out string? delay)
                 ? Math.Clamp(int.Parse(delay), 8_000, 60_000)
@@ -280,6 +284,15 @@ internal sealed record BenchmarkOptions
         values.TryGetValue(key, out string? value)
             ? Math.Clamp(int.Parse(value), 5, 7_200)
             : fallback;
+
+    private static string ParseSpeechDevice(string value)
+    {
+        string normalized = value.Trim().ToLowerInvariant();
+        return normalized is "cpu" or "gpu" or "auto"
+            ? normalized
+            : throw new ArgumentException(
+                "--speech-device must be cpu, gpu, or auto.");
+    }
 
     private static string Require(IReadOnlyDictionary<string, string> values, string key) =>
         values.TryGetValue(key, out string? value) && !string.IsNullOrWhiteSpace(value)

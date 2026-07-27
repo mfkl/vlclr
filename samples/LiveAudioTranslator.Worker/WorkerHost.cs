@@ -78,7 +78,8 @@ internal sealed class WorkerHost(WorkerCommandLine options)
 
         Console.WriteLine(
             $"event=ready speech_model={ready.SpeechModelId} translation_model={ready.TranslationModelId} " +
-            $"speech_provider={ready.SpeechProviderId} translation_provider={ready.TranslationProviderId} " +
+            $"speech_provider={ready.SpeechProviderId} speech_device={configuration.SpeechDeviceId} " +
+            $"translation_provider={ready.TranslationProviderId} " +
             $"model_init_ms={ready.InitializationMilliseconds} warmup_ms={ready.WarmupMilliseconds}");
         await using (pipeline.ConfigureAwait(false))
         await using (NamedPipeServerStream pluginPipe = CreatePipe())

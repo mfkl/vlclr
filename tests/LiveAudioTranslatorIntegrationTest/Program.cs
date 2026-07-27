@@ -80,6 +80,7 @@ foreach (string argument in new[]
              "--worker", workerPath,
              "--cpu-worker", workerPath,
              "--catalog", catalogPath,
+             "--speech-device", "gpu",
              media,
              "--",
              "-I", "dummy",
@@ -116,6 +117,7 @@ string[] pipelineLines = output
     .Where(line =>
         line.Contains("[LiveAudioTranslator]", StringComparison.Ordinal) ||
         line.Contains("event=worker_", StringComparison.Ordinal) ||
+        line.Contains("event=video_decode", StringComparison.Ordinal) ||
         line.Contains("event=runner", StringComparison.Ordinal))
     .Distinct(StringComparer.Ordinal)
     .ToArray();
@@ -125,6 +127,8 @@ bool subtitleOpenSeen = Contains("Live subtitle source opened");
 bool readySeen = Contains("event=worker_ready");
 bool vlcStartedSeen = Contains("event=runner stage=vlc-started");
 bool transportSeen = Contains("event=transport outcome=ready");
+bool safeGpuVideoPolicySeen =
+    Contains("event=video_decode policy=software reason=speech-device-gpu");
 bool warmupDiscardSeen =
     pipelineLines.Any(line =>
         line.Contains("event=audio_gate outcome=ready", StringComparison.Ordinal) &&
@@ -151,6 +155,7 @@ bool passed =
     vlcStartedSeen &&
     playbackBeforeReady &&
     transportSeen &&
+    safeGpuVideoPolicySeen &&
     warmupDiscardSeen &&
     firstAcceptedSeen &&
     translationSeen &&
@@ -162,6 +167,7 @@ Console.WriteLine($"Subtitle source opened: {subtitleOpenSeen}");
 Console.WriteLine($"VLC started before worker READY: {playbackBeforeReady}");
 Console.WriteLine($"Worker became ready: {readySeen}");
 Console.WriteLine($"Transport ready: {transportSeen}");
+Console.WriteLine($"GPU speech avoids shared hardware video decode: {safeGpuVideoPolicySeen}");
 Console.WriteLine($"Warm-up audio discarded: {warmupDiscardSeen}");
 Console.WriteLine($"First post-ready audio accepted: {firstAcceptedSeen}");
 Console.WriteLine($"Translation queued: {translationSeen}");

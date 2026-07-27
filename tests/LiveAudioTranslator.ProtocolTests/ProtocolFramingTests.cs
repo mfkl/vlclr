@@ -19,7 +19,7 @@ public sealed class ProtocolFramingTests
         byte[] bytes = LiveProtocol.EncodeHeader(header);
 
         Assert.Equal(
-            "564C4C54010004000C0B0A0004030201080706050403020133221100554477668899AABBCCDDEEFF",
+            "564C4C54020004000C0B0A0004030201080706050403020133221100554477668899AABBCCDDEEFF",
             Convert.ToHexString(bytes));
         Assert.Equal(header, LiveProtocol.DecodeHeader(bytes));
     }
@@ -109,6 +109,35 @@ public sealed class ProtocolFramingTests
         Assert.Equal(expected.SourcePts, actual.SourcePts);
         Assert.Equal(expected.DurationTicks, actual.DurationTicks);
         Assert.Equal(expected.AudioBytes, actual.AudioBytes);
+    }
+
+    [Theory]
+    [InlineData("cpu")]
+    [InlineData("gpu")]
+    [InlineData("auto")]
+    public void ConfigurePayloadRoundTripsSpeechDevice(string speechDevice)
+    {
+        var expected = new LiveConfigureMessage
+        {
+            SpeechModelId = "whisper-tiny-multilingual",
+            TranslationModelId = "opus-mt-en-fr",
+            SpeechProviderId = "openvino",
+            SpeechDeviceId = speechDevice,
+            TranslationProviderId = "cpu",
+            SourceLanguage = "auto",
+            TargetLanguage = "fr",
+            SpeechThreads = 2,
+            TranslationThreads = 1,
+            InputDelayMilliseconds = 0,
+            VadSilenceMilliseconds = 450,
+            MaximumUtteranceMilliseconds = 2_500,
+            EnergyVadThreshold = 0.012f
+        };
+
+        LiveConfigureMessage actual =
+            LiveProtocol.DecodeConfigure(LiveProtocol.EncodeConfigure(expected));
+
+        Assert.Equal(speechDevice, actual.SpeechDeviceId);
     }
 
     private sealed class ChunkedReadStream(Stream inner, int maximumRead) : Stream
