@@ -14,6 +14,7 @@
     <OnnxRuntimeVersion Condition="'$(TranslationRuntimeFlavor)' == 'DirectML'">1.24.4</OnnxRuntimeVersion>
     <OnnxRuntimeVersion Condition="'$(OnnxRuntimeVersion)' == ''">1.27.1</OnnxRuntimeVersion>
     <OpenVinoRuntimeVersion>2024.4.0.1</OpenVinoRuntimeVersion>
+    <WhisperModelPath Condition="'$(WhisperModelPath)' == ''">..\LiveAudioTranslator\models\whisper\ggml-tiny.bin</WhisperModelPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(WhisperRuntimeFlavor)' == 'OpenVino'">
@@ -70,8 +71,9 @@
     <None Include="models\model-profiles.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\LiveAudioTranslator\models\whisper\model-manifest.json"
           Link="models\whisper\model-manifest.json" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\LiveAudioTranslator\models\whisper\ggml-tiny.bin"
-          Link="models\whisper\ggml-tiny.bin" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(WhisperModelPath)"
+          Link="models\whisper\ggml-tiny.bin" CopyToOutputDirectory="PreserveNewest"
+          Condition="Exists('$(WhisperModelPath)')" />
     <None Include="..\LiveAudioTranslator\models\whisper\silero-vad\**\*"
           LinkBase="models\whisper\silero-vad" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\LiveAudioTranslator\models\whisper\openvino-tiny\**\*"
