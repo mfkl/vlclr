@@ -16,9 +16,10 @@ runner -> configure .NET worker ----- warm models ----- READY
 ```
 
 Whisper and ONNX inference never run in the Native AOT plugin. Audio callbacks
-only observe the source PTS, copy a bounded PCM block, enqueue it, and return
-the original VLC block. Dedicated transport and receive tasks perform all
-named-pipe I/O.
+only observe the source PTS, copy PCM into a preallocated non-blocking slot,
+enqueue it, and return the original VLC block. They do not allocate a managed
+payload or wait for a monitor. Dedicated transport and receive tasks perform
+payload allocation, protocol encoding, and all named-pipe I/O.
 
 ## Modes
 

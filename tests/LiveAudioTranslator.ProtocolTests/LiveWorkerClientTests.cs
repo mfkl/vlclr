@@ -26,7 +26,7 @@ public sealed class LiveWorkerClientTests
             statuses.Enqueue);
 
         client.Flush(generation: 7, sequence: 11);
-        Assert.False(client.TryQueueAudio(CreateAudio(1_000_000), 7, 1));
+        Assert.False(QueueAudio(client, 1_000_000, 7, 1));
         Assert.False(client.IsReady);
 
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -55,7 +55,7 @@ public sealed class LiveWorkerClientTests
 
         Assert.Equal(1, client.DiscardedNotReadyAudio);
         Assert.Equal(20_000, client.DiscardedNotReadyAudioTicks);
-        Assert.True(client.TryQueueAudio(CreateAudio(8_000_000), 7, 2));
+        Assert.True(QueueAudio(client, 8_000_000, 7, 2));
 
         LiveProtocolMessage audio = (await LiveProtocolStream.ReadAsync(server, timeout.Token))!;
         Assert.Equal(LiveMessageType.Audio, audio.Header.MessageType);
@@ -70,16 +70,20 @@ public sealed class LiveWorkerClientTests
                 StringComparison.Ordinal));
     }
 
-    private static LiveAudioMessage CreateAudio(long sourcePts) =>
-        new()
-        {
-            Format = LiveAudioSampleFormat.Pcm16LittleEndian,
-            SampleRate = 16_000,
-            Channels = 1,
-            SourcePts = sourcePts,
-            DurationTicks = 20_000,
-            AudioBytes = [0, 0]
-        };
+    private static bool QueueAudio(
+        LiveAudioTranslator.LiveWorkerClient client,
+        long sourcePts,
+        int generation,
+        long sequence) =>
+        client.TryQueueAudio(
+            LiveAudioSampleFormat.Pcm16LittleEndian,
+            16_000,
+            1,
+            sourcePts,
+            20_000,
+            new byte[] { 0, 0 },
+            generation,
+            sequence);
 
     private static async Task WaitUntilAsync(
         Func<bool> condition,

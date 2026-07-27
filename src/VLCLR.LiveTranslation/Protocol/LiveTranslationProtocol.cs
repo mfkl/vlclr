@@ -253,16 +253,33 @@ public static class LiveProtocol
     public static byte[] EncodeAudio(LiveAudioMessage value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        ValidateAudio(value);
-        using var writer = new PayloadWriter(28 + value.AudioBytes.Length);
-        writer.WriteInt64(value.SourcePts);
-        writer.WriteInt64(value.DurationTicks);
-        writer.WriteInt32(value.SampleRate);
-        writer.WriteUInt16(value.Channels);
-        writer.WriteByte((byte)value.Format);
+        return EncodeAudio(
+            value.Format,
+            value.SampleRate,
+            value.Channels,
+            value.SourcePts,
+            value.DurationTicks,
+            value.AudioBytes);
+    }
+
+    public static byte[] EncodeAudio(
+        LiveAudioSampleFormat format,
+        int sampleRate,
+        ushort channels,
+        long sourcePts,
+        long durationTicks,
+        ReadOnlySpan<byte> audioBytes)
+    {
+        ValidateAudio(format, sampleRate, channels, sourcePts, durationTicks, audioBytes.Length);
+        using var writer = new PayloadWriter(28 + audioBytes.Length);
+        writer.WriteInt64(sourcePts);
+        writer.WriteInt64(durationTicks);
+        writer.WriteInt32(sampleRate);
+        writer.WriteUInt16(channels);
+        writer.WriteByte((byte)format);
         writer.WriteByte(0);
-        writer.WriteInt32(value.AudioBytes.Length);
-        writer.WriteBytes(value.AudioBytes);
+        writer.WriteInt32(audioBytes.Length);
+        writer.WriteBytes(audioBytes);
         return writer.ToArray();
     }
 
@@ -401,17 +418,32 @@ public static class LiveProtocol
         }
     }
 
-    private static void ValidateAudio(LiveAudioMessage value)
+    private static void ValidateAudio(LiveAudioMessage value) =>
+        ValidateAudio(
+            value.Format,
+            value.SampleRate,
+            value.Channels,
+            value.SourcePts,
+            value.DurationTicks,
+            value.AudioBytes.Length);
+
+    private static void ValidateAudio(
+        LiveAudioSampleFormat format,
+        int sampleRate,
+        ushort channels,
+        long sourcePts,
+        long durationTicks,
+        int audioLength)
     {
-        if (!Enum.IsDefined(value.Format) || value.SampleRate is < 8_000 or > 384_000 ||
-            value.Channels is < 1 or > 32 || value.SourcePts < 0 || value.DurationTicks <= 0)
+        if (!Enum.IsDefined(format) || sampleRate is < 8_000 or > 384_000 ||
+            channels is < 1 or > 32 || sourcePts < 0 || durationTicks <= 0)
         {
             throw new InvalidDataException("Audio metadata is invalid.");
         }
-        int bytesPerSample = value.Format == LiveAudioSampleFormat.Float32LittleEndian ? 4 : 2;
-        if (value.AudioBytes.Length == 0 ||
-            value.AudioBytes.Length > MaximumPayloadBytes - 28 ||
-            value.AudioBytes.Length % (bytesPerSample * value.Channels) != 0)
+        int bytesPerSample = format == LiveAudioSampleFormat.Float32LittleEndian ? 4 : 2;
+        if (audioLength == 0 ||
+            audioLength > MaximumPayloadBytes - 28 ||
+            audioLength % (bytesPerSample * channels) != 0)
         {
             throw new InvalidDataException("Audio payload length is invalid.");
         }
