@@ -75,6 +75,49 @@ public sealed class TimedCueTests
     }
 
     [Fact]
+    public async Task ProgressReplacementRetriesWhileReaderTemporarilyDeniesDeleteSharing()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = Path.Combine(directory.Path, "timeline.jsonl");
+        Guid generation = Guid.NewGuid();
+        using var writer = new TimedCueFileWriter(path, CreateManifest(generation));
+        var initial = new TimedCueProgress
+        {
+            GenerationId = generation.ToString("D"),
+            ProcessedAudioTicks = 1_000_000,
+            PreparedThroughTicks = 1_000_000,
+            AudioDurationTicks = 60_000_000,
+            ProcessingWallMilliseconds = 100,
+            CueCount = 1
+        };
+        writer.WriteProgress(initial);
+
+        Task replacement;
+        using (FileStream reader = new(
+                   writer.ProgressPath,
+                   FileMode.Open,
+                   FileAccess.Read,
+                   FileShare.Read))
+        {
+            replacement = Task.Run(() => writer.WriteProgress(initial with
+            {
+                ProcessedAudioTicks = 2_000_000,
+                PreparedThroughTicks = 2_000_000,
+                CueCount = 2
+            }));
+            await Task.Delay(100);
+            if (OperatingSystem.IsWindows())
+                Assert.False(replacement.IsCompleted);
+        }
+
+        await replacement.WaitAsync(TimeSpan.FromSeconds(5));
+        TimedCueProgress progress = Assert.IsType<TimedCueProgress>(
+            new TimedCueFileReader(path).ReadProgress());
+        Assert.Equal(2_000_000, progress.ProcessedAudioTicks);
+        Assert.Equal(2, progress.CueCount);
+    }
+
+    [Fact]
     public void TextBoundNeverSplitsUtf16SurrogatePair()
     {
         string input = new string('a', TimedCue.MaximumTextLength - 1) + "😀";
