@@ -6,11 +6,18 @@ internal readonly record struct TimedAudioSegment(
     long EndMediaTicks,
     bool ForcedSplit);
 
+internal interface IStreamingSpeechDetector : IDisposable
+{
+    bool IsSpeech(ReadOnlySpan<float> frame);
+    void Reset();
+}
+
 /// <summary>
 /// Downmixes and resamples decoded VLC audio to Whisper's 16-kHz mono format,
-/// then emits bounded speech utterances using a lightweight energy VAD.
+/// then emits bounded speech utterances using the packaged detector, with a
+/// lightweight energy VAD as a fallback.
 /// </summary>
-internal sealed class StreamingAudioSegmenter
+internal sealed class StreamingAudioSegmenter : IDisposable
 {
     public const int OutputSampleRate = 16_000;
     private const int VadFrameSamples = 320; // 20 ms
@@ -23,6 +30,7 @@ internal sealed class StreamingAudioSegmenter
     private readonly float _vadThreshold;
     private readonly int _silenceSamples;
     private readonly int _maximumUtteranceSamples;
+    private readonly IStreamingSpeechDetector? _speechDetector;
     private readonly float[] _vadFrame = new float[VadFrameSamples];
     private readonly float[] _preRoll = new float[PreRollSamples];
     private readonly long[] _preRollTicks = new long[PreRollSamples];
@@ -53,12 +61,14 @@ internal sealed class StreamingAudioSegmenter
         float vadThreshold,
         int silenceMilliseconds,
         int maximumUtteranceMilliseconds,
-        Action<TimedAudioSegment> onUtterance)
+        Action<TimedAudioSegment> onUtterance,
+        IStreamingSpeechDetector? speechDetector = null)
     {
         _vadThreshold = vadThreshold;
         _silenceSamples = OutputSampleRate * silenceMilliseconds / 1_000;
         _maximumUtteranceSamples = OutputSampleRate * maximumUtteranceMilliseconds / 1_000;
         _onUtterance = onUtterance;
+        _speechDetector = speechDetector;
         _utterance = new List<float>(_maximumUtteranceSamples + PreRollSamples);
     }
 
@@ -134,6 +144,7 @@ internal sealed class StreamingAudioSegmenter
         _utteranceStartTicks = 0;
         _lastVoicedEndTicks = 0;
         _utterance.Clear();
+        _speechDetector?.Reset();
     }
 
     public void Flush()
@@ -181,11 +192,12 @@ internal sealed class StreamingAudioSegmenter
 
     private void ProcessVadFrame(ReadOnlySpan<float> frame, long frameStartTicks, long frameEndTicks)
     {
-        double sumSquares = 0;
-        foreach (float sample in frame)
-            sumSquares += sample * sample;
-        float rms = (float)Math.Sqrt(sumSquares / frame.Length);
-        bool voiced = rms >= _vadThreshold;
+        // Whisper.net's streaming VAD reports completed segment windows and can
+        // return no segment for an individual 20-ms frame while speech is in
+        // progress. Keep the energy detector as a per-frame fail-open guard so
+        // the optional model cannot suppress the entire live pipeline.
+        bool voiced = _speechDetector?.IsSpeech(frame) == true ||
+            CalculateRootMeanSquare(frame) >= _vadThreshold;
 
         if (voiced)
         {
@@ -216,6 +228,14 @@ internal sealed class StreamingAudioSegmenter
 
         if (_speaking && _utterance.Count >= _maximumUtteranceSamples)
             CompleteUtterance(forcedSplit: true);
+    }
+
+    private static float CalculateRootMeanSquare(ReadOnlySpan<float> samples)
+    {
+        double sumSquares = 0;
+        foreach (float sample in samples)
+            sumSquares += sample * sample;
+        return (float)Math.Sqrt(sumSquares / samples.Length);
     }
 
     private void CompleteUtterance(bool forcedSplit)
@@ -304,4 +324,6 @@ internal sealed class StreamingAudioSegmenter
             sum += samples[offset + channel] / 32768f;
         return sum / channels;
     }
+
+    public void Dispose() => _speechDetector?.Dispose();
 }

@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$WhisperOutputDirectory = (Join-Path $PSScriptRoot "models/whisper"),
-    [string]$TranslationOutputDirectory = (Join-Path $PSScriptRoot "models/opus-mt-en-fr")
+    [string]$TranslationOutputDirectory = (Join-Path $PSScriptRoot "../SubtitleTranslator/models/opus-mt-en-fr"),
+    [switch]$SkipOptionalRuntimeModels
 )
 
 $ErrorActionPreference = "Stop"
@@ -75,5 +76,14 @@ if (-not ([System.IO.Path]::GetFullPath($manifestPath)).Equals(
     [StringComparison]::OrdinalIgnoreCase)) {
     Copy-Item -LiteralPath $manifestPath -Destination $deployedManifestPath -Force
 }
+
+if (-not $SkipOptionalRuntimeModels) {
+    $setupProject = Join-Path $PSScriptRoot "../LiveAudioTranslator.ModelSetup"
+    dotnet run --project $setupProject -c Release -- --output $resolvedOutput
+    if ($LASTEXITCODE -ne 0) {
+        throw "OpenVINO/Silero model setup failed with exit code $LASTEXITCODE."
+    }
+}
+
 Write-Host "Whisper model ready: $resolvedOutput"
 Write-Host "Translation model ready: $([System.IO.Path]::GetFullPath($TranslationOutputDirectory))"

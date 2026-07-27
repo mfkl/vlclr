@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)]
     [string]$VlcDirectory,
     [string]$WhisperModelDirectory = (Join-Path $PSScriptRoot "models/whisper"),
-    [string]$TranslationModelDirectory = (Join-Path $PSScriptRoot "models/opus-mt-en-fr"),
+    [string]$TranslationModelDirectory = (Join-Path $PSScriptRoot "../SubtitleTranslator/models/opus-mt-en-fr"),
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
     [string]$RuntimeIdentifier = "win-x64",
@@ -19,6 +19,10 @@ $projectPath = Join-Path $PSScriptRoot "LiveAudioTranslator.csproj"
 $publishDirectory = Join-Path $PSScriptRoot "bin/$Configuration/net10.0/$RuntimeIdentifier/publish"
 $helperProjectPath = Join-Path $PSScriptRoot "../LiveAudioTranslator.Prepare/LiveAudioTranslator.Prepare.csproj"
 $helperPublishDirectory = Join-Path $PSScriptRoot "../LiveAudioTranslator.Prepare/bin/$Configuration/net10.0/$RuntimeIdentifier/publish"
+$workerProjectPath = Join-Path $PSScriptRoot "../LiveAudioTranslator.Worker/LiveAudioTranslator.Worker.csproj"
+$workerPublishDirectory = Join-Path $PSScriptRoot "../LiveAudioTranslator.Worker/bin/$Configuration/net10.0/$RuntimeIdentifier/publish"
+$runnerProjectPath = Join-Path $PSScriptRoot "../LiveAudioTranslator.Runner/LiveAudioTranslator.Runner.csproj"
+$runnerOutputDirectory = Join-Path $PSScriptRoot "../LiveAudioTranslator.Runner/bin/$Configuration/net10.0/$RuntimeIdentifier"
 
 if (-not (Test-Path -LiteralPath $vlcRoot -PathType Container)) {
     throw "VLC directory not found: $vlcRoot"
@@ -32,6 +36,14 @@ if (-not $SkipPublish) {
     dotnet publish $helperProjectPath -c $Configuration -r $RuntimeIdentifier --self-contained false
     if ($LASTEXITCODE -ne 0) {
         throw "Preparation helper publish failed with exit code $LASTEXITCODE."
+    }
+    dotnet publish $workerProjectPath -c $Configuration -r $RuntimeIdentifier --self-contained true
+    if ($LASTEXITCODE -ne 0) {
+        throw "Live worker publish failed with exit code $LASTEXITCODE."
+    }
+    dotnet build $runnerProjectPath -c $Configuration -r $RuntimeIdentifier
+    if ($LASTEXITCODE -ne 0) {
+        throw "Live runner build failed with exit code $LASTEXITCODE."
     }
 }
 
@@ -64,25 +76,13 @@ function Test-ModelBundle {
 $whisperManifest = Test-ModelBundle -Directory $whisperRoot
 $translationManifest = Test-ModelBundle -Directory $translationRoot
 $pluginPath = Join-Path $publishDirectory "libdotnet_live_audio_translator_plugin.dll"
-$onnxRuntimePath = Join-Path $publishDirectory "onnxruntime.dll"
-$providersPath = Join-Path $publishDirectory "onnxruntime_providers_shared.dll"
-$whisperRuntimeDirectory = Join-Path $publishDirectory "runtimes/win-x64"
-$whisperRuntimeNames = @(
-    "ggml-base-whisper.dll",
-    "ggml-cpu-whisper.dll",
-    "ggml-whisper.dll",
-    "whisper.dll"
-)
-
-foreach ($requiredPath in @($pluginPath, $onnxRuntimePath, $providersPath)) {
+foreach ($requiredPath in @(
+    $pluginPath,
+    (Join-Path $workerPublishDirectory "LiveAudioTranslator.Worker.exe"),
+    (Join-Path $runnerOutputDirectory "LiveAudioTranslator.Runner.exe")
+)) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required deployment file not found: $requiredPath"
-    }
-}
-foreach ($runtimeName in $whisperRuntimeNames) {
-    $runtimePath = Join-Path $whisperRuntimeDirectory $runtimeName
-    if (-not (Test-Path -LiteralPath $runtimePath -PathType Leaf)) {
-        throw "Required Whisper runtime not found: $runtimePath"
     }
 }
 $helperPath = Join-Path $helperPublishDirectory "LiveAudioTranslator.Prepare.dll"
@@ -91,16 +91,18 @@ if (-not (Test-Path -LiteralPath $helperPath -PathType Leaf)) {
 }
 
 $pluginDirectory = Join-Path $vlcRoot "plugins/audio_filter"
-$deployedWhisperRuntimeDirectory = Join-Path $vlcRoot "runtimes/win-x64"
 $deployedWhisperModelDirectory = Join-Path $vlcRoot "models/whisper"
 $deployedTranslationModelDirectory = Join-Path $vlcRoot "models/opus-mt-$($translationManifest.sourceLanguage)-$($translationManifest.targetLanguage)"
 $deployedHelperDirectory = Join-Path $vlcRoot "helpers/live-audio-translator"
+$deployedWorkerDirectory = Join-Path $deployedHelperDirectory "worker"
+$deployedRunnerDirectory = Join-Path $deployedHelperDirectory "runner"
 foreach ($directory in @(
     $pluginDirectory,
-    $deployedWhisperRuntimeDirectory,
     $deployedWhisperModelDirectory,
     $deployedTranslationModelDirectory,
-    $deployedHelperDirectory
+    $deployedHelperDirectory,
+    $deployedWorkerDirectory,
+    $deployedRunnerDirectory
 )) {
     New-Item -ItemType Directory -Force -Path $directory | Out-Null
 }
@@ -108,22 +110,20 @@ foreach ($directory in @(
 Get-ChildItem -LiteralPath $helperPublishDirectory -Force | ForEach-Object {
     Copy-Item -LiteralPath $_.FullName -Destination $deployedHelperDirectory -Recurse -Force
 }
-
-Copy-Item -LiteralPath $pluginPath -Destination $pluginDirectory -Force
-Copy-Item -LiteralPath $onnxRuntimePath -Destination $vlcRoot -Force
-Copy-Item -LiteralPath $providersPath -Destination $vlcRoot -Force
-foreach ($runtimeName in $whisperRuntimeNames) {
-    Copy-Item -LiteralPath (Join-Path $whisperRuntimeDirectory $runtimeName) `
-        -Destination $deployedWhisperRuntimeDirectory -Force
+Get-ChildItem -LiteralPath $workerPublishDirectory -Force | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination $deployedWorkerDirectory -Recurse -Force
+}
+Get-ChildItem -LiteralPath $runnerOutputDirectory -Force | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination $deployedRunnerDirectory -Recurse -Force
 }
 
+Copy-Item -LiteralPath $pluginPath -Destination $pluginDirectory -Force
 Copy-Item -LiteralPath (Join-Path $whisperRoot "model-manifest.json") `
     -Destination $deployedWhisperModelDirectory -Force
 foreach ($file in $whisperManifest.files) {
     Copy-Item -LiteralPath (Join-Path $whisperRoot $file.fileName) `
         -Destination $deployedWhisperModelDirectory -Force
 }
-
 Copy-Item -LiteralPath (Join-Path $translationRoot "model-manifest.json") `
     -Destination $deployedTranslationModelDirectory -Force
 foreach ($file in $translationManifest.files) {
@@ -144,7 +144,7 @@ if (-not $SkipCacheGeneration) {
 }
 
 Write-Host "Deployed plugin modules: dotnet_audio_translator, dotnet_live_subtitles"
-Write-Host "Deployed Whisper model: $deployedWhisperModelDirectory"
-Write-Host "Deployed translation model: $deployedTranslationModelDirectory"
 Write-Host "Deployed preparation helper: $deployedHelperDirectory"
+Write-Host "Deployed pre-warmed worker: $deployedWorkerDirectory"
+Write-Host "Deployed runner: $deployedRunnerDirectory"
 Write-Host "Run from Git Bash: samples/LiveAudioTranslator/run.sh /path/to/video.mp4"

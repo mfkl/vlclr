@@ -1,0 +1,91 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>LiveAudioTranslator.Worker</AssemblyName>
+    <WhisperRuntimeFlavor Condition="'$(WhisperRuntimeFlavor)' == ''">Cpu</WhisperRuntimeFlavor>
+    <TranslationRuntimeFlavor Condition="'$(TranslationRuntimeFlavor)' == ''">Cpu</TranslationRuntimeFlavor>
+    <OnnxRuntimeVersion Condition="'$(TranslationRuntimeFlavor)' == 'DirectML'">1.24.4</OnnxRuntimeVersion>
+    <OnnxRuntimeVersion Condition="'$(OnnxRuntimeVersion)' == ''">1.27.1</OnnxRuntimeVersion>
+    <OpenVinoRuntimeVersion>2024.4.0.1</OpenVinoRuntimeVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(WhisperRuntimeFlavor)' == 'OpenVino'">
+    <DefineConstants>$(DefineConstants);WHISPER_OPENVINO</DefineConstants>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(WhisperRuntimeFlavor)' == 'Vulkan'">
+    <DefineConstants>$(DefineConstants);WHISPER_VULKAN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TranslationRuntimeFlavor)' == 'DirectML'">
+    <DefineConstants>$(DefineConstants);ORT_DIRECTML</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TranslationRuntimeFlavor)' == 'OpenVino'">
+    <DefineConstants>$(DefineConstants);ORT_OPENVINO</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VLCLR.LiveTranslation\VLCLR.LiveTranslation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Whisper.net" Version="1.9.1" />
+    <PackageReference Include="Whisper.net.Runtime" Version="1.9.1"
+                      Condition="'$(WhisperRuntimeFlavor)' == 'Cpu'" />
+    <PackageReference Include="Whisper.net.Runtime.OpenVino" Version="1.9.1"
+                      Condition="'$(WhisperRuntimeFlavor)' == 'OpenVino'" />
+    <PackageReference Include="OpenVINO.runtime.win" Version="$(OpenVinoRuntimeVersion)"
+                      Condition="'$(WhisperRuntimeFlavor)' == 'OpenVino'" />
+    <PackageReference Include="Whisper.net.Runtime.Vulkan" Version="1.9.1"
+                      Condition="'$(WhisperRuntimeFlavor)' == 'Vulkan'" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="$(OnnxRuntimeVersion)"
+                      Condition="'$(TranslationRuntimeFlavor)' == 'Cpu'" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="$(OnnxRuntimeVersion)"
+                      Condition="'$(TranslationRuntimeFlavor)' == 'DirectML'" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.OpenVino" Version="$(OnnxRuntimeVersion)"
+                      Condition="'$(TranslationRuntimeFlavor)' == 'OpenVino'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\LiveAudioTranslator\StreamingAudioSegmenter.cs" Link="Pipeline\StreamingAudioSegmenter.cs" />
+    <Compile Include="..\LiveAudioTranslator\TranscriptStitcher.cs" Link="Pipeline\TranscriptStitcher.cs" />
+    <Compile Include="..\LiveAudioTranslator\TimedCue.cs" Link="Pipeline\TimedCue.cs" />
+    <Compile Include="..\SubtitleTranslator\ITranslationEngine.cs" Link="Translation\ITranslationEngine.cs" />
+    <Compile Include="..\SubtitleTranslator\ModelManifest.cs" Link="Translation\ModelManifest.cs" />
+    <Compile Include="..\SubtitleTranslator\OnnxNativeResolver.cs" Link="Translation\OnnxNativeResolver.cs" />
+    <Compile Include="..\SubtitleTranslator\OnnxSessionFactory.cs" Link="Translation\OnnxSessionFactory.cs" />
+    <Compile Include="..\SubtitleTranslator\OnnxTranslator.cs" Link="Translation\OnnxTranslator.cs" />
+    <Compile Include="..\SubtitleTranslator\SimpleTokenizer.cs" Link="Translation\SimpleTokenizer.cs" />
+    <Compile Include="..\SubtitleTranslator\TranslationCache.cs" Link="Translation\TranslationCache.cs" />
+    <Compile Include="..\SubtitleTranslator\TranslationTextNormalizer.cs" Link="Translation\TranslationTextNormalizer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="models\model-profiles.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\LiveAudioTranslator\models\whisper\model-manifest.json"
+          Link="models\whisper\model-manifest.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\LiveAudioTranslator\models\whisper\ggml-tiny.bin"
+          Link="models\whisper\ggml-tiny.bin" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\LiveAudioTranslator\models\whisper\silero-vad\**\*"
+          LinkBase="models\whisper\silero-vad" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\LiveAudioTranslator\models\whisper\openvino-tiny\**\*"
+          LinkBase="models\whisper\openvino-tiny" CopyToOutputDirectory="PreserveNewest"
+          Condition="'$(WhisperRuntimeFlavor)' == 'OpenVino'" />
+    <None Include="..\SubtitleTranslator\models\opus-mt-en-fr\**\*"
+          LinkBase="models\opus-mt-en-fr" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(WhisperRuntimeFlavor)' == 'OpenVino'">
+    <None Include="$(NuGetPackageRoot)openvino.runtime.win\$(OpenVinoRuntimeVersion)\runtimes\win-x64\native\*"
+          Link="%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

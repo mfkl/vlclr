@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "modelId": "whisper-openvino-encoder-tiny",
+  "files": [
+    {
+      "fileName": "ggml-tiny-encoder.bin",
+      "size": 32833708,
+      "sha256": "28cef399cf247512e2e91866176063129ff76e14059ae4c0ab53c18469f3fa02"
+    },
+    {
+      "fileName": "ggml-tiny-encoder.xml",
+      "size": 212538,
+      "sha256": "1f3edc5813d0714d6d4fdb68325a29216f7f24a4b299f8c7a5979fd4a8631fa0"
+    }
+  ]
+}

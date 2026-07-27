@@ -8,6 +8,22 @@ public interface ITranslationEngine : IDisposable
     TranslationResult TranslateDetailed(string text);
 }
 
+/// <summary>
+/// Creates translation adapters without coupling playback or transport code to
+/// a particular model family or inference provider.
+/// </summary>
+public interface ITranslationEngineFactory
+{
+    string AdapterId { get; }
+    bool Supports(string modelFamily);
+    ITranslationEngine Create(
+        string modelDirectory,
+        string sourceLanguage,
+        string targetLanguage,
+        string providerId,
+        int threadCount);
+}
+
 public readonly record struct TranslationResult(
     string Text,
     int[] OutputTokenIds,
@@ -24,6 +40,7 @@ public readonly record struct TranslationResult(
 
 public sealed record OnnxTranslatorOptions
 {
+    public string ProviderId { get; init; } = "cpu";
     public int IntraOpThreads { get; init; } = 4;
     public int MaximumSourceTokens { get; init; } = 128;
     public int MaximumOutputTokens { get; init; } = 128;

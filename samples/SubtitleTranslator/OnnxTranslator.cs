@@ -104,7 +104,8 @@ public sealed class OnnxTranslator : ITranslationEngine
         InferenceSession? decoder = null;
         try
         {
-            using SessionOptions sessionOptions = OnnxSessionFactory.CreateCpuOptions(options.IntraOpThreads);
+            using SessionOptions sessionOptions =
+                OnnxSessionFactory.Create(options.ProviderId, options.IntraOpThreads);
             encoder = new InferenceSession(_manifest.GetFilePath(pairDirectory, "encoder"), sessionOptions);
             decoder = new InferenceSession(_manifest.GetFilePath(pairDirectory, "decoder"), sessionOptions);
         }

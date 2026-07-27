@@ -33,47 +33,53 @@ public static unsafe class PluginEntry
             .WithName("dotnet_audio_translator")
             .WithShortcut("dotnet_audio_translator")
             .WithShortName(".NET live audio translator")
-            .WithDescription("Capture decoded audio for offline Whisper transcription and translation")
+            .WithDescription("Transport current decoded audio to a warming translation worker")
             .WithCapability("audio filter")
             .WithScore(100)
             .WithNoUnload()
             .WithSubcategory(VLCConfigSubcategory.SUBCAT_AUDIO_AFILTER)
             .AddStringConfig(
                 "live-translator-mode",
-                "sync",
+                "live-immediate",
                 "Translation mode",
-                "sync reads prepared media-timed cues; live provides bounded-latency immediate captions")
+                "prepared, live-immediate, or delayed live-sync")
             .AddFileConfig(
                 "live-translator-cue-file",
                 null,
                 "Prepared timed-cue file",
                 "Versioned JSONL timeline produced by LiveAudioTranslator.Prepare")
-            .AddFileConfig(
-                "live-translator-whisper-model",
+            .AddStringConfig(
+                "live-translator-session",
                 null,
-                "Whisper GGML model",
-                "Multilingual Whisper GGML model used to translate speech into English")
-            .AddFileConfig(
-                "live-translator-whisper-runtime",
+                "Worker session ID",
+                "Unique session ID created by the runner")
+            .AddStringConfig(
+                "live-translator-pipe",
                 null,
-                "Whisper native runtime",
-                "Path to the Whisper.net CPU whisper.dll")
-            .AddDirectoryConfig(
+                "Worker pipe",
+                "Unique named pipe created by the runner")
+            .AddStringConfig(
+                "live-translator-speech-model",
+                "whisper-tiny-multilingual",
+                "Speech model profile",
+                "Stable speech model profile ID")
+            .AddStringConfig(
                 "live-translator-translation-model",
-                null,
-                "English-to-target translation model",
-                "Directory containing the validated OPUS-MT ONNX model bundle")
+                "opus-mt-en-fr",
+                "Translation model profile",
+                "Stable translation model profile ID")
+            .AddStringConfig("live-translator-speech-provider", "auto", "Speech inference provider", "auto, cpu, openvino, or vulkan")
+            .AddStringConfig("live-translator-translation-provider", "auto", "Translation inference provider", "auto, cpu, directml, or openvino")
             .AddStringConfig("live-translator-source-language", "auto", "Spoken language", "auto or an ISO language code")
             .AddStringConfig("live-translator-target-language", "fr", "Subtitle language", "Target OPUS-MT language code")
-            .AddIntegerConfig("live-translator-whisper-threads", 2, 1, 8, "Whisper threads")
-            .AddIntegerConfig("live-translator-translation-threads", 1, 1, 8, "Translation threads")
-            .AddFloatConfig("live-translator-vad-threshold", 0.012, 0.001, 0.25, "Speech energy threshold")
-            .AddIntegerConfig("live-translator-silence-ms", 400, 200, 1_000, "Silence ending an utterance")
-            .AddIntegerConfig("live-translator-max-utterance-ms", 2_500, 1_000, 4_000, "Maximum speech chunk")
+            .AddIntegerConfig("live-translator-input-delay-ms", 15_000, 8_000, 60_000, "VLC live-sync input delay")
+            .AddIntegerConfig("live-translator-max-utterance-ms", 2_500, 1_000, 15_000, "Maximum speech chunk")
+            .AddIntegerConfig("live-translator-burst-jitter-ms", 2_000, 250, 10_000, "Extra transport queue burst budget")
             .AddIntegerConfig("live-translator-subtitle-duration-ms", 2_500, 500, 5_000, "Live subtitle duration")
-            .AddIntegerConfig("live-translator-maximum-age-ms", 3_500, 500, 10_000, "Maximum live caption age")
+            .AddIntegerConfig("live-translator-maximum-age-ms", 7_000, 500, 10_000, "Maximum live caption age")
             .AddIntegerConfig("live-translator-early-tolerance-ms", 80, 0, 500, "Synchronized cue early tolerance")
             .AddIntegerConfig("live-translator-stale-clock-ms", 2_000, 250, 10_000, "Maximum audio clock age")
+            .AddIntegerConfig("live-translator-lead-tolerance-ms", 1_000, 250, 5_000, "Decode-lead anchor tolerance")
             .WithOpenCallback(&OpenAudio, "OpenAudio")
             .Register();
         if (result != 0)
@@ -367,7 +373,7 @@ internal sealed unsafe class AudioFilterInstance(
             : block->SampleCount * VLCTick.Second / Math.Max(1, format.Rate);
         long systemTick = VLCCore.TickNow();
         Hub.ObserveAudio(block->PresentationTimestamp, blockDuration, systemTick, discontinuity);
-        if (Hub.Mode != LiveAudioTranslationMode.Live || block->Buffer == 0)
+        if (Hub.Mode == LiveAudioTranslationMode.Prepared || block->Buffer == 0)
             return;
 
         int channels = format.Channels;
@@ -396,7 +402,7 @@ internal sealed unsafe class AudioFilterInstance(
 
     public void DrainStatus()
     {
-        while (Hub.TryTakeStatus(out string status))
+        for (int count = 0; count < 4 && Hub.TryTakeStatus(out string status); count++)
             logger.Info($"[LiveAudioTranslator] {status}");
     }
 
@@ -415,14 +421,15 @@ internal sealed class SubSourceInstance(
 
     public void DrainStatus()
     {
-        while (Hub.TryTakeStatus(out string status))
+        for (int count = 0; count < 4 && Hub.TryTakeStatus(out string status); count++)
             logger.Info($"[LiveAudioTranslator] {status}");
     }
 
     public void ReportRendered(TranslatedCue cue) =>
         logger.Info(
             $"[LiveAudioTranslator] event=subtitle outcome=rendered sequence={cue.Sequence} " +
-            $"duration_ms={cue.DurationMilliseconds} scheduling_error_ms={cue.SchedulingErrorTicks / 1000d:F1} " +
+            $"duration_ms={cue.DurationMilliseconds} scheduler_error_ms={cue.SchedulingErrorTicks / 1000d:F1} " +
+            $"semantic_latency_ms={cue.SemanticLatencyTicks / 1000d:F1} " +
             $"generation={cue.Generation}");
 
     public void Dispose()
