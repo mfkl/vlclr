@@ -45,6 +45,9 @@ filtered smoke selected its first four in sequence from their media intervals.
 No completed-order fallback exists. The headless smoke closed both modules
 without a plugin error or assertion.
 
-This report is a timing/module smoke, not visual acceptance. Upright video,
-visible cue relevance, seek behavior, smoothness, and Qt close behavior still
-must be accepted in the normal visible window as described in the README.
+The later 2026-07-24 visible Qt acceptance on the same full input ran for
+98.3 seconds, rendered 45 cues, survived backward and forward seeks with
+generations 1 → 3 → 5, measured steady-state scheduler p95 at 78.5 ms, and
+closed cleanly with no underrun, dropped frame, assertion, or crash. See the
+README for the D3D11 subtitle-plane capture limitation and the exact validation
+command.
