@@ -62,7 +62,20 @@ public abstract class VLCVideoFilterBase : IDisposable
     /// Process a video frame. Override to implement filter logic.
     /// </summary>
     /// <param name="frame">The video frame to process (in-place modification).</param>
-    protected abstract void ProcessFrame(VLCFrame frame);
+    protected virtual void ProcessFrame(VLCFrame frame) { }
+
+    /// <summary>
+    /// Processes a frame and selects the picture returned to VLC.
+    /// Override this for out-of-place GPU filters. A newly allocated output
+    /// receives the input properties and the input is released by the base.
+    /// </summary>
+    /// <param name="frame">The input frame owned by the callback.</param>
+    /// <returns>The input picture, a newly allocated output picture, or zero.</returns>
+    protected virtual nint ProcessFrameToOutput(VLCFrame frame)
+    {
+        ProcessFrame(frame);
+        return frame.NativePtr;
+    }
 
     /// <summary>
     /// Called on first frame. Override for one-time setup that needs frame info.
@@ -152,12 +165,23 @@ public abstract class VLCVideoFilterBase : IDisposable
             }
 
             // Process the frame
-            ProcessFrame(frame);
+            nint outputPicture = ProcessFrameToOutput(frame);
 
             // Increment frame count
             Interlocked.Increment(ref _frameCount);
 
-            return picturePtr;
+            if (outputPicture != picturePtr)
+            {
+                if (outputPicture != 0)
+                {
+                    VLCCore.PictureCopyProperties(
+                        outputPicture,
+                        picturePtr);
+                }
+                VLCCore.PictureRelease(picturePtr);
+            }
+
+            return outputPicture;
         }
         catch (Exception ex)
         {

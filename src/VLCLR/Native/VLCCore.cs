@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace VLCLR.Native;
@@ -456,6 +457,18 @@ public static partial class VLCCore
     #region Picture Management
 
     /// <summary>
+    /// Retain a VLC video context.
+    /// </summary>
+    [LibraryImport(LibraryName, EntryPoint = "vlc_video_context_Hold")]
+    public static partial nint VideoContextHold(nint videoContext);
+
+    /// <summary>
+    /// Release a retained VLC video context.
+    /// </summary>
+    [LibraryImport(LibraryName, EntryPoint = "vlc_video_context_Release")]
+    public static partial void VideoContextRelease(nint videoContext);
+
+    /// <summary>
     /// Create a new picture from a video format.
     /// The picture must be released with PictureRelease.
     /// </summary>
@@ -488,6 +501,25 @@ public static partial class VLCCore
     /// <param name="picture">Picture pointer</param>
     [LibraryImport(LibraryName, EntryPoint = "picture_Destroy")]
     public static partial void PictureDestroy(nint picture);
+
+    /// <summary>
+    /// Release a picture reference, mirroring VLC's inline picture_Release.
+    /// </summary>
+    public static unsafe void PictureRelease(nint picture)
+    {
+        if (picture == 0)
+        {
+            return;
+        }
+
+        VLCPicture* picturePointer = (VLCPicture*)picture;
+        ref int references = ref Unsafe.As<uint, int>(
+            ref picturePointer->Refs);
+        if (Interlocked.Decrement(ref references) == 0)
+        {
+            PictureDestroy(picture);
+        }
+    }
 
     /// <summary>
     /// Get the chroma description for a fourcc code.
