@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "purpose": "Evaluation-only YOLOX candidates for the pure-C# VLCLR GPU feasibility benchmark",
+  "input": {
+    "width": 416,
+    "height": 416,
+    "colorFormat": "BGR",
+    "layout": "NCHW",
+    "elementType": "float32",
+    "normalization": "none"
+  },
+  "output": {
+    "shape": [1, 3549, 85],
+    "classes": "COCO-80",
+    "decodeInGraph": false,
+    "nmsInGraph": false
+  },
+  "candidates": [
+    {
+      "id": "yolox-tiny-416-official-0.1.1rc0",
+      "fileName": "yolox_tiny.onnx",
+      "source": "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_tiny.onnx",
+      "sha256": "427cc366d34e27ff7a03e2899b5e3671425c262ea2291f88bb942bc1cc70b0f7",
+      "size": 20219662,
+      "repositoryLicense": "Apache-2.0",
+      "redistributionStatus": "review-required"
+    },
+    {
+      "id": "yolox-nano-416-official-0.1.1rc0",
+      "fileName": "yolox_nano.onnx",
+      "source": "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_nano.onnx",
+      "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+      "size": 3659407,
+      "repositoryLicense": "Apache-2.0",
+      "redistributionStatus": "review-required"
+    }
+  ]
+}
