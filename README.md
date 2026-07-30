@@ -1,208 +1,119 @@
 # VLCLR
 
-> ⚠︎ **This is an experimental project. Do not use in production.**
+> Experimental project. Do not use it in production.
 
-**VLC + CLR = VLCLR** - A framework for building VLC 4.x plugins in C# using Native AOT compilation.
+**VLC + CLR = VLCLR** is a framework for authoring VLC 4.x plugins in C# and
+publishing them as Native AOT libraries that VLC loads directly—without a
+separate C shim.
 
-## Overview
+Current target: Windows x64, .NET 10, VLC 4.0.6.
 
-VLCLR enables writing VLC plugins entirely in C# without any C code by leveraging .NET Native AOT to compile directly to native DLLs that VLC can load.
-
-Key features:
-- **Pure C# implementation** - No C code or interop bridge required
-- **Native AOT compilation** - Compiles to native code for direct VLC plugin loading
-- **VLC 4.x support** - Built for VLC 4.0.6 plugin API
-- **Base classes** - `VLCVideoFilterBase` and `VLCTextRendererBase` handle boilerplate
-- **Source generator** - Automatically generates entry points from attributes
-- **Configuration system** - Declarative VLC config options via `[VLCConfig]` attribute
-
-## Project Structure
-
-| Component | Description |
-|-----------|-------------|
-| `src/VLCLR/` | Framework library with VLC bindings, base classes, and helpers |
-| `src/VLCLR.Generators/` | Source generator for automatic entry point generation |
-| `src/VLCLR.Tests/` | Unit tests for struct layouts and API contracts |
-| `samples/VideoOverlay/` | Sample video filter plugin with text overlay |
-| `samples/SubtitleRenderer/` | Sample text renderer plugin for subtitles |
-
-### VLCLR Framework
-
-The framework provides:
-- **Base classes** (`VLCLR.Plugin`) - `VLCVideoFilterBase`, `VLCTextRendererBase` for easy plugin development
-- **Native types** (`VLCLR.Native`) - C# struct definitions matching VLC 4.x (filter_t, picture_t, etc.)
-- **Module registration** (`VLCLR.Module`) - Fluent API for plugin entry points
-- **Wrapper classes** (`VLCLR`) - High-level C# wrappers (VLCPlayer, VLCPlaylist, VLCLogger, etc.)
-- **Text rendering** (`VLCLR.Text`, `VLCLR.Rendering`) - Text parsing and canvas rendering
-- **Source generator** - Generates `vlc_entry`, callbacks, and config registration from attributes
-
-## Building
-
-Requirements:
-- .NET 10 SDK
-- VLC 4.0 import library (`libvlccore.lib` in `lib/`)
-
-```bash
-# Build the sample plugins
-dotnet publish samples/VideoOverlay -c Release -r win-x64
-dotnet publish samples/SubtitleRenderer -c Release -r win-x64
-
-# Run tests
-dotnet test src/VLCLR.Tests
+```mermaid
+flowchart LR
+    CS["C# plugin"] --> GEN["VLCLR source generator"]
+    GEN --> AOT["Native AOT DLL"]
+    AOT --> VLC["VLC 4"]
+    VLC --> VIDEO["Video filters"]
+    VLC --> TEXT["Text renderers"]
+    VLC --> AUDIO["Audio filters / sub-sources"]
 ```
 
-## Creating a Plugin
+## What is included
 
-### 1. Video Filter (Simplest Example)
+- Attribute-based modules with generated exports, callbacks, configuration,
+  exception boundaries, and instance lifecycle.
+- Base classes and ABI wrappers for video, subtitle, audio, player, and
+  playlist integration.
+- Low-level fluent module registration for advanced or multi-module plugins.
+- Unit, ABI, Native AOT export, VLC integration, visual, and benchmark coverage.
+
+## Samples
+
+Each sample owns its setup, commands, parameters, examples, architecture, and
+troubleshooting documentation.
+
+| Sample | Capability | Guide |
+|---|---|---|
+| YOLOX object detection | D3D11/OpenVINO GPU video filter with COCO-80 boxes and labels | [YoloObjectSearch](samples/YoloObjectSearch/README.md) |
+| Diagnostic overlay | CPU video filter with ImageSharp text and graphics | [VideoOverlay](samples/VideoOverlay/README.md) |
+| Styled subtitles | ImageSharp text renderer | [SubtitleRenderer](samples/SubtitleRenderer/README.md) |
+| Offline subtitle translation | ONNX English-to-French text renderer | [SubtitleTranslator](samples/SubtitleTranslator/README.md) |
+| Live speech translation | Audio filter, subtitle source, and external worker | [LiveAudioTranslator](samples/LiveAudioTranslator/README.md) |
+
+## Requirements
+
+- .NET SDK 10.0.102
+- Windows x64 with an MSVC C++ toolchain
+- `vswhere.exe` in `PATH`
+- A VLC 4 development build compatible with plugin API 4.0.6
+- `lib/libvlccore.lib` when publishing plugins
+- Git Bash for visible VLC runs on Windows
+
+Large model and runtime binaries are intentionally excluded from Git.
+
+## Build and test
+
+From the repository root:
+
+```powershell
+dotnet build vlclr.sln -c Release
+dotnet test src/VLCLR.Tests -c Release
+dotnet test tests/VLCLR.ObjectDetection.Tests -c Release
+dotnet test tests/SubtitleTranslator.UnitTests -c Release
+dotnet test tests/LiveAudioTranslator.ProtocolTests -c Release
+```
+
+Publish a Native AOT sample:
+
+```powershell
+$env:PATH += ';C:\Program Files (x86)\Microsoft Visual Studio\Installer'
+dotnet publish samples/VideoOverlay -c Release -r win-x64
+```
+
+Model-free builds and unit tests do not download model assets.
+
+## Minimal plugin
 
 ```csharp
 using VLCLR.Plugin;
 
 [VLCModule("my_filter")]
 [VLCCapability("video filter", Score = 0)]
-[VLCDescription("My Video Filter")]
+[VLCDescription("My C# video filter")]
 public partial class MyFilter : VLCVideoFilterBase
 {
     protected override void ProcessFrame(VLCFrame frame)
     {
-        // Modify frame.Pixels here
-        // frame.Width, frame.Height, frame.Pitch available
+        // Inspect or modify the negotiated VLC picture.
     }
 }
 ```
 
-That's it! The source generator creates all entry points automatically.
+The source generator supplies `vlc_entry`, module registration, native
+callbacks, exception handling, and per-instance state. Advanced plugins can use
+`VLCLR.Module.ModuleBuilder` directly.
 
-### 2. With Configuration Options
+## Repository map
 
-```csharp
-[VLCModule("my_filter")]
-[VLCCapability("video filter")]
-[VLCConfig("my-filter-opacity", VLCConfigType.Float, Default = 1.0f, Min = 0.0f, Max = 1.0f,
-    Description = "Filter opacity")]
-[VLCConfig("my-filter-enabled", VLCConfigType.Bool, Default = true,
-    Description = "Enable filter")]
-public partial class MyFilter : VLCVideoFilterBase
-{
-    protected override void ProcessFrame(VLCFrame frame)
-    {
-        // Access config via VLC's var_GetFloat/var_GetBool
-    }
-}
-```
+| Path | Purpose |
+|---|---|
+| `src/VLCLR/` | Core bindings, wrappers, module registration, and plugin base classes |
+| `src/VLCLR.Generators/` | Attribute-based VLC module source generator |
+| `src/VLCLR.ImageSharp/` | Reusable frame and text-rendering helpers |
+| `src/VLCLR.ObjectDetection/` | Detection contracts, COCO vocabulary, YOLOX decoding, query, and overlay timing |
+| `src/VLCLR.LiveTranslation/` | Translation worker protocol and model profiles |
+| `samples/` | Runnable Native AOT plugin examples with per-sample guides |
+| `tests/` | Unit, ABI, integration, and visual harnesses |
+| `benchmarks/` | Rendering, inference, and playback measurements |
 
-### 3. Text Renderer
+## Documentation approach
 
-```csharp
-[VLCModule("my_renderer")]
-[VLCCapability("text renderer", Score = 100)]
-[VLCDescription("My Text Renderer")]
-public partial class MyRenderer : VLCTextRendererBase
-{
-    protected override nint RenderText(VLCTextRequest request)
-    {
-        // request.Text, request.Style, request.Alignment available
-        // Return pointer to rendered subpicture_region_t
-    }
-}
-```
-
-### 4. Project File Settings
-
-```xml
-<PropertyGroup>
-  <TargetFramework>net10.0</TargetFramework>
-  <PublishAot>true</PublishAot>
-  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  <AssemblyName>libmy_plugin_plugin</AssemblyName>
-</PropertyGroup>
-
-<ItemGroup>
-  <ProjectReference Include="path/to/VLCLR.csproj" />
-  <DirectPInvoke Include="libvlccore" />
-  <NativeLibrary Include="path/to/libvlccore.lib" />
-</ItemGroup>
-```
-
-## Generated Code
-
-The source generator produces:
-- `vlc_entry` - Module registration with all attributes
-- `vlc_entry_api_version` - VLC API version pointer
-- `vlc_entry_copyright` - Copyright string pointer
-- Filter callbacks (`FilterVideo`, `Close`, `Flush` or `Render`, `Close`)
-- GCHandle management for multi-instance support
-- Configuration option registration
-
-## Usage
-
-### Integration Tests (LibVLCSharp)
-
-```bash
-# Run VideoOverlay integration test
-cd tests/IntegrationTest && dotnet run -- ../../vlc-sdk path/to/video.mp4
-
-# Run SubtitleRenderer integration test
-cd tests/SubtitleRendererTest && dotnet run -- ../../vlc-sdk path/to/video.mp4 path/to/subtitles.srt
-```
-
-### Manual Testing with VLC
-
-```bash
-# Build the plugin
-dotnet publish samples/VideoOverlay -c Release -r win-x64
-
-# Copy to VLC plugin directory
-cp samples/VideoOverlay/bin/Release/net10.0/win-x64/native/libdotnet_overlay_plugin.dll <vlc-path>/plugins/video_filter/
-
-# Regenerate plugin cache
-<vlc-path>/vlc-cache-gen.exe <vlc-path>/plugins
-
-# Run with VLC
-vlc.exe --video-filter dotnet_overlay --no-hw-dec video.mp4
-```
-
-## Samples
-
-### VideoOverlay
-
-A video filter that overlays debug information (frame count, GC stats) on video frames.
-
-See [`samples/VideoOverlay/README.md`](samples/VideoOverlay/README.md)
-
-### SubtitleRenderer
-
-A text renderer that renders styled subtitles using ImageSharp.
-
-See [`samples/SubtitleRenderer/README.md`](samples/SubtitleRenderer/README.md)
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Source Generator (VLCLR.Generators)                        │
-│  - Generates entry points from [VLCModule] attribute        │
-│  - Generates callbacks from base class                      │
-│  - Zero boilerplate for plugin author                       │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ uses
-┌─────────────────────────────────────────────────────────────┐
-│  Base Classes (VLCLR.Plugin)                                │
-│  - VLCVideoFilterBase, VLCTextRendererBase                  │
-│  - Handles state management, lifecycle, error handling      │
-│  - Plugin author overrides virtual methods                  │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ uses
-┌─────────────────────────────────────────────────────────────┐
-│  Core Framework (VLCLR)                                     │
-│  - ModuleBuilder, native types, wrappers                    │
-│  - Direct control for advanced users                        │
-└─────────────────────────────────────────────────────────────┘
-```
+- This README is the concise project entry point.
+- Each sample README is the operational guide for that plugin.
+- Design plans record decisions, evidence, risks, and future work; for example,
+  [YOLO Object Search Plan](YOLO_OBJECT_SEARCH_PLAN.md).
+- Benchmark result files retain machine-specific measurements.
 
 ## License
 
-See individual source files for licensing information.
+See individual source files and model manifests for licensing information.
