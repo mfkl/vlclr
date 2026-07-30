@@ -137,6 +137,39 @@ public readonly ref struct VLCFrame
         return GetPicture().GetPlane(planeIndex);
     }
 
+    /// <summary>
+    /// Gets the borrowed D3D11 texture and array slice for a GPU-backed frame.
+    /// The returned COM pointer is valid only while VLC owns this frame callback.
+    /// </summary>
+    public unsafe bool TryGetD3D11Surface(out VLCD3D11Surface surface)
+    {
+        surface = default;
+        if (_picturePtr == 0)
+        {
+            return false;
+        }
+
+        VLCPicture* picture = (VLCPicture*)_picturePtr;
+        if (!VLCFourCC.IsD3D11Opaque(picture->Format.Chroma) ||
+            picture->Context == 0)
+        {
+            return false;
+        }
+
+        VLCD3D11PictureContext* pictureContext =
+            (VLCD3D11PictureContext*)picture->Context;
+        if (pictureContext->System.Texture0 == 0)
+        {
+            return false;
+        }
+
+        surface = new VLCD3D11Surface(
+            pictureContext->System.Texture0,
+            pictureContext->System.ArraySlice,
+            pictureContext->System.VideoProcessorInputView);
+        return true;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private unsafe VLCPicture GetPicture()
     {
