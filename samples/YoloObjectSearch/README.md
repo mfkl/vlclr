@@ -288,10 +288,6 @@ elsewhere indicate that a decoder-owned surface was modified.
 | [`D3D11OutputPictureAllocator.cs`](D3D11OutputPictureAllocator.cs) | Pooled VLC-compatible D3D11 output pictures; decoder surfaces stay immutable |
 | [`src/VLCLR.ObjectDetection/`](../../src/VLCLR.ObjectDetection/) | COCO vocabulary, queries, YOLOX decode/NMS, staleness and timestamp gates |
 
-See the [YOLO Object Search Plan](../../YOLO_OBJECT_SEARCH_PLAN.md) for detailed
-design decisions, feasibility evidence, release gates, and future indexing
-work.
-
 ## Current limitations
 
 - Windows x64, D3D11, NV12, and Intel OpenVINO GPU are the v1 capability matrix.

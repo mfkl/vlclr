@@ -110,8 +110,7 @@ callbacks, exception handling, and per-instance state. Advanced plugins can use
 
 - This README is the concise project entry point.
 - Each sample README is the operational guide for that plugin.
-- Design plans record decisions, evidence, risks, and future work; for example,
-  [YOLO Object Search Plan](YOLO_OBJECT_SEARCH_PLAN.md).
+- Planning documents remain local and are intentionally excluded from Git.
 - Benchmark result files retain machine-specific measurements.
 
 ## License
