@@ -17,6 +17,11 @@ public static class VLCFourCC
     public const uint BGRA = 0x41524742; // "BGRA"
     public const uint I420 = 0x30323449; // "I420" - YUV 4:2:0 planar
     public const uint YV12 = 0x32315659; // "YV12" - YUV 4:2:0 planar
+    public const uint D3D11Opaque = 0x31315844; // "DX11" - D3D11 8-bit video surface
+    public const uint D3D11Opaque10Bit = 0x30315844; // "DX10" - D3D11 10-bit video surface
+    public const uint D3D11OpaqueRgba = 0x47525844; // "DXRG"
+    public const uint D3D11OpaqueBgra = 0x52474144; // "DAGR"
+    public const uint D3D11OpaqueAlpha = 0x31314144; // "DA11"
 
     // Common native little-endian audio formats on Windows.
     public const uint F32L = 0x6C323366; // "f32l" - interleaved 32-bit float
@@ -100,5 +105,18 @@ public static class VLCFourCC
             BGRA => true,
             _ => false
         };
+    }
+
+    /// <summary>
+    /// Checks whether a chroma value represents a GPU-backed D3D11 picture.
+    /// </summary>
+    public static bool IsD3D11Opaque(uint chroma)
+    {
+        return chroma is
+            D3D11Opaque or
+            D3D11Opaque10Bit or
+            D3D11OpaqueRgba or
+            D3D11OpaqueBgra or
+            D3D11OpaqueAlpha;
     }
 }

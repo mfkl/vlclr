@@ -79,6 +79,67 @@ public readonly struct VLCFilterContext
     public nint NativePtr => _filterPtr;
 
     /// <summary>
+    /// Propagates the input hardware video context to this filter's output.
+    /// Call ReleaseOutputVideoContext when the filter closes.
+    /// </summary>
+    public unsafe bool PassThroughVideoContext()
+    {
+        if (_filterPtr == 0)
+        {
+            return false;
+        }
+
+        VLCFilter* filter = (VLCFilter*)_filterPtr;
+        if (filter->VideoContextIn == 0)
+        {
+            return false;
+        }
+        if (filter->VideoContextOut != 0)
+        {
+            return true;
+        }
+
+        filter->VideoContextOut = VLCCore.VideoContextHold(
+            filter->VideoContextIn);
+        return filter->VideoContextOut != 0;
+    }
+
+    /// <summary>
+    /// Gets the retained hardware video context configured for filter output.
+    /// </summary>
+    public unsafe nint OutputVideoContext
+    {
+        get
+        {
+            if (_filterPtr == 0)
+            {
+                return 0;
+            }
+
+            return ((VLCFilter*)_filterPtr)->VideoContextOut;
+        }
+    }
+
+    /// <summary>
+    /// Releases a hardware video context retained by PassThroughVideoContext.
+    /// </summary>
+    public unsafe void ReleaseOutputVideoContext()
+    {
+        if (_filterPtr == 0)
+        {
+            return;
+        }
+
+        VLCFilter* filter = (VLCFilter*)_filterPtr;
+        nint videoContext = filter->VideoContextOut;
+        filter->VideoContextOut = 0;
+        if (videoContext != 0)
+        {
+            VLCCore.VideoContextRelease(videoContext);
+        }
+    }
+
+    /// <summary>
     /// Gets whether this context is valid (has a non-null filter pointer).
     /// </summary>
     public bool IsValid => _filterPtr != 0;
