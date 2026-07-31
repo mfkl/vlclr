@@ -18,6 +18,11 @@ internal enum OvColorFormat : uint
     Bgr = 6
 }
 
+internal enum OvPreprocessResizeAlgorithm : uint
+{
+    Linear = 0
+}
+
 [StructLayout(LayoutKind.Sequential)]
 internal readonly unsafe struct OvShape
 {
@@ -167,6 +172,16 @@ internal static unsafe partial class OpenVinoNative
 
     [DllImport(
         LibraryName,
+        EntryPoint = "ov_preprocess_input_tensor_info_set_spatial_static_shape",
+        CallingConvention = CallingConvention.Cdecl)]
+    internal static extern OvStatus
+        PreprocessTensorInfoSetSpatialStaticShape(
+            nint tensorInfo,
+            nuint height,
+            nuint width);
+
+    [DllImport(
+        LibraryName,
         EntryPoint = "ov_preprocess_input_info_get_preprocess_steps",
         CallingConvention = CallingConvention.Cdecl)]
     internal static extern OvStatus PreprocessInputInfoGetSteps(
@@ -180,6 +195,14 @@ internal static unsafe partial class OpenVinoNative
     internal static extern OvStatus PreprocessStepsConvertColor(
         nint preprocessSteps,
         OvColorFormat colorFormat);
+
+    [DllImport(
+        LibraryName,
+        EntryPoint = "ov_preprocess_preprocess_steps_resize",
+        CallingConvention = CallingConvention.Cdecl)]
+    internal static extern OvStatus PreprocessStepsResize(
+        nint preprocessSteps,
+        OvPreprocessResizeAlgorithm algorithm);
 
     [DllImport(
         LibraryName,

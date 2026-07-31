@@ -5,10 +5,11 @@ using VLCLR.ObjectDetection;
 
 namespace YoloObjectSearch;
 
-internal sealed unsafe class OpenVinoYoloXSession : IDisposable
+internal sealed unsafe class OpenVinoDetectionSession : IDisposable
 {
     private readonly Guid _sessionId = Guid.NewGuid();
-    private readonly YoloXOutputDecoder _decoder;
+    private readonly ObjectDetectionModelProfile _profile;
+    private readonly IObjectDetectionOutputDecoder _decoder;
 
     private nint _core;
     private nint _remoteContext;
@@ -21,11 +22,10 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
     private int _outputElementCount;
     private bool _disposed;
 
-    public OpenVinoYoloXSession(
+    public OpenVinoDetectionSession(
         ID3D11Device* device,
         ID3D11Texture2D* inferenceTexture,
-        string modelPath,
-        YoloXOutputDecoder decoder)
+        ObjectDetectionModelProfile profile)
     {
         if (device is null)
         {
@@ -35,53 +35,26 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
         {
             throw new ArgumentNullException(nameof(inferenceTexture));
         }
-        if (!File.Exists(modelPath))
+        _profile = profile ??
+            throw new ArgumentNullException(nameof(profile));
+        if (!File.Exists(_profile.ModelPath))
         {
             throw new FileNotFoundException(
-                "YOLOX model was not found.",
-                modelPath);
+                $"{_profile.Name} model was not found.",
+                _profile.ModelPath);
         }
 
-        _decoder = decoder ??
-            throw new ArgumentNullException(nameof(decoder));
+        _decoder = _profile.Decoder;
 
         try
         {
             CreateCoreAndRemoteInputs(device, inferenceTexture);
-            CompileAndBind(modelPath);
+            CompileAndBind(_profile.ModelPath);
 
             Check(
                 OpenVinoNative.InferRequestInfer(_inferRequest),
                 "ov_infer_request_infer(warmup)");
-            Check(
-                OpenVinoNative.InferRequestGetOutputByIndex(
-                    _inferRequest,
-                    0,
-                    out _outputTensor),
-                "ov_infer_request_get_output_tensor_by_index");
-            Check(
-                OpenVinoNative.TensorGetSize(
-                    _outputTensor,
-                    out nuint outputElementCount),
-                "ov_tensor_get_size");
-            _outputElementCount = checked((int)outputElementCount);
-            if (_outputElementCount != _decoder.ExpectedOutputLength)
-            {
-                throw new InvalidOperationException(
-                    $"YOLOX output contains {_outputElementCount} values; " +
-                    $"expected {_decoder.ExpectedOutputLength}.");
-            }
-
-            Check(
-                OpenVinoNative.TensorGetData(
-                    _outputTensor,
-                    out _outputData),
-                "ov_tensor_data");
-            if (_outputData == 0)
-            {
-                throw new InvalidOperationException(
-                    "OpenVINO returned a null output tensor pointer.");
-            }
+            RefreshOutputTensor();
         }
         catch
         {
@@ -103,6 +76,7 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
             OpenVinoNative.InferRequestInfer(_inferRequest),
             "ov_infer_request_infer");
         timer.Stop();
+        RefreshOutputTensor();
 
         IReadOnlyList<ObjectDetection> detections = _decoder.Decode(
             new ReadOnlySpan<float>(
@@ -180,7 +154,13 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
         using Utf8String yPlane = new("0");
         using Utf8String uvPlane = new("1");
 
-        long* yDimensions = stackalloc long[] { 1, 416, 416, 1 };
+        long* yDimensions = stackalloc long[]
+        {
+            1,
+            _decoder.InputHeight,
+            _decoder.InputWidth,
+            1
+        };
         Check(
             OpenVinoNative.RemoteContextCreateD3DTensor(
                 _remoteContext,
@@ -196,7 +176,13 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
                 yPlane.Pointer),
             "ov_remote_context_create_tensor(Y)");
 
-        long* uvDimensions = stackalloc long[] { 1, 208, 208, 2 };
+        long* uvDimensions = stackalloc long[]
+        {
+            1,
+            _decoder.InputHeight / 2,
+            _decoder.InputWidth / 2,
+            2
+        };
         Check(
             OpenVinoNative.RemoteContextCreateD3DTensor(
                 _remoteContext,
@@ -277,6 +263,12 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
                     surfaceMemoryType.Pointer),
                 "set_memory_type");
             Check(
+                OpenVinoNative.PreprocessTensorInfoSetSpatialStaticShape(
+                    tensorInfo,
+                    checked((nuint)_decoder.InputHeight),
+                    checked((nuint)_decoder.InputWidth)),
+                "set_spatial_static_shape");
+            Check(
                 OpenVinoNative.PreprocessInputInfoGetSteps(
                     inputInfo,
                     out preprocessSteps),
@@ -287,15 +279,21 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
                     OvColorFormat.Bgr),
                 "convert_color");
             Check(
+                OpenVinoNative.PreprocessStepsResize(
+                    preprocessSteps,
+                    OvPreprocessResizeAlgorithm.Linear),
+                "resize");
+            Check(
                 OpenVinoNative.PreprocessInputInfoGetModelInfo(
                     inputInfo,
                     out modelInfo),
                 "get_model_info");
 
-            using Utf8String nchw = new("NCHW");
+            using Utf8String modelInputLayout = new(
+                _profile.OpenVinoLayout);
             Check(
                 OpenVinoNative.LayoutCreate(
-                    nchw.Pointer,
+                    modelInputLayout.Pointer,
                     out modelLayout),
                 "ov_layout_create");
             Check(
@@ -383,4 +381,42 @@ internal sealed unsafe class OpenVinoYoloXSession : IDisposable
         throw new InvalidOperationException(
             $"{operation} failed with {(int)status}: {message}");
     }
+
+    private void RefreshOutputTensor()
+    {
+        OpenVinoNative.TensorFree(_outputTensor);
+        _outputTensor = 0;
+        _outputData = 0;
+        Check(
+            OpenVinoNative.InferRequestGetOutputByIndex(
+                _inferRequest,
+                0,
+                out _outputTensor),
+            "ov_infer_request_get_output_tensor_by_index");
+        Check(
+            OpenVinoNative.TensorGetSize(
+                _outputTensor,
+                out nuint outputElementCount),
+            "ov_tensor_get_size");
+        _outputElementCount = checked((int)outputElementCount);
+        if (_outputElementCount != _decoder.ExpectedOutputLength)
+        {
+            throw new InvalidOperationException(
+                $"{_profile.Name} output contains " +
+                $"{_outputElementCount} values; " +
+                $"expected {_decoder.ExpectedOutputLength}.");
+        }
+
+        Check(
+            OpenVinoNative.TensorGetData(
+                _outputTensor,
+                out _outputData),
+            "ov_tensor_data");
+        if (_outputData == 0)
+        {
+            throw new InvalidOperationException(
+                "OpenVINO returned a null output tensor pointer.");
+        }
+    }
+
 }

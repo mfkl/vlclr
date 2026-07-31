@@ -284,7 +284,7 @@ elsewhere indicate that a decoder-owned surface was modified.
 | [`GpuYoloXDetector.cs`](GpuYoloXDetector.cs) | Bounded scheduling, background worker, timeline-safe publication |
 | [`D3D11Nv12Scaler.cs`](D3D11Nv12Scaler.cs) | GPU resize and center letterbox |
 | [`OpenVinoYoloXSession.cs`](OpenVinoYoloXSession.cs) | D3D11 remote tensors and inference |
-| [`D3D11DetectionOverlay.cs`](D3D11DetectionOverlay.cs) | Box/label rasterization and GPU NV12 composition |
+| [`D3D11DetectionOverlay.cs`](D3D11DetectionOverlay.cs) | Box/label or solid-redaction rasterization and GPU NV12 composition |
 | [`D3D11OutputPictureAllocator.cs`](D3D11OutputPictureAllocator.cs) | Pooled VLC-compatible D3D11 output pictures; decoder surfaces stay immutable |
 | [`src/VLCLR.ObjectDetection/`](../../src/VLCLR.ObjectDetection/) | COCO vocabulary, queries, YOLOX decode/NMS, staleness and timestamp gates |
 

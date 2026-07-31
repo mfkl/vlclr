@@ -44,7 +44,7 @@ public readonly record struct YoloXImageTransform(
     }
 }
 
-public sealed class YoloXOutputDecoder
+public sealed class YoloXOutputDecoder : IObjectDetectionOutputDecoder
 {
     private static readonly int[] Strides = [8, 16, 32];
 
@@ -67,6 +67,13 @@ public sealed class YoloXOutputDecoder
     public int ProposalCount => _grid.Length;
 
     public int ValuesPerProposal => 5 + _catalog.Classes.Count;
+
+    public int InputWidth => _options.InputWidth;
+
+    public int InputHeight => _options.InputHeight;
+
+    public ObjectDetectionInputResizeMode InputResizeMode =>
+        ObjectDetectionInputResizeMode.CenteredLetterbox;
 
     public int ExpectedOutputLength => ProposalCount * ValuesPerProposal;
 

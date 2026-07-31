@@ -1,0 +1,50 @@
+{
+  "formatVersion": 1,
+  "modelBundle": "Privacy Shield sensitive-object detectors",
+  "precision": "FP16",
+  "source": {
+    "repository": "https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1",
+    "project": "Open Model Zoo",
+    "projectUrl": "https://github.com/openvinotoolkit/open_model_zoo",
+    "license": "Apache-2.0",
+    "licenseUrl": "https://github.com/openvinotoolkit/open_model_zoo/blob/master/LICENSE"
+  },
+  "models": [
+    {
+      "name": "face-detection-retail-0004",
+      "documentation": "https://docs.openvino.ai/2023.3/omz_models_model_face_detection_retail_0004.html",
+      "files": [
+        {
+          "fileName": "face-detection-retail-0004.xml",
+          "sourcePath": "face-detection-retail-0004/FP16/face-detection-retail-0004.xml",
+          "size": 143827,
+          "sha256": "8675F0B00D91A4B5048D0E9CAF492D7B48E80C9150DB23429BB92C0428B97447"
+        },
+        {
+          "fileName": "face-detection-retail-0004.bin",
+          "sourcePath": "face-detection-retail-0004/FP16/face-detection-retail-0004.bin",
+          "size": 1176544,
+          "sha256": "D0A8CA818C657B454CE6118715C49027B1B70D9D85A83A9A4A6606D773B02DFE"
+        }
+      ]
+    },
+    {
+      "name": "vehicle-license-plate-detection-barrier-0106",
+      "documentation": "https://docs.openvino.ai/2023.3/omz_models_model_vehicle_license_plate_detection_barrier_0106.html",
+      "files": [
+        {
+          "fileName": "vehicle-license-plate-detection-barrier-0106.xml",
+          "sourcePath": "vehicle-license-plate-detection-barrier-0106/FP16/vehicle-license-plate-detection-barrier-0106.xml",
+          "size": 325452,
+          "sha256": "69ED174CEE70E19B098215F53D1FE6F27EDC5B417790BBC44CDE7F37CC082FAE"
+        },
+        {
+          "fileName": "vehicle-license-plate-detection-barrier-0106.bin",
+          "sourcePath": "vehicle-license-plate-detection-barrier-0106/FP16/vehicle-license-plate-detection-barrier-0106.bin",
+          "size": 1286772,
+          "sha256": "7F96BFAA0AC3AF65D136F6A185D1D78D68D03BAB2E1F2FAAFE1D27CCD94B0DC1"
+        }
+      ]
+    }
+  ]
+}
