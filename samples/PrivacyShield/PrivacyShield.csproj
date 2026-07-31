@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>libdotnet_privacy_shield_plugin</AssemblyName>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <StackTraceSupport>false</StackTraceSupport>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+    <DebuggerSupport>false</DebuggerSupport>
+    <StripSymbols>true</StripSymbols>
+    <EventSourceSupport>false</EventSourceSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+    <IlcTrimMetadata>true</IlcTrimMetadata>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.20348-beta1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VLCLR\VLCLR.csproj" />
+    <ProjectReference Include="..\..\src\VLCLR.ObjectDetection\VLCLR.ObjectDetection.csproj" />
+    <ProjectReference Include="..\..\src\VLCLR.Generators\VLCLR.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Share the validated YOLOX/OpenVINO D3D11 implementation. -->
+    <Compile Include="..\YoloObjectSearch\D3D11CapabilityDiagnostics.cs"
+             Link="Gpu\D3D11CapabilityDiagnostics.cs" />
+    <Compile Include="..\YoloObjectSearch\D3D11DetectionOverlay.cs"
+             Link="Gpu\D3D11DetectionOverlay.cs" />
+    <Compile Include="..\YoloObjectSearch\D3D11Nv12Scaler.cs"
+             Link="Gpu\D3D11Nv12Scaler.cs" />
+    <Compile Include="..\YoloObjectSearch\D3D11OutputPictureAllocator.cs"
+             Link="Gpu\D3D11OutputPictureAllocator.cs" />
+    <Compile Include="..\YoloObjectSearch\GpuYoloXDetector.cs"
+             Link="Gpu\GpuYoloXDetector.cs" />
+    <Compile Include="..\YoloObjectSearch\OpenVinoNative.cs"
+             Link="Gpu\OpenVinoNative.cs" />
+    <Compile Include="..\YoloObjectSearch\ObjectDetectionModelProfile.cs"
+             Link="Gpu\ObjectDetectionModelProfile.cs" />
+    <Compile Include="..\YoloObjectSearch\OpenVinoYoloXSession.cs"
+             Link="Gpu\OpenVinoYoloXSession.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DirectPInvoke Include="libvlccore" />
+    <NativeLibrary Include="..\..\lib\libvlccore.lib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Shaders\PrivacyOverlayVS.cso"
+                      LogicalName="PrivacyShield.Shaders.PrivacyOverlayVS.cso" />
+    <EmbeddedResource Include="Shaders\PrivacyOverlayPS.cso"
+                      LogicalName="PrivacyShield.Shaders.PrivacyOverlayPS.cso" />
+  </ItemGroup>
+
+</Project>

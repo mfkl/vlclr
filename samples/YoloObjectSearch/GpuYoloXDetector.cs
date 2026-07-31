@@ -6,20 +6,19 @@ using static TerraFX.Interop.Windows;
 
 namespace YoloObjectSearch;
 
-internal sealed unsafe class GpuYoloXDetector : IDisposable
+internal sealed unsafe class GpuObjectDetector : IDisposable
 {
     private sealed record PublishedDetectionBatch(
         long TimelineEpoch,
         DetectionBatch Batch);
 
     private readonly D3D11Nv12Scaler _scaler;
-    private readonly string _modelPath;
-    private readonly YoloXOutputDecoder _decoder;
+    private readonly ObjectDetectionModelProfile _profile;
     private readonly long _submissionPeriodTicks;
     private readonly AutoResetEvent _workAvailable = new(false);
     private readonly Thread _worker;
 
-    private OpenVinoYoloXSession? _session;
+    private OpenVinoDetectionSession? _session;
     private PublishedDetectionBatch? _latest;
     private string? _failure;
     private long _generation;
@@ -43,17 +42,28 @@ internal sealed unsafe class GpuYoloXDetector : IDisposable
     private bool _ready;
     private bool _disposed;
 
-    public GpuYoloXDetector(
+    public GpuObjectDetector(
         nint sourceTexture,
         int sourceWidth,
         int sourceHeight,
-        string modelPath,
-        float confidenceThreshold,
+        ObjectDetectionModelProfile profile,
         float targetRate)
     {
         if (sourceTexture == 0)
         {
             throw new ArgumentNullException(nameof(sourceTexture));
+        }
+
+        _profile = profile ??
+            throw new ArgumentNullException(nameof(profile));
+        if (_profile.Decoder.InputWidth <= 0 ||
+            _profile.Decoder.InputHeight <= 0 ||
+            (_profile.Decoder.InputWidth & 1) != 0 ||
+            (_profile.Decoder.InputHeight & 1) != 0)
+        {
+            throw new ArgumentException(
+                "The detector input dimensions must be positive and even.",
+                nameof(profile));
         }
 
         ID3D11Texture2D* texture = (ID3D11Texture2D*)sourceTexture;
@@ -71,19 +81,15 @@ internal sealed unsafe class GpuYoloXDetector : IDisposable
                 device,
                 checked((uint)sourceWidth),
                 checked((uint)sourceHeight),
-                416,
-                416);
+                checked((uint)_profile.Decoder.InputWidth),
+                checked((uint)_profile.Decoder.InputHeight),
+                _profile.Decoder.InputResizeMode);
         }
         finally
         {
             device->Release();
         }
 
-        _modelPath = modelPath;
-        _decoder = new YoloXOutputDecoder(
-            Coco80ObjectCatalog.Create(),
-            new YoloXDecoderOptions(
-                ConfidenceThreshold: confidenceThreshold));
         _submissionPeriodTicks = Math.Max(
             1,
             checked((long)Math.Round(
@@ -91,7 +97,7 @@ internal sealed unsafe class GpuYoloXDetector : IDisposable
         _worker = new Thread(WorkerMain)
         {
             IsBackground = true,
-            Name = "VLCLR YOLOX GPU worker"
+            Name = $"VLCLR {_profile.Name} GPU worker"
         };
         _worker.Start();
     }
@@ -208,11 +214,10 @@ internal sealed unsafe class GpuYoloXDetector : IDisposable
     {
         try
         {
-            _session = new OpenVinoYoloXSession(
+            _session = new OpenVinoDetectionSession(
                 _scaler.Device,
                 _scaler.OutputTexture,
-                _modelPath,
-                _decoder);
+                _profile);
             Volatile.Write(ref _ready, true);
 
             while (true)
@@ -268,7 +273,8 @@ internal sealed unsafe class GpuYoloXDetector : IDisposable
         {
             Volatile.Write(
                 ref _failure,
-                "OpenVINO GPU startup failed. Verify the validated runtime, " +
+                $"OpenVINO GPU startup failed for {_profile.Name}. Verify " +
+                "the validated runtime, " +
                 "the Intel GPU driver, and same-adapter D3D11 remote-context " +
                 $"support. {exception.Message}");
         }

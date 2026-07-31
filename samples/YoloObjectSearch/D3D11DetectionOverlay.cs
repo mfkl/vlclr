@@ -6,6 +6,73 @@ using static TerraFX.Interop.Windows;
 
 namespace YoloObjectSearch;
 
+internal enum D3D11DetectionOverlayMode
+{
+    BoxesAndLabels,
+    SolidRedaction,
+    MosaicRedaction,
+    BlurRedaction
+}
+
+internal readonly record struct D3D11DetectionOverlayOptions(
+    D3D11DetectionOverlayMode Mode,
+    int PaddingPixels,
+    byte Blue,
+    byte Green,
+    byte Red,
+    byte Alpha,
+    int EffectSizePixels)
+{
+    public bool UsesSceneTexture =>
+        Mode is D3D11DetectionOverlayMode.MosaicRedaction or
+        D3D11DetectionOverlayMode.BlurRedaction;
+
+    public static D3D11DetectionOverlayOptions BoxesAndLabels { get; } =
+        new(
+            D3D11DetectionOverlayMode.BoxesAndLabels,
+            0,
+            0,
+            0,
+            0,
+            255,
+            0);
+
+    public static D3D11DetectionOverlayOptions SolidBlackRedaction(
+        int paddingPixels) =>
+        new(
+            D3D11DetectionOverlayMode.SolidRedaction,
+            paddingPixels,
+            0,
+            0,
+            0,
+            255,
+            0);
+
+    public static D3D11DetectionOverlayOptions MosaicRedaction(
+        int paddingPixels,
+        int pixelSize) =>
+        new(
+            D3D11DetectionOverlayMode.MosaicRedaction,
+            paddingPixels,
+            0,
+            0,
+            0,
+            255,
+            pixelSize);
+
+    public static D3D11DetectionOverlayOptions BlurRedaction(
+        int paddingPixels,
+        int radius) =>
+        new(
+            D3D11DetectionOverlayMode.BlurRedaction,
+            paddingPixels,
+            0,
+            0,
+            0,
+            255,
+            radius);
+}
+
 internal sealed unsafe class D3D11DetectionOverlay : IDisposable
 {
     private const int OverlayWidth = 416;
@@ -18,11 +85,27 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
     private const int LabelPadding = 1;
     private const int LabelHeight = GlyphHeight + LabelPadding * 2;
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PrivacyShaderSettings
+    {
+        public float TextureWidth;
+        public float TextureHeight;
+        public float BlurStepX;
+        public float BlurStepY;
+        public float MosaicBlockWidth;
+        public float MosaicBlockHeight;
+        public uint EffectMode;
+        public float Padding;
+    }
+
     private readonly byte[] _overlayPixels =
         new byte[OverlayWidth * OverlayHeight * BytesPerPixel];
     private readonly uint _textureWidth;
     private readonly uint _textureHeight;
+    private readonly uint _visibleWidth;
+    private readonly uint _visibleHeight;
     private readonly DXGI_FORMAT _sourceFormat;
+    private readonly D3D11DetectionOverlayOptions _options;
 
     private ID3D11Device* _device;
     private ID3D11DeviceContext* _deviceContext;
@@ -32,6 +115,19 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
     private ID3D11VideoProcessor* _processor;
     private ID3D11Texture2D* _overlayTexture;
     private ID3D11VideoProcessorInputView* _overlayInputView;
+    private ID3D11VideoProcessorEnumerator* _sceneEnumerator;
+    private ID3D11VideoProcessor* _sceneProcessor;
+    private ID3D11Texture2D* _sceneTexture;
+    private ID3D11VideoProcessorOutputView* _sceneOutputView;
+    private ID3D11ShaderResourceView* _sceneShaderResourceView;
+    private ID3D11Texture2D* _maskTexture;
+    private ID3D11ShaderResourceView* _maskShaderResourceView;
+    private ID3D11RenderTargetView* _overlayRenderTargetView;
+    private ID3D11VertexShader* _privacyVertexShader;
+    private ID3D11PixelShader* _privacyPixelShader;
+    private ID3D11SamplerState* _linearSampler;
+    private ID3D11SamplerState* _pointSampler;
+    private ID3D11Buffer* _privacySettingsBuffer;
     private long _uploadedGeneration = -1;
     private long _renderedFrames;
     private long _uploadedBatches;
@@ -47,7 +143,8 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
     public D3D11DetectionOverlay(
         nint sourceTexture,
         int visibleWidth,
-        int visibleHeight)
+        int visibleHeight,
+        D3D11DetectionOverlayOptions? options = null)
     {
         if (sourceTexture == 0)
         {
@@ -62,6 +159,24 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
             throw new ArgumentOutOfRangeException(nameof(visibleHeight));
         }
 
+        _options =
+            options ?? D3D11DetectionOverlayOptions.BoxesAndLabels;
+        if (_options.PaddingPixels < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                _options.PaddingPixels,
+                "Overlay padding cannot be negative.");
+        }
+        if (_options.UsesSceneTexture &&
+            _options.EffectSizePixels <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                _options.EffectSizePixels,
+                "Blur radius and mosaic pixel size must be positive.");
+        }
+
         ID3D11Texture2D* texture = (ID3D11Texture2D*)sourceTexture;
         D3D11_TEXTURE2D_DESC sourceDescription;
         texture->GetDesc(&sourceDescription);
@@ -74,6 +189,8 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
 
         _textureWidth = sourceDescription.Width;
         _textureHeight = sourceDescription.Height;
+        _visibleWidth = checked((uint)visibleWidth);
+        _visibleHeight = checked((uint)visibleHeight);
         _sourceFormat = sourceDescription.Format;
 
         ID3D11Device* device = null;
@@ -94,6 +211,10 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
             CreateVideoInterfaces();
             CreateProcessor();
             CreateOverlayTexture();
+            if (_options.UsesSceneTexture)
+            {
+                CreatePrivacyEffectResources();
+            }
             ConfigureStreams(visibleWidth, visibleHeight);
         }
         catch
@@ -185,6 +306,10 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
                 sourceHeight,
                 detections);
         }
+        if (_options.UsesSceneTexture)
+        {
+            RenderPrivacyEffect(sourceTexture, sourceSurface.ArraySlice);
+        }
 
         ID3D11VideoProcessorInputView* sourceInputView = null;
         D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inputDescription = new()
@@ -266,6 +391,126 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
         }
     }
 
+    private void RenderPrivacyEffect(
+        ID3D11Texture2D* sourceTexture,
+        uint sourceArraySlice)
+    {
+        D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inputDescription = new()
+        {
+            ViewDimension = D3D11_VPIV_DIMENSION
+                .D3D11_VPIV_DIMENSION_TEXTURE2D
+        };
+        inputDescription.Texture2D.MipSlice = 0;
+        inputDescription.Texture2D.ArraySlice = sourceArraySlice;
+
+        ID3D11VideoProcessorInputView* sourceInputView = null;
+        CheckHResult(
+            _videoDevice->CreateVideoProcessorInputView(
+                (ID3D11Resource*)sourceTexture,
+                _sceneEnumerator,
+                &inputDescription,
+                &sourceInputView),
+            "CreateVideoProcessorInputView(privacy scene)");
+        try
+        {
+            D3D11_VIDEO_PROCESSOR_STREAM stream =
+                new()
+                {
+                    Enable = 1,
+                    pInputSurface = sourceInputView
+                };
+            CheckHResult(
+                _videoContext->VideoProcessorBlt(
+                    _sceneProcessor,
+                    _sceneOutputView,
+                    0,
+                    1,
+                    &stream),
+                "VideoProcessorBlt(privacy scene)");
+        }
+        finally
+        {
+            sourceInputView->Release();
+        }
+
+        float* clearColor = stackalloc float[4];
+        clearColor[0] = 0;
+        clearColor[1] = 0;
+        clearColor[2] = 0;
+        clearColor[3] = 0;
+        _deviceContext->ClearRenderTargetView(
+            _overlayRenderTargetView,
+            clearColor);
+
+        D3D11_VIEWPORT viewport = new()
+        {
+            Width = OverlayWidth,
+            Height = OverlayHeight,
+            MinDepth = 0,
+            MaxDepth = 1
+        };
+        _deviceContext->RSSetViewports(1, &viewport);
+        _deviceContext->RSSetState(null);
+        _deviceContext->IASetInputLayout(null);
+        _deviceContext->IASetPrimitiveTopology(
+            D3D_PRIMITIVE_TOPOLOGY
+                .D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        _deviceContext->VSSetShader(
+            _privacyVertexShader,
+            null,
+            0);
+        _deviceContext->PSSetShader(
+            _privacyPixelShader,
+            null,
+            0);
+
+        ID3D11ShaderResourceView** shaderResources =
+            stackalloc ID3D11ShaderResourceView*[2];
+        shaderResources[0] = _sceneShaderResourceView;
+        shaderResources[1] = _maskShaderResourceView;
+        _deviceContext->PSSetShaderResources(
+            0,
+            2,
+            shaderResources);
+
+        ID3D11SamplerState** samplers =
+            stackalloc ID3D11SamplerState*[2];
+        samplers[0] = _linearSampler;
+        samplers[1] = _pointSampler;
+        _deviceContext->PSSetSamplers(0, 2, samplers);
+
+        ID3D11Buffer** buffers =
+            stackalloc ID3D11Buffer*[1];
+        buffers[0] = _privacySettingsBuffer;
+        _deviceContext->PSSetConstantBuffers(0, 1, buffers);
+
+        ID3D11RenderTargetView** renderTargets =
+            stackalloc ID3D11RenderTargetView*[1];
+        renderTargets[0] = _overlayRenderTargetView;
+        _deviceContext->OMSetRenderTargets(
+            1,
+            renderTargets,
+            null);
+        _deviceContext->OMSetBlendState(
+            null,
+            null,
+            uint.MaxValue);
+        _deviceContext->OMSetDepthStencilState(null, 0);
+        _deviceContext->Draw(3, 0);
+
+        shaderResources[0] = null;
+        shaderResources[1] = null;
+        _deviceContext->PSSetShaderResources(
+            0,
+            2,
+            shaderResources);
+        renderTargets[0] = null;
+        _deviceContext->OMSetRenderTargets(
+            1,
+            renderTargets,
+            null);
+    }
+
     public void Reset()
     {
         _uploadedGeneration = -1;
@@ -278,6 +523,71 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
             return;
         }
 
+        if (_privacySettingsBuffer is not null)
+        {
+            _privacySettingsBuffer->Release();
+            _privacySettingsBuffer = null;
+        }
+        if (_pointSampler is not null)
+        {
+            _pointSampler->Release();
+            _pointSampler = null;
+        }
+        if (_linearSampler is not null)
+        {
+            _linearSampler->Release();
+            _linearSampler = null;
+        }
+        if (_privacyPixelShader is not null)
+        {
+            _privacyPixelShader->Release();
+            _privacyPixelShader = null;
+        }
+        if (_privacyVertexShader is not null)
+        {
+            _privacyVertexShader->Release();
+            _privacyVertexShader = null;
+        }
+        if (_overlayRenderTargetView is not null)
+        {
+            _overlayRenderTargetView->Release();
+            _overlayRenderTargetView = null;
+        }
+        if (_maskShaderResourceView is not null)
+        {
+            _maskShaderResourceView->Release();
+            _maskShaderResourceView = null;
+        }
+        if (_maskTexture is not null)
+        {
+            _maskTexture->Release();
+            _maskTexture = null;
+        }
+        if (_sceneShaderResourceView is not null)
+        {
+            _sceneShaderResourceView->Release();
+            _sceneShaderResourceView = null;
+        }
+        if (_sceneOutputView is not null)
+        {
+            _sceneOutputView->Release();
+            _sceneOutputView = null;
+        }
+        if (_sceneTexture is not null)
+        {
+            _sceneTexture->Release();
+            _sceneTexture = null;
+        }
+        if (_sceneProcessor is not null)
+        {
+            _sceneProcessor->Release();
+            _sceneProcessor = null;
+        }
+        if (_sceneEnumerator is not null)
+        {
+            _sceneEnumerator->Release();
+            _sceneEnumerator = null;
+        }
         if (_overlayInputView is not null)
         {
             _overlayInputView->Release();
@@ -454,6 +764,319 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
         _overlayInputView = overlayInputView;
     }
 
+    private void CreatePrivacyEffectResources()
+    {
+        CreateSceneProcessor();
+        CreateSceneTexture();
+        CreateMaskTexture();
+        CreatePrivacyShaders();
+    }
+
+    private void CreateSceneProcessor()
+    {
+        D3D11_VIDEO_PROCESSOR_CONTENT_DESC content = new()
+        {
+            InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT
+                .D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
+            InputFrameRate = new DXGI_RATIONAL
+            {
+                Numerator = 30,
+                Denominator = 1
+            },
+            InputWidth = _textureWidth,
+            InputHeight = _textureHeight,
+            OutputFrameRate = new DXGI_RATIONAL
+            {
+                Numerator = 30,
+                Denominator = 1
+            },
+            OutputWidth = OverlayWidth,
+            OutputHeight = OverlayHeight,
+            Usage = D3D11_VIDEO_USAGE
+                .D3D11_VIDEO_USAGE_PLAYBACK_NORMAL
+        };
+        ID3D11VideoProcessorEnumerator* enumerator = null;
+        CheckHResult(
+            _videoDevice->CreateVideoProcessorEnumerator(
+                &content,
+                &enumerator),
+            "CreateVideoProcessorEnumerator(privacy scene)");
+        _sceneEnumerator = enumerator;
+
+        ValidateFormat(
+            _sceneEnumerator,
+            _sourceFormat,
+            D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT
+                .D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_INPUT);
+        ValidateFormat(
+            _sceneEnumerator,
+            DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM,
+            D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT
+                .D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT_OUTPUT);
+
+        ID3D11VideoProcessor* processor = null;
+        CheckHResult(
+            _videoDevice->CreateVideoProcessor(
+                _sceneEnumerator,
+                0,
+                &processor),
+            "CreateVideoProcessor(privacy scene)");
+        _sceneProcessor = processor;
+
+        RECT sourceRectangle = new(
+            0,
+            0,
+            checked((int)_visibleWidth),
+            checked((int)_visibleHeight));
+        RECT outputRectangle = new(
+            0,
+            0,
+            OverlayWidth,
+            OverlayHeight);
+        _videoContext->VideoProcessorSetOutputTargetRect(
+            _sceneProcessor,
+            1,
+            &outputRectangle);
+        _videoContext->VideoProcessorSetStreamFrameFormat(
+            _sceneProcessor,
+            0,
+            D3D11_VIDEO_FRAME_FORMAT
+                .D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE);
+        _videoContext->VideoProcessorSetStreamSourceRect(
+            _sceneProcessor,
+            0,
+            1,
+            &sourceRectangle);
+        _videoContext->VideoProcessorSetStreamDestRect(
+            _sceneProcessor,
+            0,
+            1,
+            &outputRectangle);
+        _videoContext->VideoProcessorSetStreamAutoProcessingMode(
+            _sceneProcessor,
+            0,
+            0);
+    }
+
+    private void CreateSceneTexture()
+    {
+        D3D11_TEXTURE2D_DESC description = new()
+        {
+            Width = OverlayWidth,
+            Height = OverlayHeight,
+            MipLevels = 1,
+            ArraySize = 1,
+            Format = DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM,
+            SampleDesc = new DXGI_SAMPLE_DESC { Count = 1 },
+            Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
+            BindFlags = (uint)(
+                D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET |
+                D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE)
+        };
+        ID3D11Texture2D* texture = null;
+        CheckHResult(
+            _device->CreateTexture2D(
+                &description,
+                null,
+                &texture),
+            "CreateTexture2D(privacy scene)");
+        _sceneTexture = texture;
+
+        D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outputDescription =
+            new()
+            {
+                ViewDimension = D3D11_VPOV_DIMENSION
+                    .D3D11_VPOV_DIMENSION_TEXTURE2D
+            };
+        outputDescription.Texture2D.MipSlice = 0;
+        ID3D11VideoProcessorOutputView* outputView = null;
+        CheckHResult(
+            _videoDevice->CreateVideoProcessorOutputView(
+                (ID3D11Resource*)_sceneTexture,
+                _sceneEnumerator,
+                &outputDescription,
+                &outputView),
+            "CreateVideoProcessorOutputView(privacy scene)");
+        _sceneOutputView = outputView;
+
+        ID3D11ShaderResourceView* shaderResourceView = null;
+        CheckHResult(
+            _device->CreateShaderResourceView(
+                (ID3D11Resource*)_sceneTexture,
+                null,
+                &shaderResourceView),
+            "CreateShaderResourceView(privacy scene)");
+        _sceneShaderResourceView = shaderResourceView;
+    }
+
+    private void CreateMaskTexture()
+    {
+        D3D11_TEXTURE2D_DESC description = new()
+        {
+            Width = OverlayWidth,
+            Height = OverlayHeight,
+            MipLevels = 1,
+            ArraySize = 1,
+            Format = DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM,
+            SampleDesc = new DXGI_SAMPLE_DESC { Count = 1 },
+            Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
+            BindFlags = (uint)D3D11_BIND_FLAG
+                .D3D11_BIND_SHADER_RESOURCE
+        };
+        ID3D11Texture2D* texture = null;
+        CheckHResult(
+            _device->CreateTexture2D(
+                &description,
+                null,
+                &texture),
+            "CreateTexture2D(privacy mask)");
+        _maskTexture = texture;
+
+        ID3D11ShaderResourceView* shaderResourceView = null;
+        CheckHResult(
+            _device->CreateShaderResourceView(
+                (ID3D11Resource*)_maskTexture,
+                null,
+                &shaderResourceView),
+            "CreateShaderResourceView(privacy mask)");
+        _maskShaderResourceView = shaderResourceView;
+
+        ID3D11RenderTargetView* renderTargetView = null;
+        CheckHResult(
+            _device->CreateRenderTargetView(
+                (ID3D11Resource*)_overlayTexture,
+                null,
+                &renderTargetView),
+            "CreateRenderTargetView(privacy overlay)");
+        _overlayRenderTargetView = renderTargetView;
+    }
+
+    private void CreatePrivacyShaders()
+    {
+        byte[] vertexBytecode = ReadEmbeddedShader(
+            "PrivacyShield.Shaders.PrivacyOverlayVS.cso");
+        fixed (byte* bytecode = vertexBytecode)
+        {
+            ID3D11VertexShader* shader = null;
+            CheckHResult(
+                _device->CreateVertexShader(
+                    bytecode,
+                    (nuint)vertexBytecode.Length,
+                    null,
+                    &shader),
+                "CreateVertexShader(privacy overlay)");
+            _privacyVertexShader = shader;
+        }
+
+        byte[] pixelBytecode = ReadEmbeddedShader(
+            "PrivacyShield.Shaders.PrivacyOverlayPS.cso");
+        fixed (byte* bytecode = pixelBytecode)
+        {
+            ID3D11PixelShader* shader = null;
+            CheckHResult(
+                _device->CreatePixelShader(
+                    bytecode,
+                    (nuint)pixelBytecode.Length,
+                    null,
+                    &shader),
+                "CreatePixelShader(privacy overlay)");
+            _privacyPixelShader = shader;
+        }
+
+        _linearSampler = CreateSampler(
+            D3D11_FILTER.D3D11_FILTER_MIN_MAG_MIP_LINEAR);
+        _pointSampler = CreateSampler(
+            D3D11_FILTER.D3D11_FILTER_MIN_MAG_MIP_POINT);
+
+        float blurRadius = _options.Mode ==
+            D3D11DetectionOverlayMode.BlurRedaction
+                ? _options.EffectSizePixels
+                : 1;
+        float mosaicSize = _options.Mode ==
+            D3D11DetectionOverlayMode.MosaicRedaction
+                ? _options.EffectSizePixels
+                : 1;
+        PrivacyShaderSettings settings = new()
+        {
+            TextureWidth = OverlayWidth,
+            TextureHeight = OverlayHeight,
+            BlurStepX = blurRadius / _visibleWidth / 2.0f,
+            BlurStepY = blurRadius / _visibleHeight / 2.0f,
+            MosaicBlockWidth = MathF.Max(
+                1,
+                mosaicSize * OverlayWidth / _visibleWidth),
+            MosaicBlockHeight = MathF.Max(
+                1,
+                mosaicSize * OverlayHeight / _visibleHeight),
+            EffectMode = _options.Mode ==
+                D3D11DetectionOverlayMode.MosaicRedaction
+                    ? 1u
+                    : 2u
+        };
+        D3D11_BUFFER_DESC bufferDescription = new()
+        {
+            ByteWidth = checked((uint)sizeof(PrivacyShaderSettings)),
+            Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
+            BindFlags = (uint)D3D11_BIND_FLAG
+                .D3D11_BIND_CONSTANT_BUFFER
+        };
+        D3D11_SUBRESOURCE_DATA initialData = new()
+        {
+            pSysMem = &settings
+        };
+        ID3D11Buffer* settingsBuffer = null;
+        CheckHResult(
+            _device->CreateBuffer(
+                &bufferDescription,
+                &initialData,
+                &settingsBuffer),
+            "CreateBuffer(privacy settings)");
+        _privacySettingsBuffer = settingsBuffer;
+    }
+
+    private ID3D11SamplerState* CreateSampler(D3D11_FILTER filter)
+    {
+        D3D11_SAMPLER_DESC description = new()
+        {
+            Filter = filter,
+            AddressU = D3D11_TEXTURE_ADDRESS_MODE
+                .D3D11_TEXTURE_ADDRESS_CLAMP,
+            AddressV = D3D11_TEXTURE_ADDRESS_MODE
+                .D3D11_TEXTURE_ADDRESS_CLAMP,
+            AddressW = D3D11_TEXTURE_ADDRESS_MODE
+                .D3D11_TEXTURE_ADDRESS_CLAMP,
+            ComparisonFunc = D3D11_COMPARISON_FUNC
+                .D3D11_COMPARISON_NEVER,
+            MinLOD = 0,
+            MaxLOD = float.MaxValue
+        };
+        ID3D11SamplerState* sampler = null;
+        CheckHResult(
+            _device->CreateSamplerState(
+                &description,
+                &sampler),
+            $"CreateSamplerState({filter})");
+        return sampler;
+    }
+
+    private static byte[] ReadEmbeddedShader(string resourceName)
+    {
+        using Stream stream =
+            typeof(D3D11DetectionOverlay).Assembly
+                .GetManifestResourceStream(resourceName) ??
+            throw new InvalidOperationException(
+                $"Embedded shader '{resourceName}' was not found.");
+        if (stream.Length > int.MaxValue)
+        {
+            throw new InvalidOperationException(
+                $"Embedded shader '{resourceName}' is too large.");
+        }
+
+        byte[] bytecode = new byte[checked((int)stream.Length)];
+        stream.ReadExactly(bytecode);
+        return bytecode;
+    }
+
     private void ConfigureStreams(int visibleWidth, int visibleHeight)
     {
         RECT videoRectangle = new(
@@ -526,9 +1149,17 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
         DXGI_FORMAT format,
         D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT required)
     {
+        ValidateFormat(_enumerator, format, required);
+    }
+
+    private static void ValidateFormat(
+        ID3D11VideoProcessorEnumerator* enumerator,
+        DXGI_FORMAT format,
+        D3D11_VIDEO_PROCESSOR_FORMAT_SUPPORT required)
+    {
         uint support;
         CheckHResult(
-            _enumerator->CheckVideoProcessorFormat(format, &support),
+            enumerator->CheckVideoProcessorFormat(format, &support),
             $"CheckVideoProcessorFormat({format})");
         if ((support & (uint)required) != (uint)required)
         {
@@ -556,13 +1187,25 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
         Array.Clear(_overlayPixels);
         foreach (ObjectDetection detection in detections)
         {
-            DrawBox(detection, sourceWidth, sourceHeight);
+            if (_options.Mode ==
+                D3D11DetectionOverlayMode.BoxesAndLabels)
+            {
+                DrawBox(detection, sourceWidth, sourceHeight);
+            }
+            else
+            {
+                DrawRedaction(detection, sourceWidth, sourceHeight);
+            }
         }
 
         fixed (byte* pixels = _overlayPixels)
         {
+            ID3D11Texture2D* destinationTexture =
+                _options.UsesSceneTexture
+                    ? _maskTexture
+                    : _overlayTexture;
             _deviceContext->UpdateSubresource(
-                (ID3D11Resource*)_overlayTexture,
+                (ID3D11Resource*)destinationTexture,
                 0,
                 null,
                 pixels,
@@ -572,6 +1215,49 @@ internal sealed unsafe class D3D11DetectionOverlay : IDisposable
         _uploadedGeneration = generation;
         _uploadedBatches++;
         _uploadedBoxes += detections.Length;
+    }
+
+    private void DrawRedaction(
+        ObjectDetection detection,
+        int sourceWidth,
+        int sourceHeight)
+    {
+        float scaleX = (float)OverlayWidth / sourceWidth;
+        float scaleY = (float)OverlayHeight / sourceHeight;
+        int horizontalPadding =
+            (int)MathF.Ceiling(_options.PaddingPixels * scaleX);
+        int verticalPadding =
+            (int)MathF.Ceiling(_options.PaddingPixels * scaleY);
+        int left = Math.Clamp(
+            (int)MathF.Floor(detection.Box.X * scaleX) -
+            horizontalPadding,
+            0,
+            OverlayWidth - 1);
+        int top = Math.Clamp(
+            (int)MathF.Floor(detection.Box.Y * scaleY) -
+            verticalPadding,
+            0,
+            OverlayHeight - 1);
+        int right = Math.Clamp(
+            (int)MathF.Ceiling(detection.Box.Right * scaleX) +
+            horizontalPadding,
+            left,
+            OverlayWidth - 1);
+        int bottom = Math.Clamp(
+            (int)MathF.Ceiling(detection.Box.Bottom * scaleY) +
+            verticalPadding,
+            top,
+            OverlayHeight - 1);
+
+        FillRectangle(
+            left,
+            top,
+            right - left + 1,
+            bottom - top + 1,
+            _options.Blue,
+            _options.Green,
+            _options.Red,
+            _options.Alpha);
     }
 
     private void DrawBox(

@@ -62,7 +62,7 @@ public partial class YoloObjectSearchFilter : VLCVideoFilterBase
         new ObjectDetection[12];
     private readonly MediaTimestampGate _mediaTimestampGate = new();
 
-    private GpuYoloXDetector? _detector;
+    private GpuObjectDetector? _detector;
     private D3D11DetectionOverlay? _overlay;
     private D3D11OutputPictureAllocator? _outputPictures;
     private DetectionOverlaySelector _overlaySelector = new();
@@ -247,12 +247,20 @@ public partial class YoloObjectSearchFilter : VLCVideoFilterBase
         {
             try
             {
-                _detector = new GpuYoloXDetector(
+                var decoder = new YoloXOutputDecoder(
+                    Coco80ObjectCatalog.Create(),
+                    new YoloXDecoderOptions(
+                        ConfidenceThreshold: _confidence));
+                var profile = new ObjectDetectionModelProfile(
+                    "YOLOX COCO-80",
+                    _modelPath,
+                    ObjectDetectionModelInputLayout.Nchw,
+                    decoder);
+                _detector = new GpuObjectDetector(
                     surface.Texture,
                     frame.Width,
                     frame.Height,
-                    _modelPath,
-                    _confidence,
+                    profile,
                     _targetRate);
                 Context.Logger.Info(
                     "[YoloSearch] GPU worker started; OpenVINO is compiling " +
@@ -305,7 +313,7 @@ public partial class YoloObjectSearchFilter : VLCVideoFilterBase
         bool mediaTimeAdvanced =
             _mediaTimestampGate.TryAdvance(frame.Date);
 
-        GpuYoloXDetector? detector = _detector;
+        GpuObjectDetector? detector = _detector;
         if (detector is null)
         {
             return frame.NativePtr;
@@ -412,7 +420,7 @@ public partial class YoloObjectSearchFilter : VLCVideoFilterBase
         _selectedOverlayCount = count;
     }
 
-    private void ReportFailure(GpuYoloXDetector detector)
+    private void ReportFailure(GpuObjectDetector detector)
     {
         string? failure = detector.Failure;
         long now = Stopwatch.GetTimestamp();
@@ -461,7 +469,7 @@ public partial class YoloObjectSearchFilter : VLCVideoFilterBase
         outputPictures?.Dispose();
         _outputPictures = null;
 
-        GpuYoloXDetector? detector = _detector;
+        GpuObjectDetector? detector = _detector;
         detector?.Dispose();
         if (detector is not null)
         {

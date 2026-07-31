@@ -35,6 +35,7 @@ troubleshooting documentation.
 | Sample | Capability | Guide |
 |---|---|---|
 | YOLOX object detection | D3D11/OpenVINO GPU video filter with COCO-80 boxes and labels | [YoloObjectSearch](samples/YoloObjectSearch/README.md) |
+| Privacy Shield | Composable GPU COCO-80, face, and plate detection with solid, mosaic, or blur redaction | [PrivacyShield](samples/PrivacyShield/README.md) |
 | Diagnostic overlay | CPU video filter with ImageSharp text and graphics | [VideoOverlay](samples/VideoOverlay/README.md) |
 | Styled subtitles | ImageSharp text renderer | [SubtitleRenderer](samples/SubtitleRenderer/README.md) |
 | Offline subtitle translation | ONNX English-to-French text renderer | [SubtitleTranslator](samples/SubtitleTranslator/README.md) |
@@ -100,7 +101,7 @@ callbacks, exception handling, and per-instance state. Advanced plugins can use
 | `src/VLCLR/` | Core bindings, wrappers, module registration, and plugin base classes |
 | `src/VLCLR.Generators/` | Attribute-based VLC module source generator |
 | `src/VLCLR.ImageSharp/` | Reusable frame and text-rendering helpers |
-| `src/VLCLR.ObjectDetection/` | Detection contracts, COCO vocabulary, YOLOX decoding, query, and overlay timing |
+| `src/VLCLR.ObjectDetection/` | Detection contracts, COCO vocabulary, YOLOX decoding, query, timing, and persistence tracking |
 | `src/VLCLR.LiveTranslation/` | Translation worker protocol and model profiles |
 | `samples/` | Runnable Native AOT plugin examples with per-sample guides |
 | `tests/` | Unit, ABI, integration, and visual harnesses |

@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using TerraFX.Interop;
+using VLCLR.ObjectDetection;
 using static TerraFX.Interop.Windows;
 
 namespace YoloObjectSearch;
@@ -20,7 +21,9 @@ internal sealed unsafe class D3D11Nv12Scaler : IDisposable
         uint sourceWidth,
         uint sourceHeight,
         uint outputWidth,
-        uint outputHeight)
+        uint outputHeight,
+        ObjectDetectionInputResizeMode resizeMode =
+            ObjectDetectionInputResizeMode.CenteredLetterbox)
     {
         if (device is null)
         {
@@ -91,7 +94,9 @@ internal sealed unsafe class D3D11Nv12Scaler : IDisposable
                 Usage = D3D11_USAGE.D3D11_USAGE_DEFAULT,
                 BindFlags = (uint)(
                     D3D11_BIND_FLAG.D3D11_BIND_RENDER_TARGET |
-                    D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE)
+                    D3D11_BIND_FLAG.D3D11_BIND_SHADER_RESOURCE),
+                MiscFlags = (uint)D3D11_RESOURCE_MISC_FLAG
+                    .D3D11_RESOURCE_MISC_SHARED
             };
             ID3D11Texture2D* outputTexture = null;
             CheckHResult(
@@ -132,7 +137,8 @@ internal sealed unsafe class D3D11Nv12Scaler : IDisposable
                 sourceWidth,
                 sourceHeight,
                 outputWidth,
-                outputHeight);
+                outputHeight,
+                resizeMode);
         }
         catch
         {
@@ -288,24 +294,44 @@ internal sealed unsafe class D3D11Nv12Scaler : IDisposable
         uint sourceWidth,
         uint sourceHeight,
         uint outputWidth,
-        uint outputHeight)
+        uint outputHeight,
+        ObjectDetectionInputResizeMode resizeMode)
     {
         RECT sourceRectangle = new(
             0,
             0,
             checked((int)sourceWidth),
             checked((int)sourceHeight));
-        float scale = MathF.Min(
-            (float)outputWidth / sourceWidth,
-            (float)outputHeight / sourceHeight);
-        int contentWidth = checked((int)MathF.Round(
-            sourceWidth * scale));
-        int contentHeight = checked((int)MathF.Round(
-            sourceHeight * scale));
-        int contentX =
-            (checked((int)outputWidth) - contentWidth) / 2;
-        int contentY =
-            (checked((int)outputHeight) - contentHeight) / 2;
+        int contentWidth;
+        int contentHeight;
+        int contentX;
+        int contentY;
+        if (resizeMode == ObjectDetectionInputResizeMode.Stretch)
+        {
+            contentWidth = checked((int)outputWidth);
+            contentHeight = checked((int)outputHeight);
+            contentX = 0;
+            contentY = 0;
+        }
+        else if (resizeMode ==
+                 ObjectDetectionInputResizeMode.CenteredLetterbox)
+        {
+            float scale = MathF.Min(
+                (float)outputWidth / sourceWidth,
+                (float)outputHeight / sourceHeight);
+            contentWidth = checked((int)MathF.Round(
+                sourceWidth * scale));
+            contentHeight = checked((int)MathF.Round(
+                sourceHeight * scale));
+            contentX =
+                (checked((int)outputWidth) - contentWidth) / 2;
+            contentY =
+                (checked((int)outputHeight) - contentHeight) / 2;
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(resizeMode));
+        }
         RECT destinationRectangle = new(
             contentX,
             contentY,

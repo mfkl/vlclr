@@ -27,6 +27,11 @@ samples/LiveAudioTranslator/models/**/*
 !samples/LiveAudioTranslator/models/**/
 !samples/LiveAudioTranslator/models/**/model-manifest.json
 
+# Privacy Shield face/plate Open Model Zoo IR files are downloaded separately.
+samples/PrivacyShield/models/**/*
+!samples/PrivacyShield/models/**/
+!samples/PrivacyShield/models/**/model-manifest.json
+
 # Ignore generated .lib files except VLC SDK import libraries in lib/
 *.lib
 !lib/*.lib
@@ -66,3 +71,8 @@ specs/
 tests/fixtures/live-sync-speech.mp4
 artifacts/live-sync/
 artifacts/live-sync-real/
+
+# Downloaded YOLO models and generated OpenVINO GPU cache.
+benchmarks/YoloObjectSearch.Benchmarks/models/*.onnx
+artifacts/yolo-openvino-cache/
+artifacts/yolo-d3d11-openvino/
