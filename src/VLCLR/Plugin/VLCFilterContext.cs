@@ -179,6 +179,36 @@ public readonly struct VLCFilterContext
         filterPtr->Operations = opsPtr;
     }
 
+    /// <summary>
+    /// Allocates an output picture the way VLC's inline <c>filter_NewPicture</c>
+    /// does: through the owner's <c>buffer_new</c> callback when the owner
+    /// provides one, otherwise <c>picture_NewFromFormat</c> on the output
+    /// format. Out-of-place CPU filters return it from
+    /// <see cref="VLCVideoFilterBase"/>'s <c>ProcessFrameToOutput</c>.
+    /// </summary>
+    /// <returns>The new picture, or 0 (logged as a warning) when none could be allocated.</returns>
+    public unsafe nint NewPicture()
+    {
+        if (_filterPtr == 0) return 0;
+        var filter = (VLCFilter*)_filterPtr;
+        nint picture = 0;
+        var callbacks = (VLCFilterVideoCallbacks*)filter->Owner.Callbacks;
+        if (callbacks != null && callbacks->BufferNew != 0)
+        {
+            picture = ((delegate* unmanaged<nint, nint>)callbacks->BufferNew)(_filterPtr);
+        }
+        if (picture == 0)
+        {
+            // Owners that set no allocator (legacy), as in filter_NewPicture.
+            picture = VLCCore.PictureNewFromFormat((nint)(&filter->FormatOut.Video));
+        }
+        if (picture == 0)
+        {
+            Logger.Warning("can't get output picture");
+        }
+        return picture;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private unsafe VLCFilter GetFilter()
     {
