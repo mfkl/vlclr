@@ -50,6 +50,7 @@ public sealed record VLCExternalTrackAttachmentResult(
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed class VLCMediaCapabilities : IVLCMediaCapabilitySmokeAdapter
 {
     /// <summary>Managed safety bound for delay writes. VLC accepts signed 64-bit microseconds; this API limits daily-use requests to one day.</summary>

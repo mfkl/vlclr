@@ -8,11 +8,11 @@ namespace VLCLR.Native;
 /// </summary>
 /// <remarks>
 /// Each slot holds one argument as a variadic call would pass it: an integer
-/// widened to 64 bits, a pointer, or the bits of a double. On Win64 a
-/// <c>va_list</c> is a pointer to those slots. On System V x86-64 it is a pointer
-/// to a <c>__va_list_tag</c>; marking both register save areas as consumed makes
-/// <c>va_arg</c> read every argument, including doubles, from the overflow area.
-/// The slots and tag must stay alive until the native call returns.
+/// widened to 64 bits, a pointer, or the bits of a double. On Win64 and Apple
+/// arm64 a <c>va_list</c> is a pointer to those slots. On System V x86-64 it is a
+/// pointer to a <c>__va_list_tag</c>; marking both register save areas as
+/// consumed makes <c>va_arg</c> read every argument, including doubles, from the
+/// overflow area. The slots and tag must stay alive until the native call returns.
 /// </remarks>
 public static unsafe class VLCVaList
 {
@@ -36,7 +36,7 @@ public static unsafe class VLCVaList
     public static nint Create(long* slots, SystemVTag* tag)
     {
         VLCPlatform.EnsureSupported(nameof(VLCVaList));
-        if (OperatingSystem.IsWindows())
+        if (!UsesSystemVTag)
             return (nint)slots;
         *tag = new SystemVTag
         {
@@ -46,6 +46,25 @@ public static unsafe class VLCVaList
         };
         return (nint)tag;
     }
+
+    /// <summary>
+    /// Reads the first argument of a <c>va_list</c> VLC passed in, such as the
+    /// configuration pointer of a video output control query, without consuming it.
+    /// </summary>
+    public static nint PeekPointer(nint vaList)
+    {
+        VLCPlatform.EnsureSupported(nameof(VLCVaList));
+        if (!UsesSystemVTag)
+            return *(nint*)vaList;
+        SystemVTag* tag = (SystemVTag*)vaList;
+        return tag->GeneralOffset < SystemVGeneralRegistersConsumed
+            ? *(nint*)(tag->RegisterSaveArea + (nint)tag->GeneralOffset)
+            : *(nint*)tag->OverflowArea;
+    }
+
+    // Windows x64 and Apple arm64 use a plain pointer to the argument slots.
+    private static bool UsesSystemVTag =>
+        RuntimeInformation.ProcessArchitecture == Architecture.X64 && !OperatingSystem.IsWindows();
 
     /// <summary>The slot value of a double argument.</summary>
     public static long Double(double value) => BitConverter.DoubleToInt64Bits(value);

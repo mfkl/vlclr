@@ -15,6 +15,7 @@ public sealed record VLCPlaylistSmokeOptions(int MaxPolls = 20) { internal bool 
 /// <summary>Deterministic host smoke. The injected poll yields to the product dispatcher; VLCLR never sleeps.</summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public static class VLCPlaylistQueueSmoke
 {
     public static async ValueTask<VLCPlaylistSmokeReport> RunAsync(IVLCPlaylistQueueSmokeAdapter a, IEnumerable<string> uris, Func<CancellationToken, ValueTask> poll, VLCPlaylistSmokeOptions? options = null, CancellationToken ct = default)

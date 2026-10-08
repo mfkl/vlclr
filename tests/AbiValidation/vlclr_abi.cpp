@@ -31,6 +31,7 @@ extern "C" int poll(struct pollfd *, unsigned, int);
 #include <vlc_plugin.h>
 #include <vlc_subpicture.h>
 #include <vlc_text_style.h>
+#include <vlc_vout_display.h>
 
 static_assert(sizeof(void *) == 8, "VLCLR currently targets the 64-bit VLC ABI");
 
@@ -289,6 +290,47 @@ VLCLR_OFFSET(vlclr_pic_sys_vaapi_instance, num_render_targets, 24);
 VLCLR_OFFSET(vlclr_pic_sys_vaapi_instance, render_targets, 28);
 VLCLR_SIZE(vlclr_vaapi_picture_sys, 40);
 VLCLR_OFFSET(vlclr_vaapi_picture_sys, ctx, 8);
+
+// --- Video output displays (VLCVoutDisplay.cs) ---
+VLCLR_SIZE(vout_display_t, 504);
+VLCLR_OFFSET(vout_display_t, cfg, 48);
+VLCLR_OFFSET(vout_display_t, source, 56);
+VLCLR_OFFSET(vout_display_t, fmt, 232);
+VLCLR_OFFSET(vout_display_t, info, 408);
+VLCLR_OFFSET(vout_display_t, info.subpicture_chromas, 416);
+VLCLR_OFFSET(vout_display_t, pool, 424);
+VLCLR_OFFSET(vout_display_t, control, 448);
+VLCLR_OFFSET(vout_display_t, sys, 464);
+VLCLR_OFFSET(vout_display_t, owner, 472);
+// VLCVoutDisplayControls: Windows builds have a leading is_fullscreen flag and
+// two extra control queries.
+#if defined(_WIN32)
+VLCLR_OFFSET(vout_display_cfg_t, is_display_filled, 40);
+VLCLR_OFFSET(vout_display_cfg_t, zoom.num, 44);
+VLCLR_OFFSET(vout_display_cfg_t, zoom.den, 48);
+static_assert(VOUT_DISPLAY_CHANGE_DISPLAY_SIZE == 4, "Windows display size query");
+static_assert(VOUT_DISPLAY_CHANGE_SOURCE_CROP == 8, "Windows source crop query");
+#else
+VLCLR_OFFSET(vout_display_cfg_t, is_display_filled, 32);
+VLCLR_OFFSET(vout_display_cfg_t, zoom.num, 36);
+VLCLR_OFFSET(vout_display_cfg_t, zoom.den, 40);
+static_assert(VOUT_DISPLAY_CHANGE_DISPLAY_SIZE == 2, "display size query");
+static_assert(VOUT_DISPLAY_CHANGE_SOURCE_CROP == 6, "source crop query");
+#endif
+static_assert(VOUT_DISPLAY_RESET_PICTURES == 1, "reset pictures query");
+
+// --- CoreVideo pictures (VLCCvpxPicture.cs) ---
+// struct cvpxpic_ctx is private to modules/codec/vt_utils.c; the copy below
+// follows that file at the pinned commit (CVPixelBufferRef is a pointer).
+struct vlclr_cvpxpic_ctx { picture_context_t s; void *cvpx; unsigned nb_fields; unsigned ref_count; void (*on_released_cb)(void *, void *, unsigned); void *on_released_data; };
+VLCLR_SIZE(vlclr_cvpxpic_ctx, 48);
+VLCLR_OFFSET(vlclr_cvpxpic_ctx, cvpx, 16);
+VLCLR_OFFSET(vlclr_cvpxpic_ctx, nb_fields, 24);
+VLCLR_OFFSET(vlclr_cvpxpic_ctx, ref_count, 28);
+VLCLR_OFFSET(vlclr_cvpxpic_ctx, on_released_cb, 32);
+VLCLR_OFFSET(vlclr_cvpxpic_ctx, on_released_data, 40);
+static_assert(VLC_CODEC_CVPX_BGRA == VLC_FOURCC('C','V','P','B'), "CVPX BGRA fourcc");
+static_assert(VLC_CODEC_CVPX_NV12 == VLC_FOURCC('C','V','P','N'), "CVPX NV12 fourcc");
 
 int main()
 {

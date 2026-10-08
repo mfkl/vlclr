@@ -36,6 +36,7 @@ public sealed record VLCMediaSmokeOptions(int MaxPolls = 20)
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public static class VLCMediaCapabilitiesSmoke
 {
     public static async ValueTask<VLCMediaSmokeReport> RunAsync(

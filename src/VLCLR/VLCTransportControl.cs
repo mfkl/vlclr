@@ -8,15 +8,15 @@ namespace VLCLR;
 /// Provides ownership-safe transport controls for a VLC 3 playlist.
 /// </summary>
 /// <remarks>
-/// This abstraction targets the VLC 3 ABI on Windows x64 and Linux x64. VLC
-/// exposes <c>playlist_Control</c> and <c>input_Control</c> as variadic C
+/// This abstraction targets the VLC 3 ABI on Windows x64, Linux x64 and macOS.
+/// VLC exposes <c>playlist_Control</c> and <c>input_Control</c> as variadic C
 /// functions, which must not be represented as ordinary fixed P/Invokes. Input
 /// commands use VLC's fixed-signature <c>input_vaControl</c> export with a
 /// <see cref="VLCVaList"/>. <c>playlist_Control</c> has no exported
-/// <c>va_list</c> form, so its integer-only commands are dispatched through a
-/// fixed function pointer: on both targets those arguments travel in the same
-/// registers as a variadic call. On System V the callee only tests whether AL
-/// is zero to decide whether to spill vector registers, which no argument uses.
+/// <c>va_list</c> form; the commands used here pass no variadic arguments, so a
+/// fixed function pointer puts the playlist, query and lock flag where the
+/// callee reads them on every target. On System V the callee only tests whether
+/// AL is zero to decide whether to spill vector registers, which no argument uses.
 ///
 /// The playlist pointer supplied to the constructor is borrowed and must stay
 /// valid for this object's lifetime. Current-input references are acquired via
@@ -25,6 +25,7 @@ namespace VLCLR;
 /// </remarks>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed unsafe class VLCTransportControl
 {
     /// <summary>The nominal VLC input rate value (1.0x playback).</summary>
@@ -138,6 +139,7 @@ public sealed unsafe class VLCTransportControl
     private void PlaylistControl(int query)
     {
         VLCPlatform.EnsureSupported(nameof(VLCTransportControl));
+        // No variadic arguments, so the fixed call matches on every target.
         PlaylistControlExport.Value(_playlist, query, 0);
     }
 

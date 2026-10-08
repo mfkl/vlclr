@@ -16,6 +16,7 @@ public sealed record VLCVideoAdjustments(VLCInputGeneration Generation, ulong Ou
 /// releases both the output array and references before returning owned values.</summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed unsafe class VLCVideoPresentation(Func<VLCCurrentInputLease?> leaseProvider)
 {
     // VLC 3 vlc_input.h input_query_e INPUT_GET_VOUTS; takes vout_thread_t*** and size_t*.

@@ -73,6 +73,7 @@ public sealed class VLCPlaylistSnapshot : IDisposable
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed unsafe partial class VLCPlaylistQueue : IVLCPlaylistQueueSmokeAdapter
 {
     private const int MaxQueueItems = 100_000;
@@ -248,7 +249,7 @@ public sealed unsafe partial class VLCPlaylistQueue : IVLCPlaylistQueueSmokeAdap
     }
 
     private static VLCPlaylistResult ClearLocked(nint playlist) { VLCCore.PlaylistClear(playlist, true); return VLCPlaylistResult.Success; }
-    private static VLCPlaylistResult ViewPlay(nint playlist, nint root, nint item) { VLCPlatform.EnsureSupported(nameof(VLCPlaylistQueue)); PlaylistViewPlayExport.Value(playlist, PlaylistViewPlayQuery, 1, root, item); return new(VLCPlaylistResultCode.RequestDispatched); }
+    private static VLCPlaylistResult ViewPlay(nint playlist, nint root, nint item) { VLCPlatform.EnsureSupported(nameof(VLCPlaylistQueue)); VLCVariadic.Call(PlaylistControlExport.Value, playlist, PlaylistViewPlayQuery, 1, root, item); return new(VLCPlaylistResultCode.RequestDispatched); }
     private bool IsCurrentLocked(nint playlist, long coreGeneration, VLCPlaylistSnapshot snapshot) => TryFingerprintLocked(playlist, coreGeneration, out ulong fingerprint) && fingerprint == snapshot.Fingerprint;
     private static bool IsChildOfRoot(VLCPlaylistItemNative root, nint item) { if (item == nint.Zero || root.Children == nint.Zero || root.ChildCount < 0 || root.ChildCount > MaxQueueItems) return false; for (int i = 0; i < root.ChildCount; i++) if (Marshal.ReadIntPtr(root.Children, checked(i * IntPtr.Size)) == item) return true; return false; }
     private static int IndexOfRoot(nint rootPointer, nint item) { var root = Unsafe.Read<VLCPlaylistItemNative>((void*)rootPointer); if (!IsValidQueueShape(rootPointer, root.ChildCount, root.Children)) return -1; for (int i = 0; i < root.ChildCount; i++) if (Marshal.ReadIntPtr(root.Children, checked(i * IntPtr.Size)) == item) return i; return -1; }
@@ -295,6 +296,6 @@ public sealed unsafe partial class VLCPlaylistQueue : IVLCPlaylistQueueSmokeAdap
     private static ulong Mix(ulong x, ulong y) => (x ^ y) * 1099511628211UL;
     internal static ulong MixString(ulong value, string text) { foreach (char c in text) value = Mix(value, c); return Mix(value, (ulong)text.Length); }
     internal static bool IsValidQueueShape(nint rootPointer, int count, nint children) => rootPointer != nint.Zero && count >= 0 && count <= MaxQueueItems && (count == 0 || children != nint.Zero);
-    // playlist_Control is variadic with no exported va_list form; its pointer arguments use the same registers either way (see VLCTransportControl).
-    private static class PlaylistViewPlayExport { internal static readonly delegate* unmanaged[Cdecl]<nint, int, int, nint, nint, void> Value = (delegate* unmanaged[Cdecl]<nint, int, int, nint, nint, void>)NativeLibrary.GetExport(VLCCore.Library, "playlist_Control"); }
+    // playlist_Control is variadic with no exported va_list form (see VLCVariadic).
+    private static class PlaylistControlExport { internal static readonly nint Value = NativeLibrary.GetExport(VLCCore.Library, "playlist_Control"); }
 }

@@ -47,6 +47,7 @@ public sealed record VLCAudioStartupOptions(string? OutputModule = null, float? 
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed class VLCPlayerCapabilities
 {
     private readonly Func<VLCCurrentInputLease?> _leaseProvider;
@@ -101,6 +102,7 @@ public sealed class VLCPlayerCapabilities
 /// <summary>Deterministic capability probe. Unsupported runtime features are reported as skipped, never passed.</summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public static class VLCPlayerCapabilitiesSmoke
 {
     public static VLCPlayerSmokeReport Run(VLCPlayerCapabilities capabilities)
@@ -120,6 +122,7 @@ public static class VLCPlayerCapabilitiesSmoke
 /// <summary>Optional public-libVLC controls for a host-owned media-player handle. This cannot be inferred from an internal input pointer.</summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed class VLCLibVLCVideoCapabilities
 {
     private static readonly HashSet<string> Modes = new(StringComparer.Ordinal) { "", "blend", "bob", "discard", "linear", "mean", "x", "yadif", "yadif2x", "phosphor", "ivtc" };

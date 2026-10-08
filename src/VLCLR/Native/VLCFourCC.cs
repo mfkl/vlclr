@@ -24,6 +24,11 @@ public static class VLCFourCC
     public const uint D3D11OpaqueAlpha = 0x31314144; // "DA11"
     public const uint VaapiOpaque420 = 0x504F4156; // "VAOP" - VA-API 4:2:0 8-bit surface
     public const uint VaapiOpaque420TenBit = 0x304F4156; // "VAO0" - VA-API 4:2:0 10-bit surface
+    public const uint CvpxNV12 = 0x4E505643; // "CVPN" - CoreVideo NV12 pixel buffer
+    public const uint CvpxUYVY = 0x59505643; // "CVPY" - CoreVideo UYVY pixel buffer
+    public const uint CvpxI420 = 0x49505643; // "CVPI" - CoreVideo I420 pixel buffer
+    public const uint CvpxBGRA = 0x42505643; // "CVPB" - CoreVideo BGRA pixel buffer
+    public const uint CvpxP010 = 0x50505643; // "CVPP" - CoreVideo P010 pixel buffer
 
     // Common native little-endian audio formats on Windows.
     public const uint F32L = 0x6C323366; // "f32l" - interleaved 32-bit float
@@ -127,4 +132,10 @@ public static class VLCFourCC
     /// </summary>
     public static bool IsVaapiOpaque(uint chroma) =>
         chroma is VaapiOpaque420 or VaapiOpaque420TenBit;
+
+    /// <summary>
+    /// Checks whether a chroma value represents a CoreVideo pixel buffer picture.
+    /// </summary>
+    public static bool IsCvpx(uint chroma) =>
+        chroma is CvpxNV12 or CvpxUYVY or CvpxI420 or CvpxBGRA or CvpxP010;
 }

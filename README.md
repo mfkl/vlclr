@@ -18,11 +18,18 @@ git submodule.
 
 ## Platforms
 
-Windows x64 and Linux x64. VLC's variadic control calls take a `va_list` that
-VLCLR builds in managed code for each platform (`VLCVaList`), so no native
-helper library is needed. Linux distributions that renamed the module suffix
-for their 64-bit `time_t` transition (`3_0_0ft64`, Debian and Ubuntu) use the
-same ABI on 64-bit targets.
+Windows x64, Linux x64, and macOS on arm64 and x64. VLC's variadic control
+calls take a `va_list` that VLCLR builds in managed code for each platform
+(`VLCVaList`), and calls to variadic functions such as `vlc_set` place their
+arguments where each platform's convention expects them (`VLCVariadic`; Apple
+arm64 passes them on the stack), so no native helper library is needed. Linux
+distributions that renamed the module suffix for their 64-bit `time_t`
+transition (`3_0_0ft64`, Debian and Ubuntu) use the same ABI on 64-bit targets.
+
+Hosts that load VLC from an explicit path, such as `VLC.app` on macOS or a
+distribution's versioned sonames, bind VLCLR to it with
+`VLCCore.UseLibraries`. Plugins on Linux and macOS find the core that loaded
+them with `VLCCore.UseLibraryContaining`, passing the `vlc_set` callback.
 
 ## Build
 

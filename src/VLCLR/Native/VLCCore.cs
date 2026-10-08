@@ -18,18 +18,26 @@ public static partial class VLCCore
     #region Logging
 
     /// <summary>
-    /// Log a message through VLC's logging system (vlc_Log).
+    /// Log a message through VLC's logging system (vlc_Log). <paramref name="format"/>
+    /// receives <paramref name="message"/> as its only argument, so pass "%s".
     /// </summary>
+    public static void Log(nint obj, int type, string module, string file, uint line, string func, string format, string message)
+    {
+        // vlc_Log is variadic and the message is its first variadic argument. On
+        // Apple arm64 that argument goes on the stack, after a padding x7.
+        if (VLCVariadic.PassesOnStack)
+            LogStackVariadic(obj, type, module, file, line, func, format, 0, message);
+        else
+            LogRegisterVariadic(obj, type, module, file, line, func, format, message);
+    }
+
     [LibraryImport(LibraryName, EntryPoint = "vlc_Log", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void Log(
-        nint obj,
-        int type,
-        string module,
-        string file,
-        uint line,
-        string func,
-        string format,
-        string message);
+    private static partial void LogRegisterVariadic(
+        nint obj, int type, string module, string file, uint line, string func, string format, string message);
+
+    [LibraryImport(LibraryName, EntryPoint = "vlc_Log", StringMarshalling = StringMarshalling.Utf8)]
+    private static partial void LogStackVariadic(
+        nint obj, int type, string module, string file, uint line, string func, string format, nint padding, string message);
 
     #endregion
 
@@ -205,7 +213,66 @@ public static partial class VLCCore
     /// <summary>
     /// The core library, for exports that need a custom function-pointer signature.
     /// </summary>
-    internal static nint Library => LoadedLibrary.Handle;
+    internal static nint Library => s_library != 0 ? s_library : LoadedLibrary.Handle;
+
+    private static nint s_library;
+    private static readonly object s_libraryGate = new();
+
+    /// <summary>
+    /// Binds VLCLR's native calls to VLC libraries the caller loaded itself, for
+    /// runtimes the default library probing cannot find: versioned Linux sonames,
+    /// VLC.app on macOS, or a bundled runtime. Call it before any other VLCLR
+    /// native call. Repeating it with the same core does nothing; a process
+    /// cannot switch to another core.
+    /// </summary>
+    /// <param name="core">Handle of the loaded libvlccore.</param>
+    /// <param name="library">Handle of the loaded libvlc, or zero when unused.</param>
+    public static void UseLibraries(nint core, nint library = 0)
+    {
+        ArgumentOutOfRangeException.ThrowIfZero(core);
+        lock (s_libraryGate)
+        {
+            if (s_library == core)
+                return;
+            if (s_library != 0)
+                throw new InvalidOperationException("VLCLR is already bound to another libvlccore.");
+            NativeLibrary.SetDllImportResolver(typeof(VLCCore).Assembly, (name, _, _) => name switch
+            {
+                LibraryName => core,
+                "libvlc" => library,
+                _ => 0,
+            });
+            Volatile.Write(ref s_library, core);
+        }
+    }
+
+    /// <summary>
+    /// For plugins on Linux and macOS: binds VLCLR to the libvlccore that contains
+    /// <paramref name="address"/>, such as the <c>vlc_set</c> callback VLC passes
+    /// to the module entry point. That is the core which loaded the plugin,
+    /// wherever it lives.
+    /// </summary>
+    public static unsafe void UseLibraryContaining(nint address)
+    {
+        if (OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException("Windows plugins link libvlccore directly.");
+        var dladdr = (delegate* unmanaged[Cdecl]<nint, DynamicLibraryInfo*, int>)
+            NativeLibrary.GetExport(NativeLibrary.GetMainProgramHandle(), "dladdr");
+        DynamicLibraryInfo info;
+        if (dladdr(address, &info) == 0 || info.FileName == 0)
+            throw new DllNotFoundException("No loaded library contains the given libvlccore address.");
+        UseLibraries(NativeLibrary.Load(Marshal.PtrToStringUTF8(info.FileName)!));
+    }
+
+    // Dl_info, identical on glibc and Darwin.
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DynamicLibraryInfo
+    {
+        public nint FileName;
+        public nint FileBase;
+        public nint SymbolName;
+        public nint SymbolAddress;
+    }
 
     private static class LoadedLibrary
     {
@@ -257,7 +324,7 @@ public static partial class VLCCore
 
     /// <summary>
     /// Frees memory VLC allocated with its C runtime's <c>malloc</c>: msvcrt for
-    /// the MinGW-built Windows runtime, the process C library on Linux.
+    /// the MinGW-built Windows runtime, the process C library on Linux and macOS.
     /// </summary>
     public static unsafe void Free(nint ptr) => CFree.Value(ptr);
 

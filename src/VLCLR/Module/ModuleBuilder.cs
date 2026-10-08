@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using VLCLR.Native;
 
 namespace VLCLR.Module;
 
@@ -52,8 +53,7 @@ public unsafe ref struct ModuleBuilder
 
         // First call: VLC_MODULE_CREATE to get a module handle
         nint moduleOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, nint*, int>)vlcSetPtr;
-        _result = vlcSetCreate(opaque, 0, VLCModuleConstants.VLC_MODULE_CREATE, &moduleOut);
+        _result = VLCVariadic.Call(vlcSetPtr, opaque, 0, VLCModuleConstants.VLC_MODULE_CREATE, (long)&moduleOut);
         _module = moduleOut;
     }
 
@@ -85,13 +85,7 @@ public unsafe ref struct ModuleBuilder
             nint shortcutPtr = PinString(shortcut);
             nint* shortcuts = stackalloc nint[1];
             shortcuts[0] = shortcutPtr;
-            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nuint, nint*, int>)_vlcSetPtr;
-            _result = vlcSet(
-                _opaque,
-                _module,
-                VLCModuleConstants.VLC_MODULE_SHORTCUT,
-                1,
-                shortcuts);
+            _result = Set(_module, VLCModuleConstants.VLC_MODULE_SHORTCUT, 1, (long)shortcuts);
         }
         return this;
     }
@@ -180,8 +174,7 @@ public unsafe ref struct ModuleBuilder
 
         // Create config item
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_INTEGER, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_INTEGER, (long)&configOut);
         if (_result != 0) return 0;
 
         // Set name
@@ -208,8 +201,7 @@ public unsafe ref struct ModuleBuilder
 
         // Set range - requires passing min and max as two int64 values
         // Note: VLC_CONFIG_RANGE expects (min, max) as two separate int64 arguments
-        var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, long, long, int>)_vlcSetPtr;
-        _result = vlcSetRange(_opaque, config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+        _result = Set(config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
 
         return this;
     }
@@ -233,8 +225,7 @@ public unsafe ref struct ModuleBuilder
 
         // Create config item
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_FLOAT, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_FLOAT, (long)&configOut);
         if (_result != 0) return 0;
 
         // Set name
@@ -260,8 +251,15 @@ public unsafe ref struct ModuleBuilder
         if (_result != 0) return this;
 
         // Set range
-        var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, double, double, int>)_vlcSetPtr;
-        _result = vlcSetRange(_opaque, config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+        // System V reads variadic doubles from vector registers, so only Apple
+        // arm64 can pass their bits through integer slots.
+        if (VLCVariadic.PassesOnStack)
+            _result = Set(config, VLCModuleConstants.VLC_CONFIG_RANGE, VLCVaList.Double(min), VLCVaList.Double(max));
+        else
+        {
+            var vlcSetRange = (delegate* unmanaged[Cdecl]<nint, nint, int, double, double, int>)_vlcSetPtr;
+            _result = vlcSetRange(_opaque, config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+        }
 
         return this;
     }
@@ -279,8 +277,7 @@ public unsafe ref struct ModuleBuilder
 
         // Create config item
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_BOOL, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_BOOL, (long)&configOut);
         if (_result != 0) return this;
 
         // Set name
@@ -310,8 +307,7 @@ public unsafe ref struct ModuleBuilder
 
         // Create config item
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_STRING, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_STRING, (long)&configOut);
         if (_result != 0) return this;
 
         // Set name
@@ -339,8 +335,7 @@ public unsafe ref struct ModuleBuilder
         if (_result != 0) return this;
 
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_LOADFILE, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_LOADFILE, (long)&configOut);
         if (_result != 0) return this;
 
         SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
@@ -364,8 +359,7 @@ public unsafe ref struct ModuleBuilder
         if (_result != 0) return this;
 
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_DIRECTORY, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_ITEM_DIRECTORY, (long)&configOut);
         if (_result != 0) return this;
 
         SetConfigString(configOut, VLCModuleConstants.VLC_CONFIG_NAME, name);
@@ -389,8 +383,7 @@ public unsafe ref struct ModuleBuilder
         if (_result != 0) return this;
 
         nint configOut = 0;
-        var vlcSetCreate = (delegate* unmanaged[Cdecl]<nint, nint, int, int, nint*, int>)_vlcSetPtr;
-        _result = vlcSetCreate(_opaque, _module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_SUBCATEGORY, &configOut);
+        _result = Set(_module, VLCModuleConstants.VLC_CONFIG_CREATE, VLCConfigTypes.CONFIG_SUBCATEGORY, (long)&configOut);
         if (_result != 0) return this;
 
         // Set the subcategory value
@@ -400,29 +393,30 @@ public unsafe ref struct ModuleBuilder
 
     private void SetConfigString(nint config, int key, string value)
     {
-        nint ptr = PinString(value);
-        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, int>)_vlcSetPtr;
-        _result = vlcSet(_opaque, config, key, ptr);
+        _result = Set(config, key, PinString(value));
     }
 
     private void SetConfigLong(nint config, int key, long value)
     {
-        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, long, int>)_vlcSetPtr;
-        _result = vlcSet(_opaque, config, key, value);
+        _result = Set(config, key, value);
     }
 
     private void SetConfigDouble(nint config, int key, double value)
     {
-        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, double, int>)_vlcSetPtr;
-        _result = vlcSet(_opaque, config, key, value);
+        if (VLCVariadic.PassesOnStack)
+            _result = Set(config, key, VLCVaList.Double(value));
+        else
+        {
+            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, double, int>)_vlcSetPtr;
+            _result = vlcSet(_opaque, config, key, value);
+        }
     }
 
     private void SetConfigDesc(nint config, string description, string? longDescription)
     {
         nint descPtr = PinString(description);
         nint longDescPtr = longDescription != null ? PinString(longDescription) : 0;
-        var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)_vlcSetPtr;
-        _result = vlcSet(_opaque, config, VLCModuleConstants.VLC_CONFIG_DESC, descPtr, longDescPtr);
+        _result = Set(config, VLCModuleConstants.VLC_CONFIG_DESC, descPtr, longDescPtr);
     }
 
     /// <summary>
@@ -437,9 +431,7 @@ public unsafe ref struct ModuleBuilder
         // Register open callback if set
         if (_openCallback != 0)
         {
-            var vlcSetCallback = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)_vlcSetPtr;
-            nint namePtr = PinString(_openCallbackName);
-            _result = vlcSetCallback(_opaque, _module, VLCModuleConstants.VLC_MODULE_CB_OPEN, namePtr, _openCallback);
+            _result = Set(_module, VLCModuleConstants.VLC_MODULE_CB_OPEN, PinString(_openCallbackName), _openCallback);
             if (_result != 0)
                 return _result;
         }
@@ -447,9 +439,7 @@ public unsafe ref struct ModuleBuilder
         // Register close callback if set
         if (_closeCallback != 0)
         {
-            var vlcSetCallback = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, int>)_vlcSetPtr;
-            nint namePtr = PinString(_closeCallbackName);
-            _result = vlcSetCallback(_opaque, _module, VLCModuleConstants.VLC_MODULE_CB_CLOSE, namePtr, _closeCallback);
+            _result = Set(_module, VLCModuleConstants.VLC_MODULE_CB_CLOSE, PinString(_closeCallbackName), _closeCallback);
             if (_result != 0)
                 return _result;
         }
@@ -461,9 +451,7 @@ public unsafe ref struct ModuleBuilder
     {
         if (_result == 0)
         {
-            nint ptr = PinString(value);
-            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, nint, int>)_vlcSetPtr;
-            _result = vlcSet(_opaque, _module, key, ptr);
+            _result = Set(_module, key, PinString(value));
         }
         return this;
     }
@@ -472,8 +460,7 @@ public unsafe ref struct ModuleBuilder
     {
         if (_result == 0)
         {
-            var vlcSetInt = (delegate* unmanaged[Cdecl]<nint, nint, int, int, int>)_vlcSetPtr;
-            _result = vlcSetInt(_opaque, _module, key, value);
+            _result = Set(_module, key, value);
         }
         return this;
     }
@@ -482,11 +469,17 @@ public unsafe ref struct ModuleBuilder
     {
         if (_result == 0)
         {
-            var vlcSet = (delegate* unmanaged[Cdecl]<nint, nint, int, int>)_vlcSetPtr;
-            _result = vlcSet(_opaque, _module, key);
+            _result = Set(_module, key);
         }
         return this;
     }
+
+    /// <summary>
+    /// <c>vlc_set(opaque, target, property, ...)</c> with integer or pointer
+    /// arguments, each passed in a 64-bit variadic slot.
+    /// </summary>
+    private readonly int Set(nint target, int property, long first = 0, long second = 0) =>
+        VLCVariadic.Call(_vlcSetPtr, _opaque, target, property, first, second);
 
     /// <summary>
     /// Pins a string for the lifetime of the plugin.
