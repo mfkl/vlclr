@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+    <!--
+      Selects the VLC ABI variant for the native layout wrappers.
+      MSVC and GCC pack video_format_t.dovi differently, which shifts every
+      field after it by 8 bytes between Windows and Linux VLC builds.
+      The RID decides when present; without a RID (JIT dev/test builds) the
+      host OS is used.
+    -->
+    <VlclrWindowsAbi Condition="'$(RuntimeIdentifier)' != ''">false</VlclrWindowsAbi>
+    <VlclrWindowsAbi Condition="'$(RuntimeIdentifier)' != '' AND $(RuntimeIdentifier.StartsWith('win'))">true</VlclrWindowsAbi>
+    <VlclrWindowsAbi Condition="'$(RuntimeIdentifier)' == ''">$([MSBuild]::IsOSPlatform('Windows'))</VlclrWindowsAbi>
+    <DefineConstants Condition="'$(VlclrWindowsAbi)' == 'true'">$(DefineConstants);VLCLR_WINDOWS_ABI</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Include the source generator for consumers of this package -->
+  <ItemGroup>
+    <ProjectReference Include="..\VLCLR.Generators\VLCLR.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

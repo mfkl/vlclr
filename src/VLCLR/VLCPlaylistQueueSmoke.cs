@@ -1,0 +1,49 @@
+using System.Runtime.Versioning;
+
+namespace VLCLR;
+
+public enum VLCPlaylistSmokePhase { Validate, ClearExisting, Add, Reorder, Select, Remove, Next, Previous, RepeatNone, RepeatCurrent, RepeatAll, OrderNormal, OrderRandom, ClearFinal, Complete }
+public readonly record struct VLCPlaylistSmokeReport(VLCPlaylistSmokePhase Phase, VLCPlaylistResult Result, string? Detail = null) { public bool Succeeded => Phase == VLCPlaylistSmokePhase.Complete && Result.Succeeded; }
+
+/// <summary>Host seam for deterministic smoke orchestration; implementations own their borrowed playlist lifetime.</summary>
+public interface IVLCPlaylistQueueSmokeAdapter
+{
+    VLCPlaylistSnapshot? TryGetSnapshot(out VLCPlaylistResult result); bool TryGetActiveCurrentItemId(out int? itemId, out VLCPlaylistResult result); VLCPlaylistResult Add(IEnumerable<string> uris, bool playFirst = false); VLCPlaylistResult Clear(VLCPlaylistSnapshot snapshot); VLCPlaylistResult Move(VLCPlaylistSnapshot snapshot, VLCPlaylistItem item, int destinationIndex); VLCPlaylistResult SelectAndPlay(VLCPlaylistSnapshot snapshot, VLCPlaylistItem item); VLCPlaylistResult Remove(VLCPlaylistSnapshot snapshot, VLCPlaylistItem item); VLCPlaylistResult Next(); VLCPlaylistResult Previous(); VLCPlaylistModeSnapshot? TryGetModes(out VLCPlaylistResult result); VLCPlaylistResult SetRepeatMode(VLCPlaylistRepeatMode mode); VLCPlaylistResult SetOrder(VLCPlaylistOrder order);
+}
+public sealed record VLCPlaylistSmokeOptions(int MaxPolls = 20) { internal bool IsValid => MaxPolls is > 0 and <= 1000; }
+
+/// <summary>Deterministic host smoke. The injected poll yields to the product dispatcher; VLCLR never sleeps.</summary>
+[SupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
+public static class VLCPlaylistQueueSmoke
+{
+    public static async ValueTask<VLCPlaylistSmokeReport> RunAsync(IVLCPlaylistQueueSmokeAdapter a, IEnumerable<string> uris, Func<CancellationToken, ValueTask> poll, VLCPlaylistSmokeOptions? options = null, CancellationToken ct = default)
+    {
+        if (a is null || uris is null || poll is null) return Fail(VLCPlaylistSmokePhase.Validate, VLCPlaylistResultCode.InvalidArgument);
+        options ??= new(); string[] values;
+        try { values = uris.ToArray(); } catch (Exception ex) { return new(VLCPlaylistSmokePhase.Validate, new(VLCPlaylistResultCode.InvalidArgument), ex.Message); }
+        if (!options.IsValid || values.Length != 3 || values.Any(string.IsNullOrWhiteSpace) || values.Distinct(StringComparer.Ordinal).Count() != 3) return Fail(VLCPlaylistSmokePhase.Validate, VLCPlaylistResultCode.InvalidArgument);
+        using (var old = a.TryGetSnapshot(out var result))
+        { if (old is null) return new(VLCPlaylistSmokePhase.ClearExisting, result); if (old.Items.Count != 0) { result = a.Clear(old); if (!result.Succeeded) return new(VLCPlaylistSmokePhase.ClearExisting, result); var w = await WaitSnapshot(a, poll, options, s => s.Items.Count == 0, ct); if (!w.Succeeded) return w with { Phase = VLCPlaylistSmokePhase.ClearExisting }; } }
+        var add = a.Add(values); if (!add.Succeeded || add.CompletedCount != 3) return new(VLCPlaylistSmokePhase.Add, add);
+        var wait = await WaitSnapshot(a, poll, options, s => Ordered(s, values), ct); if (!wait.Succeeded) return wait with { Phase = VLCPlaylistSmokePhase.Add };
+        using (var s = a.TryGetSnapshot(out var result)) { if (s is null || !Ordered(s, values)) return new(VLCPlaylistSmokePhase.Reorder, s is null ? result : new(VLCPlaylistResultCode.NativeFailure)); result = a.Move(s, s.Items[0], 2); if (!result.Succeeded) return new(VLCPlaylistSmokePhase.Reorder, result); }
+        string[] reordered = [values[1], values[2], values[0]]; wait = await WaitSnapshot(a, poll, options, s => Ordered(s, reordered), ct); if (!wait.Succeeded) return wait with { Phase = VLCPlaylistSmokePhase.Reorder };
+        int selectedId; using (var s = a.TryGetSnapshot(out var result)) { if (s is null || s.Items.Count != 3) return new(VLCPlaylistSmokePhase.Select, s is null ? result : new(VLCPlaylistResultCode.NativeFailure)); selectedId = s.Items[0].Id; result = a.SelectAndPlay(s, s.Items[0]); if (!result.Accepted) return new(VLCPlaylistSmokePhase.Select, result); }
+        wait = await WaitActiveCurrent(a, poll, options, selectedId, ct); if (!wait.Succeeded) return wait with { Phase = VLCPlaylistSmokePhase.Select };
+        using (var s = a.TryGetSnapshot(out var result)) { if (s is null || s.Items.Count != 3) return new(VLCPlaylistSmokePhase.Remove, s is null ? result : new(VLCPlaylistResultCode.NativeFailure)); string uri = s.Items[1].Uri; result = a.Remove(s, s.Items[1]); if (!result.Succeeded) return new(VLCPlaylistSmokePhase.Remove, result); wait = await WaitSnapshot(a, poll, options, x => x.Items.Count == 2 && x.Items.All(i => i.Uri != uri), ct); if (!wait.Succeeded) return wait with { Phase = VLCPlaylistSmokePhase.Remove }; }
+        var nav = await Navigate(a, poll, options, ct); if (!nav.Succeeded) return nav;
+        foreach (var pair in new[] { (VLCPlaylistSmokePhase.RepeatNone, VLCPlaylistRepeatMode.None), (VLCPlaylistSmokePhase.RepeatCurrent, VLCPlaylistRepeatMode.CurrentItem), (VLCPlaylistSmokePhase.RepeatAll, VLCPlaylistRepeatMode.All) }) { var result = a.SetRepeatMode(pair.Item2); if (!result.Succeeded) return new(pair.Item1, result); var w = await WaitModes(a, poll, options, m => m.Repeat == pair.Item2 && m.RepeatVariable == (pair.Item2 == VLCPlaylistRepeatMode.CurrentItem) && m.LoopVariable == (pair.Item2 == VLCPlaylistRepeatMode.All), ct); if (!w.Succeeded) return w with { Phase = pair.Item1 }; }
+        foreach (var pair in new[] { (VLCPlaylistSmokePhase.OrderNormal, VLCPlaylistOrder.Normal), (VLCPlaylistSmokePhase.OrderRandom, VLCPlaylistOrder.Random) }) { var result = a.SetOrder(pair.Item2); if (!result.Succeeded) return new(pair.Item1, result); var w = await WaitModes(a, poll, options, m => m.Order == pair.Item2, ct); if (!w.Succeeded) return w with { Phase = pair.Item1 }; }
+        using (var s = a.TryGetSnapshot(out var result)) { if (s is null) return new(VLCPlaylistSmokePhase.ClearFinal, result); result = a.Clear(s); if (!result.Succeeded) return new(VLCPlaylistSmokePhase.ClearFinal, result); }
+        wait = await WaitSnapshot(a, poll, options, s => s.Items.Count == 0, ct); return wait.Succeeded ? new(VLCPlaylistSmokePhase.Complete, VLCPlaylistResult.Success) : wait with { Phase = VLCPlaylistSmokePhase.ClearFinal };
+    }
+
+    private static async ValueTask<VLCPlaylistSmokeReport> Navigate(IVLCPlaylistQueueSmokeAdapter a, Func<CancellationToken, ValueTask> poll, VLCPlaylistSmokeOptions o, CancellationToken ct)
+    { using var first = a.TryGetSnapshot(out var r); if (first is null) return new(VLCPlaylistSmokePhase.Next, r); if (first.CanNext) { int old = first.CurrentItemId ?? int.MinValue; r = a.Next(); if (!r.Accepted) return new(VLCPlaylistSmokePhase.Next, r); var w = await WaitActiveCurrent(a, poll, o, old, ct, requireDifferent: true); if (!w.Succeeded) return w with { Phase = VLCPlaylistSmokePhase.Next }; } using var second = a.TryGetSnapshot(out r); if (second is null) return new(VLCPlaylistSmokePhase.Previous, r); if (second.CanPrevious) { int old = second.CurrentItemId ?? int.MinValue; r = a.Previous(); if (!r.Accepted) return new(VLCPlaylistSmokePhase.Previous, r); var w = await WaitActiveCurrent(a, poll, o, old, ct, requireDifferent: true); if (!w.Succeeded) return w with { Phase = VLCPlaylistSmokePhase.Previous }; } return new(VLCPlaylistSmokePhase.Complete, VLCPlaylistResult.Success); }
+    private static async ValueTask<VLCPlaylistSmokeReport> WaitSnapshot(IVLCPlaylistQueueSmokeAdapter a, Func<CancellationToken, ValueTask> poll, VLCPlaylistSmokeOptions o, Func<VLCPlaylistSnapshot, bool> p, CancellationToken ct) { for (int n = 0; n <= o.MaxPolls; n++) { ct.ThrowIfCancellationRequested(); using var s = a.TryGetSnapshot(out var r); if (s is null) return new(VLCPlaylistSmokePhase.Complete, r); if (p(s)) return new(VLCPlaylistSmokePhase.Complete, VLCPlaylistResult.Success); if (n != o.MaxPolls) await poll(ct); } return new(VLCPlaylistSmokePhase.Complete, new(VLCPlaylistResultCode.NativeFailure), "Observation timed out."); }
+    private static async ValueTask<VLCPlaylistSmokeReport> WaitActiveCurrent(IVLCPlaylistQueueSmokeAdapter a, Func<CancellationToken, ValueTask> poll, VLCPlaylistSmokeOptions o, int expected, CancellationToken ct, bool requireDifferent = false) { for (int n = 0; n <= o.MaxPolls; n++) { ct.ThrowIfCancellationRequested(); if (!a.TryGetActiveCurrentItemId(out int? active, out var r)) return new(VLCPlaylistSmokePhase.Complete, r); if (active is int id && (requireDifferent ? id != expected : id == expected)) return new(VLCPlaylistSmokePhase.Complete, VLCPlaylistResult.Success); if (n != o.MaxPolls) await poll(ct); } return new(VLCPlaylistSmokePhase.Complete, new(VLCPlaylistResultCode.NativeFailure), "Active input did not reach the requested playlist item."); }
+    private static async ValueTask<VLCPlaylistSmokeReport> WaitModes(IVLCPlaylistQueueSmokeAdapter a, Func<CancellationToken, ValueTask> poll, VLCPlaylistSmokeOptions o, Func<VLCPlaylistModeSnapshot, bool> p, CancellationToken ct) { for (int n = 0; n <= o.MaxPolls; n++) { ct.ThrowIfCancellationRequested(); var m = a.TryGetModes(out var r); if (m is null) return new(VLCPlaylistSmokePhase.Complete, r); if (p(m.Value)) return new(VLCPlaylistSmokePhase.Complete, VLCPlaylistResult.Success); if (n != o.MaxPolls) await poll(ct); } return new(VLCPlaylistSmokePhase.Complete, new(VLCPlaylistResultCode.NativeFailure), "Mode observation timed out."); }
+    private static bool Ordered(VLCPlaylistSnapshot s, IReadOnlyList<string> values) => s.Items.Count == values.Count && s.Items.Select(x => x.Uri).SequenceEqual(values);
+    private static VLCPlaylistSmokeReport Fail(VLCPlaylistSmokePhase p, VLCPlaylistResultCode c) => new(p, new(c));
+}

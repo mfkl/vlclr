@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VLCLR/VLCLR.csproj" />
+    <Project Path="src/VLCLR.Generators/VLCLR.Generators.csproj" />
+  </Folder>
+</Solution>
