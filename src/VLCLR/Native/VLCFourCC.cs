@@ -22,6 +22,8 @@ public static class VLCFourCC
     public const uint D3D11OpaqueRgba = 0x47525844; // "DXRG"
     public const uint D3D11OpaqueBgra = 0x52474144; // "DAGR"
     public const uint D3D11OpaqueAlpha = 0x31314144; // "DA11"
+    public const uint VaapiOpaque420 = 0x504F4156; // "VAOP" - VA-API 4:2:0 8-bit surface
+    public const uint VaapiOpaque420TenBit = 0x304F4156; // "VAO0" - VA-API 4:2:0 10-bit surface
 
     // Common native little-endian audio formats on Windows.
     public const uint F32L = 0x6C323366; // "f32l" - interleaved 32-bit float
@@ -119,4 +121,10 @@ public static class VLCFourCC
             D3D11OpaqueBgra or
             D3D11OpaqueAlpha;
     }
+
+    /// <summary>
+    /// Checks whether a chroma value represents a VA-API surface picture.
+    /// </summary>
+    public static bool IsVaapiOpaque(uint chroma) =>
+        chroma is VaapiOpaque420 or VaapiOpaque420TenBit;
 }

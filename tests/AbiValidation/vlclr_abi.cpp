@@ -270,6 +270,26 @@ VLCLR_OFFSET(text_segment_t, psz_text, 0);
 VLCLR_OFFSET(text_segment_t, style, 8);
 VLCLR_OFFSET(text_segment_t, p_next, 16);
 
+// --- VA-API pictures (VLCVaapiPicture.cs) ---
+// These structures are private to modules/hw/vaapi/vlc_vaapi.c; the copies
+// below follow that file at the pinned commit. picture_context_t is public.
+VLCLR_SIZE(picture_context_t, 16);
+struct vlclr_vaapi_instance { void *dpy; void *native; void (*native_destroy_cb)(void *); unsigned pic_refcount; };
+struct vlclr_vaapi_pic_ctx { picture_context_t s; unsigned surface; picture_t *picref; };
+struct vlclr_pic_sys_vaapi_instance { int pic_refcount; void *va_dpy; void *va_inst; unsigned num_render_targets; unsigned render_targets[1]; };
+struct vlclr_vaapi_picture_sys { vlclr_pic_sys_vaapi_instance *instance; vlclr_vaapi_pic_ctx ctx; };
+VLCLR_SIZE(vlclr_vaapi_instance, 32);
+VLCLR_OFFSET(vlclr_vaapi_instance, pic_refcount, 24);
+VLCLR_SIZE(vlclr_vaapi_pic_ctx, 32);
+VLCLR_OFFSET(vlclr_vaapi_pic_ctx, surface, 16);
+VLCLR_OFFSET(vlclr_vaapi_pic_ctx, picref, 24);
+VLCLR_OFFSET(vlclr_pic_sys_vaapi_instance, va_dpy, 8);
+VLCLR_OFFSET(vlclr_pic_sys_vaapi_instance, va_inst, 16);
+VLCLR_OFFSET(vlclr_pic_sys_vaapi_instance, num_render_targets, 24);
+VLCLR_OFFSET(vlclr_pic_sys_vaapi_instance, render_targets, 28);
+VLCLR_SIZE(vlclr_vaapi_picture_sys, 40);
+VLCLR_OFFSET(vlclr_vaapi_picture_sys, ctx, 8);
+
 int main()
 {
     printf("VLC 3.x ABI probe passed.\n");
