@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Ready-made VLC filters for VLCLR plugins. Each filter is an engine that
+    works on VLC pictures (usable on its own) plus a base class that turns it
+    into a VLC filter: a plugin derives from the base class and adds the
+    [VLCModule] / [VLCConfig] attributes.
+  -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VLCLR\VLCLR.csproj" />
+  </ItemGroup>
+
+</Project>
