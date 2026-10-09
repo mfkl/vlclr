@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VLCLR.Generators\VLCLR.Generators.csproj" />
+    <ProjectReference Include="..\VLCLR.Filters\VLCLR.Filters.csproj" />
     <ProjectReference Include="..\VLCLR.ImageSharp\VLCLR.ImageSharp.csproj" />
     <ProjectReference Include="..\VLCLR\VLCLR.csproj" />
   </ItemGroup>
