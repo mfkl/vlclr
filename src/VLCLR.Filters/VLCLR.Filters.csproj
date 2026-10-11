@@ -1,10 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Ready-made VLC filters for VLCLR plugins. Each filter is an engine that
-    works on VLC pictures (usable on its own) plus a base class that turns it
-    into a VLC filter: a plugin derives from the base class and adds the
-    [VLCModule] / [VLCConfig] attributes.
+    Ready-made filter engines for VLCLR plugins. Each one works on VLC
+    pictures (VLCFrame); a plugin wraps it in a VLCVideoFilterBase with its
+    own [VLCModule] / [VLCConfig] attributes (see samples/GaussianBlur).
   -->
   <PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
