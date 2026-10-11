@@ -3,17 +3,29 @@
 VLC's Gaussian blur as a C# video filter plugin, built with VLCLR and Native AOT.
 It produces exactly the same output as VLC's own `gaussianblur` filter.
 
-The blur itself lives in the framework, in `VLCLR.Filters`
-(`VLCLR.Filters.Video.GaussianBlur` and `GaussianBlurFilterBase`), so this
-plugin is only its module declaration:
+The blur engine lives in the framework, in `VLCLR.Filters`
+(`VLCLR.Filters.Video.GaussianBlur`: a line-for-line port of VLC's C code plus
+tuned and AVX2 versions, all bit-exact). [`GaussianBlurPlugin.cs`](GaussianBlurPlugin.cs)
+is the VLC video filter around it:
+
+- **Open**: check the chroma (planar YUV, same in and out), read the
+  `--dotnet-gaussianblur-sigma` option and create the blur.
+- **Each frame**: get a new picture from VLC's output pool
+  (`Context.NewPicture()`) and blur the input into it. The blur can't work in
+  place; `VLCVideoFilterBase` copies the input's timestamps onto the output and
+  releases the input.
+- **Close**: free the blur's buffers.
 
 ```csharp
-[VLCModule("dotnet_gaussianblur")]
-[VLCCapability("video filter", Score = 0)]
-[VLCConfig("dotnet-gaussianblur-sigma", VLCConfigType.Float, Default = 2.0f, Min = 0.01f, Max = 4096.0f)]
-public partial class GaussianBlurPlugin : GaussianBlurFilterBase
+protected override nint ProcessFrameToOutput(VLCFrame frame)
 {
-    protected override string SigmaOption => "dotnet-gaussianblur-sigma";
+    nint outputPicture = Context.NewPicture();
+    if (outputPicture == 0)
+    {
+        return 0;
+    }
+    _blur!.Apply(frame, new VLCFrame(outputPicture, Context));
+    return outputPicture;
 }
 ```
 

@@ -47,7 +47,7 @@ internal static class BlurNames
 [VLCConfig(BlurNames.Prefix + "impl", VLCConfigType.String, Default = "scalar",
     Description = "Implementation",
     LongDescription = "scalar: line-for-line port of VLC's C code. tuned: restructured scalar code. simd: AVX2. simdmax: AVX2 with wider loops. All give identical output; simd and simdmax need a -p:BlurIsa=avx2 build.")]
-public partial class GaussianBlurFilter : GaussianBlurFilterBase
+public partial class GaussianBlurFilter : VLCVideoFilterBase
 {
 #if BLUR_ISA_AVX2
     private const string IsaSuffix = "-AVX2";
@@ -55,29 +55,49 @@ public partial class GaussianBlurFilter : GaussianBlurFilterBase
     private const string IsaSuffix = "";
 #endif
 
+    private GaussianBlur? _blur;
     private BenchStats _stats = new("CS");
 
-    protected override string SigmaOption => BlurNames.Prefix + "sigma";
-
-    protected override GaussianBlurImplementation SelectImplementation(VLCFilterContext context)
+    protected override bool OnOpen(VLCFilterContext context)
     {
-        string name = new VLCConfiguration(context.NativePtr).GetString(BlurNames.Prefix + "impl", "scalar") ?? "scalar";
-        return name.ToLowerInvariant() switch
+        uint chroma = context.InputFormat.Chroma;
+        if (!GaussianBlur.IsSupportedChroma(chroma))
+        {
+            context.Logger.Error($"Unsupported input chroma ({context.ChromaString})");
+            return false;
+        }
+        if (context.OutputFormat.Chroma != chroma)
+        {
+            context.Logger.Error("Input and output chromas don't match");
+            return false;
+        }
+
+        var config = new VLCConfiguration(context.NativePtr);
+        float sigma = config.GetFloat(BlurNames.Prefix + "sigma", 2.0f);
+        if (!(sigma > 0))
+        {
+            context.Logger.Error("sigma must be greater than zero");
+            return false;
+        }
+        string name = config.GetString(BlurNames.Prefix + "impl", "scalar") ?? "scalar";
+        GaussianBlurImplementation implementation = name.ToLowerInvariant() switch
         {
             "tuned" => GaussianBlurImplementation.Tuned,
             "simd" => GaussianBlurImplementation.Simd,
             "simdmax" => GaussianBlurImplementation.SimdMax,
             _ => GaussianBlurImplementation.Reference,
         };
-    }
-
-    protected override bool OnOpen(VLCFilterContext context)
-    {
-        if (!base.OnOpen(context))
+        try
         {
+            _blur = new GaussianBlur(sigma, implementation);
+        }
+        catch (PlatformNotSupportedException e)
+        {
+            context.Logger.Error(e.Message);
             return false;
         }
-        string label = Blur!.Implementation switch
+
+        string label = _blur.Implementation switch
         {
             GaussianBlurImplementation.Tuned => "CS-Tuned",
             GaussianBlurImplementation.Simd => "CS-SIMD",
@@ -85,24 +105,32 @@ public partial class GaussianBlurFilter : GaussianBlurFilterBase
             _ => "CS-Scalar",
         } + IsaSuffix;
         _stats = new BenchStats(label);
-        context.Logger.Info($"gaussian distribution is {Blur.WindowSize} pixels wide ({label}, {RuntimeInformation.FrameworkDescription})");
+        context.Logger.Info($"gaussian distribution is {_blur.WindowSize} pixels wide ({label}, {RuntimeInformation.FrameworkDescription})");
         return true;
     }
 
-    protected override void Filter(VLCFrame input, VLCFrame output)
+    protected override nint ProcessFrameToOutput(VLCFrame frame)
     {
+        nint outputPicture = Context.NewPicture();
+        if (outputPicture == 0)
+        {
+            return 0;
+        }
+        var output = new VLCFrame(outputPicture, Context);
         _stats.Begin();
-        base.Filter(input, output);
+        _blur!.Apply(frame, output);
         _stats.End();
         _stats.Dump(output);
+        return outputPicture;
     }
 
     protected override void OnClose()
     {
-        if (Blur is not null)
+        if (_blur is not null)
         {
-            _stats.Report(Context.Logger, Blur.Sigma);
+            _stats.Report(Context.Logger, _blur.Sigma);
+            _blur.Dispose();
+            _blur = null;
         }
-        base.OnClose();
     }
 }
