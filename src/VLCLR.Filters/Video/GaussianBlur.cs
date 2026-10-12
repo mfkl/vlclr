@@ -33,6 +33,13 @@ public enum GaussianBlurImplementation
 
     /// <summary>AVX2 with wider loops, vpmaddwd in the vertical pass and vectorized borders.</summary>
     SimdMax,
+
+    /// <summary>
+    /// <see cref="Reference"/> with the inner loop bounds computed before each
+    /// loop and native-sized indices, which RyuJIT compiles closer to what clang
+    /// makes of the C. Same loops and arithmetic otherwise.
+    /// </summary>
+    ReferenceHoisted,
 }
 
 /// <summary>
@@ -210,6 +217,10 @@ public sealed unsafe class GaussianBlur : IDisposable
                         GaussianBlurTuned.Plane(source, inPlane.Pitch, inPlane.VisibleLines, inPlane.VisiblePitch,
                             destination, outPlane.Pitch, xFactor, yFactor, _buffer, _scale, distribution, _dim,
                             _tunedSetup!, _accumulator);
+                        break;
+                    case GaussianBlurImplementation.ReferenceHoisted:
+                        GaussianBlurReferenceHoisted.Plane(source, inPlane.Pitch, inPlane.VisibleLines, inPlane.VisiblePitch,
+                            destination, outPlane.Pitch, xFactor, yFactor, _buffer, _scale, distribution, _dim);
                         break;
                     default:
                         GaussianBlurReference.Plane(source, inPlane.Pitch, inPlane.VisibleLines, inPlane.VisiblePitch,
