@@ -10,8 +10,8 @@ Compared to the sample, this plugin:
   the builds install side by side: `dotnet_gaussianblur_net10` (options
   `--dotnet-gaussianblur-net10-*`), `dotnet_gaussianblur_net10_avx2`, and so on;
 - lets you pick the implementation with `--dotnet-gaussianblur-<runtime>-impl`:
-  `scalar` (line-for-line port of VLC's C, the default), `tuned`, `simd`,
-  `simdmax`. All produce the same output as VLC's filter;
+  `scalar` (line-for-line port of VLC's C, the default), `hoisted` (the same
+  with loop bounds in locals and `nint` indices), `tuned`, `simd`, `simdmax`. All produce the same output as VLC's filter;
 - times the blur on every frame.
 
 ## Build

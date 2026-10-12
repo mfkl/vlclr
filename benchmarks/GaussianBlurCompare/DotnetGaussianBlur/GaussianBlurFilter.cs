@@ -46,7 +46,7 @@ internal static class BlurNames
     LongDescription = "Gaussian's standard deviation. The blurring will take into account pixels up to 3*sigma away in any direction.")]
 [VLCConfig(BlurNames.Prefix + "impl", VLCConfigType.String, Default = "scalar",
     Description = "Implementation",
-    LongDescription = "scalar: line-for-line port of VLC's C code. tuned: restructured scalar code. simd: AVX2. simdmax: AVX2 with wider loops. All give identical output; simd and simdmax need a -p:BlurIsa=avx2 build.")]
+    LongDescription = "scalar: line-for-line port of VLC's C code. hoisted: the same with loop bounds in locals and nint indices. tuned: restructured scalar code. simd: AVX2. simdmax: AVX2 with wider loops. All give identical output; simd and simdmax need a -p:BlurIsa=avx2 build.")]
 public partial class GaussianBlurFilter : VLCVideoFilterBase
 {
 #if BLUR_ISA_AVX2
@@ -82,6 +82,7 @@ public partial class GaussianBlurFilter : VLCVideoFilterBase
         string name = config.GetString(BlurNames.Prefix + "impl", "scalar") ?? "scalar";
         GaussianBlurImplementation implementation = name.ToLowerInvariant() switch
         {
+            "hoisted" => GaussianBlurImplementation.ReferenceHoisted,
             "tuned" => GaussianBlurImplementation.Tuned,
             "simd" => GaussianBlurImplementation.Simd,
             "simdmax" => GaussianBlurImplementation.SimdMax,
@@ -99,6 +100,7 @@ public partial class GaussianBlurFilter : VLCVideoFilterBase
 
         string label = _blur.Implementation switch
         {
+            GaussianBlurImplementation.ReferenceHoisted => "CS-Hoisted",
             GaussianBlurImplementation.Tuned => "CS-Tuned",
             GaussianBlurImplementation.Simd => "CS-SIMD",
             GaussianBlurImplementation.SimdMax => "CS-SIMDMax",
