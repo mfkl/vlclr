@@ -97,7 +97,11 @@ public unsafe class GaussianBlurTests
     {
         byte[] reference = Blur(sigma, GaussianBlurImplementation.Reference, width, height, chromaXShift, chromaYShift);
 
-        var implementations = new List<GaussianBlurImplementation> { GaussianBlurImplementation.Tuned };
+        var implementations = new List<GaussianBlurImplementation>
+        {
+            GaussianBlurImplementation.ReferenceHoisted,
+            GaussianBlurImplementation.Tuned,
+        };
         if (Avx2.IsSupported)
         {
             implementations.Add(GaussianBlurImplementation.Simd);
