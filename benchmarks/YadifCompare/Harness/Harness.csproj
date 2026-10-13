@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Yadif kernels outside VLC: VLC's C (clang, VLC's release flags) and SSE2/SSSE3
+    assembly (NASM) against the C# implementations of VLCLR.Filters, Native AOT,
+    same frames, same driver loop.
+      ./build.ps1            builds x86-64-v2, v3 and v4 into bin/<isa>
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishAot>true</PublishAot>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <Isa Condition="'$(Isa)' == ''">x86-64-v2</Isa>
+    <IlcInstructionSet>$(Isa)</IlcInstructionSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\VLCLR.Filters\VLCLR.Filters.csproj" />
+  </ItemGroup>
+
+</Project>
