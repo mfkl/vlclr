@@ -318,6 +318,15 @@ public static partial class VLCCore
     [LibraryImport(LibraryName, EntryPoint = "var_FreeList")]
     internal static partial void VarFreeList(ref VLCValueNative values, ref VLCValueNative texts);
 
+    /// <summary>
+    /// Runs the callbacks of a variable without changing it, as VLC's hotkeys
+    /// do for <c>VLC_VAR_VOID</c> commands such as an input's <c>frame-next</c>
+    /// or a vout's <c>video-snapshot</c>. Returns <c>VLC_ENOVAR</c> when the
+    /// object has no such variable.
+    /// </summary>
+    [LibraryImport(LibraryName, EntryPoint = "var_TriggerCallback", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int VarTriggerCallback(nint obj, string name);
+
     #endregion
 
     #region Memory Management

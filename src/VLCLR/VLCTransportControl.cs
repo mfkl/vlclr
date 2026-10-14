@@ -119,6 +119,41 @@ public sealed unsafe class VLCTransportControl
         return InputControlForCurrentInput(InputSetRateQuery, nativeRate) == 0;
     }
 
+    /// <summary>
+    /// Shows the next frame, as VLC 3's E key does (the input's <c>frame-next</c>):
+    /// a playing input pauses first, a paused one steps one frame.
+    /// </summary>
+    /// <returns><see langword="false"/> when VLC has no current input.</returns>
+    public bool NextFrame() => TriggerOnCurrentInput("frame-next");
+
+    /// <summary>Goes to the next chapter (the input's <c>next-chapter</c>, VLC 3's Shift+N).</summary>
+    /// <returns><see langword="false"/> when VLC has no current input or the media has no chapters.</returns>
+    public bool NextChapter() => TriggerOnCurrentInput("next-chapter");
+
+    /// <summary>
+    /// Goes to the previous chapter (the input's <c>prev-chapter</c>, VLC 3's
+    /// Shift+P); VLC restarts the current one instead once it has played 1.5 s.
+    /// </summary>
+    /// <returns><see langword="false"/> when VLC has no current input or the media has no chapters.</returns>
+    public bool PreviousChapter() => TriggerOnCurrentInput("prev-chapter");
+
+    private bool TriggerOnCurrentInput(string variable)
+    {
+        VLCPlatform.EnsureSupported(nameof(VLCTransportControl));
+        nint input = VLCCore.PlaylistCurrentInput(_playlist);
+        if (input == nint.Zero)
+            return false;
+
+        try
+        {
+            return VLCCore.VarTriggerCallback(input, variable) == 0;
+        }
+        finally
+        {
+            VLCCore.ObjectRelease(input);
+        }
+    }
+
     private int InputControlForCurrentInput(int query, long argument)
     {
         VLCPlatform.EnsureSupported(nameof(VLCTransportControl));

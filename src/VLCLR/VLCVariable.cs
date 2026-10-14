@@ -98,6 +98,14 @@ public sealed class VLCVariable
         return result == 0 ? value.Integer : 0;
     }
 
+    /// <summary>Runs a command variable's callbacks (a <c>VLC_VAR_VOID</c> such as <c>frame-next</c>).</summary>
+    /// <returns>True if the object has the variable and VLC ran it.</returns>
+    public bool Trigger(string name) => VLCCore.VarTriggerCallback(_vlcObject, name) == 0;
+
+    /// <summary>Sets a Boolean VLC variable.</summary>
+    public bool SetBool(string name, bool value) =>
+        VLCCore.VarSetChecked(_vlcObject, name, VLCVarType.Bool, new VLCValueNative { Bool = value ? (byte)1 : (byte)0 }) == 0;
+
     /// <summary>Sets a floating-point VLC variable.</summary>
     public bool SetFloat(string name, float value)
     {
