@@ -41,9 +41,10 @@ public sealed record VLCAudioStartupOptions(string? OutputModule = null, float? 
 }
 
 /// <summary>
-/// VLC 3 metadata and legacy capability boundary. Live aspect/crop/zoom controls are
-/// provided separately by VLCVideoPresentation after review of INPUT_GET_VOUTS.
-/// Deinterlace, snapshot and device-control qualification remain separate work.
+/// VLC 3 metadata and legacy capability boundary. Live aspect/crop/zoom, deinterlace,
+/// filter and snapshot controls are provided by VLCVideoPresentation on the held vout
+/// (INPUT_GET_VOUTS); these legacy probes still report them unsupported.
+/// Device-control qualification remains separate work.
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
