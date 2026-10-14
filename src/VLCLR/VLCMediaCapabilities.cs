@@ -29,6 +29,9 @@ public sealed record VLCTrackSnapshot(VLCInputGeneration Generation, IReadOnlyLi
 public sealed record VLCTitleChoice(long Id, string Label);
 public sealed record VLCChapterChoice(long Id, string Label);
 public sealed record VLCTitleChapterSnapshot(VLCInputGeneration Generation, IReadOnlyList<VLCTitleChoice> Titles, IReadOnlyList<VLCChapterChoice> Chapters, long? SelectedTitleId, long? SelectedChapterId);
+/// <summary>A program of a multi-program stream (DVB, MPEG-TS): the input's <c>program</c> choices.</summary>
+public sealed record VLCProgramChoice(long Id, string Label);
+public sealed record VLCProgramSnapshot(VLCInputGeneration Generation, IReadOnlyList<VLCProgramChoice> Programs, long? SelectedId);
 public enum VLCMediaDelayKind { Audio, Subtitle }
 /// <summary>Effective VLC delays, represented as <see cref="TimeSpan"/>. VLC stores signed microseconds.</summary>
 public readonly record struct VLCMediaDelaySnapshot(VLCInputGeneration Generation, TimeSpan Audio, TimeSpan Subtitle);
@@ -81,6 +84,37 @@ public sealed class VLCMediaCapabilities : IVLCMediaCapabilitySmokeAdapter
     {
         if (!TryAcquire(out var held, out result)) return null;
         using (held) { var value = ReadTitlesAndChapters(held.Input, held.Generation, out result); if (!GenerationStillCurrent(held.Lease)) { result = new(VLCMediaResultCode.StaleSnapshot); return null; } return value; }
+    }
+
+    /// <summary>
+    /// The input's programs. A single-program media has no <c>program</c>
+    /// variable, or one choice; both read as success.
+    /// </summary>
+    public VLCProgramSnapshot? TryGetPrograms(out VLCMediaResult result)
+    {
+        if (!TryAcquire(out var held, out result)) return null;
+        using (held)
+        {
+            VLCProgramSnapshot value;
+            using (var list = _native.GetChoices(held.Input, "program", out _))
+            {
+                if (list is null || !list.HasMatchingCounts) value = new(held.Generation, Array.Empty<VLCProgramChoice>(), null);
+                else
+                {
+                    var programs = list.Copy().Select(x => new VLCProgramChoice(x.Id, string.IsNullOrEmpty(x.Label) ? "Program " + x.Id : x.Label)).ToArray();
+                    value = new(held.Generation, programs, _native.TryGetInteger(held.Input, "program", out long selected, out _) ? selected : null);
+                }
+            }
+            if (!GenerationStillCurrent(held.Lease)) { result = new(VLCMediaResultCode.StaleSnapshot); return null; }
+            result = new(VLCMediaResultCode.Success);
+            return value;
+        }
+    }
+
+    public VLCMediaResult SelectProgram(VLCProgramSnapshot snapshot, long id)
+    {
+        if (snapshot is null || !snapshot.Programs.Any(x => x.Id == id)) return new(VLCMediaResultCode.InvalidArgument);
+        return WithMutation(snapshot.Generation, input => SetInteger(input, "program", id));
     }
 
     public VLCMediaDelaySnapshot? TryGetDelays(out VLCMediaResult result)
@@ -149,6 +183,23 @@ public sealed class VLCMediaCapabilities : IVLCMediaCapabilitySmokeAdapter
             }
             finally { _native.InputItemRelease(itemHold); }
         }
+    }
+
+    /// <summary>
+    /// Adds a subtitle or audio file to the playing input, as VLC 3's Add
+    /// Subtitle File and a dropped subtitle do (input_AddSlave, forced and
+    /// notified): the input opens it and selects it. The new track shows in a
+    /// later <see cref="TryGetTracks"/>; this result never claims it already did.
+    /// </summary>
+    public VLCExternalTrackAttachmentResult AttachExternalTrackLive(string localPathOrUri, VLCExternalTrackKind kind)
+    {
+        if (!TryNormalizeUri(localPathOrUri, out string? uri)) return new(new(VLCMediaResultCode.InvalidArgument), false, false, false, null, null);
+        VLCMediaResult result = WithMutation(null, input =>
+        {
+            int error = _native.AddInputSlave(input, kind == VLCExternalTrackKind.Audio ? SlaveTypeAudio : SlaveTypeSubtitle, uri!);
+            return error == 0 ? new(VLCMediaResultCode.RequestDispatched) : new(VLCMediaResultCode.NativeFailure, error);
+        });
+        return new(result, false, false, false, null, null);
     }
 
     private VLCTrackSnapshot? ReadTracks(nint input, VLCInputGeneration generation, out VLCMediaResult result)
@@ -245,10 +296,17 @@ internal interface IVLCMediaNative
     nint CurrentInput(nint playlist); void ReleaseInput(nint input); nint InputGetItem(nint input); nint InputItemHold(nint item); void InputItemRelease(nint item);
     bool TryGetInteger(nint input, string name, out long value, out int error); int SetInteger(nint input, string name, long value); IVLCChoiceList? GetChoices(nint input, string name, out int error);
     nint NewSlave(string uri, int type, int priority); int AddSlave(nint item, nint slave); void Free(nint ptr);
+    int AddInputSlave(nint input, int type, string uri);
 }
 
 internal sealed unsafe class VLCMediaNative : IVLCMediaNative
 {
+    // VLC 3 vlc_input.h input_query_e INPUT_ADD_SLAVE: arg1 = enum slave_type,
+    // arg2 = const char *uri, arg3 = bool forced, arg4 = bool notify,
+    // arg5 = bool check_extension. Checked against 3.0.24's input_vaControl:
+    // its case 36 calls input_item_slave_New (43, INPUT_GET_VOUTS, holds the vouts).
+    private const int InputAddSlave = 36;
+
     public bool IsSupported => VLCPlatform.IsSupported;
     public nint CurrentInput(nint playlist) => VLCCore.PlaylistCurrentInput(playlist);
     public void ReleaseInput(nint input) => VLCCore.ObjectRelease(input);
@@ -265,6 +323,12 @@ internal sealed unsafe class VLCMediaNative : IVLCMediaNative
     }
     public nint NewSlave(string uri, int type, int priority) => VLCCore.InputItemSlaveNew(uri, type, priority);
     public int AddSlave(nint item, nint slave) => VLCCore.InputItemAddSlave(item, slave);
+    public int AddInputSlave(nint input, int type, string uri)
+    {
+        nint text = Marshal.StringToCoTaskMemUTF8(uri);
+        try { return VLCCore.InputControl(input, InputAddSlave, type, text, 1, 1, 0); }
+        finally { Marshal.FreeCoTaskMem(text); }
+    }
     public void Free(nint ptr) => VLCCore.Free(ptr);
 
     private sealed class VLCNativeChoiceList : IVLCChoiceList
