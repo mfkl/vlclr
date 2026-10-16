@@ -32,6 +32,7 @@ public unsafe ref struct ModuleBuilder
     private readonly nint _opaque;
     private nint _module;
     private int _result;
+    private nint _configName;
 
     // Stored callback pointers - must be set before vlc_set call
     private nint _openCallback;
@@ -238,7 +239,7 @@ public unsafe ref struct ModuleBuilder
         if (_result != 0) return 0;
 
         // Set default value (as double)
-        SetConfigDouble(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
+        SetConfigFloat(configOut, VLCModuleConstants.VLC_CONFIG_VALUE, defaultValue);
         if (_result != 0) return 0;
 
         // Set description
@@ -256,7 +257,7 @@ public unsafe ref struct ModuleBuilder
         if (_result != 0) return this;
 
         // Set range
-        _result = VLCVariadic.CallDouble(_vlcSetPtr, _opaque, config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
+        SetConfigFloat(config, VLCModuleConstants.VLC_CONFIG_RANGE, min, max);
 
         return this;
     }
@@ -391,6 +392,8 @@ public unsafe ref struct ModuleBuilder
     private void SetConfigString(nint config, int key, string value)
     {
         nint ptr = PinString(value);
+        if (key == VLCModuleConstants.VLC_CONFIG_NAME)
+            _configName = ptr;
         _result = VLCVariadic.Call(_vlcSetPtr, _opaque, config, key, ptr);
     }
 
@@ -399,10 +402,24 @@ public unsafe ref struct ModuleBuilder
         _result = VLCVariadic.Call(_vlcSetPtr, _opaque, config, key, value);
     }
 
-    private void SetConfigDouble(nint config, int key, double value)
+    private const int VlcParamItemOffset = 24;
+    private const int ModuleConfigNameOffset = 16;
+
+    private void SetConfigFloat(nint config, int key, double first, double second = 0)
     {
-        _result = VLCVariadic.CallDouble(_vlcSetPtr, _opaque, config, key, value);
+        byte* item = (byte*)config + VlcParamItemOffset;
+        if (*item != VLCConfigTypes.CONFIG_ITEM_FLOAT || *(nint*)(item + ModuleConfigNameOffset) != _configName)
+        {
+            _result = VLCVariadic.CallDouble(_vlcSetPtr, _opaque, config, key, first, second);
+            return;
+        }
+
+        *item = VLCConfigTypes.CONFIG_ITEM_INTEGER;
+        _result = VLCVariadic.Call(_vlcSetPtr, _opaque, config, key, FloatBits(first), FloatBits(second));
+        *item = VLCConfigTypes.CONFIG_ITEM_FLOAT;
     }
+
+    private static long FloatBits(double value) => (uint)BitConverter.SingleToInt32Bits((float)value);
 
     private void SetConfigDesc(nint config, string description, string? longDescription)
     {

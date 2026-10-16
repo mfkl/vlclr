@@ -100,8 +100,9 @@ echo "== Playing the clip in $("$vlc" --version 2> /dev/null | head -n 1 || echo
 play original "scene"
 
 play vlc-blur "gaussianblur:scene" --gaussianblur-sigma=$sigma
-play dotnet-blur "dotnet_gaussianblur:scene" --dotnet-gaussianblur-sigma=$sigma
+play dotnet-blur "dotnet_gaussianblur:scene"
 expect_log dotnet-blur 'Filter GaussianBlurPlugin initialized successfully' "filter did not open"
+expect_log dotnet-blur 'distribution is 13 pixels wide' "the sigma default (a float config value) did not reach VLC"
 expect_log dotnet-blur 'processed [1-9][0-9]* frames' "filter processed no frames"
 if [ -f "$work/out/vlc-blur/f.png" ] && [ -f "$work/out/dotnet-blur/f.png" ]; then
     "$python" -I "$here/pngdiff.py" "$work/out/vlc-blur/f.png" "$work/out/dotnet-blur/f.png" \
