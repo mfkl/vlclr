@@ -66,3 +66,6 @@ specs/
 tests/fixtures/live-sync-speech.mp4
 artifacts/live-sync/
 artifacts/live-sync-real/
+
+artifacts/vlc/
+artifacts/vlc-e2e/
