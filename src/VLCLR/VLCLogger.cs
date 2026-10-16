@@ -62,14 +62,13 @@ public sealed class VLCLogger
         LogInternal((int)type, message);
     }
 
-    /// <summary>
-    /// Internal logging method that calls VLC's variadic log function.
-    /// Uses "%s" format and passes the pre-formatted message as the single argument.
-    /// </summary>
     private void LogInternal(int type, string message)
     {
-        // VLC's vlc_object_Log is variadic: (obj, type, module, file, line, func, format, ...)
-        // We use "%s" as format and pass the message as a single argument
-        VLCCore.Log(_vlcObject, type, ModuleName, "", 0, "", "%s", message);
+        VLCCore.Log(_vlcObject, type, ModuleName, "", 0, "", ToLiteralFormat(message));
     }
+
+    /// <summary>
+    /// Turns a message into a printf format that prints it as is.
+    /// </summary>
+    internal static string ToLiteralFormat(string message) => message.Replace("%", "%%");
 }

@@ -12,6 +12,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="VLCLR.Tests" />
+  </ItemGroup>
+
   <!-- Include the source generator for consumers of this package -->
   <ItemGroup>
     <ProjectReference Include="..\VLCLR.Generators\VLCLR.Generators.csproj"
