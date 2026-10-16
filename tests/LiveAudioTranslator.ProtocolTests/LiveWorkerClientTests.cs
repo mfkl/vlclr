@@ -10,7 +10,7 @@ public sealed class LiveWorkerClientTests
     public async Task RejectsWarmupAudioAndFlushesCurrentGenerationBeforeOpeningGate()
     {
         Guid session = Guid.NewGuid();
-        string pipeName = $"vlclr-client-test-{session:N}";
+        string pipeName = $"vlclr-{session.ToString("N")[..12]}";
         await using var server = new NamedPipeServerStream(
             pipeName,
             PipeDirection.InOut,

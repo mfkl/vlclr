@@ -113,6 +113,7 @@ fi
 play dotnet-overlay "dotnet_overlay:scene"
 expect_log dotnet-overlay 'Filter VideoOverlayFilter initialized successfully' "filter did not open"
 expect_log dotnet-overlay 'processed [1-9][0-9]* frames' "filter processed no frames"
+expect_log dotnet-overlay 'opacity=1\.00' "the opacity default (a float config value) did not reach VLC"
 if [ -f "$work/out/dotnet-overlay/f.png" ]; then
     "$python" -I "$here/pngdiff.py" "$work/out/original/f.png" "$work/out/dotnet-overlay/f.png" \
         --expect-different > /dev/null || fail "dotnet_overlay left the picture unchanged"
