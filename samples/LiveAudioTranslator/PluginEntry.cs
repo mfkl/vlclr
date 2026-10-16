@@ -305,7 +305,7 @@ public static unsafe class PluginEntry
     private static void AppendRegion(VLCSubpicture* subpicture, VLCSubpictureRegion* region)
     {
         var head = (VLCListNode*)(&subpicture->RegionsPrev);
-        var node = (VLCListNode*)(&region->NodePrev);
+        var node = (VLCListNode*)Unsafe.AsPointer(ref region->NodePrev);
         node->Prev = head->Prev;
         node->Next = (nint)head;
         ((VLCListNode*)head->Prev)->Next = (nint)node;

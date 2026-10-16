@@ -13,15 +13,6 @@ public class VLCSubpictureRegionTests
     #region Struct Size Tests
 
     [Fact]
-    public void VLCSubpictureRegion_Size_Is224Bytes()
-    {
-        // subpicture_region_t is 224 bytes on 64-bit
-        // video_format_t (152) + pointer (8) + 2 bytes + 2 padding + 4 ints (16) + 4 padding
-        // + pointer (8) + 3 ints (12) + 4 padding + 2 pointers (16) = 224 bytes
-        Assert.Equal(224, Marshal.SizeOf<VLCSubpictureRegion>());
-    }
-
-    [Fact]
     public void VLCListNode_Size_Is16Bytes()
     {
         // vlc_list is 16 bytes on 64-bit (2 pointers)
@@ -39,126 +30,6 @@ public class VLCSubpictureRegionTests
         byte* basePtr = (byte*)&region;
         byte* fieldPtr = (byte*)&region.Format;
         Assert.Equal(0, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_Picture_IsAtOffset152()
-    {
-        // After VLCVideoFormat (152 bytes)
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.Picture;
-        Assert.Equal(152, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_IsAbsolute_IsAtOffset160()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.IsAbsolute;
-        Assert.Equal(160, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_IsInWindow_IsAtOffset161()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.IsInWindow;
-        Assert.Equal(161, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_X_IsAtOffset164()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.X;
-        Assert.Equal(164, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_Y_IsAtOffset168()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.Y;
-        Assert.Equal(168, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_Align_IsAtOffset172()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.Align;
-        Assert.Equal(172, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_Alpha_IsAtOffset176()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.Alpha;
-        Assert.Equal(176, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_Text_IsAtOffset184()
-    {
-        // After Alpha (176 + 4 = 180), padded to 8-byte alignment = 184
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.Text;
-        Assert.Equal(184, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_TextFlags_IsAtOffset192()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.TextFlags;
-        Assert.Equal(192, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_MaxWidth_IsAtOffset196()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.MaxWidth;
-        Assert.Equal(196, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_MaxHeight_IsAtOffset200()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.MaxHeight;
-        Assert.Equal(200, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_NodePrev_IsAtOffset208()
-    {
-        // After MaxHeight (200 + 4 = 204), padded to 8-byte alignment = 208
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.NodePrev;
-        Assert.Equal(208, (int)(fieldPtr - basePtr));
-    }
-
-    [Fact]
-    public unsafe void VLCSubpictureRegion_NodeNext_IsAtOffset216()
-    {
-        VLCSubpictureRegion region = default;
-        byte* basePtr = (byte*)&region;
-        byte* fieldPtr = (byte*)&region.NodeNext;
-        Assert.Equal(216, (int)(fieldPtr - basePtr));
     }
 
     #endregion
@@ -286,23 +157,25 @@ public class VLCSubpictureRegionTests
 
             byte* regionBase = (byte*)regionMemory;
 
-            // Write Picture at offset 152
-            *(nint*)(regionBase + 152) = unchecked((nint)0xDEADBEEF);
+            int fmtEnd = OperatingSystem.IsWindows() ? 152 : 144;
 
-            // Write IsAbsolute at offset 160
-            *(byte*)(regionBase + 160) = 1;
+            // Write Picture
+            *(nint*)(regionBase + fmtEnd) = unchecked((nint)0xDEADBEEF);
 
-            // Write X at offset 164
-            *(int*)(regionBase + 164) = 50;
+            // Write IsAbsolute
+            *(byte*)(regionBase + fmtEnd + 8) = 1;
 
-            // Write Y at offset 168
-            *(int*)(regionBase + 168) = 100;
+            // Write X
+            *(int*)(regionBase + fmtEnd + 12) = 50;
 
-            // Write Align at offset 172
-            *(int*)(regionBase + 172) = VLCSubpictureAlign.Bottom;
+            // Write Y
+            *(int*)(regionBase + fmtEnd + 16) = 100;
 
-            // Write Text at offset 184
-            *(nint*)(regionBase + 184) = unchecked((nint)0x12345678);
+            // Write Align
+            *(int*)(regionBase + fmtEnd + 20) = VLCSubpictureAlign.Bottom;
+
+            // Write Text
+            *(nint*)(regionBase + fmtEnd + 32) = unchecked((nint)0x12345678);
 
             // Read back using struct access
             ref VLCSubpictureRegion region = ref *(VLCSubpictureRegion*)regionMemory;

@@ -8,7 +8,12 @@ namespace VLCLR.Native;
 
 /// <summary>
 /// Video format description (video_format_t from vlc_es.h)
-/// Size on 64-bit: 152 bytes
+/// Native size on 64-bit: 152 bytes on Windows, 144 bytes on Linux and macOS
+/// (see <see cref="VLCAbi"/>). This struct holds the 144 bytes both layouts
+/// share, so assigning a whole format into VLC memory
+/// (<c>fmt_out.Video = fmt_in.Video</c>) never writes past the native struct.
+/// The dovi bitfields and i_cubemap_padding sit at different offsets on the
+/// two ABIs and are not exposed.
 ///
 /// Layout:
 /// - offset 0-43: 11 unsigned ints (chroma through frame_rate_base)
@@ -21,8 +26,8 @@ namespace VLCLR.Native;
 /// - offset 92-107: viewpoint pose (4 floats)
 /// - offset 108-131: mastering (primaries + white_point + luminance)
 /// - offset 132-135: lighting (MaxCLL + MaxFALL)
-/// - offset 136-143: dovi (version bytes, alignment, unsigned bitfields)
-/// - offset 144-147: i_cubemap_padding
+/// - offset 136-137: dovi version bytes
+/// - offset 138-143: dovi bitfields and, outside Windows, i_cubemap_padding
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct VLCVideoFormat
@@ -123,12 +128,6 @@ public struct VLCVideoFormat
     // Dolby Vision info
     public byte DoviVersionMajor;         // offset 136
     public byte DoviVersionMinor;         // offset 137
-    private ushort _padBeforeDoviFlags;   // offset 138
-    public uint DoviFlags;                // offset 140 (unsigned bitfield storage unit)
-
-    /// <summary>Cubemap padding</summary>
-    public uint CubemapPadding;           // offset 144
-
-    // Tail padding to the structure's 8-byte alignment.
-    private uint _endPad;                 // offset 148
+    private ushort _abiDependent0;        // offset 138
+    private uint _abiDependent1;          // offset 140
 }
