@@ -28,7 +28,7 @@ public sealed class WorkerLifecycleTests
         Assert.True(File.Exists(workerPath), $"Worker was not built: {workerPath}");
 
         Guid session = Guid.NewGuid();
-        string pipeName = $"vlclr-test-{session:N}";
+        string pipeName = $"vlclr-{session.ToString("N")[..12]}";
         var start = new ProcessStartInfo(workerPath)
         {
             UseShellExecute = false,
