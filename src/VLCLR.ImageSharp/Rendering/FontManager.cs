@@ -31,6 +31,9 @@ public static class FontManager
     /// </summary>
     public const string DefaultFontName = "Arial";
 
+    private static readonly string[] FallbackFontNames =
+        [DefaultFontName, "Helvetica", "Liberation Sans", "DejaVu Sans", "Noto Sans"];
+
     /// <summary>
     /// Key for font cache lookup.
     /// </summary>
@@ -162,10 +165,10 @@ public static class FontManager
                 if (_defaultFontFamily == null)
                 {
                     // Try system fonts as last resort
-                    if (!SystemFonts.TryGet(DefaultFontName, out family))
+                    if (!TryGetFallbackFamily(SystemFonts.Collection, out family))
                     {
                         throw new InvalidOperationException(
-                            $"No fonts available - FontManager not initialized and '{DefaultFontName}' not found in system fonts");
+                            "No fonts available - FontManager not initialized and no system fonts found");
                     }
                 }
                 else
@@ -232,6 +235,31 @@ public static class FontManager
                 return _fontCache.Count;
             }
         }
+    }
+
+    /// <summary>
+    /// Picks the family used when no default font family is set: the first of
+    /// <see cref="FallbackFontNames"/> that <paramref name="fonts"/> has, or
+    /// else its first family by name.
+    /// </summary>
+    internal static bool TryGetFallbackFamily(IReadOnlyFontCollection fonts, out FontFamily family)
+    {
+        foreach (string name in FallbackFontNames)
+        {
+            if (fonts.TryGet(name, out family))
+            {
+                return true;
+            }
+        }
+
+        foreach (FontFamily candidate in fonts.Families.OrderBy(f => f.Name, StringComparer.Ordinal))
+        {
+            family = candidate;
+            return true;
+        }
+
+        family = default;
+        return false;
     }
 
     /// <summary>

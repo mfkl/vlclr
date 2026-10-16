@@ -113,6 +113,26 @@ public class FontManagerTests : IDisposable
 
     #endregion
 
+    #region Fallback Tests
+
+    [Fact]
+    public void TryGetFallbackFamily_WithoutPreferredFamilies_UsesAnInstalledFamily()
+    {
+        var fonts = new FontCollection();
+        FontFamily installed = fonts.Add(Path.Combine(AppContext.BaseDirectory, "Fonts", "JetBrainsMono-Regular.ttf"));
+
+        Assert.True(FontManager.TryGetFallbackFamily(fonts, out FontFamily family));
+        Assert.Equal(installed.Name, family.Name);
+    }
+
+    [Fact]
+    public void TryGetFallbackFamily_WithNoFonts_ReturnsFalse()
+    {
+        Assert.False(FontManager.TryGetFallbackFamily(new FontCollection(), out _));
+    }
+
+    #endregion
+
     #region GetDefaultFont Tests
 
     [Fact]
@@ -207,7 +227,7 @@ public class FontManagerTests : IDisposable
     {
         FontManager.Initialize();
         FontManager.GetFont(null, 24f, bold: false, italic: false);
-        FontManager.DefaultFontFamily = SystemFonts.Get("Arial");
+        FontManager.DefaultFontFamily = SystemFonts.Families.First();
 
         FontManager.Reset();
 

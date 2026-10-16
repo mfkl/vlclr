@@ -29,4 +29,10 @@
     <ProjectReference Include="..\VLCLR\VLCLR.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\samples\SubtitleRenderer\Resources\JetBrainsMono-Regular.ttf"
+          Link="Fonts\JetBrainsMono-Regular.ttf"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
