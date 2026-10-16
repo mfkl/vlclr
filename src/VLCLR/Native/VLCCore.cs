@@ -19,7 +19,9 @@ public static partial class VLCCore
 
     /// <summary>
     /// Log a message through VLC's logging system.
-    /// Note: This is a variadic function. We use "%s" format and pass a single pre-formatted string.
+    /// vlc_object_Log is variadic; it is called with no variable arguments,
+    /// which every ABI passes the same way, so <paramref name="format"/> must
+    /// hold no conversions: escape '%' as "%%" (see <see cref="VLCLogger.ToLiteralFormat"/>).
     /// </summary>
     /// <param name="obj">Pointer to vlc_object_t</param>
     /// <param name="type">Log type: 0=INFO, 1=ERR, 2=WARN, 3=DBG</param>
@@ -27,8 +29,7 @@ public static partial class VLCCore
     /// <param name="file">Source file name (can be empty)</param>
     /// <param name="line">Source line number (can be 0)</param>
     /// <param name="func">Function name (can be empty)</param>
-    /// <param name="format">Format string - use "%s" for pre-formatted message</param>
-    /// <param name="message">The pre-formatted message (when format is "%s")</param>
+    /// <param name="format">The message, with '%' escaped as "%%"</param>
     [LibraryImport(LibraryName, EntryPoint = "vlc_object_Log", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Log(
         nint obj,
@@ -37,8 +38,7 @@ public static partial class VLCCore
         string file,
         uint line,
         string func,
-        string format,
-        string message);
+        string format);
 
     #endregion
 
