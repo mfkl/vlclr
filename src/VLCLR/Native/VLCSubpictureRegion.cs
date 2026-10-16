@@ -2,6 +2,7 @@
 // Source: vlc/include/vlc_subpicture.h
 // VLC Version: 4.0.6
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace VLCLR.Native;
@@ -12,15 +13,16 @@ namespace VLCLR.Native;
 /// Subtitles contain a list of regions.
 /// </summary>
 /// <remarks>
-/// Layout on 64-bit:
-/// - fmt (video_format_t): 152 bytes at offset 0
+/// Layout on 64-bit, Windows offsets (8 less on Linux and macOS for every
+/// member after fmt, which are ref properties placed for the running ABI):
+/// - fmt (video_format_t): 152 bytes at offset 0 (144 on Linux and macOS)
 /// - p_picture: 8 bytes at offset 152
 /// - b_absolute + b_in_window: 2 bytes at offset 160, then 2 bytes padding
 /// - i_x, i_y, i_align, i_alpha: 4 ints = 16 bytes at offset 164
 /// - p_text: 8 bytes at offset 180 (needs padding to 8-byte alignment, so offset 184)
 /// - text_flags, i_max_width, i_max_height: 3 ints = 12 bytes
 /// - node (vlc_list): 16 bytes (two pointers)
-/// Total size needs verification
+/// Total: 224 bytes (216 on Linux and macOS); the managed struct uses 224.
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = 224)]
 public struct VLCSubpictureRegion
@@ -29,63 +31,65 @@ public struct VLCSubpictureRegion
     [FieldOffset(0)]
     public VLCVideoFormat Format;
 
+    private static int FormatEnd => VLCAbi.VideoFormatSize;
+
     /// <summary>Picture comprising this region (p_picture)</summary>
-    [FieldOffset(152)]
-    public nint Picture;
+    [UnscopedRef]
+    public ref nint Picture => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd);
 
     /// <summary>Position is absolute in the movie (b_absolute)</summary>
-    [FieldOffset(160)]
-    public byte IsAbsolute;
+    [UnscopedRef]
+    public ref byte IsAbsolute => ref VLCAbi.Field<VLCSubpictureRegion, byte>(ref this, FormatEnd + 8);
 
     /// <summary>Position the region in window (b_in_window)</summary>
-    [FieldOffset(161)]
-    public byte IsInWindow;
+    [UnscopedRef]
+    public ref byte IsInWindow => ref VLCAbi.Field<VLCSubpictureRegion, byte>(ref this, FormatEnd + 9);
 
-    // 2 bytes padding at 162-163
+    // 2 bytes padding at FormatEnd + 10
 
     /// <summary>X position relative to alignment (i_x)</summary>
-    [FieldOffset(164)]
-    public int X;
+    [UnscopedRef]
+    public ref int X => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 12);
 
     /// <summary>Y position relative to alignment (i_y)</summary>
-    [FieldOffset(168)]
-    public int Y;
+    [UnscopedRef]
+    public ref int Y => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 16);
 
     /// <summary>Alignment flags SUBPICTURE_ALIGN_xxx (i_align)</summary>
-    [FieldOffset(172)]
-    public int Align;
+    [UnscopedRef]
+    public ref int Align => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 20);
 
     /// <summary>Transparency/alpha value (i_alpha)</summary>
-    [FieldOffset(176)]
-    public int Alpha;
+    [UnscopedRef]
+    public ref int Alpha => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 24);
 
-    // Padding to 8-byte boundary at offset 180 (4 bytes padding)
+    // 4 bytes padding at FormatEnd + 28 for 8-byte alignment of p_text
 
     /// <summary>Subtitle text segments (p_text)</summary>
-    [FieldOffset(184)]
-    public nint Text;
+    [UnscopedRef]
+    public ref nint Text => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd + 32);
 
     /// <summary>Text flags VLC_SUBPIC_TEXT_FLAG_xxx (text_flags)</summary>
-    [FieldOffset(192)]
-    public int TextFlags;
+    [UnscopedRef]
+    public ref int TextFlags => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 40);
 
     /// <summary>Horizontal rendering/cropping target (i_max_width)</summary>
-    [FieldOffset(196)]
-    public int MaxWidth;
+    [UnscopedRef]
+    public ref int MaxWidth => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 44);
 
     /// <summary>Vertical rendering/cropping target (i_max_height)</summary>
-    [FieldOffset(200)]
-    public int MaxHeight;
+    [UnscopedRef]
+    public ref int MaxHeight => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 48);
 
-    // 4 bytes padding at 204-207 for 8-byte alignment of node
+    // 4 bytes padding at FormatEnd + 52 for 8-byte alignment of node
 
     /// <summary>List node prev pointer (node.prev)</summary>
-    [FieldOffset(208)]
-    public nint NodePrev;
+    [UnscopedRef]
+    public ref nint NodePrev => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd + 56);
 
     /// <summary>List node next pointer (node.next)</summary>
-    [FieldOffset(216)]
-    public nint NodeNext;
+    [UnscopedRef]
+    public ref nint NodeNext => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd + 64);
 }
 
 /// <summary>
