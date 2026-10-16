@@ -90,6 +90,15 @@ public unsafe class VLCAbiLayoutTests
         { "subpicture_region_t.i_max_height",         200,  192 },
         { "subpicture_region_t.node",               208,  200 },
         { "subpicture_region_t.node.next",            216,  208 },
+
+        { "vlc_chroma_description_t.fcc",               0,    0 },
+        { "vlc_chroma_description_t.subtype",           4,    4 },
+        { "vlc_chroma_description_t.plane_count",       8,    8 },
+        { "vlc_chroma_description_t.p",                12,   12 },
+        { "vlc_chroma_description_t.p[1].h",           36,   36 },
+        { "vlc_chroma_description_t.pixel_size",       76,   76 },
+        { "vlc_chroma_description_t.pixel_bits",       80,   80 },
+        { "vlc_chroma_description_t.color_bits",       84,   84 },
     };
 
     [Theory]
@@ -139,6 +148,12 @@ public unsafe class VLCAbiLayoutTests
         Assert.Equal(144, sizeof(VLCVideoFormat));
     }
 
+    [Fact]
+    public void ChromaDescription_MatchesNativeSize()
+    {
+        Assert.Equal(88, sizeof(VLCChromaDescription));
+    }
+
     private static int MeasureOffset(string member)
     {
         byte* native = (byte*)NativeMemory.AllocZeroed(1024);
@@ -152,6 +167,7 @@ public unsafe class VLCAbiLayoutTests
             var filter = (VLCFilter*)native;
             var picture = (VLCPicture*)native;
             var region = (VLCSubpictureRegion*)native;
+            var chroma = (VLCChromaDescription*)native;
 
             return member switch
             {
@@ -229,6 +245,15 @@ public unsafe class VLCAbiLayoutTests
                 "subpicture_region_t.i_max_height" => At(native, ref region->MaxHeight),
                 "subpicture_region_t.node" => At(native, ref region->NodePrev),
                 "subpicture_region_t.node.next" => At(native, ref region->NodeNext),
+
+                "vlc_chroma_description_t.fcc" => At(native, ref chroma->Fourcc),
+                "vlc_chroma_description_t.subtype" => At(native, ref chroma->Subtype),
+                "vlc_chroma_description_t.plane_count" => At(native, ref chroma->PlaneCount),
+                "vlc_chroma_description_t.p" => At(native, ref chroma->Plane0),
+                "vlc_chroma_description_t.p[1].h" => At(native, ref chroma->Plane1.Height),
+                "vlc_chroma_description_t.pixel_size" => At(native, ref chroma->PixelSize),
+                "vlc_chroma_description_t.pixel_bits" => At(native, ref chroma->PixelBits),
+                "vlc_chroma_description_t.color_bits" => At(native, ref chroma->ColorBits),
 
                 _ => throw new ArgumentOutOfRangeException(nameof(member), member, null),
             };

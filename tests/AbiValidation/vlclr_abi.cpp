@@ -14,6 +14,7 @@ typedef SSIZE_T ssize_t;
 
 #include <vlc_common.h>
 #include <vlc_es.h>
+#include <vlc_fourcc.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
@@ -148,6 +149,16 @@ VLCLR_OFFSET(text_segment_t, p_next, 16);
 VLCLR_OFFSET(text_segment_t, p_ruby, 24);
 
 VLCLR_SIZE(text_segment_ruby_t, 24);
+
+VLCLR_SIZE(vlc_chroma_description_t, 88);
+VLCLR_OFFSET(vlc_chroma_description_t, fcc, 0);
+VLCLR_OFFSET(vlc_chroma_description_t, subtype, 4);
+VLCLR_OFFSET(vlc_chroma_description_t, plane_count, 8);
+VLCLR_OFFSET(vlc_chroma_description_t, p, 12);
+VLCLR_OFFSET(vlc_chroma_description_t, p[1].h, 36);
+VLCLR_OFFSET(vlc_chroma_description_t, pixel_size, 76);
+VLCLR_OFFSET(vlc_chroma_description_t, pixel_bits, 80);
+VLCLR_OFFSET(vlc_chroma_description_t, color_bits, 84);
 
 VLCLR_SIZE(module_value_t, 8);
 VLCLR_OFFSET(module_config_t, i_type, 0);
