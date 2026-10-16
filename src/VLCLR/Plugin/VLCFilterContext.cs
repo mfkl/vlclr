@@ -200,7 +200,7 @@ public readonly struct VLCFilterContext
         if (picture == 0)
         {
             // Owners that set no allocator (legacy), as in filter_NewPicture.
-            picture = VLCCore.PictureNewFromFormat((nint)(&filter->FormatOut.Video));
+            picture = VLCCore.PictureNewFromFormat((nint)Unsafe.AsPointer(ref filter->FormatOut.Video));
         }
         if (picture == 0)
         {
