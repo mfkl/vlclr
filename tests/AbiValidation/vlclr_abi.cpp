@@ -18,6 +18,7 @@ typedef SSIZE_T ssize_t;
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
 #include <vlc_text_style.h>
+#include <vlc_configuration.h>
 
 static_assert(sizeof(void *) == 8, "VLCLR currently targets the 64-bit VLC ABI");
 
@@ -147,6 +148,10 @@ VLCLR_OFFSET(text_segment_t, p_next, 16);
 VLCLR_OFFSET(text_segment_t, p_ruby, 24);
 
 VLCLR_SIZE(text_segment_ruby_t, 24);
+
+VLCLR_SIZE(module_value_t, 8);
+VLCLR_OFFSET(module_config_t, i_type, 0);
+VLCLR_OFFSET(module_config_t, psz_name, 16);
 
 int main()
 {
