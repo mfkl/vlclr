@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>libdotnet_overlay_plugin</AssemblyName>
@@ -36,7 +36,8 @@
 
   <ItemGroup>
     <DirectPInvoke Include="libvlccore" />
-    <NativeLibrary Include="..\..\lib\libvlccore.lib" />
+    <NativeLibrary Include="..\..\lib\libvlccore.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+    <LinkerArg Include="-Wl,-undefined,dynamic_lookup" Condition="$(RuntimeIdentifier.StartsWith('osx'))" />
   </ItemGroup>
 
   <ItemGroup>
