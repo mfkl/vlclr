@@ -1,0 +1,87 @@
+name: Cross-platform
+
+on:
+  push:
+    branches: [main, "cross-platform/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            os: ubuntu-24.04
+          - name: macOS arm64
+            os: macos-15
+          - name: macOS x64
+            os: macos-15-intel
+          - name: Windows x64
+            os: windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8 and 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Add vswhere to PATH for Native AOT
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: echo "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Build
+        run: dotnet build vlclr.sln -c Release
+
+      - name: Unit tests
+        run: |
+          status=0
+          for project in src/VLCLR.Tests tests/VLCLR.ObjectDetection.Tests \
+                         tests/SubtitleTranslator.UnitTests tests/LiveAudioTranslator.ProtocolTests; do
+            dotnet test "$project" -c Release --no-build || status=1
+          done
+          exit $status
+
+      - name: Install unsquashfs
+        if: ${{ !cancelled() && runner.os == 'Linux' }}
+        run: command -v unsquashfs || { sudo apt-get update && sudo apt-get install -y squashfs-tools; }
+
+      - name: Download the VLC 4 nightly
+        if: ${{ !cancelled() }}
+        run: tests/VlcEndToEnd/download-vlc.sh artifacts/vlc
+
+      - name: Check interop layouts against the VLC headers
+        if: ${{ !cancelled() && runner.os != 'Windows' }}
+        run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc/include
+
+      - name: Check interop layouts against the VLC headers (MSVC)
+        if: ${{ !cancelled() && runner.os == 'Windows' }}
+        shell: cmd
+        run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc\include
+
+      - name: Run the plugins in VLC
+        if: ${{ !cancelled() }}
+        env:
+          PYTHON: ${{ runner.os == 'Windows' && 'python' || 'python3' }}
+        run: tests/VlcEndToEnd/run.sh artifacts/vlc/vlc artifacts/vlc-e2e
+
+      - name: Upload logs and snapshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.os }}
+          path: |
+            artifacts/vlc-e2e/out
+            artifacts/vlc-e2e/*.log
