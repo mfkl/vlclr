@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using VLCLR.LiveTranslation.Protocol;
 
 namespace LiveAudioTranslator.ProtocolTests;
@@ -22,8 +23,8 @@ public sealed class WorkerLifecycleTests
             "bin",
             configuration,
             "net10.0",
-            "win-x64",
-            "LiveAudioTranslator.Worker.exe");
+            RuntimeInformation.RuntimeIdentifier,
+            OperatingSystem.IsWindows() ? "LiveAudioTranslator.Worker.exe" : "LiveAudioTranslator.Worker");
         Assert.True(File.Exists(workerPath), $"Worker was not built: {workerPath}");
 
         Guid session = Guid.NewGuid();

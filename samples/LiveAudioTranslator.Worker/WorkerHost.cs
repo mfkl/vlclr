@@ -13,10 +13,12 @@ internal sealed class WorkerHost(WorkerCommandLine options)
         LiveConfigureMessage configuration;
         WorkerPipeline pipeline;
         LiveReadyMessage ready;
+        NamedPipeServerStream pluginPipe;
 
         await using (NamedPipeServerStream runnerPipe = CreatePipe())
         {
             await runnerPipe.WaitForConnectionAsync().ConfigureAwait(false);
+            pluginPipe = CreatePipe();
             await ExpectHelloAsync(runnerPipe, LivePeerRole.Runner).ConfigureAwait(false);
             await SendAsync(
                 runnerPipe,
@@ -82,7 +84,7 @@ internal sealed class WorkerHost(WorkerCommandLine options)
             $"translation_provider={ready.TranslationProviderId} " +
             $"model_init_ms={ready.InitializationMilliseconds} warmup_ms={ready.WarmupMilliseconds}");
         await using (pipeline.ConfigureAwait(false))
-        await using (NamedPipeServerStream pluginPipe = CreatePipe())
+        await using (pluginPipe.ConfigureAwait(false))
         {
             await pluginPipe.WaitForConnectionAsync().ConfigureAwait(false);
             await ExpectHelloAsync(pluginPipe, LivePeerRole.Plugin).ConfigureAwait(false);
@@ -171,7 +173,7 @@ internal sealed class WorkerHost(WorkerCommandLine options)
         new(
             options.PipeName,
             PipeDirection.InOut,
-            1,
+            2,
             PipeTransmissionMode.Byte,
             PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly,
             LiveProtocol.MaximumPayloadBytes + LiveProtocol.HeaderSize,
