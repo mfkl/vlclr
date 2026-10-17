@@ -2,9 +2,10 @@
 # Runs the VLCLR sample plugins inside a real VLC 4 on this machine.
 #
 # Publishes GaussianBlur, VideoOverlay and SubtitleRenderer with Native AOT
-# for the host, checks their VLC entry points, then plays a generated I420
+# for the host, checks their VLC entry points, then runs a generated I420
 # clip through each one:
-#   - dotnet_gaussianblur must match VLC's own gaussianblur pixel for pixel,
+#   - dotnet_gaussianblur must give the output of VLC's own gaussianblur on
+#     every frame (VLC transcodes the clip through each filter, twice),
 #   - dotnet_overlay must process every frame and change the picture,
 #   - dotnet_subtitle must render the subtitles.
 # A struct layout that does not match the platform ABI makes these fail
@@ -24,7 +25,8 @@ here="$(cd "$(dirname "$0")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
 work="${2:-$repo/artifacts/vlc-e2e}"
 python="${PYTHON:-python3}"
-sigma=2
+width=320
+height=240
 failures=0
 
 rm -rf "$work"
@@ -37,6 +39,11 @@ fail() {
 
 native_path() {
     if command -v cygpath > /dev/null; then cygpath -w "$1"; else echo "$1"; fi
+}
+
+# A path inside a --sout chain, where backslashes are escapes.
+sout_path() {
+    if command -v cygpath > /dev/null; then cygpath -m "$1"; else echo "$1"; fi
 }
 
 case "$(uname -s)" in
@@ -69,23 +76,19 @@ for sample in GaussianBlur VideoOverlay SubtitleRenderer; do
 done
 
 clip="$work/clip.y4m"
-"$python" -I "$here/make-y4m.py" "$clip" 320 240 25
+"$python" -I "$here/make-y4m.py" "$clip" $width $height 25
 subtitles="$work/clip.srt"
 printf '1\n00:00:00,000 --> 00:00:10,000\nVLCLR end-to-end\n' > "$subtitles"
 
-play() {
-    local name="$1" chain="$2"
-    shift 2
-    local out="$work/out/$name"
-    mkdir -p "$out"
+# run_vlc NAME OPTIONS...: runs VLC on the clip, logging to out/NAME.log.
+run_vlc() {
+    local name="$1"
+    shift
     # The launcher turns the media library on. It and preparsing run in
     # vlc-preparser child processes, which the macOS arm64 nightly fails to
     # spawn; the test needs neither.
     VLC_PLUGIN_PATH="$(native_path "$work/plugins")" "$vlc" -I dummy --ignore-config --no-plugins-cache \
-        --no-media-library --no-auto-preparse \
-        --no-audio --vout=vdummy --video-filter="$chain" \
-        --scene-format=png --scene-path="$(native_path "$out")" --scene-prefix=f --scene-ratio=1 --scene-replace \
-        --play-and-exit -vv "$@" "$(native_path "$clip")" > "$work/out/$name.log" 2>&1 &
+        --no-media-library --no-auto-preparse --no-audio -vv "$@" > "$work/out/$name.log" 2>&1 &
     local pid=$!
     (sleep 120 && kill -9 "$pid" 2> /dev/null) &
     local watchdog=$!
@@ -93,27 +96,72 @@ play() {
     wait "$pid" || status=$?
     kill "$watchdog" 2> /dev/null || true
     [ "$status" -eq 0 ] || fail "$name: VLC exited with status $status (see $work/out/$name.log)"
+}
+
+# play NAME CHAIN [OPTIONS...]: plays the clip through the video filter chain,
+# snapshot of the last frame in out/NAME/f.png.
+play() {
+    local name="$1" chain="$2"
+    shift 2
+    local out="$work/out/$name"
+    mkdir -p "$out"
+    run_vlc "$name" --vout=vdummy --video-filter="$chain" \
+        --scene-format=png --scene-path="$(native_path "$out")" --scene-prefix=f --scene-ratio=1 --scene-replace \
+        --play-and-exit "$@" "$(native_path "$clip")"
     [ -f "$out/f.png" ] || fail "$name: no snapshot written"
+}
+
+# transcode NAME FILTER [OPTIONS...]: every frame of the clip through the
+# video filter (none if empty), as raw I420 in out/NAME.yuv. Transcoding
+# follows no clock, so no frame is dropped; the subtitles next to the clip
+# stay out of the file.
+transcode() {
+    local name="$1" filter="$2"
+    shift 2
+    local out="$work/out/$name.yuv"
+    run_vlc "$name" --no-sout-spu --no-sout-audio "$@" "$(native_path "$clip")" \
+        --sout "#transcode{vcodec=I420${filter:+,vfilter=$filter}}:std{access=file,mux=dummy,dst=\"$(sout_path "$out")\"}" \
+        vlc://quit
+    [ -s "$out" ] || fail "$name: no frames written"
 }
 
 expect_log() {
     grep -aqE "$2" "$work/out/$1.log" || fail "$1: $3 (see $work/out/$1.log)"
 }
 
-echo "== Playing the clip in $("$vlc" --version 2> /dev/null | head -n 1 || echo VLC)"
-play original "scene"
+# parity NAME VLC_FILTER DOTNET_FILTER VLC_OPTION DOTNET_OPTION: the ported
+# filter must give the output of VLC's on every frame. Each runs twice:
+# values that change between two runs of the same filter (a read of
+# uninitialized padding) are left out of the comparison.
+parity() {
+    local name="$1" vlc_filter="$2" dotnet_filter="$3" vlc_option="$4" dotnet_option="$5" run
+    for run in 1 2; do
+        transcode "$name-vlc-$run" "$vlc_filter" $vlc_option
+        transcode "$name-dotnet-$run" "$dotnet_filter" $dotnet_option
+    done
+    expect_log "$name-vlc-1" "using video filter module \"$vlc_filter\"" "VLC's filter did not open"
+    expect_log "$name-dotnet-1" 'Filter [A-Za-z]+ initialized successfully' "filter did not open"
+    local out="$work/out/$name" result status=0
+    "$python" -I "$here/framediff.py" $width $height "$work/out/unfiltered.yuv" "$out-dotnet-1.yuv" \
+        --expect-different > /dev/null || fail "$name: $dotnet_filter left the video unchanged"
+    result="$("$python" -I "$here/framediff.py" $width $height "$out-vlc-1.yuv" "$out-dotnet-1.yuv" \
+        --again "$out-vlc-2.yuv" "$out-dotnet-2.yuv")" || status=$?
+    echo "   $name: $result"
+    [ "$status" -eq 0 ] || fail "$name: $dotnet_filter does not give the output of VLC's $vlc_filter"
+}
 
-play vlc-blur "gaussianblur:scene" --gaussianblur-sigma=$sigma
-play dotnet-blur "dotnet_gaussianblur:scene"
-expect_log dotnet-blur 'Filter GaussianBlurPlugin initialized successfully' "filter did not open"
-expect_log dotnet-blur 'distribution is 13 pixels wide' "the sigma default (a float config value) did not reach VLC"
-expect_log dotnet-blur 'processed [1-9][0-9]* frames' "filter processed no frames"
-if [ -f "$work/out/vlc-blur/f.png" ] && [ -f "$work/out/dotnet-blur/f.png" ]; then
-    "$python" -I "$here/pngdiff.py" "$work/out/vlc-blur/f.png" "$work/out/dotnet-blur/f.png" \
-        --ignore-right $((3 * sigma)) || fail "dotnet_gaussianblur does not match VLC's gaussianblur"
-    "$python" -I "$here/pngdiff.py" "$work/out/original/f.png" "$work/out/dotnet-blur/f.png" \
-        --expect-different > /dev/null || fail "dotnet_gaussianblur left the picture unchanged"
-fi
+echo "== Comparing the ported filters with VLC's in $("$vlc" --version 2> /dev/null | head -n 1 || echo VLC)"
+transcode unfiltered ""
+
+# dotnet_gaussianblur's sigma defaults to 2: this run also checks that a
+# float config default reaches VLC.
+parity blur-2 gaussianblur dotnet_gaussianblur --gaussianblur-sigma=2 ""
+expect_log blur-2-dotnet-1 'distribution is 13 pixels wide' "the sigma default (a float config value) did not reach VLC"
+parity blur-0.5 gaussianblur dotnet_gaussianblur --gaussianblur-sigma=0.5 --dotnet-gaussianblur-sigma=0.5
+parity blur-6 gaussianblur dotnet_gaussianblur --gaussianblur-sigma=6 --dotnet-gaussianblur-sigma=6
+
+echo "== Playing the clip"
+play original "scene"
 
 play dotnet-overlay "dotnet_overlay:scene"
 expect_log dotnet-overlay 'Filter VideoOverlayFilter initialized successfully' "filter did not open"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compare two 8-bit RGB/RGBA PNG snapshots pixel by pixel (stdlib only).
 
-Usage: pngdiff.py EXPECTED ACTUAL [--ignore-right COLUMNS] [--expect-different]
+Usage: pngdiff.py EXPECTED ACTUAL [--expect-different]
 
 Exit status 0 when the pictures match (or differ, with --expect-different).
 """
@@ -57,7 +57,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("expected")
     parser.add_argument("actual")
-    parser.add_argument("--ignore-right", type=int, default=0, metavar="COLUMNS")
     parser.add_argument("--expect-different", action="store_true")
     args = parser.parse_args()
 
@@ -67,7 +66,7 @@ def main():
         print(f"FAIL: {w1}x{h1}x{c1} vs {w2}x{h2}x{c2}")
         return 0 if args.expect_different else 1
 
-    compared = (w1 - args.ignore_right) * c1
+    compared = w1 * c1
     differing, largest = 0, 0
     for row_e, row_a in zip(expected, actual):
         for e, a in zip(row_e[:compared], row_a[:compared]):
@@ -76,8 +75,7 @@ def main():
                 largest = max(largest, abs(e - a))
     total = compared * h1
     print(f"{w1}x{h1}: {differing} of {total} channel values differ"
-          + (f" (max delta {largest})" if differing else "")
-          + (f", rightmost {args.ignore_right} columns ignored" if args.ignore_right else ""))
+          + (f" (max delta {largest})" if differing else ""))
     if args.expect_different:
         return 0 if differing else 1
     return 1 if differing else 0
