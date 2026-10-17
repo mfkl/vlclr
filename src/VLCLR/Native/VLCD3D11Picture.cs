@@ -10,22 +10,25 @@ namespace VLCLR.Native;
 
 /// <summary>
 /// The common prefix of VLC's picture_context_t.
+/// Layout and size come from <see cref="Interop.PictureContext"/>.
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 24)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.PictureContext.MaxSizeOf)]
 public struct VLCPictureContext
 {
-    [FieldOffset(0)]
+    [FieldOffset(Interop.PictureContext.Offsets.Destroy)]
     public nint Destroy;
 
-    [FieldOffset(8)]
+    [FieldOffset(Interop.PictureContext.Offsets.Copy)]
     public nint Copy;
 
-    [FieldOffset(16)]
+    [FieldOffset(Interop.PictureContext.Offsets.Vctx)]
     public nint VideoContext;
 }
 
 /// <summary>
 /// Managed ABI view of VLC's picture_sys_d3d11_t.
+/// It is declared in modules/video_chroma/d3d11_fmt.h, which is not a public VLC header, so it
+/// has no generated counterpart and its layout stays hand-written.
 /// COM pointers and handles are borrowed from the current VLC picture.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 104)]
@@ -72,7 +75,8 @@ public struct VLCD3D11PictureSystem
 }
 
 /// <summary>
-/// Managed ABI view of VLC's d3d11_pic_context.
+/// Managed ABI view of VLC's d3d11_pic_context (modules/video_chroma/d3d11_fmt.h, not a public
+/// header, hence hand-written). The embedded picture_context_t prefix uses its generated size.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 128)]
 public struct VLCD3D11PictureContext
@@ -80,7 +84,7 @@ public struct VLCD3D11PictureContext
     [FieldOffset(0)]
     public VLCPictureContext Picture;
 
-    [FieldOffset(24)]
+    [FieldOffset(Interop.PictureContext.MaxSizeOf)]
     public VLCD3D11PictureSystem System;
 }
 
