@@ -5,42 +5,8 @@ namespace VLCLR.CImport.Emit;
 
 internal sealed partial class CSharpGeneration
 {
-    /// <summary>
-    /// Named records, plus anonymous ones that are the type of a named field.
-    /// Anonymous records used only as anonymous members are already flattened
-    /// into their parent's members.
-    /// </summary>
     private Dictionary<string, MergedType> SelectRecords()
-    {
-        var referenced = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var type in merged.Types)
-        {
-            foreach (var field in type.Fields.Where(f => !f.IsAnonymousMember))
-                CollectRecords(field.Type, referenced);
-        }
-
-        return merged.Types
-            .Where(t => !t.IsAnonymous || referenced.Contains(t.Name))
-            .ToDictionary(t => t.Name, StringComparer.Ordinal);
-    }
-
-    private static void CollectRecords(TypeRef type, HashSet<string> into)
-    {
-        switch (type.Kind)
-        {
-            case TypeRefKind.Record:
-                into.Add(type.Name!);
-                break;
-            case TypeRefKind.Pointer or TypeRefKind.Array or TypeRefKind.Typedef:
-                CollectRecords(type.Element!, into);
-                break;
-            case TypeRefKind.Function:
-                CollectRecords(type.Function!.ReturnType, into);
-                foreach (var p in type.Function.Parameters)
-                    CollectRecords(p.Type, into);
-                break;
-        }
-    }
+        => EmittedRecords.Select(merged, includeOpaque: true).ToDictionary(t => t.Name, StringComparer.Ordinal);
 
     private List<string> EmitRecord(MergedType t)
     {

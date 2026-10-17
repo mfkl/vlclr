@@ -50,7 +50,12 @@ internal sealed partial class Extraction
         foreach (var macro in _selectedMacros)
         {
             if (macro.FunctionLike)
-                Skip(macro.Name, macro.Header, "constant", "function-like macro");
+            {
+                // #define var_Create(a, b, c) var_Create(VLC_OBJECT(a), b, c) wraps the
+                // function the root also selected: nothing is missing.
+                if (!_functions.ContainsKey(macro.Name))
+                    Skip(macro.Name, macro.Header, "constant", "function-like macro");
+            }
             else if (macro.Body.Count > 0)
                 candidates.Add(macro);
             // Empty macros (include guards, VLC_API) carry no value and are not reported.

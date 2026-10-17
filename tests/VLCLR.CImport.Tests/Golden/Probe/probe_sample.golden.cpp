@@ -4,6 +4,12 @@
 // C# bindings disagrees with the C compiler. Build with: cl /std:c++17 /TP /c, or g++ -std=c++17 -c.
 // </auto-generated>
 
+#ifdef _WIN32
+#define PROBE_ABI_WINDOWS 1
+#else
+#define PROBE_ABI_SYSV 1
+#endif
+
 #include <cstddef>
 #include <atomic>
 #include <cstdio>
@@ -18,12 +24,6 @@
 typedef SSIZE_T ssize_t;
 #endif
 #define restrict __restrict
-
-#ifdef _WIN32
-#define PROBE_ABI_WINDOWS 1
-#else
-#define PROBE_ABI_SYSV 1
-#endif
 
 #include <probe_sample.h>
 

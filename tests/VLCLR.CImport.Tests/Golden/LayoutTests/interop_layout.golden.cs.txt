@@ -30,7 +30,7 @@ public unsafe class InteropLayoutTests
         var s = default(Plane);
         AssertEqual(16, Plane.SizeOf, "plane_t sizeof");
         AssertEqual(16, Unsafe.SizeOf<Plane>(), "plane_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.PPixels), "plane_t.p_pixels offset");
+        { ref var r = ref s.PPixels; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "plane_t.p_pixels offset"); }
         AssertEqual(8, Offset(ref s, ref s.ILines), "plane_t.i_lines offset");
         AssertEqual(12, Offset(ref s, ref s.IPitch), "plane_t.i_pitch offset");
     }
@@ -185,6 +185,9 @@ public unsafe class InteropLayoutTests
 
     private static nint Offset<TOwner, TField>(ref TOwner owner, ref TField field)
         => Unsafe.ByteOffset(ref Unsafe.As<TOwner, byte>(ref owner), ref Unsafe.As<TField, byte>(ref field));
+
+    private static nint PointerOffset<TOwner>(ref TOwner owner, void* field)
+        => (nint)((byte*)field - (byte*)Unsafe.AsPointer(ref owner));
 
     private static void AssertEqual(long expected, long actual, string what)
     {
