@@ -45,7 +45,7 @@ public unsafe partial struct PictureContext
 public unsafe partial struct Picture
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 376 : 368;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 376 : 368; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 368;
@@ -58,55 +58,55 @@ public unsafe partial struct Picture
 
     /// <summary>p</summary>
     [UnscopedRef]
-    public ref PArray P => ref CImportHelpers.FieldAt<Picture, PArray>(ref this, OperatingSystem.IsWindows() ? 152 : 144);
+    public ref PArray P { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, PArray>(ref this, OperatingSystem.IsWindows() ? 152 : 144); }
 
     /// <summary>i_planes</summary>
     [UnscopedRef]
-    public ref int Planes => ref CImportHelpers.FieldAt<Picture, int>(ref this, OperatingSystem.IsWindows() ? 312 : 304);
+    public ref int Planes { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, int>(ref this, OperatingSystem.IsWindows() ? 312 : 304); }
 
     /// <summary>date</summary>
     [UnscopedRef]
-    public ref long Date => ref CImportHelpers.FieldAt<Picture, long>(ref this, OperatingSystem.IsWindows() ? 320 : 312);
+    public ref long Date { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, long>(ref this, OperatingSystem.IsWindows() ? 320 : 312); }
 
     /// <summary>b_force</summary>
     [UnscopedRef]
-    public ref byte Force => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 328 : 320);
+    public ref byte Force { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 328 : 320); }
 
     /// <summary>b_still</summary>
     [UnscopedRef]
-    public ref byte Still => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 329 : 321);
+    public ref byte Still { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 329 : 321); }
 
     /// <summary>b_progressive</summary>
     [UnscopedRef]
-    public ref byte Progressive => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 330 : 322);
+    public ref byte Progressive { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 330 : 322); }
 
     /// <summary>b_top_field_first</summary>
     [UnscopedRef]
-    public ref byte TopFieldFirst => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 331 : 323);
+    public ref byte TopFieldFirst { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 331 : 323); }
 
     /// <summary>b_multiview_left_eye</summary>
     [UnscopedRef]
-    public ref byte MultiviewLeftEye => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 332 : 324);
+    public ref byte MultiviewLeftEye { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, byte>(ref this, OperatingSystem.IsWindows() ? 332 : 324); }
 
     /// <summary>i_nb_fields</summary>
     [UnscopedRef]
-    public ref uint NbFields => ref CImportHelpers.FieldAt<Picture, uint>(ref this, OperatingSystem.IsWindows() ? 336 : 328);
+    public ref uint NbFields { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, uint>(ref this, OperatingSystem.IsWindows() ? 336 : 328); }
 
     /// <summary>context</summary>
     [UnscopedRef]
-    public ref PictureContext* Context => ref *(PictureContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 344 : 336));
+    public ref PictureContext* Context { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(PictureContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 344 : 336)); }
 
     /// <summary>p_sys</summary>
     [UnscopedRef]
-    public ref void* Sys => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 352 : 344));
+    public ref void* Sys { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 352 : 344)); }
 
     /// <summary>p_next</summary>
     [UnscopedRef]
-    public ref Picture* Next => ref *(Picture**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 360 : 352));
+    public ref Picture* Next { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(Picture**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 360 : 352)); }
 
     /// <summary>refs</summary>
     [UnscopedRef]
-    public ref AtomicRc Refs => ref CImportHelpers.FieldAt<Picture, AtomicRc>(ref this, OperatingSystem.IsWindows() ? 368 : 360);
+    public ref AtomicRc Refs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Picture, AtomicRc>(ref this, OperatingSystem.IsWindows() ? 368 : 360); }
 
     /// <summary>Inline array of 5 elements of <c>p</c>.</summary>
     [InlineArray(5)]
@@ -121,31 +121,31 @@ public unsafe partial struct Picture
         /// <summary>offsetof(picture_t, format)</summary>
         public const int Format = 0;
         /// <summary>offsetof(picture_t, p)</summary>
-        public static int P => OperatingSystem.IsWindows() ? 152 : 144;
+        public static int P { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 152 : 144; }
         /// <summary>offsetof(picture_t, i_planes)</summary>
-        public static int Planes => OperatingSystem.IsWindows() ? 312 : 304;
+        public static int Planes { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 312 : 304; }
         /// <summary>offsetof(picture_t, date)</summary>
-        public static int Date => OperatingSystem.IsWindows() ? 320 : 312;
+        public static int Date { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 320 : 312; }
         /// <summary>offsetof(picture_t, b_force)</summary>
-        public static int Force => OperatingSystem.IsWindows() ? 328 : 320;
+        public static int Force { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 328 : 320; }
         /// <summary>offsetof(picture_t, b_still)</summary>
-        public static int Still => OperatingSystem.IsWindows() ? 329 : 321;
+        public static int Still { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 329 : 321; }
         /// <summary>offsetof(picture_t, b_progressive)</summary>
-        public static int Progressive => OperatingSystem.IsWindows() ? 330 : 322;
+        public static int Progressive { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 330 : 322; }
         /// <summary>offsetof(picture_t, b_top_field_first)</summary>
-        public static int TopFieldFirst => OperatingSystem.IsWindows() ? 331 : 323;
+        public static int TopFieldFirst { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 331 : 323; }
         /// <summary>offsetof(picture_t, b_multiview_left_eye)</summary>
-        public static int MultiviewLeftEye => OperatingSystem.IsWindows() ? 332 : 324;
+        public static int MultiviewLeftEye { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 332 : 324; }
         /// <summary>offsetof(picture_t, i_nb_fields)</summary>
-        public static int NbFields => OperatingSystem.IsWindows() ? 336 : 328;
+        public static int NbFields { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 336 : 328; }
         /// <summary>offsetof(picture_t, context)</summary>
-        public static int Context => OperatingSystem.IsWindows() ? 344 : 336;
+        public static int Context { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 344 : 336; }
         /// <summary>offsetof(picture_t, p_sys)</summary>
-        public static int Sys => OperatingSystem.IsWindows() ? 352 : 344;
+        public static int Sys { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 352 : 344; }
         /// <summary>offsetof(picture_t, p_next)</summary>
-        public static int Next => OperatingSystem.IsWindows() ? 360 : 352;
+        public static int Next { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 360 : 352; }
         /// <summary>offsetof(picture_t, refs)</summary>
-        public static int Refs => OperatingSystem.IsWindows() ? 368 : 360;
+        public static int Refs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 368 : 360; }
     }
 }
 

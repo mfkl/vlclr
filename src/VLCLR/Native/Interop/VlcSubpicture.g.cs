@@ -14,7 +14,7 @@ public partial struct SubpicturePrivate { }
 public unsafe partial struct SubpictureRegion
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 224 : 216;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 224 : 216; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 216;
@@ -27,51 +27,51 @@ public unsafe partial struct SubpictureRegion
 
     /// <summary>p_picture</summary>
     [UnscopedRef]
-    public ref Picture* Picture => ref *(Picture**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 152 : 144));
+    public ref Picture* Picture { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(Picture**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 152 : 144)); }
 
     /// <summary>b_absolute</summary>
     [UnscopedRef]
-    public ref byte Absolute => ref CImportHelpers.FieldAt<SubpictureRegion, byte>(ref this, OperatingSystem.IsWindows() ? 160 : 152);
+    public ref byte Absolute { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, byte>(ref this, OperatingSystem.IsWindows() ? 160 : 152); }
 
     /// <summary>b_in_window</summary>
     [UnscopedRef]
-    public ref byte InWindow => ref CImportHelpers.FieldAt<SubpictureRegion, byte>(ref this, OperatingSystem.IsWindows() ? 161 : 153);
+    public ref byte InWindow { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, byte>(ref this, OperatingSystem.IsWindows() ? 161 : 153); }
 
     /// <summary>i_x</summary>
     [UnscopedRef]
-    public ref int X => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 164 : 156);
+    public ref int X { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 164 : 156); }
 
     /// <summary>i_y</summary>
     [UnscopedRef]
-    public ref int Y => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 168 : 160);
+    public ref int Y { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 168 : 160); }
 
     /// <summary>i_align</summary>
     [UnscopedRef]
-    public ref int Align => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 172 : 164);
+    public ref int Align { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 172 : 164); }
 
     /// <summary>i_alpha</summary>
     [UnscopedRef]
-    public ref int Alpha => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 176 : 168);
+    public ref int Alpha { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 176 : 168); }
 
     /// <summary>p_text</summary>
     [UnscopedRef]
-    public ref TextSegment* Text => ref *(TextSegment**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 184 : 176));
+    public ref TextSegment* Text { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(TextSegment**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 184 : 176)); }
 
     /// <summary>text_flags</summary>
     [UnscopedRef]
-    public ref int TextFlags => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 192 : 184);
+    public ref int TextFlags { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 192 : 184); }
 
     /// <summary>i_max_width</summary>
     [UnscopedRef]
-    public ref int MaxWidth => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 196 : 188);
+    public ref int MaxWidth { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 196 : 188); }
 
     /// <summary>i_max_height</summary>
     [UnscopedRef]
-    public ref int MaxHeight => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 200 : 192);
+    public ref int MaxHeight { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, int>(ref this, OperatingSystem.IsWindows() ? 200 : 192); }
 
     /// <summary>node</summary>
     [UnscopedRef]
-    public ref List Node => ref CImportHelpers.FieldAt<SubpictureRegion, List>(ref this, OperatingSystem.IsWindows() ? 208 : 200);
+    public ref List Node { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<SubpictureRegion, List>(ref this, OperatingSystem.IsWindows() ? 208 : 200); }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -79,29 +79,29 @@ public unsafe partial struct SubpictureRegion
         /// <summary>offsetof(subpicture_region_t, fmt)</summary>
         public const int Fmt = 0;
         /// <summary>offsetof(subpicture_region_t, p_picture)</summary>
-        public static int Picture => OperatingSystem.IsWindows() ? 152 : 144;
+        public static int Picture { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 152 : 144; }
         /// <summary>offsetof(subpicture_region_t, b_absolute)</summary>
-        public static int Absolute => OperatingSystem.IsWindows() ? 160 : 152;
+        public static int Absolute { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 160 : 152; }
         /// <summary>offsetof(subpicture_region_t, b_in_window)</summary>
-        public static int InWindow => OperatingSystem.IsWindows() ? 161 : 153;
+        public static int InWindow { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 161 : 153; }
         /// <summary>offsetof(subpicture_region_t, i_x)</summary>
-        public static int X => OperatingSystem.IsWindows() ? 164 : 156;
+        public static int X { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 164 : 156; }
         /// <summary>offsetof(subpicture_region_t, i_y)</summary>
-        public static int Y => OperatingSystem.IsWindows() ? 168 : 160;
+        public static int Y { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 168 : 160; }
         /// <summary>offsetof(subpicture_region_t, i_align)</summary>
-        public static int Align => OperatingSystem.IsWindows() ? 172 : 164;
+        public static int Align { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 172 : 164; }
         /// <summary>offsetof(subpicture_region_t, i_alpha)</summary>
-        public static int Alpha => OperatingSystem.IsWindows() ? 176 : 168;
+        public static int Alpha { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 176 : 168; }
         /// <summary>offsetof(subpicture_region_t, p_text)</summary>
-        public static int Text => OperatingSystem.IsWindows() ? 184 : 176;
+        public static int Text { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 184 : 176; }
         /// <summary>offsetof(subpicture_region_t, text_flags)</summary>
-        public static int TextFlags => OperatingSystem.IsWindows() ? 192 : 184;
+        public static int TextFlags { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 192 : 184; }
         /// <summary>offsetof(subpicture_region_t, i_max_width)</summary>
-        public static int MaxWidth => OperatingSystem.IsWindows() ? 196 : 188;
+        public static int MaxWidth { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 196 : 188; }
         /// <summary>offsetof(subpicture_region_t, i_max_height)</summary>
-        public static int MaxHeight => OperatingSystem.IsWindows() ? 200 : 192;
+        public static int MaxHeight { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 200 : 192; }
         /// <summary>offsetof(subpicture_region_t, node)</summary>
-        public static int Node => OperatingSystem.IsWindows() ? 208 : 200;
+        public static int Node { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 208 : 200; }
     }
 }
 
