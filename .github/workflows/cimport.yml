@@ -1,0 +1,131 @@
+name: CImport
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      upload-snapshots:
+        description: Upload the freshly extracted ABI snapshots as the cimport-snapshots artifact
+        type: boolean
+        default: false
+
+env:
+  HINT: "The generated interop code or an ABI snapshot is stale. Run the extract and emit commands, see tools/VLCLR.CImport, and commit the result."
+
+jobs:
+  generated-code-fresh:
+    name: Generated code is fresh (Linux)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install clang (builtin headers for the extractor)
+        run: |
+          if ! ls -d /usr/lib/llvm-*/lib/clang/* >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y clang
+          fi
+          ls -d /usr/lib/llvm-*/lib/clang/*
+
+      - name: Fetch the pinned VLC headers
+        run: tools/VLCLR.CImport/fetch-headers.sh
+
+      - name: Extract the sysv snapshot
+        run: >
+          dotnet run --project tools/VLCLR.CImport -c Release --
+          extract --abi sysv
+          --manifest tools/VLCLR.CImport/vlc.cimport.json
+          --out src/VLCLR/Native/Interop/abi/sysv.json
+
+      - name: Emit the generated code
+        run: >
+          dotnet run --project tools/VLCLR.CImport -c Release --
+          emit --manifest tools/VLCLR.CImport/vlc.cimport.json
+
+      - name: Generated code and sysv snapshot match the commit
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::$HINT"
+            git status --short
+            exit 1
+          fi
+
+      - name: Generator tests
+        if: ${{ !cancelled() }}
+        run: dotnet test tests/VLCLR.CImport.Tests -c Release
+
+      - name: Upload the extracted snapshot
+        if: ${{ !cancelled() && (failure() || inputs.upload-snapshots) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimport-snapshot-sysv
+          path: src/VLCLR/Native/Interop/abi/sysv.json
+
+  windows-snapshot-fresh:
+    name: Windows snapshot is fresh
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Fetch the pinned VLC headers
+        shell: pwsh
+        run: tools/VLCLR.CImport/fetch-headers.ps1
+
+      - name: Extract the windows snapshot
+        shell: pwsh
+        run: >
+          dotnet run --project tools/VLCLR.CImport -c Release --
+          extract --abi windows
+          --manifest tools/VLCLR.CImport/vlc.cimport.json
+          --out src/VLCLR/Native/Interop/abi/windows.json
+
+      - name: Windows snapshot matches the commit
+        shell: bash
+        run: |
+          if ! git diff --exit-code -- src/VLCLR/Native/Interop/abi/windows.json; then
+            echo "::error::$HINT"
+            exit 1
+          fi
+
+      - name: Generator tests
+        if: ${{ !cancelled() }}
+        run: dotnet test tests/VLCLR.CImport.Tests -c Release
+
+      - name: Upload the extracted snapshot
+        if: ${{ !cancelled() && (failure() || inputs.upload-snapshots) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimport-snapshot-windows
+          path: src/VLCLR/Native/Interop/abi/windows.json
+
+  # One artifact with both fresh snapshots, so a maintainer without WSL can
+  # copy them into src/VLCLR/Native/Interop/abi/ and run emit.
+  upload-snapshots:
+    name: Collect cimport-snapshots
+    needs: [generated-code-fresh, windows-snapshot-fresh]
+    if: ${{ !cancelled() && (inputs.upload-snapshots || needs.generated-code-fresh.result == 'failure' || needs.windows-snapshot-fresh.result == 'failure') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cimport-snapshot-*
+          merge-multiple: true
+          path: snapshots
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cimport-snapshots
+          path: snapshots
