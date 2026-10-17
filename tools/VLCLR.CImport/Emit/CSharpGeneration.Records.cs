@@ -37,7 +37,7 @@ internal sealed partial class CSharpGeneration
             new[]
             {
                 "/// <summary>Size of the C struct in bytes on the running platform.</summary>",
-                $"public static int SizeOf => {Choice(t.Size!, v => v.ToString())};",
+                Getter("public static int SizeOf", Choice(t.Size!, v => v.ToString())),
             },
             new[]
             {
@@ -84,7 +84,7 @@ internal sealed partial class CSharpGeneration
                 offsets.Add($"/// <summary>offsetof({CSharpLiterals.Xml(t.Name)}, {CSharpLiterals.Xml(m.Name)})</summary>");
                 offsets.Add(m.Offset.IsUniform
                     ? $"public const int {csNames[i]} = {m.Offset[0]};"
-                    : $"public static int {csNames[i]} => {Choice(m.Offset, v => v.ToString())};");
+                    : Getter($"public static int {csNames[i]}", Choice(m.Offset, v => v.ToString())));
             }
         }
 
@@ -152,14 +152,14 @@ internal sealed partial class CSharpGeneration
             [
                 doc,
                 "[UnscopedRef]",
-                $"public ref {type} {csName} => ref *({type}*)((byte*)Unsafe.AsPointer(ref this) + {Choice(m.Offset, v => v.ToString(), parenthesize: true)});",
+                Getter($"public ref {type} {csName}", $"ref *({type}*)((byte*)Unsafe.AsPointer(ref this) + {Choice(m.Offset, v => v.ToString(), parenthesize: true)})"),
             ];
         }
         return
         [
             doc,
             "[UnscopedRef]",
-            $"public ref {type} {csName} => ref {CSharpHelpers.ClassName}.FieldAt<{ownerName}, {type}>(ref this, {Choice(m.Offset, v => v.ToString())});",
+            Getter($"public ref {type} {csName}", $"ref {CSharpHelpers.ClassName}.FieldAt<{ownerName}, {type}>(ref this, {Choice(m.Offset, v => v.ToString())})"),
         ];
     }
 
@@ -287,6 +287,16 @@ internal sealed partial class CSharpGeneration
             "}",
         ];
     }
+
+    /// <summary>
+    /// <c>signature => body;</c>, or a getter marked AggressiveInlining when the
+    /// body picks a per-ABI value: Native AOT only folds
+    /// <c>OperatingSystem.IsWindows()</c> to a constant where the getter is inlined.
+    /// </summary>
+    internal static string Getter(string signature, string body)
+        => body.Contains("OperatingSystem.IsWindows()", StringComparison.Ordinal)
+            ? $"{signature} {{ [MethodImpl(MethodImplOptions.AggressiveInlining)] get => {body}; }}"
+            : $"{signature} => {body};";
 
     /// <summary>One C# expression for a per-ABI value: the literal when the ABIs agree, else a platform conditional.</summary>
     private static string Choice<T>(PerAbi<T> values, Func<T, string> format, bool parenthesize = false)

@@ -11,7 +11,7 @@ namespace Test.Interop;
 public unsafe partial struct Longs
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 40 : 48;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 40 : 48; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 40;
@@ -24,19 +24,19 @@ public unsafe partial struct Longs
 
     /// <summary>ul</summary>
     [UnscopedRef]
-    public ref CULong Ul => ref CImportHelpers.FieldAt<Longs, CULong>(ref this, OperatingSystem.IsWindows() ? 4 : 8);
+    public ref CULong Ul { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Longs, CULong>(ref this, OperatingSystem.IsWindows() ? 4 : 8); }
 
     /// <summary>ll</summary>
     [UnscopedRef]
-    public ref long Ll => ref CImportHelpers.FieldAt<Longs, long>(ref this, OperatingSystem.IsWindows() ? 8 : 16);
+    public ref long Ll { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Longs, long>(ref this, OperatingSystem.IsWindows() ? 8 : 16); }
 
     /// <summary>size</summary>
     [UnscopedRef]
-    public ref nuint Size => ref CImportHelpers.FieldAt<Longs, nuint>(ref this, OperatingSystem.IsWindows() ? 16 : 24);
+    public ref nuint Size { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Longs, nuint>(ref this, OperatingSystem.IsWindows() ? 16 : 24); }
 
     /// <summary>tick</summary>
     [UnscopedRef]
-    public ref long Tick => ref CImportHelpers.FieldAt<Longs, long>(ref this, OperatingSystem.IsWindows() ? 24 : 32);
+    public ref long Tick { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Longs, long>(ref this, OperatingSystem.IsWindows() ? 24 : 32); }
 
     /// <summary>bl : 5</summary>
     public CLong Bl
@@ -51,12 +51,12 @@ public unsafe partial struct Longs
         /// <summary>offsetof(longs_t, l)</summary>
         public const int L = 0;
         /// <summary>offsetof(longs_t, ul)</summary>
-        public static int Ul => OperatingSystem.IsWindows() ? 4 : 8;
+        public static int Ul { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 4 : 8; }
         /// <summary>offsetof(longs_t, ll)</summary>
-        public static int Ll => OperatingSystem.IsWindows() ? 8 : 16;
+        public static int Ll { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 8 : 16; }
         /// <summary>offsetof(longs_t, size)</summary>
-        public static int Size => OperatingSystem.IsWindows() ? 16 : 24;
+        public static int Size { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 16 : 24; }
         /// <summary>offsetof(longs_t, tick)</summary>
-        public static int Tick => OperatingSystem.IsWindows() ? 24 : 32;
+        public static int Tick { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 24 : 32; }
     }
 }

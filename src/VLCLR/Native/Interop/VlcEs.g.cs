@@ -80,7 +80,7 @@ public unsafe partial struct AudioFormat
 public unsafe partial struct EsFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 240 : 232;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 240 : 232; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 232;
@@ -132,27 +132,27 @@ public unsafe partial struct EsFormat
 
     /// <summary>i_bitrate</summary>
     [UnscopedRef]
-    public ref uint Bitrate => ref CImportHelpers.FieldAt<EsFormat, uint>(ref this, OperatingSystem.IsWindows() ? 208 : 200);
+    public ref uint Bitrate { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<EsFormat, uint>(ref this, OperatingSystem.IsWindows() ? 208 : 200); }
 
     /// <summary>i_profile</summary>
     [UnscopedRef]
-    public ref int Profile => ref CImportHelpers.FieldAt<EsFormat, int>(ref this, OperatingSystem.IsWindows() ? 212 : 204);
+    public ref int Profile { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<EsFormat, int>(ref this, OperatingSystem.IsWindows() ? 212 : 204); }
 
     /// <summary>i_level</summary>
     [UnscopedRef]
-    public ref int Level => ref CImportHelpers.FieldAt<EsFormat, int>(ref this, OperatingSystem.IsWindows() ? 216 : 208);
+    public ref int Level { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<EsFormat, int>(ref this, OperatingSystem.IsWindows() ? 216 : 208); }
 
     /// <summary>b_packetized</summary>
     [UnscopedRef]
-    public ref byte Packetized => ref CImportHelpers.FieldAt<EsFormat, byte>(ref this, OperatingSystem.IsWindows() ? 220 : 212);
+    public ref byte Packetized { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<EsFormat, byte>(ref this, OperatingSystem.IsWindows() ? 220 : 212); }
 
     /// <summary>i_extra</summary>
     [UnscopedRef]
-    public ref nuint ExtraSize => ref CImportHelpers.FieldAt<EsFormat, nuint>(ref this, OperatingSystem.IsWindows() ? 224 : 216);
+    public ref nuint ExtraSize { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<EsFormat, nuint>(ref this, OperatingSystem.IsWindows() ? 224 : 216); }
 
     /// <summary>p_extra</summary>
     [UnscopedRef]
-    public ref void* Extra => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 232 : 224));
+    public ref void* Extra { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 232 : 224)); }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -186,17 +186,17 @@ public unsafe partial struct EsFormat
         /// <summary>offsetof(es_format_t, subs)</summary>
         public const int Subs = 56;
         /// <summary>offsetof(es_format_t, i_bitrate)</summary>
-        public static int Bitrate => OperatingSystem.IsWindows() ? 208 : 200;
+        public static int Bitrate { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 208 : 200; }
         /// <summary>offsetof(es_format_t, i_profile)</summary>
-        public static int Profile => OperatingSystem.IsWindows() ? 212 : 204;
+        public static int Profile { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 212 : 204; }
         /// <summary>offsetof(es_format_t, i_level)</summary>
-        public static int Level => OperatingSystem.IsWindows() ? 216 : 208;
+        public static int Level { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 216 : 208; }
         /// <summary>offsetof(es_format_t, b_packetized)</summary>
-        public static int Packetized => OperatingSystem.IsWindows() ? 220 : 212;
+        public static int Packetized { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 220 : 212; }
         /// <summary>offsetof(es_format_t, i_extra)</summary>
-        public static int ExtraSize => OperatingSystem.IsWindows() ? 224 : 216;
+        public static int ExtraSize { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 224 : 216; }
         /// <summary>offsetof(es_format_t, p_extra)</summary>
-        public static int Extra => OperatingSystem.IsWindows() ? 232 : 224;
+        public static int Extra { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 232 : 224; }
     }
 }
 
@@ -390,7 +390,7 @@ public unsafe partial struct SubsFormatTeletext
 public unsafe partial struct VideoFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 152 : 144;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 152 : 144; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 144;
@@ -475,7 +475,7 @@ public unsafe partial struct VideoFormat
 
     /// <summary>i_cubemap_padding</summary>
     [UnscopedRef]
-    public ref uint CubemapPadding => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 144 : 140);
+    public ref uint CubemapPadding { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 144 : 140); }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -531,7 +531,7 @@ public unsafe partial struct VideoFormat
         /// <summary>offsetof(video_format_t, dovi)</summary>
         public const int Dovi = 136;
         /// <summary>offsetof(video_format_t, i_cubemap_padding)</summary>
-        public static int CubemapPadding => OperatingSystem.IsWindows() ? 144 : 140;
+        public static int CubemapPadding { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 144 : 140; }
     }
 }
 
@@ -540,7 +540,7 @@ public unsafe partial struct VideoFormat
 public unsafe partial struct VideoFormatDovi
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 8 : 4;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 8 : 4; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 4;

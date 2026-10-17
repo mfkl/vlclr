@@ -11,7 +11,7 @@ namespace Test.Interop;
 public unsafe partial struct Dv
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 4 : 8;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 4 : 8; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 4;
