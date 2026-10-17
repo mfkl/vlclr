@@ -1,0 +1,10 @@
+vlc_weird.h	field	weird_t.c16	'char16_t' is not supported
+vlc_weird.h	field	weird_t.diff	field type differs between ABIs
+vlc_weird.h	field	weird_t.e_missing	enum 'missing_e' is not emitted
+vlc_weird.h	field	weird_t.ld	long double is not supported
+vlc_weird.h	field	weird_t.missing	record 'missing_t' is not emitted
+vlc_weird.h	field	weird_t.p_missing	record 'missing_t' is not emitted
+vlc_weird.h	field	weird_t.pp_arr	pointer to array
+vlc_weird.h	field	weird_t.v	void field
+vlc_weird.h	field	weird_t.wc	'wchar_t' is not supported
+vlc_weird.h	field	weird_t.wide	__int128 is not supported
