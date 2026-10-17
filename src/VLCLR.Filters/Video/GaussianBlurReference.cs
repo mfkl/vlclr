@@ -1,9 +1,9 @@
 // Straight C# port of the pixel code in VLC's modules/video_filter/gaussianblur.c
 // (integer build, DONT_USE_FLOATS), kept line-for-line comparable with the C:
-// same loop bounds (including the "+ 1" in the scale table and the
-// horizontal pass reading up to two bytes past the visible width), same
-// integer math, truncating division and byte cast. Raw pointers mirror the
-// C memory accesses exactly.
+// same loop bounds, same integer math, truncating division and byte cast.
+// Raw pointers mirror the C memory accesses exactly. The horizontal bounds
+// stop at the last visible column, as in VLC since 892daf92 ("gaussianblur:
+// don't read past the right edge"); before, they read up to two bytes past it.
 //
 // LGPL-2.1-or-later, like the VLC source it is ported from.
 
@@ -38,7 +38,7 @@ internal static unsafe class GaussianBlurReference
                 int value = 0;
                 for (int y = Math.Max(-dim, -line); y <= Math.Min(dim, visibleLines - line - 1); y++)
                 {
-                    for (int x = Math.Max(-dim, -col); x <= Math.Min(dim, visiblePitch - col + 1); x++)
+                    for (int x = Math.Max(-dim, -col); x <= Math.Min(dim, visiblePitch - col - 1); x++)
                     {
                         value += distribution[y + dim] * distribution[x + dim];
                     }
@@ -62,7 +62,7 @@ internal static unsafe class GaussianBlurReference
                 int value = 0;
                 int c = line * inPitch + col;
                 for (int x = Math.Max(-dim, -col * (xFactor + 1));
-                     x <= Math.Min(dim, (visiblePitch - col) * (xFactor + 1) + 1);
+                     x <= Math.Min(dim, (visiblePitch - col) * (xFactor + 1) - 1);
                      x++)
                 {
                     value += distribution[x + dim] * input[c + (x >> xFactor)];
