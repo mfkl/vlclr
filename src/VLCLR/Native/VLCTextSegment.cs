@@ -12,29 +12,29 @@ namespace VLCLR.Native;
 /// Multiple segments are chained via p_next to represent styled text.
 /// </summary>
 /// <remarks>
-/// Layout: 4 pointers on 64-bit = 32 bytes
+/// Offsets and size come from the generated <c>Interop.TextSegment</c> layout:
 /// - psz_text: pointer to UTF-8 text string
 /// - style: pointer to text_style_t
 /// - p_next: pointer to next segment in chain
 /// - p_ruby: pointer to ruby annotations (for CJK text)
 /// </remarks>
-[StructLayout(LayoutKind.Explicit, Size = 32)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.TextSegment.MaxSizeOf)]
 public struct VLCTextSegment
 {
     /// <summary>UTF-8 text string (psz_text)</summary>
-    [FieldOffset(0)]
+    [FieldOffset(Interop.TextSegment.Offsets.Text)]
     public nint Text;
 
     /// <summary>Style applied to this segment (style), pointer to text_style_t</summary>
-    [FieldOffset(8)]
+    [FieldOffset(Interop.TextSegment.Offsets.Style)]
     public nint Style;
 
     /// <summary>Next segment in chain (p_next)</summary>
-    [FieldOffset(16)]
+    [FieldOffset(Interop.TextSegment.Offsets.Next)]
     public nint Next;
 
     /// <summary>Ruby annotations for CJK text (p_ruby)</summary>
-    [FieldOffset(24)]
+    [FieldOffset(Interop.TextSegment.Offsets.Ruby)]
     public nint Ruby;
 }
 
@@ -43,23 +43,23 @@ public struct VLCTextSegment
 /// Used for pronunciation guides above/below CJK characters.
 /// </summary>
 /// <remarks>
-/// Layout: 3 pointers on 64-bit = 24 bytes
+/// Offsets and size come from the generated <c>Interop.TextSegmentRuby</c> layout:
 /// - psz_base: pointer to base text being annotated
 /// - psz_rt: pointer to ruby text (pronunciation)
 /// - p_next: pointer to next ruby in chain
 /// </remarks>
-[StructLayout(LayoutKind.Explicit, Size = 24)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.TextSegmentRuby.MaxSizeOf)]
 public struct VLCTextSegmentRuby
 {
     /// <summary>Base text being annotated (psz_base)</summary>
-    [FieldOffset(0)]
+    [FieldOffset(Interop.TextSegmentRuby.Offsets.Base)]
     public nint BaseText;
 
     /// <summary>Ruby/pronunciation text (psz_rt)</summary>
-    [FieldOffset(8)]
+    [FieldOffset(Interop.TextSegmentRuby.Offsets.Rt)]
     public nint RubyText;
 
     /// <summary>Next ruby annotation in chain (p_next)</summary>
-    [FieldOffset(16)]
+    [FieldOffset(Interop.TextSegmentRuby.Offsets.Next)]
     public nint Next;
 }
