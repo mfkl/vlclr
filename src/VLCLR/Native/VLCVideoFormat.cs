@@ -7,127 +7,111 @@ using System.Runtime.InteropServices;
 namespace VLCLR.Native;
 
 /// <summary>
-/// Video format description (video_format_t from vlc_es.h)
-/// Native size on 64-bit: 152 bytes on Windows, 144 bytes on Linux and macOS
-/// (see <see cref="VLCAbi"/>). This struct holds the 144 bytes both layouts
+/// Video format description (video_format_t from vlc_es.h).
+/// The native struct is 152 bytes on Windows and 144 bytes on Linux and macOS
+/// (<see cref="Interop.VideoFormat.SizeOf"/>). This struct is
+/// <see cref="Interop.VideoFormat.MinSizeOf"/> bytes, the part both layouts
 /// share, so assigning a whole format into VLC memory
 /// (<c>fmt_out.Video = fmt_in.Video</c>) never writes past the native struct.
 /// The dovi bitfields and i_cubemap_padding sit at different offsets on the
-/// two ABIs and are not exposed.
-///
-/// Layout:
-/// - offset 0-43: 11 unsigned ints (chroma through frame_rate_base)
-/// - offset 44-47: padding for pointer alignment
-/// - offset 48-55: p_palette pointer
-/// - offset 56-79: 6 enums (orientation through chroma_location)
-/// - offset 80-83: multiview_mode
-/// - offset 84: b_multiview_right_eye_first + 3 padding
-/// - offset 88-91: projection_mode
-/// - offset 92-107: viewpoint pose (4 floats)
-/// - offset 108-131: mastering (primaries + white_point + luminance)
-/// - offset 132-135: lighting (MaxCLL + MaxFALL)
-/// - offset 136-137: dovi version bytes
-/// - offset 138-143: dovi bitfields and, outside Windows, i_cubemap_padding
+/// two ABIs and are not exposed. Member offsets come from
+/// <see cref="Interop.VideoFormat.Offsets"/>.
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.VideoFormat.MinSizeOf)]
 public struct VLCVideoFormat
 {
     /// <summary>Picture chroma (i_chroma) - fourcc like 'RV32', 'I420', etc.</summary>
-    public uint Chroma;           // offset 0
+    [FieldOffset(Interop.VideoFormat.Offsets.Chroma)] public uint Chroma;
 
     /// <summary>Picture width (i_width)</summary>
-    public uint Width;            // offset 4
+    [FieldOffset(Interop.VideoFormat.Offsets.Width)] public uint Width;
 
     /// <summary>Picture height (i_height)</summary>
-    public uint Height;           // offset 8
+    [FieldOffset(Interop.VideoFormat.Offsets.Height)] public uint Height;
 
     /// <summary>Start offset of visible area X (i_x_offset)</summary>
-    public uint XOffset;          // offset 12
+    [FieldOffset(Interop.VideoFormat.Offsets.XOffset)] public uint XOffset;
 
     /// <summary>Start offset of visible area Y (i_y_offset)</summary>
-    public uint YOffset;          // offset 16
+    [FieldOffset(Interop.VideoFormat.Offsets.YOffset)] public uint YOffset;
 
     /// <summary>Width of visible area (i_visible_width)</summary>
-    public uint VisibleWidth;     // offset 20
+    [FieldOffset(Interop.VideoFormat.Offsets.VisibleWidth)] public uint VisibleWidth;
 
     /// <summary>Height of visible area (i_visible_height)</summary>
-    public uint VisibleHeight;    // offset 24
+    [FieldOffset(Interop.VideoFormat.Offsets.VisibleHeight)] public uint VisibleHeight;
 
     /// <summary>Sample aspect ratio numerator (i_sar_num)</summary>
-    public uint SarNum;           // offset 28
+    [FieldOffset(Interop.VideoFormat.Offsets.SarNum)] public uint SarNum;
 
     /// <summary>Sample aspect ratio denominator (i_sar_den)</summary>
-    public uint SarDen;           // offset 32
+    [FieldOffset(Interop.VideoFormat.Offsets.SarDen)] public uint SarDen;
 
     /// <summary>Frame rate numerator (i_frame_rate)</summary>
-    public uint FrameRate;        // offset 36
+    [FieldOffset(Interop.VideoFormat.Offsets.FrameRate)] public uint FrameRate;
 
     /// <summary>Frame rate denominator (i_frame_rate_base)</summary>
-    public uint FrameRateBase;    // offset 40
-
-    // Padding for 8-byte pointer alignment (44 % 8 = 4, need 4 more)
-    private uint _padBeforePalette;  // offset 44
+    [FieldOffset(Interop.VideoFormat.Offsets.FrameRateBase)] public uint FrameRateBase;
 
     /// <summary>Video palette pointer (p_palette) - usually null</summary>
-    public nint Palette;          // offset 48
+    [FieldOffset(Interop.VideoFormat.Offsets.Palette)] public nint Palette;
 
-    /// <summary>Picture orientation</summary>
-    public int Orientation;       // offset 56
+    /// <summary>Picture orientation (orientation)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Orientation)] public int Orientation;
 
-    /// <summary>Color primaries</summary>
-    public int Primaries;         // offset 60
+    /// <summary>Color primaries (primaries)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Primaries)] public int Primaries;
 
-    /// <summary>Transfer function</summary>
-    public int Transfer;          // offset 64
+    /// <summary>Transfer function (transfer)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Transfer)] public int Transfer;
 
-    /// <summary>YCbCr color space</summary>
-    public int Space;             // offset 68
+    /// <summary>YCbCr color space (space)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Space)] public int Space;
 
-    /// <summary>Color range (0-255 vs 16-235)</summary>
-    public int ColorRange;        // offset 72
+    /// <summary>Color range, 0-255 vs 16-235 (color_range)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.ColorRange)] public int ColorRange;
 
-    /// <summary>YCbCr chroma location</summary>
-    public int ChromaLocation;    // offset 76
+    /// <summary>YCbCr chroma location (chroma_location)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.ChromaLocation)] public int ChromaLocation;
 
-    /// <summary>Multiview mode</summary>
-    public int MultiviewMode;     // offset 80
+    /// <summary>Multiview mode (multiview_mode)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.MultiviewMode)] public int MultiviewMode;
 
-    /// <summary>Multiview right eye first flag (bool)</summary>
-    public byte MultiviewRightEyeFirst;  // offset 84
+    /// <summary>Multiview right eye first flag (b_multiview_right_eye_first, bool)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.MultiviewRightEyeFirst)] public byte MultiviewRightEyeFirst;
 
-    // Padding to align next int
-    private byte _pad1;           // offset 85
-    private byte _pad2;           // offset 86
-    private byte _pad3;           // offset 87
+    /// <summary>Projection mode (projection_mode)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.ProjectionMode)] public int ProjectionMode;
 
-    /// <summary>Projection mode</summary>
-    public int ProjectionMode;    // offset 88
+    /// <summary>Viewpoint yaw (pose.yaw)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Pose + Interop.Viewpoint.Offsets.Yaw)] public float PoseYaw;
 
-    /// <summary>Viewpoint pose - 4 floats (yaw, pitch, roll, fov)</summary>
-    public float PoseYaw;         // offset 92
-    public float PosePitch;       // offset 96
-    public float PoseRoll;        // offset 100
-    public float PoseFov;         // offset 104
+    /// <summary>Viewpoint pitch (pose.pitch)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Pose + Interop.Viewpoint.Offsets.Pitch)] public float PosePitch;
 
-    // Mastering display color volume
-    public ushort MasteringPrimariesGX;   // offset 108
-    public ushort MasteringPrimariesGY;   // offset 110
-    public ushort MasteringPrimariesBX;   // offset 112
-    public ushort MasteringPrimariesBY;   // offset 114
-    public ushort MasteringPrimariesRX;   // offset 116
-    public ushort MasteringPrimariesRY;   // offset 118
-    public ushort MasteringWhitePointX;   // offset 120
-    public ushort MasteringWhitePointY;   // offset 122
-    public uint MasteringMaxLuminance;    // offset 124
-    public uint MasteringMinLuminance;    // offset 128
+    /// <summary>Viewpoint roll (pose.roll)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Pose + Interop.Viewpoint.Offsets.Roll)] public float PoseRoll;
 
-    // Content light level
-    public ushort LightingMaxCLL;         // offset 132
-    public ushort LightingMaxFALL;        // offset 134
+    /// <summary>Viewpoint field of view (pose.fov)</summary>
+    [FieldOffset(Interop.VideoFormat.Offsets.Pose + Interop.Viewpoint.Offsets.Fov)] public float PoseFov;
 
-    // Dolby Vision info
-    public byte DoviVersionMajor;         // offset 136
-    public byte DoviVersionMinor;         // offset 137
-    private ushort _abiDependent0;        // offset 138
-    private uint _abiDependent1;          // offset 140
+    // Mastering display color volume (mastering.primaries[0..5], white_point[0..1], luminance)
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.Primaries + 0 * sizeof(ushort))] public ushort MasteringPrimariesGX;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.Primaries + 1 * sizeof(ushort))] public ushort MasteringPrimariesGY;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.Primaries + 2 * sizeof(ushort))] public ushort MasteringPrimariesBX;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.Primaries + 3 * sizeof(ushort))] public ushort MasteringPrimariesBY;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.Primaries + 4 * sizeof(ushort))] public ushort MasteringPrimariesRX;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.Primaries + 5 * sizeof(ushort))] public ushort MasteringPrimariesRY;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.WhitePoint + 0 * sizeof(ushort))] public ushort MasteringWhitePointX;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.WhitePoint + 1 * sizeof(ushort))] public ushort MasteringWhitePointY;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.MaxLuminance)] public uint MasteringMaxLuminance;
+    [FieldOffset(Interop.VideoFormat.Offsets.Mastering + Interop.VideoFormatMastering.Offsets.MinLuminance)] public uint MasteringMinLuminance;
+
+    // Content light level (lighting.MaxCLL, lighting.MaxFALL)
+    [FieldOffset(Interop.VideoFormat.Offsets.Lighting + Interop.VideoFormatLighting.Offsets.MaxCLL)] public ushort LightingMaxCLL;
+    [FieldOffset(Interop.VideoFormat.Offsets.Lighting + Interop.VideoFormatLighting.Offsets.MaxFALL)] public ushort LightingMaxFALL;
+
+    // Dolby Vision version bytes (dovi.version_major, dovi.version_minor)
+    [FieldOffset(Interop.VideoFormat.Offsets.Dovi + Interop.VideoFormatDovi.Offsets.VersionMajor)] public byte DoviVersionMajor;
+    [FieldOffset(Interop.VideoFormat.Offsets.Dovi + Interop.VideoFormatDovi.Offsets.VersionMinor)] public byte DoviVersionMinor;
 }
