@@ -56,11 +56,26 @@ jobs:
         if: ${{ !cancelled() }}
         run: tests/VlcEndToEnd/download-vlc.sh artifacts/vlc
 
-      - name: Check interop layouts against the VLC headers
+      - name: Fetch the pinned VLC headers
+        if: ${{ !cancelled() }}
+        run: tools/VLCLR.CImport/fetch-headers.sh
+
+      - name: Check interop layouts against the pinned VLC headers
+        if: ${{ !cancelled() && runner.os != 'Windows' }}
+        run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc-headers/include
+
+      - name: Check interop layouts against the pinned VLC headers (MSVC)
+        if: ${{ !cancelled() && runner.os == 'Windows' }}
+        shell: cmd
+        run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc-headers\include
+
+      # A failure here, with the pinned step above green, means VLC changed a
+      # layout since the pinned commit: a real drift signal.
+      - name: VLC nightly drift, interop layouts against the nightly headers
         if: ${{ !cancelled() && runner.os != 'Windows' }}
         run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc/include
 
-      - name: Check interop layouts against the VLC headers (MSVC)
+      - name: VLC nightly drift, interop layouts against the nightly headers (MSVC)
         if: ${{ !cancelled() && runner.os == 'Windows' }}
         shell: cmd
         run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc\include
