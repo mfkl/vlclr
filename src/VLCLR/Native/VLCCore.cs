@@ -58,7 +58,7 @@ public static partial class VLCCore
     public static unsafe int VarCreate(nint obj, string name, int type)
     {
         Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
         try
         {
             utf8.FromManaged(name, buffer);
@@ -75,7 +75,7 @@ public static partial class VLCCore
     public static unsafe void VarDestroy(nint obj, string name)
     {
         Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
         try
         {
             utf8.FromManaged(name, buffer);
@@ -95,7 +95,7 @@ public static partial class VLCCore
     public static unsafe int VarSetChecked(nint obj, string name, int type, VLCValueNative value)
     {
         Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
         try
         {
             utf8.FromManaged(name, buffer);
@@ -117,7 +117,7 @@ public static partial class VLCCore
     {
         Gen.Value native = default;
         Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
         try
         {
             utf8.FromManaged(name, buffer);
@@ -140,7 +140,7 @@ public static partial class VLCCore
     {
         Gen.Value native = default;
         Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
         try
         {
             utf8.FromManaged(name, buffer);
@@ -485,7 +485,7 @@ public static partial class VLCCore
     /// <param name="obj">Pointer to vlc_object_t</param>
     /// <returns>Pointer to parent vlc_object_t, or IntPtr.Zero if none</returns>
     public static unsafe nint ObjectParent(nint obj)
-        => (nint)Gen.VlcObjects.VlcObjectParent((Gen.ObjectHeader*)obj);
+        => (nint)Gen.VlcObject.Parent((Gen.ObjectHeader*)obj);
 
     /// <summary>
     /// Get the type name of a VLC object.
@@ -493,7 +493,7 @@ public static partial class VLCCore
     /// <param name="obj">Pointer to vlc_object_t</param>
     /// <returns>Pointer to type name string (VLC-owned, do not free), or IntPtr.Zero on error</returns>
     public static unsafe nint ObjectTypename(nint obj)
-        => (nint)Gen.VlcObjects.VlcObjectTypename((Gen.ObjectHeader*)obj);
+        => (nint)Gen.VlcObject.Typename((Gen.ObjectHeader*)obj);
 
     #endregion
 
