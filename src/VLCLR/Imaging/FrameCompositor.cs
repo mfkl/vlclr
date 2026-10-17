@@ -68,8 +68,12 @@ public static class FrameCompositor
             return false;
 
         // Composite based on format
-        bool isBgra = VLCFourCC.IsBgraFormat(chroma);
-        bool hasAlpha = VLCFourCC.HasAlphaChannel(chroma);
+        // Byte offsets of each component, hoisted out of the pixel loops. The 1 byte
+        // per pixel luma path ignores them.
+        if (!VLCFourCC.TryGetRgbLayout(chroma, out int ro, out int go, out int bo, out int ao))
+        {
+            ro = 0; go = 1; bo = 2; ao = -1;
+        }
         int opacityScale = (int)(Math.Clamp(opacity, 0.0f, 1.0f) * 255.0f + 0.5f);
 
         fixed (byte* overlayPtr = overlayPixels)
@@ -96,7 +100,7 @@ public static class FrameCompositor
                         continue;
                     }
 
-                    BlendPixel(rowPtr, r, g, b, a, bytesPerPixel, isBgra, hasAlpha);
+                    BlendPixel(rowPtr, r, g, b, a, bytesPerPixel, ro, go, bo, ao);
                     rowPtr += bytesPerPixel;
                 }
             }
@@ -148,85 +152,30 @@ public static class FrameCompositor
     /// <param name="b">Source blue component.</param>
     /// <param name="a">Source alpha (0=transparent, 255=opaque).</param>
     /// <param name="bytesPerPixel">Bytes per pixel in destination.</param>
-    /// <param name="isBgra">True if destination is BGRA format.</param>
-    /// <param name="hasAlpha">True if destination has alpha channel.</param>
+    /// <param name="ro">Byte offset of red in the destination pixel.</param>
+    /// <param name="go">Byte offset of green in the destination pixel.</param>
+    /// <param name="bo">Byte offset of blue in the destination pixel.</param>
+    /// <param name="ao">Byte offset of alpha in the destination pixel, or -1 if none.</param>
     private static unsafe void BlendPixel(
-        byte* dst, 
+        byte* dst,
         byte r, byte g, byte b, byte a,
-        int bytesPerPixel, bool isBgra, bool hasAlpha)
+        int bytesPerPixel, int ro, int go, int bo, int ao)
     {
-        if (bytesPerPixel == 4)
+        if (bytesPerPixel >= 3)
         {
-            // 32-bit format (RGBA or BGRA)
             if (a == 255)
             {
-                // Fully opaque - direct copy
-                if (isBgra)
-                {
-                    dst[0] = b;
-                    dst[1] = g;
-                    dst[2] = r;
-                    if (hasAlpha) dst[3] = a;
-                }
-                else
-                {
-                    dst[0] = r;
-                    dst[1] = g;
-                    dst[2] = b;
-                    if (hasAlpha) dst[3] = a;
-                }
-            }
-            else
-            {
-                // Alpha blend
-                int invAlpha = 255 - a;
-                if (isBgra)
-                {
-                    dst[0] = (byte)((b * a + dst[0] * invAlpha) / 255);
-                    dst[1] = (byte)((g * a + dst[1] * invAlpha) / 255);
-                    dst[2] = (byte)((r * a + dst[2] * invAlpha) / 255);
-                }
-                else
-                {
-                    dst[0] = (byte)((r * a + dst[0] * invAlpha) / 255);
-                    dst[1] = (byte)((g * a + dst[1] * invAlpha) / 255);
-                    dst[2] = (byte)((b * a + dst[2] * invAlpha) / 255);
-                }
-            }
-        }
-        else if (bytesPerPixel == 3)
-        {
-            // 24-bit RGB
-            if (a == 255)
-            {
-                if (isBgra)
-                {
-                    dst[0] = b;
-                    dst[1] = g;
-                    dst[2] = r;
-                }
-                else
-                {
-                    dst[0] = r;
-                    dst[1] = g;
-                    dst[2] = b;
-                }
+                dst[ro] = r;
+                dst[go] = g;
+                dst[bo] = b;
+                if (ao >= 0) dst[ao] = a;
             }
             else
             {
                 int invAlpha = 255 - a;
-                if (isBgra)
-                {
-                    dst[0] = (byte)((b * a + dst[0] * invAlpha) / 255);
-                    dst[1] = (byte)((g * a + dst[1] * invAlpha) / 255);
-                    dst[2] = (byte)((r * a + dst[2] * invAlpha) / 255);
-                }
-                else
-                {
-                    dst[0] = (byte)((r * a + dst[0] * invAlpha) / 255);
-                    dst[1] = (byte)((g * a + dst[1] * invAlpha) / 255);
-                    dst[2] = (byte)((b * a + dst[2] * invAlpha) / 255);
-                }
+                dst[ro] = (byte)((r * a + dst[ro] * invAlpha) / 255);
+                dst[go] = (byte)((g * a + dst[go] * invAlpha) / 255);
+                dst[bo] = (byte)((b * a + dst[bo] * invAlpha) / 255);
             }
         }
         else if (bytesPerPixel == 1)
@@ -288,8 +237,12 @@ public static class FrameCompositor
         if (bytesPerPixel == 0)
             return;
 
-        bool isBgra = VLCFourCC.IsBgraFormat(chroma);
-        bool hasAlpha = VLCFourCC.HasAlphaChannel(chroma);
+        // Byte offsets of each component, hoisted out of the pixel loops. The 1 byte
+        // per pixel luma path ignores them.
+        if (!VLCFourCC.TryGetRgbLayout(chroma, out int ro, out int go, out int bo, out int ao))
+        {
+            ro = 0; go = 1; bo = 2; ao = -1;
+        }
 
         byte* framePtr = (byte*)framePixels;
 
@@ -299,7 +252,7 @@ public static class FrameCompositor
 
             for (int col = 0; col < width; col++)
             {
-                BlendPixel(rowPtr, r, g, b, a, bytesPerPixel, isBgra, hasAlpha);
+                BlendPixel(rowPtr, r, g, b, a, bytesPerPixel, ro, go, bo, ao);
                 rowPtr += bytesPerPixel;
             }
         }
