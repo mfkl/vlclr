@@ -11,7 +11,7 @@ namespace Test.Interop;
 public unsafe partial struct EsFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 72 : 64;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 72 : 64; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 64;
@@ -33,15 +33,15 @@ public unsafe partial struct EsFormat
 
     /// <summary>p_extra</summary>
     [UnscopedRef]
-    public ref void* PExtra => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 48 : 40));
+    public ref void* PExtra { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 48 : 40)); }
 
     /// <summary>i_extra</summary>
     [UnscopedRef]
-    public ref nuint IExtra => ref CImportHelpers.FieldAt<EsFormat, nuint>(ref this, OperatingSystem.IsWindows() ? 56 : 48);
+    public ref nuint IExtra { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<EsFormat, nuint>(ref this, OperatingSystem.IsWindows() ? 56 : 48); }
 
     /// <summary>psz_language</summary>
     [UnscopedRef]
-    public ref byte* PszLanguage => ref *(byte**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 64 : 56));
+    public ref byte* PszLanguage { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(byte**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 64 : 56)); }
 
     /// <summary>Inline array of 4 elements of <c>i_raw</c>.</summary>
     [InlineArray(4)]
@@ -62,11 +62,11 @@ public unsafe partial struct EsFormat
         /// <summary>offsetof(es_format_t, i_raw)</summary>
         public const int IRaw = 8;
         /// <summary>offsetof(es_format_t, p_extra)</summary>
-        public static int PExtra => OperatingSystem.IsWindows() ? 48 : 40;
+        public static int PExtra { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 48 : 40; }
         /// <summary>offsetof(es_format_t, i_extra)</summary>
-        public static int IExtra => OperatingSystem.IsWindows() ? 56 : 48;
+        public static int IExtra { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 56 : 48; }
         /// <summary>offsetof(es_format_t, psz_language)</summary>
-        public static int PszLanguage => OperatingSystem.IsWindows() ? 64 : 56;
+        public static int PszLanguage { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 64 : 56; }
     }
 }
 
@@ -75,7 +75,7 @@ public unsafe partial struct EsFormat
 public unsafe partial struct VideoFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 40 : 32;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 40 : 32; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 32;
@@ -91,19 +91,19 @@ public unsafe partial struct VideoFormat
 
     /// <summary>i_width</summary>
     [UnscopedRef]
-    public ref uint IWidth => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 12 : 8);
+    public ref uint IWidth { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 12 : 8); }
 
     /// <summary>i_height</summary>
     [UnscopedRef]
-    public ref uint IHeight => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 16 : 12);
+    public ref uint IHeight { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 16 : 12); }
 
     /// <summary>p_palette</summary>
     [UnscopedRef]
-    public ref VideoPalette* PPalette => ref *(VideoPalette**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 24 : 16));
+    public ref VideoPalette* PPalette { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(VideoPalette**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 24 : 16)); }
 
     /// <summary>orientation</summary>
     [UnscopedRef]
-    public ref VideoOrientation Orientation => ref CImportHelpers.FieldAt<VideoFormat, VideoOrientation>(ref this, OperatingSystem.IsWindows() ? 32 : 24);
+    public ref VideoOrientation Orientation { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<VideoFormat, VideoOrientation>(ref this, OperatingSystem.IsWindows() ? 32 : 24); }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -113,13 +113,13 @@ public unsafe partial struct VideoFormat
         /// <summary>offsetof(video_format_t, dovi)</summary>
         public const int Dovi = 4;
         /// <summary>offsetof(video_format_t, i_width)</summary>
-        public static int IWidth => OperatingSystem.IsWindows() ? 12 : 8;
+        public static int IWidth { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 12 : 8; }
         /// <summary>offsetof(video_format_t, i_height)</summary>
-        public static int IHeight => OperatingSystem.IsWindows() ? 16 : 12;
+        public static int IHeight { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 16 : 12; }
         /// <summary>offsetof(video_format_t, p_palette)</summary>
-        public static int PPalette => OperatingSystem.IsWindows() ? 24 : 16;
+        public static int PPalette { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 24 : 16; }
         /// <summary>offsetof(video_format_t, orientation)</summary>
-        public static int Orientation => OperatingSystem.IsWindows() ? 32 : 24;
+        public static int Orientation { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 32 : 24; }
     }
 }
 
@@ -128,7 +128,7 @@ public unsafe partial struct VideoFormat
 public unsafe partial struct VideoFormatDovi
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 8 : 4;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 8 : 4; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 4;

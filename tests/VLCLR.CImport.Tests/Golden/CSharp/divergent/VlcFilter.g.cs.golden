@@ -11,7 +11,7 @@ namespace Test.Interop;
 public unsafe partial struct Filter
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 168 : 152;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 168 : 152; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 152;
@@ -27,15 +27,15 @@ public unsafe partial struct Filter
 
     /// <summary>fmt_out</summary>
     [UnscopedRef]
-    public ref EsFormat FmtOut => ref CImportHelpers.FieldAt<Filter, EsFormat>(ref this, OperatingSystem.IsWindows() ? 80 : 72);
+    public ref EsFormat FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Filter, EsFormat>(ref this, OperatingSystem.IsWindows() ? 80 : 72); }
 
     /// <summary>p_sys</summary>
     [UnscopedRef]
-    public ref void* PSys => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 152 : 136));
+    public ref void* PSys { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 152 : 136)); }
 
     /// <summary>ops</summary>
     [UnscopedRef]
-    public ref VlcFilterOperations* Ops => ref *(VlcFilterOperations**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 160 : 144));
+    public ref VlcFilterOperations* Ops { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(VlcFilterOperations**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 160 : 144)); }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -45,11 +45,11 @@ public unsafe partial struct Filter
         /// <summary>offsetof(filter_t, fmt_in)</summary>
         public const int FmtIn = 8;
         /// <summary>offsetof(filter_t, fmt_out)</summary>
-        public static int FmtOut => OperatingSystem.IsWindows() ? 80 : 72;
+        public static int FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 80 : 72; }
         /// <summary>offsetof(filter_t, p_sys)</summary>
-        public static int PSys => OperatingSystem.IsWindows() ? 152 : 136;
+        public static int PSys { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 152 : 136; }
         /// <summary>offsetof(filter_t, ops)</summary>
-        public static int Ops => OperatingSystem.IsWindows() ? 160 : 144;
+        public static int Ops { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 160 : 144; }
     }
 }
 

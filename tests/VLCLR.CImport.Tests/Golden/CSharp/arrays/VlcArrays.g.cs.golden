@@ -145,7 +145,7 @@ public unsafe partial struct Arrays
 public unsafe partial struct Darr
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 24 : 40;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 24 : 40; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 24;
@@ -158,11 +158,11 @@ public unsafe partial struct Darr
 
     /// <summary>i_arr</summary>
     [UnscopedRef]
-    public ref IArrArray IArr => ref CImportHelpers.FieldAt<Darr, IArrArray>(ref this, OperatingSystem.IsWindows() ? 4 : 8);
+    public ref IArrArray IArr { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Darr, IArrArray>(ref this, OperatingSystem.IsWindows() ? 4 : 8); }
 
     /// <summary>longs</summary>
     [UnscopedRef]
-    public ref LongsArray Longs => ref CImportHelpers.FieldAt<Darr, LongsArray>(ref this, OperatingSystem.IsWindows() ? 16 : 24);
+    public ref LongsArray Longs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Darr, LongsArray>(ref this, OperatingSystem.IsWindows() ? 16 : 24); }
 
     /// <summary>Inline array of 3 elements of <c>i_arr</c>.</summary>
     [InlineArray(3)]
@@ -184,9 +184,9 @@ public unsafe partial struct Darr
         /// <summary>offsetof(darr_t, l_before)</summary>
         public const int LBefore = 0;
         /// <summary>offsetof(darr_t, i_arr)</summary>
-        public static int IArr => OperatingSystem.IsWindows() ? 4 : 8;
+        public static int IArr { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 4 : 8; }
         /// <summary>offsetof(darr_t, longs)</summary>
-        public static int Longs => OperatingSystem.IsWindows() ? 16 : 24;
+        public static int Longs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 16 : 24; }
     }
 }
 
@@ -195,7 +195,7 @@ public unsafe partial struct Darr
 public unsafe partial struct DvHolder
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 8 : 16;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 8 : 16; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 8;
@@ -209,7 +209,7 @@ public unsafe partial struct DvHolder
 public unsafe partial struct Dv
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 4 : 8;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 4 : 8; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 4;

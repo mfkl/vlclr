@@ -61,7 +61,7 @@ public partial struct FilterSubpictureCallbacks { }
 public unsafe partial struct Filter
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
-    public static int SizeOf => OperatingSystem.IsWindows() ? 592 : 576;
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 592 : 576; }
 
     /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
     public const int MinSizeOf = 576;
@@ -83,35 +83,35 @@ public unsafe partial struct Filter
 
     /// <summary>vctx_in</summary>
     [UnscopedRef]
-    public ref VideoContext* VctxIn => ref *(VideoContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 280 : 272));
+    public ref VideoContext* VctxIn { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(VideoContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 280 : 272)); }
 
     /// <summary>fmt_out</summary>
     [UnscopedRef]
-    public ref EsFormat FmtOut => ref CImportHelpers.FieldAt<Filter, EsFormat>(ref this, OperatingSystem.IsWindows() ? 288 : 280);
+    public ref EsFormat FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Filter, EsFormat>(ref this, OperatingSystem.IsWindows() ? 288 : 280); }
 
     /// <summary>vctx_out</summary>
     [UnscopedRef]
-    public ref VideoContext* VctxOut => ref *(VideoContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 528 : 512));
+    public ref VideoContext* VctxOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(VideoContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 528 : 512)); }
 
     /// <summary>b_allow_fmt_out_change</summary>
     [UnscopedRef]
-    public ref byte AllowFmtOutChange => ref CImportHelpers.FieldAt<Filter, byte>(ref this, OperatingSystem.IsWindows() ? 536 : 520);
+    public ref byte AllowFmtOutChange { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Filter, byte>(ref this, OperatingSystem.IsWindows() ? 536 : 520); }
 
     /// <summary>psz_name</summary>
     [UnscopedRef]
-    public ref byte* Name => ref *(byte**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 544 : 528));
+    public ref byte* Name { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(byte**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 544 : 528)); }
 
     /// <summary>p_cfg</summary>
     [UnscopedRef]
-    public ref ConfigChain* Cfg => ref *(ConfigChain**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 552 : 536));
+    public ref ConfigChain* Cfg { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(ConfigChain**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 552 : 536)); }
 
     /// <summary>ops</summary>
     [UnscopedRef]
-    public ref FilterOperations* Ops => ref *(FilterOperations**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 560 : 544));
+    public ref FilterOperations* Ops { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(FilterOperations**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 560 : 544)); }
 
     /// <summary>owner</summary>
     [UnscopedRef]
-    public ref FilterOwner Owner => ref CImportHelpers.FieldAt<Filter, FilterOwner>(ref this, OperatingSystem.IsWindows() ? 568 : 552);
+    public ref FilterOwner Owner { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Filter, FilterOwner>(ref this, OperatingSystem.IsWindows() ? 568 : 552); }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -125,21 +125,21 @@ public unsafe partial struct Filter
         /// <summary>offsetof(filter_t, fmt_in)</summary>
         public const int FmtIn = 40;
         /// <summary>offsetof(filter_t, vctx_in)</summary>
-        public static int VctxIn => OperatingSystem.IsWindows() ? 280 : 272;
+        public static int VctxIn { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 280 : 272; }
         /// <summary>offsetof(filter_t, fmt_out)</summary>
-        public static int FmtOut => OperatingSystem.IsWindows() ? 288 : 280;
+        public static int FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 288 : 280; }
         /// <summary>offsetof(filter_t, vctx_out)</summary>
-        public static int VctxOut => OperatingSystem.IsWindows() ? 528 : 512;
+        public static int VctxOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 528 : 512; }
         /// <summary>offsetof(filter_t, b_allow_fmt_out_change)</summary>
-        public static int AllowFmtOutChange => OperatingSystem.IsWindows() ? 536 : 520;
+        public static int AllowFmtOutChange { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 536 : 520; }
         /// <summary>offsetof(filter_t, psz_name)</summary>
-        public static int Name => OperatingSystem.IsWindows() ? 544 : 528;
+        public static int Name { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 544 : 528; }
         /// <summary>offsetof(filter_t, p_cfg)</summary>
-        public static int Cfg => OperatingSystem.IsWindows() ? 552 : 536;
+        public static int Cfg { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 552 : 536; }
         /// <summary>offsetof(filter_t, ops)</summary>
-        public static int Ops => OperatingSystem.IsWindows() ? 560 : 544;
+        public static int Ops { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 560 : 544; }
         /// <summary>offsetof(filter_t, owner)</summary>
-        public static int Owner => OperatingSystem.IsWindows() ? 568 : 552;
+        public static int Owner { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 568 : 552; }
     }
 }
 

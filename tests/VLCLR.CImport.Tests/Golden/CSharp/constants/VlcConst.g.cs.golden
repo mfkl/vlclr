@@ -45,13 +45,13 @@ public static partial class Constants
     public const double DblFrac = 0.1;
 
     /// <summary>DIV_INT</summary>
-    public static int DivInt => OperatingSystem.IsWindows() ? 1 : 2;
+    public static int DivInt { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 1 : 2; }
 
     /// <summary>DIV_STR</summary>
-    public static string DivStr => OperatingSystem.IsWindows() ? "\\" : "/";
+    public static string DivStr { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? "\\" : "/"; }
 
     /// <summary>DIV_ULL</summary>
-    public static ulong DivUll => OperatingSystem.IsWindows() ? 10UL : 20UL;
+    public static ulong DivUll { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 10UL : 20UL; }
 
     /// <summary>FLT_C</summary>
     public const float FltC = 1.5f;
