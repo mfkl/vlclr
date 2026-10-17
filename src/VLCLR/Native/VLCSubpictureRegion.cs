@@ -13,96 +13,85 @@ namespace VLCLR.Native;
 /// Subtitles contain a list of regions.
 /// </summary>
 /// <remarks>
-/// Layout on 64-bit, Windows offsets (8 less on Linux and macOS for every
-/// member after fmt, which are ref properties placed for the running ABI):
-/// - fmt (video_format_t): 152 bytes at offset 0 (144 on Linux and macOS)
-/// - p_picture: 8 bytes at offset 152
-/// - b_absolute + b_in_window: 2 bytes at offset 160, then 2 bytes padding
-/// - i_x, i_y, i_align, i_alpha: 4 ints = 16 bytes at offset 164
-/// - p_text: 8 bytes at offset 180 (needs padding to 8-byte alignment, so offset 184)
-/// - text_flags, i_max_width, i_max_height: 3 ints = 12 bytes
-/// - node (vlc_list): 16 bytes (two pointers)
-/// Total: 224 bytes (216 on Linux and macOS); the managed struct uses 224.
+/// Layout and size come from <see cref="Interop.SubpictureRegion"/>. Members after fmt sit at
+/// ABI-dependent offsets (they differ between Windows and Linux/macOS), so they are ref properties.
 /// </remarks>
-[StructLayout(LayoutKind.Explicit, Size = 224)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.SubpictureRegion.MaxSizeOf)]
 public struct VLCSubpictureRegion
 {
     /// <summary>Format of the picture (fmt)</summary>
-    [FieldOffset(0)]
+    [FieldOffset(Interop.SubpictureRegion.Offsets.Fmt)]
     public VLCVideoFormat Format;
-
-    private static int FormatEnd => VLCAbi.VideoFormatSize;
 
     /// <summary>Picture comprising this region (p_picture)</summary>
     [UnscopedRef]
-    public ref nint Picture => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd);
+    public ref nint Picture => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, nint>(ref this, Interop.SubpictureRegion.Offsets.Picture);
 
     /// <summary>Position is absolute in the movie (b_absolute)</summary>
     [UnscopedRef]
-    public ref byte IsAbsolute => ref VLCAbi.Field<VLCSubpictureRegion, byte>(ref this, FormatEnd + 8);
+    public ref byte IsAbsolute => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, byte>(ref this, Interop.SubpictureRegion.Offsets.Absolute);
 
     /// <summary>Position the region in window (b_in_window)</summary>
     [UnscopedRef]
-    public ref byte IsInWindow => ref VLCAbi.Field<VLCSubpictureRegion, byte>(ref this, FormatEnd + 9);
+    public ref byte IsInWindow => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, byte>(ref this, Interop.SubpictureRegion.Offsets.InWindow);
 
-    // 2 bytes padding at FormatEnd + 10
 
     /// <summary>X position relative to alignment (i_x)</summary>
     [UnscopedRef]
-    public ref int X => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 12);
+    public ref int X => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.X);
 
     /// <summary>Y position relative to alignment (i_y)</summary>
     [UnscopedRef]
-    public ref int Y => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 16);
+    public ref int Y => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.Y);
 
     /// <summary>Alignment flags SUBPICTURE_ALIGN_xxx (i_align)</summary>
     [UnscopedRef]
-    public ref int Align => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 20);
+    public ref int Align => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.Align);
 
     /// <summary>Transparency/alpha value (i_alpha)</summary>
     [UnscopedRef]
-    public ref int Alpha => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 24);
+    public ref int Alpha => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.Alpha);
 
-    // 4 bytes padding at FormatEnd + 28 for 8-byte alignment of p_text
 
     /// <summary>Subtitle text segments (p_text)</summary>
     [UnscopedRef]
-    public ref nint Text => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd + 32);
+    public ref nint Text => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, nint>(ref this, Interop.SubpictureRegion.Offsets.Text);
 
     /// <summary>Text flags VLC_SUBPIC_TEXT_FLAG_xxx (text_flags)</summary>
     [UnscopedRef]
-    public ref int TextFlags => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 40);
+    public ref int TextFlags => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.TextFlags);
 
     /// <summary>Horizontal rendering/cropping target (i_max_width)</summary>
     [UnscopedRef]
-    public ref int MaxWidth => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 44);
+    public ref int MaxWidth => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.MaxWidth);
 
     /// <summary>Vertical rendering/cropping target (i_max_height)</summary>
     [UnscopedRef]
-    public ref int MaxHeight => ref VLCAbi.Field<VLCSubpictureRegion, int>(ref this, FormatEnd + 48);
+    public ref int MaxHeight => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, int>(ref this, Interop.SubpictureRegion.Offsets.MaxHeight);
 
-    // 4 bytes padding at FormatEnd + 52 for 8-byte alignment of node
 
     /// <summary>List node prev pointer (node.prev)</summary>
     [UnscopedRef]
-    public ref nint NodePrev => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd + 56);
+    public ref nint NodePrev => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, nint>(ref this, Interop.SubpictureRegion.Offsets.Node + Interop.List.Offsets.Prev);
 
     /// <summary>List node next pointer (node.next)</summary>
     [UnscopedRef]
-    public ref nint NodeNext => ref VLCAbi.Field<VLCSubpictureRegion, nint>(ref this, FormatEnd + 64);
+    public ref nint NodeNext => ref Interop.CImportHelpers.FieldAt<VLCSubpictureRegion, nint>(ref this, Interop.SubpictureRegion.Offsets.Node + Interop.List.Offsets.Next);
 }
 
 /// <summary>
 /// VLC list node structure (vlc_list from vlc_list.h).
 /// A doubly linked list node with prev/next pointers.
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.List.MaxSizeOf)]
 public struct VLCListNode
 {
     /// <summary>Previous node pointer</summary>
+    [FieldOffset(Interop.List.Offsets.Prev)]
     public nint Prev;
 
     /// <summary>Next node pointer</summary>
+    [FieldOffset(Interop.List.Offsets.Next)]
     public nint Next;
 }
 
@@ -112,19 +101,19 @@ public struct VLCListNode
 public static class VLCSubpictureAlign
 {
     /// <summary>Align to left edge</summary>
-    public const int Left = 0x1;
+    public const int Left = Interop.VlcSubpicture.SubpictureAlignLeft;
 
     /// <summary>Align to right edge</summary>
-    public const int Right = 0x2;
+    public const int Right = Interop.VlcSubpicture.SubpictureAlignRight;
 
     /// <summary>Align to top edge</summary>
-    public const int Top = 0x4;
+    public const int Top = Interop.VlcSubpicture.SubpictureAlignTop;
 
     /// <summary>Align to bottom edge</summary>
-    public const int Bottom = 0x8;
+    public const int Bottom = Interop.VlcSubpicture.SubpictureAlignBottom;
 
     /// <summary>Mask for all alignment flags</summary>
-    public const int Mask = Left | Right | Top | Bottom;
+    public const int Mask = Interop.VlcSubpicture.SubpictureAlignMask;
 
     /// <summary>
     /// Converts VLC alignment flags to horizontal TextAlignment enum.
@@ -161,14 +150,14 @@ public static class VLCSubpictureAlign
 public static class VLCSubpictureTextFlags
 {
     /// <summary>Render background under text only, not whole region</summary>
-    public const int NoRegionBackground = 1 << 4;
+    public const int NoRegionBackground = Interop.VlcSubpicture.SubpicTextFlagNoRegionBg;
 
     /// <summary>Decoder sends row/column based output</summary>
-    public const int GridMode = 1 << 5;
+    public const int GridMode = Interop.VlcSubpicture.SubpicTextFlagGridMode;
 
     /// <summary>Don't try to balance wrapped text lines</summary>
-    public const int TextNotBalanced = 1 << 6;
+    public const int TextNotBalanced = Interop.VlcSubpicture.SubpicTextFlagTextNotBalanced;
 
     /// <summary>Mark the region as containing text</summary>
-    public const int IsText = 1 << 7;
+    public const int IsText = Interop.VlcSubpicture.SubpicTextFlagIsText;
 }
