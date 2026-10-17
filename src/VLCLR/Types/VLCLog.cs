@@ -2,6 +2,8 @@
 // Source: vlc/include/vlc_messages.h
 // VLC Version: 4.0.6
 
+using System.Runtime.InteropServices;
+
 namespace VLCLR.Types;
 
 /// <summary>
@@ -31,6 +33,13 @@ public struct VLCLog
     /// <summary>Source code calling function name or NULL</summary>
     public nint FuncPtr;
 
+    // C "unsigned long tid": 4 bytes on Windows, 8 on Linux/macOS.
+    private CULong _threadId;
+
     /// <summary>Emitter thread ID</summary>
-    public nuint ThreadId;
+    public nuint ThreadId
+    {
+        readonly get => _threadId.Value;
+        set => _threadId = new CULong(value);
+    }
 }
