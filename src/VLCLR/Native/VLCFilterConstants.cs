@@ -9,5 +9,5 @@ namespace VLCLR.Native;
 /// </summary>
 public static class VLCFilterConstants
 {
-    public const int PICTURE_PLANE_MAX = 5;
+    public const int PICTURE_PLANE_MAX = Interop.VlcPicture.PicturePlaneMax;
 }
