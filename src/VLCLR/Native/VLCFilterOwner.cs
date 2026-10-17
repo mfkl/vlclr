@@ -10,23 +10,23 @@ namespace VLCLR.Native;
 /// Filter owner structure (filter_owner_t from vlc_filter.h)
 /// Contains callbacks union and attachments function
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.FilterOwner.MaxSizeOf)]
 public struct VLCFilterOwner
 {
     /// <summary>
     /// Callbacks union - pointer to video/audio/sub callbacks
     /// For video filters, this points to filter_video_callbacks
     /// </summary>
-    public nint Callbacks;
+    [FieldOffset(Interop.FilterOwner.Offsets.Video)] public nint Callbacks;
 
     /// <summary>
     /// Get attachments function pointer
     /// Signature: int (*pf_get_attachments)(filter_t*, input_attachment_t***, int*)
     /// </summary>
-    public nint GetAttachments;
+    [FieldOffset(Interop.FilterOwner.Offsets.GetAttachments)] public nint GetAttachments;
 
     /// <summary>
     /// Owner system data (sys)
     /// </summary>
-    public nint Sys;
+    [FieldOffset(Interop.FilterOwner.Offsets.Sys)] public nint Sys;
 }

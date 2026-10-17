@@ -28,7 +28,7 @@ namespace VLCLR.Native;
 /// Returns:
 /// - A new subpicture_region_t with rendered picture, or NULL on failure
 /// </remarks>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.FilterOperations.MaxSizeOf)]
 public struct VLCTextRendererOperations
 {
     /// <summary>
@@ -48,31 +48,31 @@ public struct VLCTextRendererOperations
     /// 3. Render styled text to a picture_t (typically RGBA)
     /// 4. Create and return a new subpicture_region_t containing the rendered picture
     /// </remarks>
-    public nint Render;
+    [FieldOffset(Interop.FilterOperations.Offsets.Render)] public nint Render;
 
     /// <summary>
     /// Drain callback (unused for text renderers).
     /// </summary>
-    public nint Drain;
+    [FieldOffset(Interop.FilterOperations.Offsets.DrainAudio)] public nint Drain;
 
     /// <summary>
     /// Flush callback (optional, unused for text renderers).
     /// </summary>
-    public nint Flush;
+    [FieldOffset(Interop.FilterOperations.Offsets.Flush)] public nint Flush;
 
     /// <summary>
     /// Change viewpoint callback (unused for text renderers).
     /// </summary>
-    public nint ChangeViewpoint;
+    [FieldOffset(Interop.FilterOperations.Offsets.ChangeViewpoint)] public nint ChangeViewpoint;
 
     /// <summary>
     /// Video mouse callback (unused for text renderers).
     /// </summary>
-    public nint VideoMouse;
+    [FieldOffset(Interop.FilterOperations.Offsets.VideoMouse)] public nint VideoMouse;
 
     /// <summary>
     /// Close callback - release filter resources.
     /// Signature: void (*close)(filter_t*)
     /// </summary>
-    public nint Close;
+    [FieldOffset(Interop.FilterOperations.Offsets.Close)] public nint Close;
 }
