@@ -9,65 +9,58 @@ namespace VLCLR.Native;
 
 /// <summary>
 /// ES format definition (es_format_t from vlc_es.h)
-/// Contains video_format_t in a union - we access .video directly
-///
-/// On 64-bit:
-/// - Fields before union: 56 bytes (including padding for pointer alignment)
-/// - Union (video_format_t): 152 bytes on Windows, 144 on Linux and macOS
-/// - Fields after union: 32 bytes, reached through ref properties placed for
-///   the ABI the plugin runs on (see <see cref="VLCAbi"/>)
-/// Total: 240 bytes on Windows, 232 on Linux and macOS. The managed struct
-/// is sized for the larger layout, so a copy always holds every field.
+/// Contains video_format_t in a union - we access .video directly.
+/// Offsets come from <see cref="Interop.EsFormat.Offsets"/>. The union is
+/// <see cref="Interop.VideoFormat.SizeOf"/> bytes (152 on Windows, 144 on Linux
+/// and macOS), so the members after it are ref properties placed for the ABI
+/// the plugin runs on. The managed struct is sized for the larger layout
+/// (<see cref="Interop.EsFormat.MaxSizeOf"/>), so a copy always holds every field.
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 240)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.EsFormat.MaxSizeOf)]
 public unsafe struct VLCEsFormat
 {
     /// <summary>ES category (i_cat): 0=UNKNOWN, 1=VIDEO, 2=AUDIO, 3=SPU, 4=DATA</summary>
-    [FieldOffset(0)]
-    public int Category;          // offset 0, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.Cat)]
+    public int Category;
 
     /// <summary>FOURCC value (i_codec)</summary>
-    [FieldOffset(4)]
-    public uint Codec;            // offset 4, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.Codec)]
+    public uint Codec;
 
     /// <summary>Original FOURCC from container (i_original_fourcc)</summary>
-    [FieldOffset(8)]
-    public uint OriginalFourcc;   // offset 8, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.OriginalFourcc)]
+    public uint OriginalFourcc;
 
     /// <summary>ES identifier (i_id)</summary>
-    [FieldOffset(12)]
-    public int Id;                // offset 12, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.Id)]
+    public int Id;
 
     /// <summary>Group identifier (i_group)</summary>
-    [FieldOffset(16)]
-    public int Group;             // offset 16, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.Group)]
+    public int Group;
 
     /// <summary>Priority (i_priority)</summary>
-    [FieldOffset(20)]
-    public int Priority;          // offset 20, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.Priority)]
+    public int Priority;
 
     /// <summary>Language string pointer (psz_language)</summary>
-    [FieldOffset(24)]
-    public nint Language;         // offset 24, size 8
+    [FieldOffset(Interop.EsFormat.Offsets.Language)]
+    public nint Language;
 
     /// <summary>Description string pointer (psz_description)</summary>
-    [FieldOffset(32)]
-    public nint Description;      // offset 32, size 8
+    [FieldOffset(Interop.EsFormat.Offsets.Description)]
+    public nint Description;
 
     /// <summary>Number of extra languages (i_extra_languages)</summary>
-    [FieldOffset(40)]
-    public uint ExtraLanguagesCount;  // offset 40, size 4
-
-    // Padding for 8-byte pointer alignment
-    [FieldOffset(44)]
-    private uint _padBeforeExtraLanguages;  // offset 44, size 4
+    [FieldOffset(Interop.EsFormat.Offsets.ExtraLanguagesCount)]
+    public uint ExtraLanguagesCount;
 
     /// <summary>Extra languages pointer (p_extra_languages)</summary>
-    [FieldOffset(48)]
-    public nint ExtraLanguages;   // offset 48, size 8
+    [FieldOffset(Interop.EsFormat.Offsets.ExtraLanguages)]
+    public nint ExtraLanguages;
 
-    /// <summary>Video format (in union with audio and subs) - starts at offset 56</summary>
-    [FieldOffset(56)]
+    /// <summary>Video format (in union with audio and subs)</summary>
+    [FieldOffset(Interop.EsFormat.Offsets.Video)]
     public VLCVideoFormat Video;
 
     /// <summary>
@@ -89,29 +82,27 @@ public unsafe struct VLCEsFormat
         }
     }
 
-    private static int TailOffset => 56 + VLCAbi.VideoFormatSize;
-
     /// <summary>Bitrate (i_bitrate)</summary>
     [UnscopedRef]
-    public ref uint Bitrate => ref VLCAbi.Field<VLCEsFormat, uint>(ref this, TailOffset);
+    public ref uint Bitrate => ref Interop.CImportHelpers.FieldAt<VLCEsFormat, uint>(ref this, Interop.EsFormat.Offsets.Bitrate);
 
     /// <summary>Codec profile (i_profile)</summary>
     [UnscopedRef]
-    public ref int Profile => ref VLCAbi.Field<VLCEsFormat, int>(ref this, TailOffset + 4);
+    public ref int Profile => ref Interop.CImportHelpers.FieldAt<VLCEsFormat, int>(ref this, Interop.EsFormat.Offsets.Profile);
 
     /// <summary>Codec level (i_level)</summary>
     [UnscopedRef]
-    public ref int Level => ref VLCAbi.Field<VLCEsFormat, int>(ref this, TailOffset + 8);
+    public ref int Level => ref Interop.CImportHelpers.FieldAt<VLCEsFormat, int>(ref this, Interop.EsFormat.Offsets.Level);
 
     /// <summary>Whether data is packetized (b_packetized)</summary>
     [UnscopedRef]
-    public ref byte Packetized => ref VLCAbi.Field<VLCEsFormat, byte>(ref this, TailOffset + 12);
+    public ref byte Packetized => ref Interop.CImportHelpers.FieldAt<VLCEsFormat, byte>(ref this, Interop.EsFormat.Offsets.Packetized);
 
     /// <summary>Extra data length (i_extra)</summary>
     [UnscopedRef]
-    public ref nuint ExtraSize => ref VLCAbi.Field<VLCEsFormat, nuint>(ref this, TailOffset + 16);
+    public ref nuint ExtraSize => ref Interop.CImportHelpers.FieldAt<VLCEsFormat, nuint>(ref this, Interop.EsFormat.Offsets.ExtraSize);
 
     /// <summary>Extra data pointer (p_extra)</summary>
     [UnscopedRef]
-    public ref nint Extra => ref VLCAbi.Field<VLCEsFormat, nint>(ref this, TailOffset + 24);
+    public ref nint Extra => ref Interop.CImportHelpers.FieldAt<VLCEsFormat, nint>(ref this, Interop.EsFormat.Offsets.Extra);
 }
