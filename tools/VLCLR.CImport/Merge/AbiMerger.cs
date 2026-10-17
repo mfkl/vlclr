@@ -51,6 +51,14 @@ public static class AbiMerger
             .OfType<MergedConstant>()
             .ToList();
 
+        var skipped = snapshots
+            .SelectMany(s => s.Skipped.Select(d => (d, s.Abi)))
+            .GroupBy(x => x.d)
+            .Select(g => new MergedSkipped(g.Key, [.. g.Select(x => x.Abi)]))
+            .OrderBy(x => x.Declaration.Name, StringComparer.Ordinal)
+            .ThenBy(x => x.Declaration.Kind, StringComparer.Ordinal)
+            .ToList();
+
         return new MergedSnapshot
         {
             Abis = [.. snapshots.Select(s => s.Abi)],
@@ -60,6 +68,7 @@ public static class AbiMerger
             Typedefs = typedefs,
             Functions = functions,
             Constants = constants,
+            Skipped = skipped,
             Diagnostics = [.. diagnostics.OrderBy(d => d.Symbol, StringComparer.Ordinal).ThenBy(d => d.Message, StringComparer.Ordinal)],
         };
     }

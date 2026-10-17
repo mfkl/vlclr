@@ -25,7 +25,11 @@ public sealed record TypeDecl
     /// <summary>Synthesised-name parent (the enclosing record's <see cref="Name"/>), anonymous records only.</summary>
     public string? Parent { get; init; }
 
-    /// <summary>Declared but never defined in the parsed headers. Size, alignment and fields are absent.</summary>
+    /// <summary>
+    /// Size, alignment and fields are absent: the record is never defined in
+    /// the parsed headers, or it is reached only through pointers (it is not a
+    /// root and no kept record embeds it by value).
+    /// </summary>
     public bool IsOpaque { get; init; }
 
     /// <summary>sizeof, in bytes. Null when opaque.</summary>
@@ -172,4 +176,17 @@ public enum ConstantKind
     Integer,
     Float,
     String,
+}
+
+/// <summary>A declaration extract saw and could not represent (for cimport-report.md).</summary>
+public sealed record SkippedDecl
+{
+    public required string Name { get; init; }
+
+    public required string Header { get; init; }
+
+    /// <summary>What it is: <c>constant</c>, <c>function</c>, <c>record</c>, <c>enum</c>, <c>typedef</c>.</summary>
+    public required string Kind { get; init; }
+
+    public required string Reason { get; init; }
 }

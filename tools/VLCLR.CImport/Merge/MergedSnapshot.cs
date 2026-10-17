@@ -49,6 +49,9 @@ public sealed record MergedSnapshot
     public IReadOnlyList<MergedFunction> Functions { get; init; } = [];
     public IReadOnlyList<MergedConstant> Constants { get; init; } = [];
 
+    /// <summary>Union of every snapshot's <see cref="Snapshot.Skipped"/>, with the ABIs that skipped each.</summary>
+    public IReadOnlyList<MergedSkipped> Skipped { get; init; } = [];
+
     /// <summary>Symbols that could not be merged cleanly. Errors must stop emission; warnings go to the report.</summary>
     public IReadOnlyList<MergeDiagnostic> Diagnostics { get; init; } = [];
 
@@ -147,6 +150,8 @@ public sealed record MergedConstant
     public PerAbi<string?>? String { get; init; }
     public required string Expression { get; init; }
 }
+
+public sealed record MergedSkipped(SkippedDecl Declaration, IReadOnlyList<string> Abis);
 
 public enum DiagnosticSeverity
 {

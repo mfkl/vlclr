@@ -181,6 +181,10 @@ internal static class SampleSnapshots
                     IsInline = true,
                 },
             ],
+            Skipped = windows
+                ? [new SkippedDecl { Name = "VLC_TICK_FROM_SEC", Header = "vlc_tick.h", Kind = "constant", Reason = "function-like macro" }]
+                : [new SkippedDecl { Name = "VLC_TICK_FROM_SEC", Header = "vlc_tick.h", Kind = "constant", Reason = "function-like macro" },
+                   new SkippedDecl { Name = "vlc_va_list_fn", Header = "vlc_common.h", Kind = "typedef", Reason = "va_list parameter" }],
             Constants =
             [
                 new ConstantDecl
