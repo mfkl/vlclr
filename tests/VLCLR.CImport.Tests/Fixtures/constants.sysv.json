@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [
+    {
+      "name": "K_ALIAS",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": 42,
+      "expression": "K_DECIMAL"
+    },
+    {
+      "name": "K_CODEC_I420",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 808596553,
+      "expression": "K_FOURCC ( \u0027I\u0027 , \u00274\u0027 , \u00272\u0027 , \u00270\u0027 )"
+    },
+    {
+      "name": "K_DECIMAL",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": 42,
+      "expression": "42"
+    },
+    {
+      "name": "K_FLOAT",
+      "header": "constants.h",
+      "kind": "float",
+      "type": {
+        "kind": "builtin",
+        "builtin": "double"
+      },
+      "float": 1.5,
+      "expression": "1.5"
+    },
+    {
+      "name": "K_FLOAT_SINGLE",
+      "header": "constants.h",
+      "kind": "float",
+      "type": {
+        "kind": "builtin",
+        "builtin": "float"
+      },
+      "float": 2.5,
+      "expression": "2.5f"
+    },
+    {
+      "name": "K_HEX",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": 255,
+      "expression": "0xFF"
+    },
+    {
+      "name": "K_INT64",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "longLong"
+      },
+      "integer": 9223372036854775807,
+      "expression": "0x7FFFFFFFFFFFFFFFLL"
+    },
+    {
+      "name": "K_NEGATIVE",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": -5,
+      "expression": "( - 5 )"
+    },
+    {
+      "name": "K_OR",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": 35,
+      "expression": "( K_SHIFT | 0x3 )"
+    },
+    {
+      "name": "K_SHIFT",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": 32,
+      "expression": "( 1 \u003C\u003C 5 )"
+    },
+    {
+      "name": "K_STRING",
+      "header": "constants.h",
+      "kind": "string",
+      "type": {
+        "kind": "pointer",
+        "element": {
+          "kind": "builtin",
+          "builtin": "char",
+          "isConst": true
+        }
+      },
+      "string": "hello",
+      "expression": "\u0022hello\u0022"
+    },
+    {
+      "name": "K_UINT64",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uLongLong"
+      },
+      "integer": -1,
+      "expression": "0xFFFFFFFFFFFFFFFFull"
+    },
+    {
+      "name": "K_UNSIGNED",
+      "header": "constants.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 4000000000,
+      "expression": "4000000000u"
+    }
+  ],
+  "skipped": [
+    {
+      "name": "K_FOURCC",
+      "header": "constants.h",
+      "kind": "constant",
+      "reason": "function-like macro"
+    },
+    {
+      "name": "K_NOT_A_VALUE",
+      "header": "constants.h",
+      "kind": "constant",
+      "reason": "does not evaluate to an integer, floating or string constant"
+    },
+    {
+      "name": "K_TICKS",
+      "header": "constants.h",
+      "kind": "constant",
+      "reason": "function-like macro"
+    }
+  ]
+}

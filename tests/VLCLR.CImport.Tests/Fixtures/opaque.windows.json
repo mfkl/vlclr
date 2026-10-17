@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "abi": "windows",
+  "target": "x86_64-pc-windows-msvc",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "hidden",
+      "kind": "struct",
+      "header": "opaque.h",
+      "isOpaque": true,
+      "fields": []
+    },
+    {
+      "name": "holder",
+      "kind": "struct",
+      "header": "opaque.h",
+      "size": 24,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "direct",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "record",
+              "name": "hidden"
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "through_typedef",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "typedef",
+              "name": "hidden_t",
+              "element": {
+                "kind": "record",
+                "name": "hidden"
+              }
+            }
+          },
+          "offset": 8
+        },
+        {
+          "name": "count",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 16
+        }
+      ]
+    },
+    {
+      "name": "holder_of_visible",
+      "kind": "struct",
+      "header": "opaque.h",
+      "size": 8,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "only_by_pointer",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "record",
+              "name": "visible"
+            }
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "visible",
+      "kind": "struct",
+      "header": "opaque.h",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "hidden_t",
+      "header": "opaque.h",
+      "target": {
+        "kind": "record",
+        "name": "hidden"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

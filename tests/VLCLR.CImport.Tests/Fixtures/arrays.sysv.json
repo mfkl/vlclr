@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "arrays",
+      "kind": "struct",
+      "header": "arrays.h",
+      "size": 136,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "builtin",
+              "builtin": "char"
+            },
+            "count": 16
+          },
+          "offset": 0
+        },
+        {
+          "name": "pairs",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "record",
+              "name": "pair"
+            },
+            "count": 3
+          },
+          "offset": 16
+        },
+        {
+          "name": "ptrs",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "pointer",
+              "element": {
+                "kind": "builtin",
+                "builtin": "void"
+              }
+            },
+            "count": 4
+          },
+          "offset": 40
+        },
+        {
+          "name": "grid",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "array",
+              "element": {
+                "kind": "builtin",
+                "builtin": "int"
+              },
+              "count": 3
+            },
+            "count": 2
+          },
+          "offset": 72
+        },
+        {
+          "name": "labels",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "pointer",
+              "element": {
+                "kind": "builtin",
+                "builtin": "char",
+                "isConst": true
+              },
+              "isConst": true
+            },
+            "count": 2
+          },
+          "offset": 96
+        },
+        {
+          "name": "bytes",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "typedef",
+              "name": "uint8_t",
+              "element": {
+                "kind": "builtin",
+                "builtin": "uChar"
+              }
+            },
+            "count": 5
+          },
+          "offset": 112
+        },
+        {
+          "name": "wide",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "typedef",
+              "name": "uint64_t",
+              "element": {
+                "kind": "builtin",
+                "builtin": "uLong"
+              }
+            },
+            "count": 2
+          },
+          "offset": 120
+        }
+      ]
+    },
+    {
+      "name": "pair",
+      "kind": "struct",
+      "header": "arrays.h",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 4
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "uint64_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLong"
+      }
+    },
+    {
+      "name": "uint8_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uChar"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

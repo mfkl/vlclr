@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "aligned_block",
+      "kind": "struct",
+      "header": "aligned.h",
+      "size": 32,
+      "alignment": 16,
+      "fields": [
+        {
+          "name": "tag",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "value",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 16
+        },
+        {
+          "name": "tail",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 20
+        }
+      ]
+    },
+    {
+      "name": "attr_aligned",
+      "kind": "struct",
+      "header": "aligned.h",
+      "size": 32,
+      "alignment": 16,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 16
+        }
+      ]
+    },
+    {
+      "name": "holds_aligned",
+      "kind": "struct",
+      "header": "aligned.h",
+      "size": 48,
+      "alignment": 16,
+      "fields": [
+        {
+          "name": "id",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "block",
+          "type": {
+            "kind": "record",
+            "name": "aligned_block"
+          },
+          "offset": 16
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "normal_after",
+      "kind": "struct",
+      "header": "packed.h",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 4
+        }
+      ]
+    },
+    {
+      "name": "packed_attr",
+      "kind": "struct",
+      "header": "packed.h",
+      "size": 7,
+      "alignment": 1,
+      "isPacked": true,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 1
+        },
+        {
+          "name": "c",
+          "type": {
+            "kind": "builtin",
+            "builtin": "short"
+          },
+          "offset": 5
+        }
+      ]
+    },
+    {
+      "name": "packed_pragma",
+      "kind": "struct",
+      "header": "packed.h",
+      "size": 5,
+      "alignment": 1,
+      "isPacked": true,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 1
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

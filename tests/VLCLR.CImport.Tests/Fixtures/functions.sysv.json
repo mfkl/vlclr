@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "point",
+      "kind": "struct",
+      "header": "functions.h",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "x",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "y",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 4
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "size_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLong"
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "add",
+      "header": "functions.h",
+      "returnType": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "parameters": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          }
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          }
+        }
+      ],
+      "isExported": true,
+      "callingConvention": "cdecl"
+    },
+    {
+      "name": "exported_nothing",
+      "header": "functions.h",
+      "returnType": {
+        "kind": "builtin",
+        "builtin": "void"
+      },
+      "parameters": [],
+      "isExported": true,
+      "callingConvention": "cdecl"
+    },
+    {
+      "name": "for_each",
+      "header": "functions.h",
+      "returnType": {
+        "kind": "builtin",
+        "builtin": "void"
+      },
+      "parameters": [
+        {
+          "name": "points",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "record",
+              "name": "point",
+              "isConst": true
+            }
+          }
+        },
+        {
+          "name": "count",
+          "type": {
+            "kind": "typedef",
+            "name": "size_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uLong"
+            }
+          }
+        },
+        {
+          "name": "callback",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "function",
+              "function": {
+                "returnType": {
+                  "kind": "builtin",
+                  "builtin": "void"
+                },
+                "parameters": [
+                  {
+                    "name": "",
+                    "type": {
+                      "kind": "pointer",
+                      "element": {
+                        "kind": "record",
+                        "name": "point"
+                      }
+                    }
+                  },
+                  {
+                    "name": "",
+                    "type": {
+                      "kind": "pointer",
+                      "element": {
+                        "kind": "builtin",
+                        "builtin": "void"
+                      }
+                    }
+                  }
+                ],
+                "callingConvention": "cdecl"
+              }
+            }
+          }
+        },
+        {
+          "name": "data",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "builtin",
+              "builtin": "void"
+            }
+          }
+        }
+      ],
+      "callingConvention": "cdecl"
+    },
+    {
+      "name": "log_message",
+      "header": "functions.h",
+      "returnType": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "parameters": [
+        {
+          "name": "object",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "builtin",
+              "builtin": "void"
+            }
+          }
+        },
+        {
+          "name": "format",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "builtin",
+              "builtin": "char",
+              "isConst": true
+            }
+          }
+        }
+      ],
+      "isVariadic": true,
+      "callingConvention": "cdecl"
+    },
+    {
+      "name": "point_new",
+      "header": "functions.h",
+      "returnType": {
+        "kind": "pointer",
+        "element": {
+          "kind": "record",
+          "name": "point"
+        }
+      },
+      "parameters": [
+        {
+          "name": "x",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          }
+        },
+        {
+          "name": "y",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          }
+        }
+      ],
+      "isExported": true,
+      "callingConvention": "cdecl"
+    },
+    {
+      "name": "square",
+      "header": "functions.h",
+      "returnType": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "parameters": [
+        {
+          "name": "value",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          }
+        }
+      ],
+      "isInline": true,
+      "callingConvention": "cdecl"
+    }
+  ],
+  "constants": [],
+  "skipped": []
+}

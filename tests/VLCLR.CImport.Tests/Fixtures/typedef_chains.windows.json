@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "abi": "windows",
+  "target": "x86_64-pc-windows-msvc",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "anon_t",
+      "kind": "struct",
+      "header": "typedef_chains.h",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "typedef",
+            "name": "uint8_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uChar"
+            }
+          },
+          "offset": 4
+        }
+      ]
+    },
+    {
+      "name": "base",
+      "kind": "struct",
+      "header": "typedef_chains.h",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "v",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "tagged",
+      "kind": "struct",
+      "header": "typedef_chains.h",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "v",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "uses_typedefs",
+      "kind": "struct",
+      "header": "typedef_chains.h",
+      "size": 48,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "when",
+          "type": {
+            "kind": "typedef",
+            "name": "tick_t",
+            "element": {
+              "kind": "typedef",
+              "name": "uint64_t",
+              "element": {
+                "kind": "builtin",
+                "builtin": "uLongLong"
+              }
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "span",
+          "type": {
+            "kind": "typedef",
+            "name": "duration_t",
+            "element": {
+              "kind": "typedef",
+              "name": "tick_t",
+              "element": {
+                "kind": "typedef",
+                "name": "uint64_t",
+                "element": {
+                  "kind": "builtin",
+                  "builtin": "uLongLong"
+                }
+              }
+            }
+          },
+          "offset": 8
+        },
+        {
+          "name": "base",
+          "type": {
+            "kind": "typedef",
+            "name": "base_alias_t",
+            "element": {
+              "kind": "typedef",
+              "name": "base_t",
+              "element": {
+                "kind": "record",
+                "name": "base"
+              }
+            }
+          },
+          "offset": 16
+        },
+        {
+          "name": "anon",
+          "type": {
+            "kind": "typedef",
+            "name": "anon_ptr_t",
+            "element": {
+              "kind": "pointer",
+              "element": {
+                "kind": "typedef",
+                "name": "anon_t",
+                "element": {
+                  "kind": "record",
+                  "name": "anon_t"
+                }
+              }
+            }
+          },
+          "offset": 24
+        },
+        {
+          "name": "const_base",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "typedef",
+              "name": "base_t",
+              "element": {
+                "kind": "record",
+                "name": "base"
+              },
+              "isConst": true
+            }
+          },
+          "offset": 32
+        },
+        {
+          "name": "self",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "typedef",
+              "name": "tagged",
+              "element": {
+                "kind": "record",
+                "name": "tagged"
+              }
+            }
+          },
+          "offset": 40
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "anon_ptr_t",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "pointer",
+        "element": {
+          "kind": "typedef",
+          "name": "anon_t",
+          "element": {
+            "kind": "record",
+            "name": "anon_t"
+          }
+        }
+      }
+    },
+    {
+      "name": "anon_t",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "record",
+        "name": "anon_t"
+      }
+    },
+    {
+      "name": "base_alias_t",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "typedef",
+        "name": "base_t",
+        "element": {
+          "kind": "record",
+          "name": "base"
+        }
+      }
+    },
+    {
+      "name": "base_t",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "record",
+        "name": "base"
+      }
+    },
+    {
+      "name": "duration_t",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "typedef",
+        "name": "tick_t",
+        "element": {
+          "kind": "typedef",
+          "name": "uint64_t",
+          "element": {
+            "kind": "builtin",
+            "builtin": "uLongLong"
+          }
+        }
+      }
+    },
+    {
+      "name": "tagged",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "record",
+        "name": "tagged"
+      }
+    },
+    {
+      "name": "tick_t",
+      "header": "typedef_chains.h",
+      "target": {
+        "kind": "typedef",
+        "name": "uint64_t",
+        "element": {
+          "kind": "builtin",
+          "builtin": "uLongLong"
+        }
+      }
+    },
+    {
+      "name": "uint64_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLongLong"
+      }
+    },
+    {
+      "name": "uint8_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uChar"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

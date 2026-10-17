@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "bool_mix",
+      "kind": "struct",
+      "header": "bool.h",
+      "size": 32,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "typedef",
+            "name": "bool",
+            "element": {
+              "kind": "builtin",
+              "builtin": "bool"
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 4
+        },
+        {
+          "name": "c",
+          "type": {
+            "kind": "typedef",
+            "name": "bool",
+            "element": {
+              "kind": "builtin",
+              "builtin": "bool"
+            }
+          },
+          "offset": 8
+        },
+        {
+          "name": "d",
+          "type": {
+            "kind": "typedef",
+            "name": "bool",
+            "element": {
+              "kind": "builtin",
+              "builtin": "bool"
+            }
+          },
+          "offset": 9
+        },
+        {
+          "name": "e",
+          "type": {
+            "kind": "builtin",
+            "builtin": "double"
+          },
+          "offset": 16
+        },
+        {
+          "name": "f",
+          "type": {
+            "kind": "builtin",
+            "builtin": "bool"
+          },
+          "offset": 24
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "bool",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "bool"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}
