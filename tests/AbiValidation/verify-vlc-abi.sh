@@ -16,5 +16,5 @@ fi
 object="$(mktemp "${TMPDIR:-/tmp}/vlclr_abi_probe.XXXXXX")"
 trap 'rm -f "$object"' EXIT
 
-"${CXX:-c++}" -std=c++17 -w -c -I"$include_dir" "$script_dir/vlclr_abi.cpp" -o "$object"
+"${CXX:-c++}" -std=c++17 -w -c -I"$include_dir" "$script_dir/vlclr_abi.g.cpp" -o "$object"
 echo "VLC ABI layout matches VLCLR ($("${CXX:-c++}" --version | head -n 1))."
