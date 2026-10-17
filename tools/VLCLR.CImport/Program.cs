@@ -5,9 +5,11 @@ namespace VLCLR.CImport;
 
 internal static class Program
 {
-    private const string Usage = """
-        vlclr-cimport extract --abi <windows|sysv> [--manifest <vlc.cimport.json>] [--include <dir>] --out <snapshot.json>
+    private static readonly string Usage = $"""
+        vlclr-cimport {ExtractCommand.Usage.TrimEnd()}
         vlclr-cimport emit [--manifest <vlc.cimport.json>]
+          Reads abi/windows.json and abi/sysv.json from output.directory and writes the
+          generated C#, cimport-report.md, the C++ probe and the C# layout tests.
         """;
 
     public static int Main(string[] args)
