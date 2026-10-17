@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Native;
 
@@ -30,6 +32,8 @@ public static partial class VLCCore
     /// <param name="line">Source line number (can be 0)</param>
     /// <param name="func">Function name (can be empty)</param>
     /// <param name="format">The message, with '%' escaped as "%%"</param>
+    // Hand-written: vlc_object_Log is variadic, so the generator skipped it
+    // (see Native/Interop/cimport-report.md).
     [LibraryImport(LibraryName, EntryPoint = "vlc_object_Log", StringMarshalling = StringMarshalling.Utf8)]
     public static partial void Log(
         nint obj,
@@ -51,16 +55,34 @@ public static partial class VLCCore
     /// <param name="name">Variable name</param>
     /// <param name="type">Variable type (VLC_VAR_*)</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "var_Create", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int VarCreate(nint obj, string name, int type);
+    public static unsafe int VarCreate(nint obj, string name, int type)
+    {
+        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
+        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        try
+        {
+            utf8.FromManaged(name, buffer);
+            return Gen.Var.Create((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type);
+        }
+        finally { utf8.Free(); }
+    }
 
     /// <summary>
     /// Destroy a VLC variable.
     /// </summary>
     /// <param name="obj">Pointer to vlc_object_t</param>
     /// <param name="name">Variable name</param>
-    [LibraryImport(LibraryName, EntryPoint = "var_Destroy", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial void VarDestroy(nint obj, string name);
+    public static unsafe void VarDestroy(nint obj, string name)
+    {
+        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
+        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        try
+        {
+            utf8.FromManaged(name, buffer);
+            Gen.Var.Destroy((Gen.ObjectHeader*)obj, utf8.ToUnmanaged());
+        }
+        finally { utf8.Free(); }
+    }
 
     /// <summary>
     /// Set a variable value with type checking.
@@ -70,8 +92,18 @@ public static partial class VLCCore
     /// <param name="type">Variable type (VLC_VAR_*)</param>
     /// <param name="value">Value to set (passed as vlc_value_t)</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "var_SetChecked", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int VarSetChecked(nint obj, string name, int type, VLCValueNative value);
+    public static unsafe int VarSetChecked(nint obj, string name, int type, VLCValueNative value)
+    {
+        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
+        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        try
+        {
+            utf8.FromManaged(name, buffer);
+            return Gen.Var.SetChecked((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type,
+                Unsafe.As<VLCValueNative, Gen.Value>(ref value));
+        }
+        finally { utf8.Free(); }
+    }
 
     /// <summary>
     /// Get a variable value with type checking.
@@ -81,8 +113,20 @@ public static partial class VLCCore
     /// <param name="type">Variable type (VLC_VAR_*)</param>
     /// <param name="value">Pointer to receive value</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "var_GetChecked", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int VarGetChecked(nint obj, string name, int type, out VLCValueNative value);
+    public static unsafe int VarGetChecked(nint obj, string name, int type, out VLCValueNative value)
+    {
+        Gen.Value native = default;
+        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
+        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        try
+        {
+            utf8.FromManaged(name, buffer);
+            int result = Gen.Var.GetChecked((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type, &native);
+            value = Unsafe.As<Gen.Value, VLCValueNative>(ref native);
+            return result;
+        }
+        finally { utf8.Free(); }
+    }
 
     /// <summary>
     /// Resolves a variable from the object, its parents, or the module configuration.
@@ -92,8 +136,20 @@ public static partial class VLCCore
     /// <param name="type">Expected VLC_VAR_* type.</param>
     /// <param name="value">Receives the inherited value.</param>
     /// <returns>0 on success, a VLC error code otherwise.</returns>
-    [LibraryImport(LibraryName, EntryPoint = "var_Inherit", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int VarInherit(nint obj, string name, int type, out VLCValueNative value);
+    public static unsafe int VarInherit(nint obj, string name, int type, out VLCValueNative value)
+    {
+        Gen.Value native = default;
+        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
+        var utf8 = new Utf8StringMarshaller.ManagedToUnmanagedIn();
+        try
+        {
+            utf8.FromManaged(name, buffer);
+            int result = Gen.Var.Inherit((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type, &native);
+            value = Unsafe.As<Gen.Value, VLCValueNative>(ref native);
+            return result;
+        }
+        finally { utf8.Free(); }
+    }
 
     #endregion
 
@@ -428,16 +484,16 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="obj">Pointer to vlc_object_t</param>
     /// <returns>Pointer to parent vlc_object_t, or IntPtr.Zero if none</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_object_parent")]
-    public static partial nint ObjectParent(nint obj);
+    public static unsafe nint ObjectParent(nint obj)
+        => (nint)Gen.VlcObjects.VlcObjectParent((Gen.ObjectHeader*)obj);
 
     /// <summary>
     /// Get the type name of a VLC object.
     /// </summary>
     /// <param name="obj">Pointer to vlc_object_t</param>
     /// <returns>Pointer to type name string (VLC-owned, do not free), or IntPtr.Zero on error</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_object_typename")]
-    public static partial nint ObjectTypename(nint obj);
+    public static unsafe nint ObjectTypename(nint obj)
+        => (nint)Gen.VlcObjects.VlcObjectTypename((Gen.ObjectHeader*)obj);
 
     #endregion
 
@@ -679,7 +735,8 @@ public static partial class VLCCore
 
 /// <summary>
 /// VLC value union for P/Invoke. Matches vlc_value_t in C.
-/// Uses explicit field layout to match C union behavior.
+/// Uses explicit field layout to match C union behavior: 8 bytes, the same
+/// size and offsets as the generated <c>Interop.Value</c>.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 16)]
 public struct VLCValueNative
