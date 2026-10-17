@@ -2,6 +2,8 @@
 // Source: vlc/include/vlc_player.h
 // VLC Version: 4.0.6
 
+using Interop = VLCLR.Native.Interop;
+
 namespace VLCLR.Types;
 
 /// <summary>
@@ -11,17 +13,17 @@ namespace VLCLR.Types;
 public enum VLCPlayerState
 {
     /// <summary>Player is stopped</summary>
-    Stopped = 0,
+    Stopped = (int)Interop.PlayerState.Stopped,
 
     /// <summary>Player is starting (loading media)</summary>
-    Started = 1,
+    Started = (int)Interop.PlayerState.Started,
 
     /// <summary>Player is actively playing</summary>
-    Playing = 2,
+    Playing = (int)Interop.PlayerState.Playing,
 
     /// <summary>Player is paused</summary>
-    Paused = 3,
+    Paused = (int)Interop.PlayerState.Paused,
 
     /// <summary>Player is stopping</summary>
-    Stopping = 4
+    Stopping = (int)Interop.PlayerState.Stopping
 }

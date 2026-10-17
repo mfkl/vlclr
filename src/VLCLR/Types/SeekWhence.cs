@@ -2,6 +2,8 @@
 // Source: vlc/include/vlc_player.h
 // VLC Version: 4.0.6
 
+using Interop = VLCLR.Native.Interop;
+
 namespace VLCLR.Types;
 
 /// <summary>
@@ -10,8 +12,8 @@ namespace VLCLR.Types;
 public enum SeekWhence
 {
     /// <summary>Seek from beginning of media</summary>
-    Absolute = 0,
+    Absolute = (int)Interop.PlayerWhence.Absolute,
 
     /// <summary>Seek relative to current position</summary>
-    Relative = 1,
+    Relative = (int)Interop.PlayerWhence.Relative,
 }

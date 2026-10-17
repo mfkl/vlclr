@@ -2,6 +2,8 @@
 // Source: vlc/include/vlc_variables.h
 // VLC Version: 4.0.6
 
+using Interop = VLCLR.Native.Interop;
+
 namespace VLCLR.Types;
 
 /// <summary>
@@ -11,14 +13,14 @@ namespace VLCLR.Types;
 public enum VLCVarAtomicOp
 {
     /// <summary>Invert a boolean value (param ignored)</summary>
-    BoolToggle = 0,
+    BoolToggle = (int)Interop.VarAtomicOp.BoolToggle,
 
     /// <summary>Add parameter to an integer value</summary>
-    IntegerAdd = 1,
+    IntegerAdd = (int)Interop.VarAtomicOp.IntegerAdd,
 
     /// <summary>Binary OR over an integer bits field</summary>
-    IntegerOr = 2,
+    IntegerOr = (int)Interop.VarAtomicOp.IntegerOr,
 
     /// <summary>Binary NAND over an integer bits field</summary>
-    IntegerNand = 3
+    IntegerNand = (int)Interop.VarAtomicOp.IntegerNand
 }
