@@ -33,7 +33,15 @@
   "defines": [],
   "abiDefines": {},
   "prelude": {
-    "windows": [ "typedef long long ssize_t;" ]
+    // The MSVC CRT has no ssize_t, and its sys/types.h hides off_t under
+    // clang's __STDC__ (vlc_picture.h uses it). 64-bit like mingw with
+    // _FILE_OFFSET_BITS=64; the guard stops sys/types.h redefining it.
+    "windows": [
+      "typedef long long ssize_t;",
+      "#define _OFF_T_DEFINED",
+      "typedef long long _off_t;",
+      "typedef long long off_t;"
+    ]
   },
   "roots": [
     // Records and typedefs mirrored by src/VLCLR/Native. Records embedded by
@@ -189,7 +197,13 @@
     // vlc_object_t would become "Object", which reads as System.Object. The
     // hand-written equivalent is VLCObjectHeader.
     "types": { "vlc_object_t": "ObjectHeader" },
-    "fields": {},
+    "fields": {
+      // i_count / p_items pairs strip to the same name.
+      "es_format_t.i_extra_languages": "ExtraLanguagesCount",
+      "es_format_t.i_extra": "ExtraSize",
+      "vlc_frame_t.i_buffer": "BufferSize",
+      "subs_format_t::spu.b_palette": "HasPalette"
+    },
     "enumMembers": {},
     "functions": {},
     "constants": {},
