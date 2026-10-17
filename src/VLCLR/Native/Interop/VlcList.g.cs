@@ -13,9 +13,24 @@ public unsafe partial struct List
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>prev</summary>
     [FieldOffset(0)] public List* Prev;
 
     /// <summary>next</summary>
     [FieldOffset(8)] public List* Next;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_list, prev)</summary>
+        public const int Prev = 0;
+        /// <summary>offsetof(vlc_list, next)</summary>
+        public const int Next = 8;
+    }
 }

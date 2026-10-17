@@ -13,6 +13,12 @@ public unsafe partial struct Bits
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>i_head</summary>
     [FieldOffset(0)] public uint IHead;
 
@@ -74,6 +80,15 @@ public unsafe partial struct Bits
 
     /// <summary>i_tail</summary>
     [FieldOffset(12)] public int ITail;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(bits_t, i_head)</summary>
+        public const int IHead = 0;
+        /// <summary>offsetof(bits_t, i_tail)</summary>
+        public const int ITail = 12;
+    }
 }
 
 /// <summary>mode_e</summary>

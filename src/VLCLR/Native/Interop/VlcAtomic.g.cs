@@ -13,6 +13,19 @@ public unsafe partial struct AtomicRc
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>refs</summary>
     [FieldOffset(0)] public nuint Refs;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_atomic_rc_t, refs)</summary>
+        public const int Refs = 0;
+    }
 }

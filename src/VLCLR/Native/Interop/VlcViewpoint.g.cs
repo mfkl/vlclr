@@ -13,6 +13,12 @@ public unsafe partial struct Viewpoint
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>yaw</summary>
     [FieldOffset(0)] public float Yaw;
 
@@ -24,4 +30,17 @@ public unsafe partial struct Viewpoint
 
     /// <summary>fov</summary>
     [FieldOffset(12)] public float Fov;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_viewpoint_t, yaw)</summary>
+        public const int Yaw = 0;
+        /// <summary>offsetof(vlc_viewpoint_t, pitch)</summary>
+        public const int Pitch = 4;
+        /// <summary>offsetof(vlc_viewpoint_t, roll)</summary>
+        public const int Roll = 8;
+        /// <summary>offsetof(vlc_viewpoint_t, fov)</summary>
+        public const int Fov = 12;
+    }
 }

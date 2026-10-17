@@ -13,6 +13,12 @@ public unsafe partial struct Log
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 64;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 64;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 64;
+
     /// <summary>i_object_id</summary>
     [FieldOffset(0)] public nuint ObjectId;
 
@@ -36,6 +42,27 @@ public unsafe partial struct Log
 
     /// <summary>tid</summary>
     [FieldOffset(56)] public CULong Tid;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_log_t, i_object_id)</summary>
+        public const int ObjectId = 0;
+        /// <summary>offsetof(vlc_log_t, psz_object_type)</summary>
+        public const int ObjectType = 8;
+        /// <summary>offsetof(vlc_log_t, psz_module)</summary>
+        public const int Module = 16;
+        /// <summary>offsetof(vlc_log_t, psz_header)</summary>
+        public const int Header = 24;
+        /// <summary>offsetof(vlc_log_t, file)</summary>
+        public const int File = 32;
+        /// <summary>offsetof(vlc_log_t, line)</summary>
+        public const int Line = 40;
+        /// <summary>offsetof(vlc_log_t, func)</summary>
+        public const int Func = 48;
+        /// <summary>offsetof(vlc_log_t, tid)</summary>
+        public const int Tid = 56;
+    }
 }
 
 /// <summary>vlc_logger</summary>

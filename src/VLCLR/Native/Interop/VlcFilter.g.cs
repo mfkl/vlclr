@@ -16,6 +16,12 @@ public unsafe partial struct FilterOwner
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
     /// <summary>video</summary>
     [FieldOffset(0)] public FilterVideoCallbacks* Video;
 
@@ -30,6 +36,21 @@ public unsafe partial struct FilterOwner
 
     /// <summary>sys</summary>
     [FieldOffset(16)] public void* Sys;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_owner_t, video)</summary>
+        public const int Video = 0;
+        /// <summary>offsetof(filter_owner_t, audio)</summary>
+        public const int Audio = 0;
+        /// <summary>offsetof(filter_owner_t, sub)</summary>
+        public const int Sub = 0;
+        /// <summary>offsetof(filter_owner_t, pf_get_attachments)</summary>
+        public const int GetAttachments = 8;
+        /// <summary>offsetof(filter_owner_t, sys)</summary>
+        public const int Sys = 16;
+    }
 }
 
 /// <summary>filter_subpicture_callbacks</summary>
@@ -41,6 +62,12 @@ public unsafe partial struct Filter
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 592 : 576;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 576;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 592;
 
     /// <summary>obj</summary>
     [FieldOffset(0)] public ObjectHeader Obj;
@@ -85,6 +112,35 @@ public unsafe partial struct Filter
     /// <summary>owner</summary>
     [UnscopedRef]
     public ref FilterOwner Owner => ref CImportHelpers.FieldAt<Filter, FilterOwner>(ref this, OperatingSystem.IsWindows() ? 568 : 552);
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_t, obj)</summary>
+        public const int Obj = 0;
+        /// <summary>offsetof(filter_t, p_module)</summary>
+        public const int Module = 24;
+        /// <summary>offsetof(filter_t, p_sys)</summary>
+        public const int Sys = 32;
+        /// <summary>offsetof(filter_t, fmt_in)</summary>
+        public const int FmtIn = 40;
+        /// <summary>offsetof(filter_t, vctx_in)</summary>
+        public static int VctxIn => OperatingSystem.IsWindows() ? 280 : 272;
+        /// <summary>offsetof(filter_t, fmt_out)</summary>
+        public static int FmtOut => OperatingSystem.IsWindows() ? 288 : 280;
+        /// <summary>offsetof(filter_t, vctx_out)</summary>
+        public static int VctxOut => OperatingSystem.IsWindows() ? 528 : 512;
+        /// <summary>offsetof(filter_t, b_allow_fmt_out_change)</summary>
+        public static int AllowFmtOutChange => OperatingSystem.IsWindows() ? 536 : 520;
+        /// <summary>offsetof(filter_t, psz_name)</summary>
+        public static int Name => OperatingSystem.IsWindows() ? 544 : 528;
+        /// <summary>offsetof(filter_t, p_cfg)</summary>
+        public static int Cfg => OperatingSystem.IsWindows() ? 552 : 536;
+        /// <summary>offsetof(filter_t, ops)</summary>
+        public static int Ops => OperatingSystem.IsWindows() ? 560 : 544;
+        /// <summary>offsetof(filter_t, owner)</summary>
+        public static int Owner => OperatingSystem.IsWindows() ? 568 : 552;
+    }
 }
 
 /// <summary>filter_video_callbacks</summary>
@@ -94,11 +150,26 @@ public unsafe partial struct FilterVideoCallbacks
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>buffer_new</summary>
     [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Filter*, Picture*> BufferNew;
 
     /// <summary>hold_device</summary>
     [FieldOffset(8)] public delegate* unmanaged[Cdecl]<ObjectHeader*, void*, DecoderDevice*> HoldDevice;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_video_callbacks, buffer_new)</summary>
+        public const int BufferNew = 0;
+        /// <summary>offsetof(filter_video_callbacks, hold_device)</summary>
+        public const int HoldDevice = 8;
+    }
 }
 
 /// <summary>vlc_filter_operations</summary>
@@ -107,6 +178,12 @@ public unsafe partial struct FilterOperations
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 48;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 48;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 48;
 
     /// <summary>filter_video</summary>
     [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Filter*, Picture*, Picture*> FilterVideo;
@@ -140,4 +217,31 @@ public unsafe partial struct FilterOperations
 
     /// <summary>close</summary>
     [FieldOffset(40)] public delegate* unmanaged[Cdecl]<Filter*, void> Close;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_filter_operations, filter_video)</summary>
+        public const int FilterVideo = 0;
+        /// <summary>offsetof(vlc_filter_operations, filter_audio)</summary>
+        public const int FilterAudio = 0;
+        /// <summary>offsetof(vlc_filter_operations, blend_video)</summary>
+        public const int BlendVideo = 0;
+        /// <summary>offsetof(vlc_filter_operations, source_sub)</summary>
+        public const int SourceSub = 0;
+        /// <summary>offsetof(vlc_filter_operations, filter_sub)</summary>
+        public const int FilterSub = 0;
+        /// <summary>offsetof(vlc_filter_operations, render)</summary>
+        public const int Render = 0;
+        /// <summary>offsetof(vlc_filter_operations, drain_audio)</summary>
+        public const int DrainAudio = 8;
+        /// <summary>offsetof(vlc_filter_operations, flush)</summary>
+        public const int Flush = 16;
+        /// <summary>offsetof(vlc_filter_operations, change_viewpoint)</summary>
+        public const int ChangeViewpoint = 24;
+        /// <summary>offsetof(vlc_filter_operations, video_mouse)</summary>
+        public const int VideoMouse = 32;
+        /// <summary>offsetof(vlc_filter_operations, close)</summary>
+        public const int Close = 40;
+    }
 }

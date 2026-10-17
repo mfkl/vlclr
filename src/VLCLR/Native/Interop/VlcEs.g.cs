@@ -13,6 +13,12 @@ public unsafe partial struct AudioFormat
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 36;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 36;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 36;
+
     /// <summary>i_format</summary>
     [FieldOffset(0)] public uint Format;
 
@@ -42,6 +48,31 @@ public unsafe partial struct AudioFormat
 
     /// <summary>i_channels</summary>
     [FieldOffset(32)] public byte Channels;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(audio_format_t, i_format)</summary>
+        public const int Format = 0;
+        /// <summary>offsetof(audio_format_t, i_rate)</summary>
+        public const int Rate = 4;
+        /// <summary>offsetof(audio_format_t, i_physical_channels)</summary>
+        public const int PhysicalChannels = 8;
+        /// <summary>offsetof(audio_format_t, i_chan_mode)</summary>
+        public const int ChanMode = 10;
+        /// <summary>offsetof(audio_format_t, channel_type)</summary>
+        public const int ChannelType = 12;
+        /// <summary>offsetof(audio_format_t, i_bytes_per_frame)</summary>
+        public const int BytesPerFrame = 16;
+        /// <summary>offsetof(audio_format_t, i_frame_length)</summary>
+        public const int FrameLength = 20;
+        /// <summary>offsetof(audio_format_t, i_bitspersample)</summary>
+        public const int Bitspersample = 24;
+        /// <summary>offsetof(audio_format_t, i_blockalign)</summary>
+        public const int Blockalign = 28;
+        /// <summary>offsetof(audio_format_t, i_channels)</summary>
+        public const int Channels = 32;
+    }
 }
 
 /// <summary>es_format_t</summary>
@@ -50,6 +81,12 @@ public unsafe partial struct EsFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 240 : 232;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 232;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 240;
 
     /// <summary>i_cat</summary>
     [FieldOffset(0)] public EsFormatCategory Cat;
@@ -116,6 +153,51 @@ public unsafe partial struct EsFormat
     /// <summary>p_extra</summary>
     [UnscopedRef]
     public ref void* Extra => ref *(void**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 232 : 224));
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(es_format_t, i_cat)</summary>
+        public const int Cat = 0;
+        /// <summary>offsetof(es_format_t, i_codec)</summary>
+        public const int Codec = 4;
+        /// <summary>offsetof(es_format_t, i_original_fourcc)</summary>
+        public const int OriginalFourcc = 8;
+        /// <summary>offsetof(es_format_t, i_id)</summary>
+        public const int Id = 12;
+        /// <summary>offsetof(es_format_t, i_group)</summary>
+        public const int Group = 16;
+        /// <summary>offsetof(es_format_t, i_priority)</summary>
+        public const int Priority = 20;
+        /// <summary>offsetof(es_format_t, psz_language)</summary>
+        public const int Language = 24;
+        /// <summary>offsetof(es_format_t, psz_description)</summary>
+        public const int Description = 32;
+        /// <summary>offsetof(es_format_t, i_extra_languages)</summary>
+        public const int ExtraLanguagesCount = 40;
+        /// <summary>offsetof(es_format_t, p_extra_languages)</summary>
+        public const int ExtraLanguages = 48;
+        /// <summary>offsetof(es_format_t, audio)</summary>
+        public const int Audio = 56;
+        /// <summary>offsetof(es_format_t, audio_replay_gain)</summary>
+        public const int AudioReplayGain = 92;
+        /// <summary>offsetof(es_format_t, video)</summary>
+        public const int Video = 56;
+        /// <summary>offsetof(es_format_t, subs)</summary>
+        public const int Subs = 56;
+        /// <summary>offsetof(es_format_t, i_bitrate)</summary>
+        public static int Bitrate => OperatingSystem.IsWindows() ? 208 : 200;
+        /// <summary>offsetof(es_format_t, i_profile)</summary>
+        public static int Profile => OperatingSystem.IsWindows() ? 212 : 204;
+        /// <summary>offsetof(es_format_t, i_level)</summary>
+        public static int Level => OperatingSystem.IsWindows() ? 216 : 208;
+        /// <summary>offsetof(es_format_t, b_packetized)</summary>
+        public static int Packetized => OperatingSystem.IsWindows() ? 220 : 212;
+        /// <summary>offsetof(es_format_t, i_extra)</summary>
+        public static int ExtraSize => OperatingSystem.IsWindows() ? 224 : 216;
+        /// <summary>offsetof(es_format_t, p_extra)</summary>
+        public static int Extra => OperatingSystem.IsWindows() ? 232 : 224;
+    }
 }
 
 /// <summary>extra_languages_t</summary>
@@ -127,6 +209,12 @@ public unsafe partial struct SubsFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 112;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 112;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 112;
 
     /// <summary>psz_encoding</summary>
     [FieldOffset(0)] public byte* Encoding;
@@ -148,6 +236,25 @@ public unsafe partial struct SubsFormat
 
     /// <summary>cc</summary>
     [FieldOffset(100)] public SubsFormatCc Cc;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subs_format_t, psz_encoding)</summary>
+        public const int Encoding = 0;
+        /// <summary>offsetof(subs_format_t, i_x_origin)</summary>
+        public const int XOrigin = 8;
+        /// <summary>offsetof(subs_format_t, i_y_origin)</summary>
+        public const int YOrigin = 12;
+        /// <summary>offsetof(subs_format_t, spu)</summary>
+        public const int Spu = 16;
+        /// <summary>offsetof(subs_format_t, dvb)</summary>
+        public const int Dvb = 92;
+        /// <summary>offsetof(subs_format_t, teletext)</summary>
+        public const int Teletext = 96;
+        /// <summary>offsetof(subs_format_t, cc)</summary>
+        public const int Cc = 100;
+    }
 }
 
 /// <summary>subs_format_t::cc</summary>
@@ -157,11 +264,26 @@ public unsafe partial struct SubsFormatCc
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>i_channel</summary>
     [FieldOffset(0)] public byte Channel;
 
     /// <summary>i_reorder_depth</summary>
     [FieldOffset(4)] public int ReorderDepth;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subs_format_t::cc, i_channel)</summary>
+        public const int Channel = 0;
+        /// <summary>offsetof(subs_format_t::cc, i_reorder_depth)</summary>
+        public const int ReorderDepth = 4;
+    }
 }
 
 /// <summary>subs_format_t::dvb</summary>
@@ -171,8 +293,21 @@ public unsafe partial struct SubsFormatDvb
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 4;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 4;
+
     /// <summary>i_id</summary>
     [FieldOffset(0)] public int Id;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subs_format_t::dvb, i_id)</summary>
+        public const int Id = 0;
+    }
 }
 
 /// <summary>subs_format_t::spu</summary>
@@ -181,6 +316,12 @@ public unsafe partial struct SubsFormatSpu
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 76;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 76;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 76;
 
     /// <summary>i_original_frame_width</summary>
     [FieldOffset(0)] public uint OriginalFrameWidth;
@@ -200,6 +341,19 @@ public unsafe partial struct SubsFormatSpu
     {
         private uint _e0;
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subs_format_t::spu, i_original_frame_width)</summary>
+        public const int OriginalFrameWidth = 0;
+        /// <summary>offsetof(subs_format_t::spu, i_original_frame_height)</summary>
+        public const int OriginalFrameHeight = 4;
+        /// <summary>offsetof(subs_format_t::spu, palette)</summary>
+        public const int Palette = 8;
+        /// <summary>offsetof(subs_format_t::spu, b_palette)</summary>
+        public const int HasPalette = 72;
+    }
 }
 
 /// <summary>subs_format_t::teletext</summary>
@@ -209,11 +363,26 @@ public unsafe partial struct SubsFormatTeletext
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 2;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 2;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 2;
+
     /// <summary>i_magazine</summary>
     [FieldOffset(0)] public byte Magazine;
 
     /// <summary>i_page</summary>
     [FieldOffset(1)] public byte Page;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subs_format_t::teletext, i_magazine)</summary>
+        public const int Magazine = 0;
+        /// <summary>offsetof(subs_format_t::teletext, i_page)</summary>
+        public const int Page = 1;
+    }
 }
 
 /// <summary>video_format_t</summary>
@@ -222,6 +391,12 @@ public unsafe partial struct VideoFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 152 : 144;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 144;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 152;
 
     /// <summary>i_chroma</summary>
     [FieldOffset(0)] public uint Chroma;
@@ -301,6 +476,63 @@ public unsafe partial struct VideoFormat
     /// <summary>i_cubemap_padding</summary>
     [UnscopedRef]
     public ref uint CubemapPadding => ref CImportHelpers.FieldAt<VideoFormat, uint>(ref this, OperatingSystem.IsWindows() ? 144 : 140);
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t, i_chroma)</summary>
+        public const int Chroma = 0;
+        /// <summary>offsetof(video_format_t, i_width)</summary>
+        public const int Width = 4;
+        /// <summary>offsetof(video_format_t, i_height)</summary>
+        public const int Height = 8;
+        /// <summary>offsetof(video_format_t, i_x_offset)</summary>
+        public const int XOffset = 12;
+        /// <summary>offsetof(video_format_t, i_y_offset)</summary>
+        public const int YOffset = 16;
+        /// <summary>offsetof(video_format_t, i_visible_width)</summary>
+        public const int VisibleWidth = 20;
+        /// <summary>offsetof(video_format_t, i_visible_height)</summary>
+        public const int VisibleHeight = 24;
+        /// <summary>offsetof(video_format_t, i_sar_num)</summary>
+        public const int SarNum = 28;
+        /// <summary>offsetof(video_format_t, i_sar_den)</summary>
+        public const int SarDen = 32;
+        /// <summary>offsetof(video_format_t, i_frame_rate)</summary>
+        public const int FrameRate = 36;
+        /// <summary>offsetof(video_format_t, i_frame_rate_base)</summary>
+        public const int FrameRateBase = 40;
+        /// <summary>offsetof(video_format_t, p_palette)</summary>
+        public const int Palette = 48;
+        /// <summary>offsetof(video_format_t, orientation)</summary>
+        public const int Orientation = 56;
+        /// <summary>offsetof(video_format_t, primaries)</summary>
+        public const int Primaries = 60;
+        /// <summary>offsetof(video_format_t, transfer)</summary>
+        public const int Transfer = 64;
+        /// <summary>offsetof(video_format_t, space)</summary>
+        public const int Space = 68;
+        /// <summary>offsetof(video_format_t, color_range)</summary>
+        public const int ColorRange = 72;
+        /// <summary>offsetof(video_format_t, chroma_location)</summary>
+        public const int ChromaLocation = 76;
+        /// <summary>offsetof(video_format_t, multiview_mode)</summary>
+        public const int MultiviewMode = 80;
+        /// <summary>offsetof(video_format_t, b_multiview_right_eye_first)</summary>
+        public const int MultiviewRightEyeFirst = 84;
+        /// <summary>offsetof(video_format_t, projection_mode)</summary>
+        public const int ProjectionMode = 88;
+        /// <summary>offsetof(video_format_t, pose)</summary>
+        public const int Pose = 92;
+        /// <summary>offsetof(video_format_t, mastering)</summary>
+        public const int Mastering = 108;
+        /// <summary>offsetof(video_format_t, lighting)</summary>
+        public const int Lighting = 132;
+        /// <summary>offsetof(video_format_t, dovi)</summary>
+        public const int Dovi = 136;
+        /// <summary>offsetof(video_format_t, i_cubemap_padding)</summary>
+        public static int CubemapPadding => OperatingSystem.IsWindows() ? 144 : 140;
+    }
 }
 
 /// <summary>video_format_t::dovi</summary>
@@ -309,6 +541,12 @@ public unsafe partial struct VideoFormatDovi
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 8 : 4;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
 
     /// <summary>version_major</summary>
     [FieldOffset(0)] public byte VersionMajor;
@@ -350,6 +588,15 @@ public unsafe partial struct VideoFormatDovi
         readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 47 : 31), 1));
         set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 47 : 31), 1, (ulong)value);
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t::dovi, version_major)</summary>
+        public const int VersionMajor = 0;
+        /// <summary>offsetof(video_format_t::dovi, version_minor)</summary>
+        public const int VersionMinor = 1;
+    }
 }
 
 /// <summary>video_format_t::lighting</summary>
@@ -359,11 +606,26 @@ public unsafe partial struct VideoFormatLighting
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 4;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 4;
+
     /// <summary>MaxCLL</summary>
     [FieldOffset(0)] public ushort MaxCLL;
 
     /// <summary>MaxFALL</summary>
     [FieldOffset(2)] public ushort MaxFALL;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t::lighting, MaxCLL)</summary>
+        public const int MaxCLL = 0;
+        /// <summary>offsetof(video_format_t::lighting, MaxFALL)</summary>
+        public const int MaxFALL = 2;
+    }
 }
 
 /// <summary>video_format_t::mastering</summary>
@@ -372,6 +634,12 @@ public unsafe partial struct VideoFormatMastering
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
 
     /// <summary>primaries</summary>
     [FieldOffset(0)] public PrimariesArray Primaries;
@@ -397,6 +665,19 @@ public unsafe partial struct VideoFormatMastering
     public struct WhitePointArray
     {
         private ushort _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t::mastering, primaries)</summary>
+        public const int Primaries = 0;
+        /// <summary>offsetof(video_format_t::mastering, white_point)</summary>
+        public const int WhitePoint = 12;
+        /// <summary>offsetof(video_format_t::mastering, max_luminance)</summary>
+        public const int MaxLuminance = 16;
+        /// <summary>offsetof(video_format_t::mastering, min_luminance)</summary>
+        public const int MinLuminance = 20;
     }
 }
 

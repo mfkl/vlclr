@@ -13,8 +13,21 @@ public unsafe partial struct Dv
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 4 : 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>l</summary>
     [FieldOffset(0)] public CLong L;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(dv_t, l)</summary>
+        public const int L = 0;
+    }
 }
 
 /// <summary>obj_t</summary>
@@ -27,11 +40,26 @@ public unsafe partial struct Vec
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>x</summary>
     [FieldOffset(0)] public int X;
 
     /// <summary>y</summary>
     [FieldOffset(4)] public int Y;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vec_t, x)</summary>
+        public const int X = 0;
+        /// <summary>offsetof(vec_t, y)</summary>
+        public const int Y = 4;
+    }
 }
 
 /// <summary>video_format_t</summary>
@@ -41,11 +69,26 @@ public unsafe partial struct VideoFormat
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>i_w</summary>
     [FieldOffset(0)] public int IW;
 
     /// <summary>i_h</summary>
     [FieldOffset(4)] public int IH;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t, i_w)</summary>
+        public const int IW = 0;
+        /// <summary>offsetof(video_format_t, i_h)</summary>
+        public const int IH = 4;
+    }
 }
 
 /// <summary>mode_e</summary>

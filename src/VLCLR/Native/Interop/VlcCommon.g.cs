@@ -22,11 +22,26 @@ public unsafe partial struct Rational
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>num</summary>
     [FieldOffset(0)] public uint Num;
 
     /// <summary>den</summary>
     [FieldOffset(4)] public uint Den;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_rational_t, num)</summary>
+        public const int Num = 0;
+        /// <summary>offsetof(vlc_rational_t, den)</summary>
+        public const int Den = 4;
+    }
 }
 
 /// <summary>vlc_renderer_item_t</summary>

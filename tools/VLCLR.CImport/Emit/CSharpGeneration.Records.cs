@@ -21,7 +21,7 @@ internal sealed partial class CSharpGeneration
             return SplitLines(w);
         }
 
-        var used = new HashSet<string>(StringComparer.Ordinal) { "SizeOf" };
+        var used = new HashSet<string>(StringComparer.Ordinal) { "SizeOf", "MinSizeOf", "MaxSizeOf", "Offsets" };
         var csNames = new List<string>();
         foreach (var m in t.Members)
         {
@@ -39,8 +39,19 @@ internal sealed partial class CSharpGeneration
                 "/// <summary>Size of the C struct in bytes on the running platform.</summary>",
                 $"public static int SizeOf => {Choice(t.Size!, v => v.ToString())};",
             },
+            new[]
+            {
+                "/// <summary>Smallest size of the C struct over the supported ABIs.</summary>",
+                $"public const int MinSizeOf = {t.Size!.Values.Min()};",
+            },
+            new[]
+            {
+                "/// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>",
+                $"public const int MaxSizeOf = {t.Size!.Values.Max()};",
+            },
         };
         var nested = new List<IReadOnlyList<string>>();
+        var offsets = new List<string>();
 
         for (var i = 0; i < t.Members.Count; i++)
         {
@@ -63,12 +74,34 @@ internal sealed partial class CSharpGeneration
             }
 
             if (block is null)
+            {
                 Skip(symbol, t.Header, "field", reason);
-            else
-                blocks.Add(block);
+                continue;
+            }
+            blocks.Add(block);
+            if (!m.IsBitfield)
+            {
+                offsets.Add($"/// <summary>offsetof({CSharpLiterals.Xml(t.Name)}, {CSharpLiterals.Xml(m.Name)})</summary>");
+                offsets.Add(m.Offset.IsUniform
+                    ? $"public const int {csNames[i]} = {m.Offset[0]};"
+                    : $"public static int {csNames[i]} => {Choice(m.Offset, v => v.ToString())};");
+            }
         }
 
         blocks.AddRange(nested);
+        if (offsets.Count > 0)
+        {
+            // Lets hand-written wrappers place their fields without literal offsets:
+            // [FieldOffset(Plane.Offsets.Pixels)] when the offset is the same on every ABI.
+            blocks.Add(
+            [
+                "/// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>",
+                "public static class Offsets",
+                "{",
+                .. offsets.Select(l => "    " + l),
+                "}",
+            ]);
+        }
 
         var size = t.Size!.Values.Max();
         w.Line(size > 0

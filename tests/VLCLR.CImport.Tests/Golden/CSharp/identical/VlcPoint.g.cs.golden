@@ -13,6 +13,12 @@ public unsafe partial struct Point
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 48;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 48;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 48;
+
     /// <summary>i_x</summary>
     [FieldOffset(0)] public int IX;
 
@@ -42,4 +48,29 @@ public unsafe partial struct Point
 
     /// <summary>i_len</summary>
     [FieldOffset(40)] public nuint ILen;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(point_t, i_x)</summary>
+        public const int IX = 0;
+        /// <summary>offsetof(point_t, i_y)</summary>
+        public const int IY = 4;
+        /// <summary>offsetof(point_t, d_w)</summary>
+        public const int DW = 8;
+        /// <summary>offsetof(point_t, psz_name)</summary>
+        public const int PszName = 16;
+        /// <summary>offsetof(point_t, p_opaque)</summary>
+        public const int POpaque = 24;
+        /// <summary>offsetof(point_t, b_enabled)</summary>
+        public const int BEnabled = 32;
+        /// <summary>offsetof(point_t, b_flag)</summary>
+        public const int BFlag = 33;
+        /// <summary>offsetof(point_t, s_mid)</summary>
+        public const int SMid = 34;
+        /// <summary>offsetof(point_t, f_scale)</summary>
+        public const int FScale = 36;
+        /// <summary>offsetof(point_t, i_len)</summary>
+        public const int ILen = 40;
+    }
 }

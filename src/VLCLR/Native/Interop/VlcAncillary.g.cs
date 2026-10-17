@@ -16,6 +16,12 @@ public unsafe partial struct AncillaryArray
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
     /// <summary>cap</summary>
     [FieldOffset(0)] public nuint Cap;
 
@@ -24,4 +30,15 @@ public unsafe partial struct AncillaryArray
 
     /// <summary>data</summary>
     [FieldOffset(16)] public Ancillary** Data;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_ancillary_array, cap)</summary>
+        public const int Cap = 0;
+        /// <summary>offsetof(vlc_ancillary_array, size)</summary>
+        public const int Size = 8;
+        /// <summary>offsetof(vlc_ancillary_array, data)</summary>
+        public const int Data = 16;
+    }
 }

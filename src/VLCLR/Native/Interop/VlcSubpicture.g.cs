@@ -16,6 +16,12 @@ public unsafe partial struct SubpictureRegion
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 224 : 216;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 216;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 224;
+
     /// <summary>fmt</summary>
     [FieldOffset(0)] public VideoFormat Fmt;
 
@@ -66,6 +72,37 @@ public unsafe partial struct SubpictureRegion
     /// <summary>node</summary>
     [UnscopedRef]
     public ref List Node => ref CImportHelpers.FieldAt<SubpictureRegion, List>(ref this, OperatingSystem.IsWindows() ? 208 : 200);
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subpicture_region_t, fmt)</summary>
+        public const int Fmt = 0;
+        /// <summary>offsetof(subpicture_region_t, p_picture)</summary>
+        public static int Picture => OperatingSystem.IsWindows() ? 152 : 144;
+        /// <summary>offsetof(subpicture_region_t, b_absolute)</summary>
+        public static int Absolute => OperatingSystem.IsWindows() ? 160 : 152;
+        /// <summary>offsetof(subpicture_region_t, b_in_window)</summary>
+        public static int InWindow => OperatingSystem.IsWindows() ? 161 : 153;
+        /// <summary>offsetof(subpicture_region_t, i_x)</summary>
+        public static int X => OperatingSystem.IsWindows() ? 164 : 156;
+        /// <summary>offsetof(subpicture_region_t, i_y)</summary>
+        public static int Y => OperatingSystem.IsWindows() ? 168 : 160;
+        /// <summary>offsetof(subpicture_region_t, i_align)</summary>
+        public static int Align => OperatingSystem.IsWindows() ? 172 : 164;
+        /// <summary>offsetof(subpicture_region_t, i_alpha)</summary>
+        public static int Alpha => OperatingSystem.IsWindows() ? 176 : 168;
+        /// <summary>offsetof(subpicture_region_t, p_text)</summary>
+        public static int Text => OperatingSystem.IsWindows() ? 184 : 176;
+        /// <summary>offsetof(subpicture_region_t, text_flags)</summary>
+        public static int TextFlags => OperatingSystem.IsWindows() ? 192 : 184;
+        /// <summary>offsetof(subpicture_region_t, i_max_width)</summary>
+        public static int MaxWidth => OperatingSystem.IsWindows() ? 196 : 188;
+        /// <summary>offsetof(subpicture_region_t, i_max_height)</summary>
+        public static int MaxHeight => OperatingSystem.IsWindows() ? 200 : 192;
+        /// <summary>offsetof(subpicture_region_t, node)</summary>
+        public static int Node => OperatingSystem.IsWindows() ? 208 : 200;
+    }
 }
 
 /// <summary>subpicture_t</summary>
@@ -74,6 +111,12 @@ public unsafe partial struct Subpicture
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 96;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 96;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 96;
 
     /// <summary>i_channel</summary>
     [FieldOffset(0)] public nint Channel;
@@ -116,6 +159,39 @@ public unsafe partial struct Subpicture
 
     /// <summary>p_private</summary>
     [FieldOffset(88)] public SubpicturePrivate* Private;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subpicture_t, i_channel)</summary>
+        public const int Channel = 0;
+        /// <summary>offsetof(subpicture_t, i_order)</summary>
+        public const int Order = 8;
+        /// <summary>offsetof(subpicture_t, p_next)</summary>
+        public const int Next = 16;
+        /// <summary>offsetof(subpicture_t, regions)</summary>
+        public const int Regions = 24;
+        /// <summary>offsetof(subpicture_t, i_start)</summary>
+        public const int Start = 40;
+        /// <summary>offsetof(subpicture_t, i_stop)</summary>
+        public const int Stop = 48;
+        /// <summary>offsetof(subpicture_t, b_ephemer)</summary>
+        public const int Ephemer = 56;
+        /// <summary>offsetof(subpicture_t, b_fade)</summary>
+        public const int Fade = 57;
+        /// <summary>offsetof(subpicture_t, b_subtitle)</summary>
+        public const int Subtitle = 58;
+        /// <summary>offsetof(subpicture_t, i_original_picture_width)</summary>
+        public const int OriginalPictureWidth = 60;
+        /// <summary>offsetof(subpicture_t, i_original_picture_height)</summary>
+        public const int OriginalPictureHeight = 64;
+        /// <summary>offsetof(subpicture_t, i_alpha)</summary>
+        public const int Alpha = 68;
+        /// <summary>offsetof(subpicture_t, updater)</summary>
+        public const int Updater = 72;
+        /// <summary>offsetof(subpicture_t, p_private)</summary>
+        public const int Private = 88;
+    }
 }
 
 /// <summary>subpicture_updater_t</summary>
@@ -125,11 +201,26 @@ public unsafe partial struct SubpictureUpdater
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>sys</summary>
     [FieldOffset(0)] public void* Sys;
 
     /// <summary>ops</summary>
     [FieldOffset(8)] public SpuUpdaterOps* Ops;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subpicture_updater_t, sys)</summary>
+        public const int Sys = 0;
+        /// <summary>offsetof(subpicture_updater_t, ops)</summary>
+        public const int Ops = 8;
+    }
 }
 
 /// <summary>vlc_spu_updater_configuration</summary>
@@ -142,11 +233,26 @@ public unsafe partial struct SpuUpdaterOps
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>update</summary>
     [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Subpicture*, SpuUpdaterConfiguration*, void> Update;
 
     /// <summary>destroy</summary>
     [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Subpicture*, void> Destroy;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_spu_updater_ops, update)</summary>
+        public const int Update = 0;
+        /// <summary>offsetof(vlc_spu_updater_ops, destroy)</summary>
+        public const int Destroy = 8;
+    }
 }
 
 public unsafe partial struct Subpicture
