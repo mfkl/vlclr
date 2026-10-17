@@ -107,4 +107,14 @@ public class AbiMergerTests
         Assert.Equal([Abis.Windows, Abis.SysV], Merged.Abis);
         Assert.Equal("dc69496e", Merged.VlcCommit);
     }
+
+    [Fact]
+    public void SkippedDeclarationsAreUnitedWithTheirAbis()
+    {
+        var skipped = Merged.Skipped;
+
+        Assert.Equal(["VLC_TICK_FROM_SEC", "vlc_va_list_fn"], skipped.Select(s => s.Declaration.Name));
+        Assert.Equal([Abis.Windows, Abis.SysV], skipped[0].Abis);
+        Assert.Equal([Abis.SysV], skipped[1].Abis);
+    }
 }
