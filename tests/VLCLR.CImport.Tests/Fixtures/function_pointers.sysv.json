@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "ops",
+      "kind": "struct",
+      "header": "function_pointers.h",
+      "size": 56,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "close",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "function",
+              "function": {
+                "returnType": {
+                  "kind": "builtin",
+                  "builtin": "void"
+                },
+                "parameters": [
+                  {
+                    "name": "",
+                    "type": {
+                      "kind": "pointer",
+                      "element": {
+                        "kind": "record",
+                        "name": "ops"
+                      }
+                    }
+                  }
+                ],
+                "callingConvention": "cdecl"
+              }
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "process",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "function",
+              "function": {
+                "returnType": {
+                  "kind": "builtin",
+                  "builtin": "int"
+                },
+                "parameters": [
+                  {
+                    "name": "",
+                    "type": {
+                      "kind": "pointer",
+                      "element": {
+                        "kind": "record",
+                        "name": "ops"
+                      }
+                    }
+                  },
+                  {
+                    "name": "",
+                    "type": {
+                      "kind": "pointer",
+                      "element": {
+                        "kind": "builtin",
+                        "builtin": "char",
+                        "isConst": true
+                      }
+                    }
+                  }
+                ],
+                "isVariadic": true,
+                "callingConvention": "cdecl"
+              }
+            }
+          },
+          "offset": 8
+        },
+        {
+          "name": "on_event",
+          "type": {
+            "kind": "typedef",
+            "name": "callback_t",
+            "element": {
+              "kind": "pointer",
+              "element": {
+                "kind": "function",
+                "function": {
+                  "returnType": {
+                    "kind": "builtin",
+                    "builtin": "void"
+                  },
+                  "parameters": [
+                    {
+                      "name": "",
+                      "type": {
+                        "kind": "pointer",
+                        "element": {
+                          "kind": "builtin",
+                          "builtin": "void"
+                        }
+                      }
+                    },
+                    {
+                      "name": "",
+                      "type": {
+                        "kind": "builtin",
+                        "builtin": "int"
+                      }
+                    }
+                  ],
+                  "callingConvention": "cdecl"
+                }
+              }
+            }
+          },
+          "offset": 16
+        },
+        {
+          "name": "handlers",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "typedef",
+              "name": "callback_t",
+              "element": {
+                "kind": "pointer",
+                "element": {
+                  "kind": "function",
+                  "function": {
+                    "returnType": {
+                      "kind": "builtin",
+                      "builtin": "void"
+                    },
+                    "parameters": [
+                      {
+                        "name": "",
+                        "type": {
+                          "kind": "pointer",
+                          "element": {
+                            "kind": "builtin",
+                            "builtin": "void"
+                          }
+                        }
+                      },
+                      {
+                        "name": "",
+                        "type": {
+                          "kind": "builtin",
+                          "builtin": "int"
+                        }
+                      }
+                    ],
+                    "callingConvention": "cdecl"
+                  }
+                }
+              }
+            },
+            "count": 2
+          },
+          "offset": 24
+        },
+        {
+          "name": "lookup",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "function",
+              "function": {
+                "returnType": {
+                  "kind": "pointer",
+                  "element": {
+                    "kind": "builtin",
+                    "builtin": "char"
+                  }
+                },
+                "parameters": [
+                  {
+                    "name": "",
+                    "type": {
+                      "kind": "pointer",
+                      "element": {
+                        "kind": "builtin",
+                        "builtin": "char",
+                        "isConst": true
+                      }
+                    }
+                  }
+                ],
+                "callingConvention": "cdecl"
+              }
+            }
+          },
+          "offset": 40
+        },
+        {
+          "name": "transform",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "typedef",
+              "name": "fn_type",
+              "element": {
+                "kind": "function",
+                "function": {
+                  "returnType": {
+                    "kind": "builtin",
+                    "builtin": "int"
+                  },
+                  "parameters": [
+                    {
+                      "name": "",
+                      "type": {
+                        "kind": "builtin",
+                        "builtin": "int"
+                      }
+                    }
+                  ],
+                  "callingConvention": "cdecl"
+                }
+              }
+            }
+          },
+          "offset": 48
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "callback_t",
+      "header": "function_pointers.h",
+      "target": {
+        "kind": "pointer",
+        "element": {
+          "kind": "function",
+          "function": {
+            "returnType": {
+              "kind": "builtin",
+              "builtin": "void"
+            },
+            "parameters": [
+              {
+                "name": "",
+                "type": {
+                  "kind": "pointer",
+                  "element": {
+                    "kind": "builtin",
+                    "builtin": "void"
+                  }
+                }
+              },
+              {
+                "name": "",
+                "type": {
+                  "kind": "builtin",
+                  "builtin": "int"
+                }
+              }
+            ],
+            "callingConvention": "cdecl"
+          }
+        }
+      }
+    },
+    {
+      "name": "fn_type",
+      "header": "function_pointers.h",
+      "target": {
+        "kind": "function",
+        "function": {
+          "returnType": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "parameters": [
+            {
+              "name": "",
+              "type": {
+                "kind": "builtin",
+                "builtin": "int"
+              }
+            }
+          ],
+          "callingConvention": "cdecl"
+        }
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

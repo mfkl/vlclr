@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "abi": "windows",
+  "target": "x86_64-pc-windows-msvc",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "size_types",
+      "kind": "struct",
+      "header": "size_t.h",
+      "size": 48,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "size",
+          "type": {
+            "kind": "typedef",
+            "name": "size_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uLongLong"
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "signed_size",
+          "type": {
+            "kind": "typedef",
+            "name": "ssize_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "longLong"
+            }
+          },
+          "offset": 8
+        },
+        {
+          "name": "diff",
+          "type": {
+            "kind": "typedef",
+            "name": "ptrdiff_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "longLong"
+            }
+          },
+          "offset": 16
+        },
+        {
+          "name": "iptr",
+          "type": {
+            "kind": "typedef",
+            "name": "intptr_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "longLong"
+            }
+          },
+          "offset": 24
+        },
+        {
+          "name": "uptr",
+          "type": {
+            "kind": "typedef",
+            "name": "uintptr_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uLongLong"
+            }
+          },
+          "offset": 32
+        },
+        {
+          "name": "tick",
+          "type": {
+            "kind": "typedef",
+            "name": "uint64_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uLongLong"
+            }
+          },
+          "offset": 40
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "intptr_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "longLong"
+      }
+    },
+    {
+      "name": "ptrdiff_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "longLong"
+      }
+    },
+    {
+      "name": "size_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLongLong"
+      }
+    },
+    {
+      "name": "ssize_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "longLong"
+      }
+    },
+    {
+      "name": "uint64_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLongLong"
+      }
+    },
+    {
+      "name": "uintptr_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLongLong"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

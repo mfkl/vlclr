@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "abi": "windows",
+  "target": "x86_64-pc-windows-msvc",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "bits_mixed",
+      "kind": "struct",
+      "header": "bitfields.h",
+      "size": 32,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 0,
+          "bitOffset": 0,
+          "bitWidth": 3
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0,
+          "bitOffset": 3,
+          "bitWidth": 5
+        },
+        {
+          "name": "c",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uChar"
+          },
+          "offset": 4,
+          "bitOffset": 32,
+          "bitWidth": 2
+        },
+        {
+          "name": "d",
+          "type": {
+            "kind": "typedef",
+            "name": "uint32_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uInt"
+            }
+          },
+          "offset": 8,
+          "bitOffset": 64,
+          "bitWidth": 7
+        },
+        {
+          "name": "e",
+          "type": {
+            "kind": "builtin",
+            "builtin": "longLong"
+          },
+          "offset": 16,
+          "bitOffset": 128,
+          "bitWidth": 4
+        },
+        {
+          "name": "f",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 24,
+          "bitOffset": 192,
+          "bitWidth": 1
+        },
+        {
+          "name": "g",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 24,
+          "bitOffset": 196,
+          "bitWidth": 2
+        }
+      ]
+    },
+    {
+      "name": "bits_video",
+      "kind": "struct",
+      "header": "bitfields.h",
+      "size": 16,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "chroma",
+          "type": {
+            "kind": "typedef",
+            "name": "uint32_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uInt"
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "dovi",
+          "type": {
+            "kind": "record",
+            "name": "bits_video::dovi"
+          },
+          "offset": 4
+        },
+        {
+          "name": "padding",
+          "type": {
+            "kind": "typedef",
+            "name": "uint32_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uInt"
+            }
+          },
+          "offset": 12
+        }
+      ]
+    },
+    {
+      "name": "bits_video::dovi",
+      "kind": "struct",
+      "header": "bitfields.h",
+      "isAnonymous": true,
+      "parent": "bits_video",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "version_major",
+          "type": {
+            "kind": "typedef",
+            "name": "uint8_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uChar"
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "version_minor",
+          "type": {
+            "kind": "typedef",
+            "name": "uint8_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uChar"
+            }
+          },
+          "offset": 1
+        },
+        {
+          "name": "rpu_type",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 4,
+          "bitOffset": 32,
+          "bitWidth": 4
+        },
+        {
+          "name": "dv_profile",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 4,
+          "bitOffset": 36,
+          "bitWidth": 7
+        },
+        {
+          "name": "dv_level",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 5,
+          "bitOffset": 43,
+          "bitWidth": 6
+        },
+        {
+          "name": "rpu_present",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 6,
+          "bitOffset": 49,
+          "bitWidth": 1
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "uint32_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      }
+    },
+    {
+      "name": "uint8_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uChar"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}
