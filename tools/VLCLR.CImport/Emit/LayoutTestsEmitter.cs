@@ -64,7 +64,12 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         foreach (var member in type.Members.Where(m => !m.IsBitfield))
         {
             var csName = names.Field(member.DeclaringType, member.Name);
-            Line($"        AssertEqual({Abi(member.Offset)}, Offset(ref s, ref s.{csName}), \"{Escape(type.Name)}.{Escape(member.Name)} offset\");");
+            var label = $"\"{Escape(type.Name)}.{Escape(member.Name)} offset\"";
+            // Pointers can't be generic arguments: pin the member and subtract addresses.
+            if (member.Type.Desugar().Kind == TypeRefKind.Pointer)
+                Line($"        {{ ref var r = ref s.{csName}; fixed (void* p = &r) AssertEqual({Abi(member.Offset)}, PointerOffset(ref s, p), {label}); }}");
+            else
+                Line($"        AssertEqual({Abi(member.Offset)}, Offset(ref s, ref s.{csName}), {label});");
         }
 
         foreach (var member in type.Members.Where(m => m.IsBitfield))
@@ -139,6 +144,9 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         Line();
         Line("    private static nint Offset<TOwner, TField>(ref TOwner owner, ref TField field)");
         Line("        => Unsafe.ByteOffset(ref Unsafe.As<TOwner, byte>(ref owner), ref Unsafe.As<TField, byte>(ref field));");
+        Line();
+        Line("    private static nint PointerOffset<TOwner>(ref TOwner owner, void* field)");
+        Line("        => (nint)((byte*)field - (byte*)Unsafe.AsPointer(ref owner));");
         Line();
         Line("    private static void AssertEqual(long expected, long actual, string what)");
         Line("    {");

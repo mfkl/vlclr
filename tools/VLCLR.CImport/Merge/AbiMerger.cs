@@ -75,8 +75,9 @@ public static class AbiMerger
 
     /// <summary>
     /// True when two type references are the same type, ignoring the
-    /// canonical builtin under a typedef (<c>uint64_t</c> is
-    /// <c>unsigned long long</c> on windows and <c>unsigned long</c> on sysv).
+    /// canonical builtin and intermediate typedefs under a typedef
+    /// (<c>uint64_t</c> is <c>unsigned long long</c> on windows and
+    /// <c>__uint64_t</c>, then <c>unsigned long</c>, on sysv).
     /// </summary>
     public static bool SameShape(TypeRef a, TypeRef b, bool underTypedef = false)
     {
@@ -87,7 +88,9 @@ public static class AbiMerger
         {
             TypeRefKind.Builtin => underTypedef || a.Builtin == b.Builtin,
             TypeRefKind.Pointer or TypeRefKind.Array => SameShape(a.Element!, b.Element!, underTypedef),
-            TypeRefKind.Typedef => SameShape(a.Element!, b.Element!, underTypedef: true),
+            // Same typedef name: only the target's shape matters, not how the
+            // C library spells it (glibc: uint32_t -> __uint32_t -> unsigned int).
+            TypeRefKind.Typedef => SameShape(a.Element!.Desugar(), b.Element!.Desugar(), underTypedef: true),
             TypeRefKind.Function => SameShape(a.Function!, b.Function!, underTypedef),
             _ => true,
         };
