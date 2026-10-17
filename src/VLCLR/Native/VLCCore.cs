@@ -14,8 +14,7 @@ public static partial class VLCCore
     private const string LibraryName = "libvlccore";
 
     /// <summary>Returns VLC's monotonic system clock in microseconds.</summary>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_tick_now")]
-    public static partial long TickNow();
+    public static long TickNow() => Gen.VlcTick.Now();
 
     #region Logging
 
@@ -160,16 +159,16 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="intf">Pointer to intf_thread_t</param>
     /// <returns>Pointer to vlc_playlist_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_intf_GetMainPlaylist")]
-    public static partial nint IntfGetMainPlaylist(nint intf);
+    public static unsafe nint IntfGetMainPlaylist(nint intf)
+        => (nint)Gen.VlcIntf.GetMainPlaylist((Gen.IntfThread*)intf);
 
     /// <summary>
     /// Get the player from a playlist.
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>Pointer to vlc_player_t</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_GetPlayer")]
-    public static partial nint PlaylistGetPlayer(nint playlist);
+    public static unsafe nint PlaylistGetPlayer(nint playlist)
+        => (nint)Gen.VlcPlaylist.GetPlayer((Gen.Playlist*)playlist);
 
     #endregion
 
@@ -179,15 +178,15 @@ public static partial class VLCCore
     /// Lock the player. Must be called before most player operations.
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_Lock")]
-    public static partial void PlayerLock(nint player);
+    public static unsafe void PlayerLock(nint player)
+        => Gen.VlcPlayer.Lock((Gen.Player*)player);
 
     /// <summary>
     /// Unlock the player. Must be called after player operations.
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_Unlock")]
-    public static partial void PlayerUnlock(nint player);
+    public static unsafe void PlayerUnlock(nint player)
+        => Gen.VlcPlayer.Unlock((Gen.Player*)player);
 
     #endregion
 
@@ -199,8 +198,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>Current player state enum value</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_GetState")]
-    public static partial int PlayerGetState(nint player);
+    public static unsafe int PlayerGetState(nint player)
+        => (int)Gen.VlcPlayer.GetState((Gen.Player*)player);
 
     /// <summary>
     /// Get the current playback time.
@@ -208,8 +207,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>Current time in VLC ticks (microseconds), or VLC_TICK_INVALID if not playing</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_GetTime")]
-    public static partial long PlayerGetTime(nint player);
+    public static unsafe long PlayerGetTime(nint player)
+        => Gen.VlcPlayer.GetTime((Gen.Player*)player);
 
     /// <summary>
     /// Get the total length of the current media.
@@ -217,8 +216,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>Total length in VLC ticks (microseconds), or VLC_TICK_INVALID if unknown</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_GetLength")]
-    public static partial long PlayerGetLength(nint player);
+    public static unsafe long PlayerGetLength(nint player)
+        => Gen.VlcPlayer.GetLength((Gen.Player*)player);
 
     /// <summary>
     /// Get the current playback position as a ratio.
@@ -226,8 +225,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>Position as a ratio [0.0, 1.0], or -1.0 if not playing</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_GetPosition")]
-    public static partial double PlayerGetPosition(nint player);
+    public static unsafe double PlayerGetPosition(nint player)
+        => Gen.VlcPlayer.GetPosition((Gen.Player*)player);
 
     /// <summary>
     /// Get the current player capabilities.
@@ -235,8 +234,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>Bitfield of capabilities (VLC_PLAYER_CAP_*)</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_GetCapabilities")]
-    public static partial int PlayerGetCapabilities(nint player);
+    public static unsafe int PlayerGetCapabilities(nint player)
+        => Gen.VlcPlayer.GetCapabilities((Gen.Player*)player);
 
     #endregion
 
@@ -247,16 +246,16 @@ public static partial class VLCCore
     /// Requires player lock to be held.
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_Pause")]
-    public static partial void PlayerPause(nint player);
+    public static unsafe void PlayerPause(nint player)
+        => Gen.VlcPlayer.Pause((Gen.Player*)player);
 
     /// <summary>
     /// Resume the player.
     /// Requires player lock to be held.
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_Resume")]
-    public static partial void PlayerResume(nint player);
+    public static unsafe void PlayerResume(nint player)
+        => Gen.VlcPlayer.Resume((Gen.Player*)player);
 
     /// <summary>
     /// Seek to a specific time.
@@ -266,8 +265,9 @@ public static partial class VLCCore
     /// <param name="time">Time in VLC ticks (microseconds)</param>
     /// <param name="speed">Seek precision (0=precise, 1=fast)</param>
     /// <param name="whence">Seek reference (0=absolute, 1=relative)</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_SeekByTime")]
-    public static partial void PlayerSeekByTime(nint player, long time, int speed, int whence);
+    public static unsafe void PlayerSeekByTime(nint player, long time, int speed, int whence)
+        => Gen.VlcPlayer.SeekByTime((Gen.Player*)player, time,
+            (Gen.PlayerSeekSpeed)speed, (Gen.PlayerWhence)whence);
 
     /// <summary>
     /// Seek to a specific position.
@@ -277,8 +277,9 @@ public static partial class VLCCore
     /// <param name="position">Position as a ratio [0.0, 1.0]</param>
     /// <param name="speed">Seek precision (0=precise, 1=fast)</param>
     /// <param name="whence">Seek reference (0=absolute, 1=relative)</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_SeekByPos")]
-    public static partial void PlayerSeekByPos(nint player, double position, int speed, int whence);
+    public static unsafe void PlayerSeekByPos(nint player, double position, int speed, int whence)
+        => Gen.VlcPlayer.SeekByPos((Gen.Player*)player, position,
+            (Gen.PlayerSeekSpeed)speed, (Gen.PlayerWhence)whence);
 
     #endregion
 
@@ -292,8 +293,8 @@ public static partial class VLCCore
     /// <param name="cbs">Pointer to vlc_player_cbs structure</param>
     /// <param name="cbsData">User data passed to callbacks</param>
     /// <returns>Listener ID, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_AddListener")]
-    public static partial nint PlayerAddListener(nint player, nint cbs, nint cbsData);
+    public static unsafe nint PlayerAddListener(nint player, nint cbs, nint cbsData)
+        => (nint)Gen.VlcPlayer.AddListener((Gen.Player*)player, (Gen.PlayerCbs*)cbs, (void*)cbsData);
 
     /// <summary>
     /// Remove a player listener.
@@ -301,8 +302,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <param name="listenerId">Listener ID from PlayerAddListener</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_RemoveListener")]
-    public static partial void PlayerRemoveListener(nint player, nint listenerId);
+    public static unsafe void PlayerRemoveListener(nint player, nint listenerId)
+        => Gen.VlcPlayer.RemoveListener((Gen.Player*)player, (Gen.PlayerListenerId*)listenerId);
 
     #endregion
 
@@ -312,15 +313,15 @@ public static partial class VLCCore
     /// Lock the playlist. Must be called before most playlist operations.
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Lock")]
-    public static partial void PlaylistLock(nint playlist);
+    public static unsafe void PlaylistLock(nint playlist)
+        => Gen.VlcPlaylist.Lock((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Unlock the playlist. Must be called after playlist operations.
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Unlock")]
-    public static partial void PlaylistUnlock(nint playlist);
+    public static unsafe void PlaylistUnlock(nint playlist)
+        => Gen.VlcPlaylist.Unlock((Gen.Playlist*)playlist);
 
     #endregion
 
@@ -332,32 +333,32 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Start")]
-    public static partial int PlaylistStart(nint playlist);
+    public static unsafe int PlaylistStart(nint playlist)
+        => Gen.VlcPlaylist.Start((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Stop playback.
     /// Requires playlist lock to be held.
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Stop")]
-    public static partial void PlaylistStop(nint playlist);
+    public static unsafe void PlaylistStop(nint playlist)
+        => Gen.VlcPlaylist.Stop((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Pause playback.
     /// Requires playlist lock to be held.
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Pause")]
-    public static partial void PlaylistPause(nint playlist);
+    public static unsafe void PlaylistPause(nint playlist)
+        => Gen.VlcPlaylist.Pause((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Resume playback.
     /// Requires playlist lock to be held.
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Resume")]
-    public static partial void PlaylistResume(nint playlist);
+    public static unsafe void PlaylistResume(nint playlist)
+        => Gen.VlcPlaylist.Resume((Gen.Playlist*)playlist);
 
     #endregion
 
@@ -369,8 +370,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Next")]
-    public static partial int PlaylistNext(nint playlist);
+    public static unsafe int PlaylistNext(nint playlist)
+        => Gen.VlcPlaylist.Next((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Go to the previous item.
@@ -378,8 +379,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Prev")]
-    public static partial int PlaylistPrev(nint playlist);
+    public static unsafe int PlaylistPrev(nint playlist)
+        => Gen.VlcPlaylist.Prev((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Check if there is a next item.
@@ -387,9 +388,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>True if there is a next item</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_HasNext")]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool PlaylistHasNext(nint playlist);
+    public static unsafe bool PlaylistHasNext(nint playlist)
+        => Gen.VlcPlaylist.HasNext((Gen.Playlist*)playlist) != 0;
 
     /// <summary>
     /// Check if there is a previous item.
@@ -397,9 +397,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>True if there is a previous item</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_HasPrev")]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool PlaylistHasPrev(nint playlist);
+    public static unsafe bool PlaylistHasPrev(nint playlist)
+        => Gen.VlcPlaylist.HasPrev((Gen.Playlist*)playlist) != 0;
 
     #endregion
 
@@ -411,8 +410,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>Number of items</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Count")]
-    public static partial nuint PlaylistCount(nint playlist);
+    public static unsafe nuint PlaylistCount(nint playlist)
+        => Gen.VlcPlaylist.Count((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Get the current item index.
@@ -420,8 +419,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <returns>Current index, or -1 if none</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_GetCurrentIndex")]
-    public static partial nint PlaylistGetCurrentIndex(nint playlist);
+    public static unsafe nint PlaylistGetCurrentIndex(nint playlist)
+        => Gen.VlcPlaylist.GetCurrentIndex((Gen.Playlist*)playlist);
 
     /// <summary>
     /// Go to a specific index.
@@ -430,8 +429,8 @@ public static partial class VLCCore
     /// <param name="playlist">Pointer to vlc_playlist_t</param>
     /// <param name="index">Index to go to (-1 for none)</param>
     /// <returns>0 on success, error code on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_GoTo")]
-    public static partial int PlaylistGoTo(nint playlist, nint index);
+    public static unsafe int PlaylistGoTo(nint playlist, nint index)
+        => Gen.VlcPlaylist.GoTo((Gen.Playlist*)playlist, index);
 
     #endregion
 
@@ -443,8 +442,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>Volume in the range [0.0, 2.0], or -1.0 if no audio outputs</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_aout_GetVolume")]
-    public static partial float PlayerAoutGetVolume(nint player);
+    public static unsafe float PlayerAoutGetVolume(nint player)
+        => Gen.VlcPlayerAout.GetVolume((Gen.Player*)player);
 
     /// <summary>
     /// Set the audio volume.
@@ -453,8 +452,8 @@ public static partial class VLCCore
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <param name="volume">Volume in the range [0.0, 2.0]</param>
     /// <returns>0 on success, -1 on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_aout_SetVolume")]
-    public static partial int PlayerAoutSetVolume(nint player, float volume);
+    public static unsafe int PlayerAoutSetVolume(nint player, float volume)
+        => Gen.VlcPlayerAout.SetVolume((Gen.Player*)player, volume);
 
     /// <summary>
     /// Check if the audio output is muted.
@@ -462,8 +461,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <returns>0 if not muted, 1 if muted, -1 if no audio outputs</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_aout_IsMuted")]
-    public static partial int PlayerAoutIsMuted(nint player);
+    public static unsafe int PlayerAoutIsMuted(nint player)
+        => Gen.VlcPlayerAout.IsMuted((Gen.Player*)player);
 
     /// <summary>
     /// Mute or unmute the audio output.
@@ -472,8 +471,8 @@ public static partial class VLCCore
     /// <param name="player">Pointer to vlc_player_t</param>
     /// <param name="mute">True to mute, false to unmute</param>
     /// <returns>0 on success, -1 on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_player_aout_Mute")]
-    public static partial int PlayerAoutMute(nint player, [MarshalAs(UnmanagedType.U1)] bool mute);
+    public static unsafe int PlayerAoutMute(nint player, bool mute)
+        => Gen.VlcPlayerAout.Mute((Gen.Player*)player, mute ? (byte)1 : (byte)0);
 
     #endregion
 
@@ -515,14 +514,14 @@ public static partial class VLCCore
     /// <summary>
     /// Retain a VLC video context.
     /// </summary>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_video_context_Hold")]
-    public static partial nint VideoContextHold(nint videoContext);
+    public static unsafe nint VideoContextHold(nint videoContext)
+        => (nint)Gen.VlcVideoContext.Hold((Gen.VideoContext*)videoContext);
 
     /// <summary>
     /// Release a retained VLC video context.
     /// </summary>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_video_context_Release")]
-    public static partial void VideoContextRelease(nint videoContext);
+    public static unsafe void VideoContextRelease(nint videoContext)
+        => Gen.VlcVideoContext.Release((Gen.VideoContext*)videoContext);
 
     /// <summary>
     /// Create a new picture from a video format.
@@ -530,24 +529,24 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="format">Pointer to video_format_t structure</param>
     /// <returns>Pointer to picture_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "picture_NewFromFormat")]
-    public static partial nint PictureNewFromFormat(nint format);
+    public static unsafe nint PictureNewFromFormat(nint format)
+        => (nint)Gen.Picture.NewFromFormat((Gen.VideoFormat*)format);
 
     /// <summary>
     /// Copy both picture dynamic properties and pixels.
     /// </summary>
     /// <param name="dst">Destination picture pointer</param>
     /// <param name="src">Source picture pointer</param>
-    [LibraryImport(LibraryName, EntryPoint = "picture_Copy")]
-    public static partial void PictureCopy(nint dst, nint src);
+    public static unsafe void PictureCopy(nint dst, nint src)
+        => Gen.Picture.Copy((Gen.Picture*)dst, (Gen.Picture*)src);
 
     /// <summary>
     /// Copy picture dynamic properties (date, flags, etc) without copying pixels.
     /// </summary>
     /// <param name="dst">Destination picture pointer</param>
     /// <param name="src">Source picture pointer</param>
-    [LibraryImport(LibraryName, EntryPoint = "picture_CopyProperties")]
-    public static partial void PictureCopyProperties(nint dst, nint src);
+    public static unsafe void PictureCopyProperties(nint dst, nint src)
+        => Gen.Picture.CopyProperties((Gen.Picture*)dst, (Gen.Picture*)src);
 
     /// <summary>
     /// Destroy a picture with zero references.
@@ -555,8 +554,8 @@ public static partial class VLCCore
     /// For filters, VLC manages the refcount, so we typically use filter_NewPicture instead.
     /// </summary>
     /// <param name="picture">Picture pointer</param>
-    [LibraryImport(LibraryName, EntryPoint = "picture_Destroy")]
-    public static partial void PictureDestroy(nint picture);
+    public static unsafe void PictureDestroy(nint picture)
+        => Gen.Picture.Destroy((Gen.Picture*)picture);
 
     /// <summary>
     /// Release a picture reference, mirroring VLC's inline picture_Release.
@@ -582,8 +581,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="fourcc">Fourcc chroma code (e.g., VLC_CODEC_I420)</param>
     /// <returns>Pointer to vlc_chroma_description_t, or IntPtr.Zero if unknown</returns>
-    [LibraryImport(LibraryName, EntryPoint = "vlc_fourcc_GetChromaDescription")]
-    public static partial nint FourccGetChromaDescription(uint fourcc);
+    public static unsafe nint FourccGetChromaDescription(uint fourcc)
+        => (nint)Gen.VlcFourcc.GetChromaDescription(fourcc);
 
     #endregion
 
@@ -595,16 +594,16 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="format">Pointer to video_format_t structure</param>
     /// <returns>Pointer to subpicture_region_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_New")]
-    public static partial nint SubpictureRegionNew(nint format);
+    public static unsafe nint SubpictureRegionNew(nint format)
+        => (nint)Gen.SubpictureRegion.New((Gen.VideoFormat*)format);
 
     /// <summary>
     /// Create a new text subpicture region.
     /// You must use subpicture_region_Delete to destroy it.
     /// </summary>
     /// <returns>Pointer to subpicture_region_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_NewText")]
-    public static partial nint SubpictureRegionNewText();
+    public static unsafe nint SubpictureRegionNewText()
+        => (nint)Gen.SubpictureRegion.NewText();
 
     /// <summary>
     /// Create a subpicture region containing the picture.
@@ -613,20 +612,20 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="picture">Pointer to picture_t</param>
     /// <returns>Pointer to subpicture_region_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_ForPicture")]
-    public static partial nint SubpictureRegionForPicture(nint picture);
+    public static unsafe nint SubpictureRegionForPicture(nint picture)
+        => (nint)Gen.SubpictureRegion.ForPicture((Gen.Picture*)picture);
 
     /// <summary>
     /// Delete a subpicture region.
     /// You may give it NULL.
     /// </summary>
     /// <param name="region">Pointer to subpicture_region_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "subpicture_region_Delete")]
-    public static partial void SubpictureRegionDelete(nint region);
+    public static unsafe void SubpictureRegionDelete(nint region)
+        => Gen.SubpictureRegion.Delete((Gen.SubpictureRegion*)region);
 
     /// <summary>Delete a subpicture created by VLC.</summary>
-    [LibraryImport(LibraryName, EntryPoint = "subpicture_Delete")]
-    public static partial void SubpictureDelete(nint subpicture);
+    public static unsafe void SubpictureDelete(nint subpicture)
+        => Gen.Subpicture.Delete((Gen.Subpicture*)subpicture);
 
     #endregion
 
@@ -636,8 +635,8 @@ public static partial class VLCCore
     /// Create a default text style with sensible defaults.
     /// </summary>
     /// <returns>Pointer to text_style_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_style_New")]
-    public static partial nint TextStyleNew();
+    public static unsafe nint TextStyleNew()
+        => (nint)Gen.TextStyle.New();
 
     /// <summary>
     /// Create a text style.
@@ -646,8 +645,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="features">Feature flags (STYLE_NO_DEFAULTS or other)</param>
     /// <returns>Pointer to text_style_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_style_Create")]
-    public static partial nint TextStyleCreate(int features);
+    public static unsafe nint TextStyleCreate(int features)
+        => (nint)Gen.TextStyle.Create(features);
 
     /// <summary>
     /// Copy a text style into another.
@@ -655,16 +654,16 @@ public static partial class VLCCore
     /// <param name="dst">Destination text_style_t pointer</param>
     /// <param name="src">Source text_style_t pointer</param>
     /// <returns>Pointer to destination text_style_t</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_style_Copy")]
-    public static partial nint TextStyleCopy(nint dst, nint src);
+    public static unsafe nint TextStyleCopy(nint dst, nint src)
+        => (nint)Gen.TextStyle.Copy((Gen.TextStyle*)dst, (Gen.TextStyle*)src);
 
     /// <summary>
     /// Duplicate a text style.
     /// </summary>
     /// <param name="style">Pointer to text_style_t to duplicate</param>
     /// <returns>Pointer to new text_style_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_style_Duplicate")]
-    public static partial nint TextStyleDuplicate(nint style);
+    public static unsafe nint TextStyleDuplicate(nint style)
+        => (nint)Gen.TextStyle.Duplicate((Gen.TextStyle*)style);
 
     /// <summary>
     /// Merge two styles using non-default values.
@@ -672,15 +671,15 @@ public static partial class VLCCore
     /// <param name="dst">Destination text_style_t pointer</param>
     /// <param name="src">Source text_style_t pointer</param>
     /// <param name="override_">True to also overwrite non-defaults</param>
-    [LibraryImport(LibraryName, EntryPoint = "text_style_Merge")]
-    public static partial void TextStyleMerge(nint dst, nint src, [MarshalAs(UnmanagedType.U1)] bool override_);
+    public static unsafe void TextStyleMerge(nint dst, nint src, bool override_)
+        => Gen.TextStyle.Merge((Gen.TextStyle*)dst, (Gen.TextStyle*)src, override_ ? (byte)1 : (byte)0);
 
     /// <summary>
     /// Delete a text style.
     /// </summary>
     /// <param name="style">Pointer to text_style_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "text_style_Delete")]
-    public static partial void TextStyleDelete(nint style);
+    public static unsafe void TextStyleDelete(nint style)
+        => Gen.TextStyle.Delete((Gen.TextStyle*)style);
 
     #endregion
 
@@ -693,8 +692,17 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="text">Text string for the segment (will be duplicated)</param>
     /// <returns>Pointer to text_segment_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_segment_New", StringMarshalling = StringMarshalling.Utf8)]
-    public static partial nint TextSegmentNew(string? text);
+    public static unsafe nint TextSegmentNew(string? text)
+    {
+        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
+        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
+        try
+        {
+            utf8.FromManaged(text, buffer);
+            return (nint)Gen.TextSegment.New(utf8.ToUnmanaged());
+        }
+        finally { utf8.Free(); }
+    }
 
     /// <summary>
     /// Create a new text segment with style inherited from the given style.
@@ -702,24 +710,24 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="style">Pointer to text_style_t to inherit from</param>
     /// <returns>Pointer to text_segment_t, or IntPtr.Zero on failure</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_segment_NewInheritStyle")]
-    public static partial nint TextSegmentNewInheritStyle(nint style);
+    public static unsafe nint TextSegmentNewInheritStyle(nint style)
+        => (nint)Gen.TextSegment.NewInheritStyle((Gen.TextStyle*)style);
 
     /// <summary>
     /// Delete a single text segment and its content.
     /// This assumes the segment is not part of a chain.
     /// </summary>
     /// <param name="segment">Pointer to text_segment_t</param>
-    [LibraryImport(LibraryName, EntryPoint = "text_segment_Delete")]
-    public static partial void TextSegmentDelete(nint segment);
+    public static unsafe void TextSegmentDelete(nint segment)
+        => Gen.TextSegment.Delete((Gen.TextSegment*)segment);
 
     /// <summary>
     /// Delete a list of text segments (chain).
     /// You may pass it NULL.
     /// </summary>
     /// <param name="segment">Pointer to first text_segment_t in chain</param>
-    [LibraryImport(LibraryName, EntryPoint = "text_segment_ChainDelete")]
-    public static partial void TextSegmentChainDelete(nint segment);
+    public static unsafe void TextSegmentChainDelete(nint segment)
+        => Gen.TextSegment.ChainDelete((Gen.TextSegment*)segment);
 
     /// <summary>
     /// Copy a text_segment and its chain into a new one.
@@ -727,8 +735,8 @@ public static partial class VLCCore
     /// </summary>
     /// <param name="segment">Pointer to text_segment_t to copy</param>
     /// <returns>Pointer to new text_segment_t chain, or IntPtr.Zero if input was NULL</returns>
-    [LibraryImport(LibraryName, EntryPoint = "text_segment_Copy")]
-    public static partial nint TextSegmentCopy(nint segment);
+    public static unsafe nint TextSegmentCopy(nint segment)
+        => (nint)Gen.TextSegment.Copy((Gen.TextSegment*)segment);
 
     #endregion
 }
