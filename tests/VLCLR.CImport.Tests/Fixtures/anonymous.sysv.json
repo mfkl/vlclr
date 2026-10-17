@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "es_like",
+      "kind": "struct",
+      "header": "anonymous.h",
+      "size": 32,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "cat",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "",
+          "type": {
+            "kind": "record",
+            "name": "es_like::@0"
+          },
+          "offset": 8,
+          "isAnonymousMember": true
+        },
+        {
+          "name": "named",
+          "type": {
+            "kind": "record",
+            "name": "es_like::named"
+          },
+          "offset": 16
+        },
+        {
+          "name": "",
+          "type": {
+            "kind": "record",
+            "name": "es_like::@1"
+          },
+          "offset": 20,
+          "isAnonymousMember": true
+        },
+        {
+          "name": "tail",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 24
+        }
+      ]
+    },
+    {
+      "name": "es_like::@0",
+      "kind": "union",
+      "header": "anonymous.h",
+      "isAnonymous": true,
+      "parent": "es_like",
+      "size": 8,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "size",
+          "type": {
+            "kind": "record",
+            "name": "es_like::@0::size"
+          },
+          "offset": 0
+        },
+        {
+          "name": "",
+          "type": {
+            "kind": "record",
+            "name": "es_like::@0::@0"
+          },
+          "offset": 0,
+          "isAnonymousMember": true
+        },
+        {
+          "name": "raw",
+          "type": {
+            "kind": "builtin",
+            "builtin": "longLong"
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "es_like::@0::@0",
+      "kind": "struct",
+      "header": "anonymous.h",
+      "isAnonymous": true,
+      "parent": "es_like::@0",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "rate",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "channels",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 4
+        }
+      ]
+    },
+    {
+      "name": "es_like::@0::size",
+      "kind": "struct",
+      "header": "anonymous.h",
+      "isAnonymous": true,
+      "parent": "es_like::@0",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "width",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "height",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 4
+        }
+      ]
+    },
+    {
+      "name": "es_like::@1",
+      "kind": "union",
+      "header": "anonymous.h",
+      "isAnonymous": true,
+      "parent": "es_like",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "as_int",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "as_float",
+          "type": {
+            "kind": "builtin",
+            "builtin": "float"
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "es_like::named",
+      "kind": "struct",
+      "header": "anonymous.h",
+      "isAnonymous": true,
+      "parent": "es_like",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "quality",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

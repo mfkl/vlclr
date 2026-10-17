@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "abi": "sysv",
+  "target": "x86_64-pc-linux-gnu",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "named_union",
+      "kind": "union",
+      "header": "unions.h",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "i",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "f",
+          "type": {
+            "kind": "builtin",
+            "builtin": "float"
+          },
+          "offset": 0
+        },
+        {
+          "name": "bytes",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "builtin",
+              "builtin": "char"
+            },
+            "count": 4
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "with_struct",
+      "kind": "union",
+      "header": "unions.h",
+      "size": 8,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "pair",
+          "type": {
+            "kind": "record",
+            "name": "with_struct::pair"
+          },
+          "offset": 0
+        },
+        {
+          "name": "whole",
+          "type": {
+            "kind": "builtin",
+            "builtin": "longLong"
+          },
+          "offset": 0
+        }
+      ]
+    },
+    {
+      "name": "with_struct::pair",
+      "kind": "struct",
+      "header": "unions.h",
+      "isAnonymous": true,
+      "parent": "with_struct",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "x",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "y",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 4
+        }
+      ]
+    },
+    {
+      "name": "with_union",
+      "kind": "struct",
+      "header": "unions.h",
+      "size": 16,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "kind",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "u",
+          "type": {
+            "kind": "record",
+            "name": "named_union"
+          },
+          "offset": 4
+        },
+        {
+          "name": "inline_union",
+          "type": {
+            "kind": "record",
+            "name": "with_union::inline_union"
+          },
+          "offset": 8
+        }
+      ]
+    },
+    {
+      "name": "with_union::inline_union",
+      "kind": "union",
+      "header": "unions.h",
+      "isAnonymous": true,
+      "parent": "with_union",
+      "size": 8,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "double"
+          },
+          "offset": 0
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

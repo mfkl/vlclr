@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "abi": "windows",
+  "target": "x86_64-pc-windows-msvc",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "types": [
+    {
+      "name": "long_mix",
+      "kind": "struct",
+      "header": "long.h",
+      "size": 32,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "long"
+          },
+          "offset": 4
+        },
+        {
+          "name": "c",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uLong"
+          },
+          "offset": 8
+        },
+        {
+          "name": "d",
+          "type": {
+            "kind": "builtin",
+            "builtin": "longLong"
+          },
+          "offset": 16
+        },
+        {
+          "name": "e",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 24
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}
