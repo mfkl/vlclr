@@ -48,9 +48,9 @@ public sealed class TranslationServiceTests
             QueueCapacity = 1
         });
 
-        Task<TranslationResponse> first = Task.Run(() => service.Translate("one", TimeSpan.FromSeconds(2)));
+        Task<TranslationResponse> first = TranslateOnOwnThread(service, "one", TimeSpan.FromSeconds(2));
         Assert.True(entered.Wait(TimeSpan.FromSeconds(1)));
-        Task<TranslationResponse> second = Task.Run(() => service.Translate("two", TimeSpan.FromSeconds(2)));
+        Task<TranslationResponse> second = TranslateOnOwnThread(service, "two", TimeSpan.FromSeconds(2));
         Assert.True(SpinWait.SpinUntil(() => service.PendingCueCount >= 2, TimeSpan.FromSeconds(1)));
 
         TranslationResponse third = service.Translate("three", TimeSpan.FromMilliseconds(20));
@@ -74,9 +74,9 @@ public sealed class TranslationServiceTests
         });
         using var service = new TranslationService(engine);
 
-        Task<TranslationResponse> first = Task.Run(() => service.Translate("same", TimeSpan.FromSeconds(2)));
+        Task<TranslationResponse> first = TranslateOnOwnThread(service, "same", TimeSpan.FromSeconds(2));
         Assert.True(entered.Wait(TimeSpan.FromSeconds(1)));
-        Task<TranslationResponse> second = Task.Run(() => service.Translate("same", TimeSpan.FromSeconds(2)));
+        Task<TranslationResponse> second = TranslateOnOwnThread(service, "same", TimeSpan.FromSeconds(2));
         gate.Set();
 
         Assert.Equal("same!", (await first).Text);
@@ -114,6 +114,16 @@ public sealed class TranslationServiceTests
         Assert.Equal(1, factoryCalls);
         Assert.Equal(1, TranslationServiceRegistry.ActiveServiceCount);
     }
+
+    // Translate blocks its caller. A thread-pool caller can wait seconds for the
+    // pool to grow while other tests block pool threads, so give it its own thread.
+    private static Task<TranslationResponse> TranslateOnOwnThread(
+        TranslationService service, string text, TimeSpan deadline) =>
+        Task.Factory.StartNew(
+            () => service.Translate(text, deadline),
+            CancellationToken.None,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
 }
 
 internal sealed class RecordingEngine(Func<string, string> translate) : ITranslationEngine
