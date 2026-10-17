@@ -9,9 +9,8 @@ namespace VLCLR.Tests.Filters;
 public unsafe class GaussianBlurTests
 {
     // A planar YUV picture in native memory with padded lines, laid out like
-    // VLC's: the luma pitch is the chroma pitch times the subsampling. VLC's
-    // filter reads up to two bytes past the visible width, so the padding is
-    // part of the input and is filled too.
+    // VLC's: the luma pitch is the chroma pitch times the subsampling. The
+    // padding is filled too: the blur must not read it.
     private sealed class TestPicture : IDisposable
     {
         private const int Padding = 32;
@@ -46,6 +45,18 @@ public unsafe class GaussianBlurTests
 
         public VLCPlane[] Planes { get; }
 
+        public void FillPadding(byte value)
+        {
+            foreach (VLCPlane plane in Planes)
+            {
+                for (int line = 0; line < plane.VisibleLines; line++)
+                {
+                    new Span<byte>((byte*)plane.Pixels + line * plane.Pitch + plane.VisiblePitch,
+                        plane.Pitch - plane.VisiblePitch).Fill(value);
+                }
+            }
+        }
+
         public byte[] Visible()
         {
             var bytes = new List<byte>();
@@ -69,13 +80,33 @@ public unsafe class GaussianBlurTests
     }
 
     private static byte[] Blur(float sigma, GaussianBlurImplementation implementation,
-        int width, int height, int chromaXShift, int chromaYShift)
+        int width, int height, int chromaXShift, int chromaYShift, byte? padding = null)
     {
         using var input = new TestPicture(width, height, chromaXShift, chromaYShift, seed: width * 1000 + height);
         using var output = new TestPicture(width, height, chromaXShift, chromaYShift, seed: 1);
+        if (padding is byte value)
+        {
+            input.FillPadding(value);
+        }
         using var blur = new GaussianBlur(sigma, implementation);
         blur.Apply(input.Planes, output.Planes);
         return output.Visible();
+    }
+
+    private static List<GaussianBlurImplementation> Implementations()
+    {
+        var implementations = new List<GaussianBlurImplementation>
+        {
+            GaussianBlurImplementation.Reference,
+            GaussianBlurImplementation.ReferenceHoisted,
+            GaussianBlurImplementation.Tuned,
+        };
+        if (Avx2.IsSupported)
+        {
+            implementations.Add(GaussianBlurImplementation.Simd);
+            implementations.Add(GaussianBlurImplementation.SimdMax);
+        }
+        return implementations;
     }
 
     public static TheoryData<int, int, int, int, float> Pictures()
@@ -97,21 +128,26 @@ public unsafe class GaussianBlurTests
     {
         byte[] reference = Blur(sigma, GaussianBlurImplementation.Reference, width, height, chromaXShift, chromaYShift);
 
-        var implementations = new List<GaussianBlurImplementation>
-        {
-            GaussianBlurImplementation.ReferenceHoisted,
-            GaussianBlurImplementation.Tuned,
-        };
-        if (Avx2.IsSupported)
-        {
-            implementations.Add(GaussianBlurImplementation.Simd);
-            implementations.Add(GaussianBlurImplementation.SimdMax);
-        }
-        foreach (GaussianBlurImplementation implementation in implementations)
+        foreach (GaussianBlurImplementation implementation in Implementations().Skip(1))
         {
             byte[] result = Blur(sigma, implementation, width, height, chromaXShift, chromaYShift);
             Assert.True(reference.AsSpan().SequenceEqual(result),
                 $"{implementation} differs from the reference ({width}x{height}, sigma {sigma})");
+        }
+    }
+
+    // VLC's filter stopped reading past the right edge in 892daf92: the
+    // padding of the input must not change the output.
+    [Theory]
+    [MemberData(nameof(Pictures))]
+    public void EveryImplementation_IgnoresThePadding(int width, int height, int chromaXShift, int chromaYShift, float sigma)
+    {
+        foreach (GaussianBlurImplementation implementation in Implementations())
+        {
+            byte[] zeros = Blur(sigma, implementation, width, height, chromaXShift, chromaYShift, padding: 0);
+            byte[] ones = Blur(sigma, implementation, width, height, chromaXShift, chromaYShift, padding: 0xFF);
+            Assert.True(zeros.AsSpan().SequenceEqual(ones),
+                $"{implementation} reads the padding ({width}x{height}, sigma {sigma})");
         }
     }
 

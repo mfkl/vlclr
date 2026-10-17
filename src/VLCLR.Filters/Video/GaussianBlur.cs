@@ -132,9 +132,7 @@ public sealed unsafe class GaussianBlur : IDisposable
     /// may be subsampled horizontally and vertically by 2 (sizes rounded down,
     /// as VLC does). The layout must be VLC's: like VLC's filter, the blur reads the luma-sized normalization
     /// table with each chroma line's pitch times the subsampling, which must
-    /// not exceed the luma pitch. Like VLC's filter, the horizontal pass reads
-    /// up to two bytes past the visible width of each line, which VLC's
-    /// picture buffers allow.
+    /// not exceed the luma pitch. Only the visible pixels are read.
     /// </summary>
     /// <exception cref="ArgumentException">The planes do not have VLC's layout.</exception>
     public void Apply(ReadOnlySpan<VLCPlane> input, ReadOnlySpan<VLCPlane> output)

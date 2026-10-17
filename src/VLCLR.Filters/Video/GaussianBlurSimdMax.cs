@@ -50,7 +50,7 @@ internal static unsafe class GaussianBlurSimdMax
         Vector256<ushort> vbias = Vector256.Create(bias);
         int interiorStart = Math.Min(visiblePitch, (dim + step - 1) / step);
         int interiorEnd = Math.Min(visiblePitch,
-            Math.Max(interiorStart, visiblePitch - Math.Max(0, (dim - 1 + step - 1) / step) + 1));
+            Math.Max(interiorStart, visiblePitch - (dim + step) / step + 1));
 
         int taps = dim + 2;
         int* merged = stackalloc int[2 * taps];
@@ -79,7 +79,7 @@ internal static unsafe class GaussianBlurSimdMax
         {
             int col = j < interiorStart ? j : interiorEnd + (j - interiorStart);
             int lo = Math.Max(-dim, -col * (xFactor + 1));
-            int hi = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) + 1);
+            int hi = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) - 1);
             int first = lo >> xFactor;
             borderFirst[j] = first;
             borderLength[j] = (hi >> xFactor) - first + 1;
