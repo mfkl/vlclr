@@ -158,7 +158,12 @@ jobs:
             choco install ffmpeg -y --no-progress
           }
           $fixture = Join-Path $PWD "tests/fixtures/filter-integration.mp4"
-          pwsh tests/fixtures/create-live-sync-speech.ps1 -OutputPath $fixture
+          New-Item -ItemType Directory -Force -Path (Split-Path $fixture) | Out-Null
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i "testsrc2=s=1280x720:r=30:d=12" `
+            -c:v libx264 -pix_fmt yuv420p $fixture
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $fixture)) {
+            throw "ffmpeg did not create the filter integration fixture"
+          }
           $fixtureUri = [Uri]::new($fixture).AbsoluteUri
           dotnet run --project tests/IntegrationTest -- vlc-sdk $fixtureUri 10
 
