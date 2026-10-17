@@ -108,7 +108,7 @@ public sealed class VLCPlayer : IDisposable
 
     /// <summary>
     /// Gets the current playback time in microseconds.
-    /// Returns Int64.MinValue if not playing or unavailable.
+    /// Returns <see cref="VLCTick.Invalid"/> (VLC_TICK_INVALID, 0) if not playing or unavailable.
     /// </summary>
     public long Time
     {
@@ -135,7 +135,7 @@ public sealed class VLCPlayer : IDisposable
         get
         {
             long time = Time;
-            if (time == long.MinValue)
+            if (time == VLCTick.Invalid)
                 return TimeSpan.Zero;
             // VLC ticks are microseconds
             return TimeSpan.FromTicks(time * 10);  // Convert microseconds to 100-nanosecond ticks
@@ -144,7 +144,7 @@ public sealed class VLCPlayer : IDisposable
 
     /// <summary>
     /// Gets the total length of the current media in microseconds.
-    /// Returns Int64.MinValue if unknown.
+    /// Returns <see cref="VLCTick.Invalid"/> (VLC_TICK_INVALID, 0) if unknown.
     /// </summary>
     public long Length
     {
@@ -171,7 +171,7 @@ public sealed class VLCPlayer : IDisposable
         get
         {
             long length = Length;
-            if (length == long.MinValue)
+            if (length == VLCTick.Invalid)
                 return TimeSpan.Zero;
             // VLC ticks are microseconds
             return TimeSpan.FromTicks(length * 10);  // Convert microseconds to 100-nanosecond ticks
