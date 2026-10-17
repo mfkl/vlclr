@@ -1,6 +1,8 @@
 // VLC module descriptor constants from vlc_plugin.h
 // VLC 4.x API version: 4.0.6
 
+using Interop = VLCLR.Native.Interop;
+
 namespace VLCLR.Module;
 
 /// <summary>
@@ -9,42 +11,42 @@ namespace VLCLR.Module;
 public static class VLCModuleConstants
 {
     // Core module operations
-    public const int VLC_MODULE_CREATE = 0;
-    public const int VLC_CONFIG_CREATE = 1;
+    public const int VLC_MODULE_CREATE = (int)Interop.ModuleProperties.ModuleCreate;
+    public const int VLC_CONFIG_CREATE = (int)Interop.ModuleProperties.ConfigCreate;
 
     // Module metadata (0x100 range)
-    public const int VLC_MODULE_CPU_REQUIREMENT = 0x100;
-    public const int VLC_MODULE_SHORTCUT = 0x101;
-    public const int VLC_MODULE_CAPABILITY = 0x102;
-    public const int VLC_MODULE_SCORE = 0x103;
-    public const int VLC_MODULE_CB_OPEN = 0x104;
-    public const int VLC_MODULE_CB_CLOSE = 0x105;
-    public const int VLC_MODULE_NO_UNLOAD = 0x106;
-    public const int VLC_MODULE_NAME = 0x107;
-    public const int VLC_MODULE_SHORTNAME = 0x108;
-    public const int VLC_MODULE_DESCRIPTION = 0x109;
-    public const int VLC_MODULE_HELP = 0x10A;
-    public const int VLC_MODULE_TEXTDOMAIN = 0x10B;
-    public const int VLC_MODULE_HELP_HTML = 0x10C;
+    public const int VLC_MODULE_CPU_REQUIREMENT = (int)Interop.ModuleProperties.ModuleCpuRequirement;
+    public const int VLC_MODULE_SHORTCUT = (int)Interop.ModuleProperties.ModuleShortcut;
+    public const int VLC_MODULE_CAPABILITY = (int)Interop.ModuleProperties.ModuleCapability;
+    public const int VLC_MODULE_SCORE = (int)Interop.ModuleProperties.ModuleScore;
+    public const int VLC_MODULE_CB_OPEN = (int)Interop.ModuleProperties.ModuleCbOpen;
+    public const int VLC_MODULE_CB_CLOSE = (int)Interop.ModuleProperties.ModuleCbClose;
+    public const int VLC_MODULE_NO_UNLOAD = (int)Interop.ModuleProperties.ModuleNoUnload;
+    public const int VLC_MODULE_NAME = (int)Interop.ModuleProperties.ModuleName;
+    public const int VLC_MODULE_SHORTNAME = (int)Interop.ModuleProperties.ModuleShortname;
+    public const int VLC_MODULE_DESCRIPTION = (int)Interop.ModuleProperties.ModuleDescription;
+    public const int VLC_MODULE_HELP = (int)Interop.ModuleProperties.ModuleHelp;
+    public const int VLC_MODULE_TEXTDOMAIN = (int)Interop.ModuleProperties.ModuleTextdomain;
+    public const int VLC_MODULE_HELP_HTML = (int)Interop.ModuleProperties.ModuleHelpHtml;
 
     // Config property constants (0x1000 range)
-    public const int VLC_CONFIG_NAME = 0x1000;
-    public const int VLC_CONFIG_VALUE = 0x1001;
-    public const int VLC_CONFIG_RANGE = 0x1002;
-    public const int VLC_CONFIG_ADVANCED_RESERVED = 0x1003;
-    public const int VLC_CONFIG_VOLATILE = 0x1004;
-    public const int VLC_CONFIG_PERSISTENT_OBSOLETE = 0x1005;
-    public const int VLC_CONFIG_PRIVATE = 0x1006;
-    public const int VLC_CONFIG_REMOVED = 0x1007;
-    public const int VLC_CONFIG_CAPABILITY = 0x1008;
-    public const int VLC_CONFIG_SHORTCUT = 0x1009;
-    public const int VLC_CONFIG_OLDNAME_OBSOLETE = 0x100A;
-    public const int VLC_CONFIG_SAFE = 0x100B;
-    public const int VLC_CONFIG_DESC = 0x100C;
-    public const int VLC_CONFIG_LIST_OBSOLETE = 0x100D;
-    public const int VLC_CONFIG_ADD_ACTION_OBSOLETE = 0x100E;
-    public const int VLC_CONFIG_LIST = 0x100F;
-    public const int VLC_CONFIG_LIST_CB_OBSOLETE = 0x1010;
+    public const int VLC_CONFIG_NAME = (int)Interop.ModuleProperties.ConfigName;
+    public const int VLC_CONFIG_VALUE = (int)Interop.ModuleProperties.ConfigValue;
+    public const int VLC_CONFIG_RANGE = (int)Interop.ModuleProperties.ConfigRange;
+    public const int VLC_CONFIG_ADVANCED_RESERVED = (int)Interop.ModuleProperties.ConfigAdvancedReserved;
+    public const int VLC_CONFIG_VOLATILE = (int)Interop.ModuleProperties.ConfigVolatile;
+    public const int VLC_CONFIG_PERSISTENT_OBSOLETE = (int)Interop.ModuleProperties.ConfigPersistentObsolete;
+    public const int VLC_CONFIG_PRIVATE = (int)Interop.ModuleProperties.ConfigPrivate;
+    public const int VLC_CONFIG_REMOVED = (int)Interop.ModuleProperties.ConfigRemoved;
+    public const int VLC_CONFIG_CAPABILITY = (int)Interop.ModuleProperties.ConfigCapability;
+    public const int VLC_CONFIG_SHORTCUT = (int)Interop.ModuleProperties.ConfigShortcut;
+    public const int VLC_CONFIG_OLDNAME_OBSOLETE = (int)Interop.ModuleProperties.ConfigOldnameObsolete;
+    public const int VLC_CONFIG_SAFE = (int)Interop.ModuleProperties.ConfigSafe;
+    public const int VLC_CONFIG_DESC = (int)Interop.ModuleProperties.ConfigDesc;
+    public const int VLC_CONFIG_LIST_OBSOLETE = (int)Interop.ModuleProperties.ConfigListObsolete;
+    public const int VLC_CONFIG_ADD_ACTION_OBSOLETE = (int)Interop.ModuleProperties.ConfigAddActionObsolete;
+    public const int VLC_CONFIG_LIST = (int)Interop.ModuleProperties.ConfigList;
+    public const int VLC_CONFIG_LIST_CB_OBSOLETE = (int)Interop.ModuleProperties.ConfigListCbObsolete;
 }
 
 /// <summary>
@@ -53,26 +55,26 @@ public static class VLCModuleConstants
 public static class VLCConfigTypes
 {
     // Configuration hint types
-    public const int CONFIG_HINT_CATEGORY = 0x02;
-    public const int CONFIG_SUBCATEGORY = 0x07;
-    public const int CONFIG_SECTION = 0x08;
+    public const int CONFIG_HINT_CATEGORY = Interop.VlcPlugin.ConfigHintCategory;
+    public const int CONFIG_SUBCATEGORY = Interop.VlcPlugin.ConfigSubcategory;
+    public const int CONFIG_SECTION = Interop.VlcPlugin.ConfigSection;
 
     // Configuration item types
-    public const int CONFIG_ITEM_FLOAT = 1 << 5;      // 0x20
-    public const int CONFIG_ITEM_INTEGER = 2 << 5;    // 0x40
-    public const int CONFIG_ITEM_RGB = CONFIG_ITEM_INTEGER | 0x01;
-    public const int CONFIG_ITEM_BOOL = 3 << 5;       // 0x60
-    public const int CONFIG_ITEM_STRING = 4 << 5;     // 0x80
-    public const int CONFIG_ITEM_PASSWORD = CONFIG_ITEM_STRING | 0x01;
-    public const int CONFIG_ITEM_KEY = CONFIG_ITEM_STRING | 0x02;
-    public const int CONFIG_ITEM_MODULE = CONFIG_ITEM_STRING | 0x04;
-    public const int CONFIG_ITEM_MODULE_CAT = CONFIG_ITEM_STRING | 0x05;
-    public const int CONFIG_ITEM_MODULE_LIST = CONFIG_ITEM_STRING | 0x06;
-    public const int CONFIG_ITEM_MODULE_LIST_CAT = CONFIG_ITEM_STRING | 0x07;
-    public const int CONFIG_ITEM_LOADFILE = CONFIG_ITEM_STRING | 0x0C;
-    public const int CONFIG_ITEM_SAVEFILE = CONFIG_ITEM_STRING | 0x0D;
-    public const int CONFIG_ITEM_DIRECTORY = CONFIG_ITEM_STRING | 0x0E;
-    public const int CONFIG_ITEM_FONT = CONFIG_ITEM_STRING | 0x0F;
+    public const int CONFIG_ITEM_FLOAT = Interop.VlcPlugin.ConfigItemFloat;
+    public const int CONFIG_ITEM_INTEGER = Interop.VlcPlugin.ConfigItemInteger;
+    public const int CONFIG_ITEM_RGB = Interop.VlcPlugin.ConfigItemRgb;
+    public const int CONFIG_ITEM_BOOL = Interop.VlcPlugin.ConfigItemBool;
+    public const int CONFIG_ITEM_STRING = Interop.VlcPlugin.ConfigItemString;
+    public const int CONFIG_ITEM_PASSWORD = Interop.VlcPlugin.ConfigItemPassword;
+    public const int CONFIG_ITEM_KEY = Interop.VlcPlugin.ConfigItemKey;
+    public const int CONFIG_ITEM_MODULE = Interop.VlcPlugin.ConfigItemModule;
+    public const int CONFIG_ITEM_MODULE_CAT = Interop.VlcPlugin.ConfigItemModuleCat;
+    public const int CONFIG_ITEM_MODULE_LIST = Interop.VlcPlugin.ConfigItemModuleList;
+    public const int CONFIG_ITEM_MODULE_LIST_CAT = Interop.VlcPlugin.ConfigItemModuleListCat;
+    public const int CONFIG_ITEM_LOADFILE = Interop.VlcPlugin.ConfigItemLoadfile;
+    public const int CONFIG_ITEM_SAVEFILE = Interop.VlcPlugin.ConfigItemSavefile;
+    public const int CONFIG_ITEM_DIRECTORY = Interop.VlcPlugin.ConfigItemDirectory;
+    public const int CONFIG_ITEM_FONT = Interop.VlcPlugin.ConfigItemFont;
 }
 
 /// <summary>
@@ -80,15 +82,15 @@ public static class VLCConfigTypes
 /// </summary>
 public static class VLCConfigCategory
 {
-    public const int CAT_HIDDEN = -1;
-    public const int CAT_UNKNOWN = 0;
-    public const int CAT_INTERFACE = 1;
-    public const int CAT_AUDIO = 2;
-    public const int CAT_VIDEO = 3;
-    public const int CAT_INPUT = 4;
-    public const int CAT_SOUT = 5;
-    public const int CAT_ADVANCED = 6;
-    public const int CAT_PLAYLIST = 7;
+    public const int CAT_HIDDEN = (int)Interop.ConfigCat.Hidden;
+    public const int CAT_UNKNOWN = (int)Interop.ConfigCat.Unknown;
+    public const int CAT_INTERFACE = (int)Interop.ConfigCat.Interface;
+    public const int CAT_AUDIO = (int)Interop.ConfigCat.Audio;
+    public const int CAT_VIDEO = (int)Interop.ConfigCat.Video;
+    public const int CAT_INPUT = (int)Interop.ConfigCat.Input;
+    public const int CAT_SOUT = (int)Interop.ConfigCat.Sout;
+    public const int CAT_ADVANCED = (int)Interop.ConfigCat.Advanced;
+    public const int CAT_PLAYLIST = (int)Interop.ConfigCat.Playlist;
 }
 
 /// <summary>
@@ -96,55 +98,55 @@ public static class VLCConfigCategory
 /// </summary>
 public static class VLCConfigSubcategory
 {
-    public const int SUBCAT_HIDDEN = -1;
-    public const int SUBCAT_UNKNOWN = 0;
+    public const int SUBCAT_HIDDEN = (int)Interop.ConfigSubcat.Hidden;
+    public const int SUBCAT_UNKNOWN = (int)Interop.ConfigSubcat.Unknown;
 
     // Interface
-    public const int SUBCAT_INTERFACE_GENERAL = 101;
-    public const int SUBCAT_INTERFACE_MAIN = 102;
-    public const int SUBCAT_INTERFACE_CONTROL = 103;
-    public const int SUBCAT_INTERFACE_HOTKEYS = 104;
+    public const int SUBCAT_INTERFACE_GENERAL = (int)Interop.ConfigSubcat.InterfaceGeneral;
+    public const int SUBCAT_INTERFACE_MAIN = (int)Interop.ConfigSubcat.InterfaceMain;
+    public const int SUBCAT_INTERFACE_CONTROL = (int)Interop.ConfigSubcat.InterfaceControl;
+    public const int SUBCAT_INTERFACE_HOTKEYS = (int)Interop.ConfigSubcat.InterfaceHotkeys;
 
     // Audio
-    public const int SUBCAT_AUDIO_GENERAL = 201;
-    public const int SUBCAT_AUDIO_AOUT = 202;
-    public const int SUBCAT_AUDIO_AFILTER = 203;
-    public const int SUBCAT_AUDIO_VISUAL = 204;
-    public const int SUBCAT_AUDIO_RESAMPLER = 206;
+    public const int SUBCAT_AUDIO_GENERAL = (int)Interop.ConfigSubcat.AudioGeneral;
+    public const int SUBCAT_AUDIO_AOUT = (int)Interop.ConfigSubcat.AudioAout;
+    public const int SUBCAT_AUDIO_AFILTER = (int)Interop.ConfigSubcat.AudioAfilter;
+    public const int SUBCAT_AUDIO_VISUAL = (int)Interop.ConfigSubcat.AudioVisual;
+    public const int SUBCAT_AUDIO_RESAMPLER = (int)Interop.ConfigSubcat.AudioResampler;
 
     // Video
-    public const int SUBCAT_VIDEO_GENERAL = 301;
-    public const int SUBCAT_VIDEO_VOUT = 302;
-    public const int SUBCAT_VIDEO_VFILTER = 303;
-    public const int SUBCAT_VIDEO_SUBPIC = 305;
-    public const int SUBCAT_VIDEO_SPLITTER = 306;
+    public const int SUBCAT_VIDEO_GENERAL = (int)Interop.ConfigSubcat.VideoGeneral;
+    public const int SUBCAT_VIDEO_VOUT = (int)Interop.ConfigSubcat.VideoVout;
+    public const int SUBCAT_VIDEO_VFILTER = (int)Interop.ConfigSubcat.VideoVfilter;
+    public const int SUBCAT_VIDEO_SUBPIC = (int)Interop.ConfigSubcat.VideoSubpic;
+    public const int SUBCAT_VIDEO_SPLITTER = (int)Interop.ConfigSubcat.VideoSplitter;
 
     // Input
-    public const int SUBCAT_INPUT_GENERAL = 401;
-    public const int SUBCAT_INPUT_ACCESS = 402;
-    public const int SUBCAT_INPUT_DEMUX = 403;
-    public const int SUBCAT_INPUT_VCODEC = 404;
-    public const int SUBCAT_INPUT_ACODEC = 405;
-    public const int SUBCAT_INPUT_SCODEC = 406;
-    public const int SUBCAT_INPUT_STREAM_FILTER = 407;
+    public const int SUBCAT_INPUT_GENERAL = (int)Interop.ConfigSubcat.InputGeneral;
+    public const int SUBCAT_INPUT_ACCESS = (int)Interop.ConfigSubcat.InputAccess;
+    public const int SUBCAT_INPUT_DEMUX = (int)Interop.ConfigSubcat.InputDemux;
+    public const int SUBCAT_INPUT_VCODEC = (int)Interop.ConfigSubcat.InputVcodec;
+    public const int SUBCAT_INPUT_ACODEC = (int)Interop.ConfigSubcat.InputAcodec;
+    public const int SUBCAT_INPUT_SCODEC = (int)Interop.ConfigSubcat.InputScodec;
+    public const int SUBCAT_INPUT_STREAM_FILTER = (int)Interop.ConfigSubcat.InputStreamFilter;
 
     // Stream output
-    public const int SUBCAT_SOUT_GENERAL = 501;
-    public const int SUBCAT_SOUT_STREAM = 502;
-    public const int SUBCAT_SOUT_MUX = 503;
-    public const int SUBCAT_SOUT_ACO = 504;
-    public const int SUBCAT_SOUT_PACKETIZER = 505;
-    public const int SUBCAT_SOUT_VOD = 507;
-    public const int SUBCAT_SOUT_RENDERER = 508;
+    public const int SUBCAT_SOUT_GENERAL = (int)Interop.ConfigSubcat.SoutGeneral;
+    public const int SUBCAT_SOUT_STREAM = (int)Interop.ConfigSubcat.SoutStream;
+    public const int SUBCAT_SOUT_MUX = (int)Interop.ConfigSubcat.SoutMux;
+    public const int SUBCAT_SOUT_ACO = (int)Interop.ConfigSubcat.SoutAco;
+    public const int SUBCAT_SOUT_PACKETIZER = (int)Interop.ConfigSubcat.SoutPacketizer;
+    public const int SUBCAT_SOUT_VOD = (int)Interop.ConfigSubcat.SoutVod;
+    public const int SUBCAT_SOUT_RENDERER = (int)Interop.ConfigSubcat.SoutRenderer;
 
     // Advanced
-    public const int SUBCAT_ADVANCED_MISC = 602;
-    public const int SUBCAT_ADVANCED_NETWORK = 603;
+    public const int SUBCAT_ADVANCED_MISC = (int)Interop.ConfigSubcat.AdvancedMisc;
+    public const int SUBCAT_ADVANCED_NETWORK = (int)Interop.ConfigSubcat.AdvancedNetwork;
 
     // Playlist
-    public const int SUBCAT_PLAYLIST_GENERAL = 701;
-    public const int SUBCAT_PLAYLIST_SD = 702;
-    public const int SUBCAT_PLAYLIST_EXPORT = 703;
+    public const int SUBCAT_PLAYLIST_GENERAL = (int)Interop.ConfigSubcat.PlaylistGeneral;
+    public const int SUBCAT_PLAYLIST_SD = (int)Interop.ConfigSubcat.PlaylistSd;
+    public const int SUBCAT_PLAYLIST_EXPORT = (int)Interop.ConfigSubcat.PlaylistExport;
 }
 
 /// <summary>
@@ -152,10 +154,10 @@ public static class VLCConfigSubcategory
 /// </summary>
 public static class VLCApi
 {
-    public const string VLC_API_VERSION_STRING = "4.0.6";
+    public const string VLC_API_VERSION_STRING = Interop.VlcPlugin.ApiVersionString;
 
     // License strings (decoded from vlc_plugin.h hex values)
-    public const string VLC_COPYRIGHT_VIDEOLAN = "Copyright (C) the VideoLAN VLC media player developers";
-    public const string VLC_LICENSE_LGPL_2_1_PLUS = "Licensed under the terms of the GNU Lesser General Public License, version 2.1 or later.";
-    public const string VLC_LICENSE_GPL_2_PLUS = "Licensed under the terms of the GNU General Public License, version 2 or later.";
+    public const string VLC_COPYRIGHT_VIDEOLAN = Interop.VlcPlugin.CopyrightVideolan;
+    public const string VLC_LICENSE_LGPL_2_1_PLUS = Interop.VlcPlugin.LicenseLgpl21Plus;
+    public const string VLC_LICENSE_GPL_2_PLUS = Interop.VlcPlugin.LicenseGpl2Plus;
 }

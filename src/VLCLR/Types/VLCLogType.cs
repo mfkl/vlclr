@@ -2,6 +2,8 @@
 // Source: vlc/include/vlc_messages.h
 // VLC Version: 4.0.6
 
+using Interop = VLCLR.Native.Interop;
+
 namespace VLCLR.Types;
 
 /// <summary>
@@ -11,14 +13,14 @@ namespace VLCLR.Types;
 public enum VLCLogType
 {
     /// <summary>Important information (VLC_MSG_INFO)</summary>
-    Info = 0,
+    Info = (int)Interop.LogType.Info,
 
     /// <summary>Error (VLC_MSG_ERR)</summary>
-    Error = 1,
+    Error = (int)Interop.LogType.Err,
 
     /// <summary>Warning (VLC_MSG_WARN)</summary>
-    Warning = 2,
+    Warning = (int)Interop.LogType.Warn,
 
     /// <summary>Debug (VLC_MSG_DBG)</summary>
-    Debug = 3
+    Debug = (int)Interop.LogType.Dbg
 }

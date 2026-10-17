@@ -11,21 +11,21 @@ namespace VLCLR.Native;
 public static class VLCFourCC
 {
     // Common VLC chroma fourcc values
-    public const uint RV32 = 0x32335652; // "RV32" - 32-bit RGB (actually BGRX)
-    public const uint RV24 = 0x34325652; // "RV24" - 24-bit RGB (actually BGR)
-    public const uint RGBA = 0x41424752; // "RGBA"
-    public const uint BGRA = 0x41524742; // "BGRA"
-    public const uint I420 = 0x30323449; // "I420" - YUV 4:2:0 planar
-    public const uint YV12 = 0x32315659; // "YV12" - YUV 4:2:0 planar
-    public const uint D3D11Opaque = 0x31315844; // "DX11" - D3D11 8-bit video surface
-    public const uint D3D11Opaque10Bit = 0x30315844; // "DX10" - D3D11 10-bit video surface
-    public const uint D3D11OpaqueRgba = 0x47525844; // "DXRG"
-    public const uint D3D11OpaqueBgra = 0x52474144; // "DAGR"
-    public const uint D3D11OpaqueAlpha = 0x31314144; // "DA11"
+    public const uint RV32 = Interop.VlcFourcc.CodecXrgb; // "RV32" - 32-bit RGB (VLC_CODEC_XRGB)
+    public const uint RV24 = Interop.VlcFourcc.CodecRgb24; // "RV24" - 24-bit RGB (VLC_CODEC_RGB24)
+    public const uint RGBA = Interop.VlcFourcc.CodecRgba; // "RGBA"
+    public const uint BGRA = Interop.VlcFourcc.CodecBgra; // "BGRA"
+    public const uint I420 = Interop.VlcFourcc.CodecI420; // "I420" - YUV 4:2:0 planar
+    public const uint YV12 = Interop.VlcFourcc.CodecYv12; // "YV12" - YUV 4:2:0 planar
+    public const uint D3D11Opaque = Interop.VlcFourcc.CodecD3d11Opaque; // "DX11" - D3D11 8-bit video surface
+    public const uint D3D11Opaque10Bit = Interop.VlcFourcc.CodecD3d11Opaque10b; // "DX10" - D3D11 10-bit video surface
+    public const uint D3D11OpaqueRgba = Interop.VlcFourcc.CodecD3d11OpaqueRgba; // "DXRG"
+    public const uint D3D11OpaqueBgra = Interop.VlcFourcc.CodecD3d11OpaqueBgra; // "DAGR"
+    public const uint D3D11OpaqueAlpha = Interop.VlcFourcc.CodecD3d11OpaqueAlpha; // "DA11"
 
     // Common native little-endian audio formats on Windows.
-    public const uint F32L = 0x6C323366; // "f32l" - interleaved 32-bit float
-    public const uint S16L = 0x6C363173; // "s16l" - interleaved signed 16-bit PCM
+    public const uint F32L = Interop.VlcFourcc.CodecF32l; // "f32l" - interleaved 32-bit float
+    public const uint S16L = Interop.VlcFourcc.CodecS16l; // "s16l" - interleaved signed 16-bit PCM
 
     /// <summary>
     /// Convert a FourCC uint to its 4-character string representation.
