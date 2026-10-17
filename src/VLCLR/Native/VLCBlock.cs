@@ -7,27 +7,30 @@ using System.Runtime.InteropServices;
 namespace VLCLR.Native;
 
 /// <summary>
-/// Prefix of VLC's <c>block_t</c>/<c>vlc_frame_t</c> used by audio filters.
-/// The fields through <see cref="Length"/> are ABI-stable and sufficient for
+/// Prefix of VLC's <c>block_t</c>/<c>vlc_frame_t</c> (<see cref="Interop.Frame"/>) used by
+/// audio filters: every member before <c>ancillaries</c>. It is sufficient for
 /// observing decoded PCM without taking ownership of the block.
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 72)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.Frame.Offsets.Ancillaries)]
 public struct VLCBlock
 {
-    [FieldOffset(0)] public nint Next;
-    [FieldOffset(8)] public nint Buffer;
-    [FieldOffset(16)] public nuint BufferLength;
-    [FieldOffset(24)] public nint AllocationStart;
-    [FieldOffset(32)] public nuint AllocationSize;
-    [FieldOffset(40)] public uint Flags;
-    [FieldOffset(44)] public uint SampleCount;
-    [FieldOffset(48)] public long PresentationTimestamp;
-    [FieldOffset(56)] public long DecodeTimestamp;
-    [FieldOffset(64)] public long Length;
+    [FieldOffset(Interop.Frame.Offsets.Next)] public nint Next;
+    [FieldOffset(Interop.Frame.Offsets.Buffer)] public nint Buffer;
+    [FieldOffset(Interop.Frame.Offsets.BufferSize)] public nuint BufferLength;
+    [FieldOffset(Interop.Frame.Offsets.Start)] public nint AllocationStart;
+    [FieldOffset(Interop.Frame.Offsets.Size)] public nuint AllocationSize;
+    [FieldOffset(Interop.Frame.Offsets.Flags)] public uint Flags;
+    [FieldOffset(Interop.Frame.Offsets.NbSamples)] public uint SampleCount;
+    [FieldOffset(Interop.Frame.Offsets.Pts)] public long PresentationTimestamp;
+    [FieldOffset(Interop.Frame.Offsets.Dts)] public long DecodeTimestamp;
+    [FieldOffset(Interop.Frame.Offsets.Length)] public long Length;
 }
 
 public static class VLCBlockFlags
 {
-    public const uint Discontinuity = 0x0001;
-    public const uint Corrupted = 0x0400;
+    /// <summary>VLC_FRAME_FLAG_DISCONTINUITY</summary>
+    public const uint Discontinuity = (uint)Interop.VlcFrame.FrameFlagDiscontinuity;
+
+    /// <summary>VLC_FRAME_FLAG_CORRUPTED</summary>
+    public const uint Corrupted = (uint)Interop.VlcFrame.FrameFlagCorrupted;
 }
