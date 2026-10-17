@@ -130,12 +130,15 @@ public struct VLCSubpictureUpdaterOps
 /// </summary>
 public static class VLCTick
 {
-    /// <summary>Invalid tick value</summary>
-    public const long Invalid = long.MinValue;
+    /// <summary>Invalid tick value (VLC_TICK_INVALID, 0). Not a negative sentinel.</summary>
+    public const long Invalid = Interop.VlcConfig.TickInvalid;
 
-    /// <summary>One second in microseconds</summary>
-    public const long Second = 1_000_000;
+    /// <summary>First valid tick (VLC_TICK_0, 1).</summary>
+    public const long Zero = Interop.VlcConfig.Tick0;
 
-    /// <summary>One millisecond in microseconds</summary>
-    public const long Millisecond = 1_000;
+    /// <summary>One second in ticks (CLOCK_FREQ, microseconds).</summary>
+    public const long Second = Interop.VlcConfig.ClockFreq;
+
+    /// <summary>One millisecond in ticks (CLOCK_FREQ / 1000).</summary>
+    public const long Millisecond = Interop.VlcConfig.ClockFreq / 1000;
 }
