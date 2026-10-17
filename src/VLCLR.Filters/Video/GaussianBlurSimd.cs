@@ -124,10 +124,11 @@ internal static unsafe class GaussianBlurSimd
     {
         int* center = distribution + dim;
         int step = xFactor + 1;
-        // Columns where the C bounds are exactly [-dim, dim].
+        // Columns where the C bounds are exactly [-dim, dim]: col * step >= dim
+        // and (visiblePitch - col) * step - 1 >= dim.
         int interiorStart = Math.Min(visiblePitch, (dim + step - 1) / step);
         int interiorEnd = Math.Min(visiblePitch,
-            Math.Max(interiorStart, visiblePitch - Math.Max(0, (dim - 1 + step - 1) / step) + 1));
+            Math.Max(interiorStart, visiblePitch - (dim + step) / step + 1));
 
         int taps = dim + 2;
         int* merged = stackalloc int[2 * taps];
@@ -188,7 +189,7 @@ internal static unsafe class GaussianBlurSimd
     internal static int BorderPixel(byte* row, int col, int visiblePitch, int xFactor, int* center, int dim)
     {
         int lo = Math.Max(-dim, -col * (xFactor + 1));
-        int hi = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) + 1);
+        int hi = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) - 1);
         byte* p = row + col;
         int value = 0;
         for (int x = lo; x <= hi; x++)
