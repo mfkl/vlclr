@@ -69,6 +69,13 @@ jobs:
         shell: cmd
         run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc-headers\include
 
+      # Compiles tests/InlineParity/native/inline_parity.c against the pinned
+      # headers (cl on Windows, cc elsewhere; the fixture finds the compiler)
+      # and compares the C# reimplementations of VLC's static inlines with it.
+      - name: Inline parity, C# reimplementations against the VLC inline functions
+        if: ${{ !cancelled() }}
+        run: dotnet test tests/InlineParity -c Release --no-build
+
       # A failure here, with the pinned step above green, means VLC changed a
       # layout since the pinned commit: a real drift signal.
       - name: VLC nightly drift, interop layouts against the nightly headers
