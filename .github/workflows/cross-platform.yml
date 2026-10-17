@@ -46,13 +46,7 @@ jobs:
         run: dotnet build vlclr.sln -c Release
 
       - name: Unit tests
-        run: |
-          status=0
-          for project in src/VLCLR.Tests tests/VLCLR.ObjectDetection.Tests \
-                         tests/SubtitleTranslator.UnitTests tests/LiveAudioTranslator.ProtocolTests; do
-            dotnet test "$project" -c Release --no-build || status=1
-          done
-          exit $status
+        run: dotnet test src/VLCLR.Tests -c Release --no-build
 
       - name: Install unsquashfs
         if: ${{ !cancelled() && runner.os == 'Linux' }}

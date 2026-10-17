@@ -45,9 +45,7 @@ callbacks, exception handling, and per-instance state. Advanced plugins can use
 |---|---|---|
 | [VideoOverlay](samples/VideoOverlay/README.md) | CPU video filter with ImageSharp text and graphics | Windows, Linux, macOS |
 | [SubtitleRenderer](samples/SubtitleRenderer/README.md) | ImageSharp text renderer | Windows, Linux, macOS |
-| [LiveAudioTranslator](samples/LiveAudioTranslator/README.md) | Live speech translation: audio filter, subtitle source, and external worker | Windows, Linux, macOS |
-| [SubtitleTranslator](samples/SubtitleTranslator/README.md) | Offline ONNX English-to-French text renderer | Windows |
-| [YoloObjectSearch](samples/YoloObjectSearch/README.md) | D3D11/OpenVINO GPU video filter with COCO-80 boxes and labels | Windows |
+| [GaussianBlur](samples/GaussianBlur/README.md) | Port of VLC's Gaussian blur video filter with the same output, SIMD included | Windows, Linux, macOS |
 
 ### Advanced samples
 
@@ -58,6 +56,9 @@ These are closed source and available under the commercial license.
 | Privacy Shield | Real-time redaction of people, faces, and license plates during playback, with solid, mosaic, or blur effects. GPU-accelerated end to end |
 | Semantic Video Navigator | Describe a moment in plain words and jump straight to it. Indexing runs in the background while playback stays smooth |
 | Shader Studio | GPU-accelerated live effects (CRT, Comic, Neon, VHS, Noir, Halftone, Temporal Echo), switched instantly from a panel inside VLC |
+| Live Audio Translator | Live speech translation: listens to the audio track, transcribes and translates it, and shows the result as subtitles |
+| Subtitle Translator | Offline English-to-French subtitle translation with a local ONNX model, inside the text renderer |
+| Object Search | YOLOX object detection on the GPU (D3D11 and OpenVINO), with boxes and labels drawn over the video |
 
 ## Requirements
 
@@ -84,11 +85,10 @@ dotnet publish samples/VideoOverlay -c Release
 | `src/VLCLR/` | Core bindings, wrappers, module registration, and plugin base classes |
 | `src/VLCLR.Generators/` | Attribute-based VLC module source generator |
 | `src/VLCLR.ImageSharp/` | Frame and text-rendering helpers |
-| `src/VLCLR.ObjectDetection/` | Detection contracts, YOLOX decoding, and overlay timing |
-| `src/VLCLR.LiveTranslation/` | Translation worker protocol and model profiles |
+| `src/VLCLR.Filters/` | Ports of VLC's video filters |
 | `samples/` | Native AOT plugin examples, each with its own guide |
 | `tests/` | Unit, ABI, integration, and visual tests |
-| `benchmarks/` | Rendering, inference, and playback measurements |
+| `benchmarks/` | Rendering and filter performance measurements |
 
 ## License
 
@@ -98,5 +98,4 @@ VLCLR is dual-licensed:
 - **Commercial**: for use in proprietary software without GPL obligations,
   contact [@mfkl](https://github.com/mfkl).
 
-Model files and third-party components keep their own licenses; see each
-sample's model manifest.
+Third-party components keep their own licenses.
