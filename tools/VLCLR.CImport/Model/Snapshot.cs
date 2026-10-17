@@ -29,6 +29,9 @@ public sealed record Snapshot
     public IReadOnlyList<FunctionDecl> Functions { get; init; } = [];
     public IReadOnlyList<ConstantDecl> Constants { get; init; } = [];
 
+    /// <summary>Selected symbols extract could not represent (macros that do not evaluate, unsupported types, ...).</summary>
+    public IReadOnlyList<SkippedDecl> Skipped { get; init; } = [];
+
     /// <summary>
     /// Returns a copy with every top-level list sorted by name (ordinal).
     /// Declaration-internal lists are left as declared.
@@ -40,6 +43,7 @@ public sealed record Snapshot
         Typedefs = [.. Typedefs.OrderBy(t => t.Name, StringComparer.Ordinal)],
         Functions = [.. Functions.OrderBy(f => f.Name, StringComparer.Ordinal)],
         Constants = [.. Constants.OrderBy(c => c.Name, StringComparer.Ordinal)],
+        Skipped = [.. Skipped.OrderBy(c => c.Name, StringComparer.Ordinal).ThenBy(c => c.Kind, StringComparer.Ordinal)],
     };
 }
 
