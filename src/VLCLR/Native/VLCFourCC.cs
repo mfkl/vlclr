@@ -11,8 +11,16 @@ namespace VLCLR.Native;
 public static class VLCFourCC
 {
     // Common VLC chroma fourcc values
-    public const uint RV32 = Interop.VlcFourcc.CodecXrgb; // "RV32" - 32-bit RGB (VLC_CODEC_XRGB)
-    public const uint RV24 = Interop.VlcFourcc.CodecRgb24; // "RV24" - 24-bit RGB (VLC_CODEC_RGB24)
+    public const uint RV32 = Interop.VlcFourcc.CodecXrgb; // "RV32" - 32-bit RGB, memory order X,R,G,B (VLC_CODEC_XRGB)
+    public const uint RV24 = Interop.VlcFourcc.CodecRgb24; // "RV24" - 24-bit RGB, memory order R,G,B (VLC_CODEC_RGB24)
+    public const uint XRGB = Interop.VlcFourcc.CodecXrgb; // "RV32" - memory order X,R,G,B (same value as RV32)
+    public const uint RGBX = Interop.VlcFourcc.CodecRgbx; // "RGBX" - memory order R,G,B,X
+    public const uint BGRX = Interop.VlcFourcc.CodecBgrx; // "BGRX" - memory order B,G,R,X
+    public const uint XBGR = Interop.VlcFourcc.CodecXbgr; // "XBGR" - memory order X,B,G,R
+    public const uint RGB24 = Interop.VlcFourcc.CodecRgb24; // "RV24" - memory order R,G,B (same value as RV24)
+    public const uint BGR24 = Interop.VlcFourcc.CodecBgr24; // "BGR3" - memory order B,G,R
+    public const uint ARGB = Interop.VlcFourcc.CodecArgb; // "ARGB" - memory order A,R,G,B
+    public const uint ABGR = Interop.VlcFourcc.CodecAbgr; // "ABGR" - memory order A,B,G,R
     public const uint RGBA = Interop.VlcFourcc.CodecRgba; // "RGBA"
     public const uint BGRA = Interop.VlcFourcc.CodecBgra; // "BGRA"
     public const uint I420 = Interop.VlcFourcc.CodecI420; // "I420" - YUV 4:2:0 planar
@@ -47,10 +55,9 @@ public static class VLCFourCC
     {
         return chroma switch
         {
-            RV32 => 4,
-            RV24 => 3,
-            RGBA => 4,
-            BGRA => 4,
+            XRGB or RGBX or BGRX or XBGR => 4,
+            RGB24 or BGR24 => 3,
+            RGBA or BGRA or ARGB or ABGR => 4,
             I420 => 1, // Y plane only
             YV12 => 1, // Y plane only
             _ => GuessFromFourcc(chroma)
@@ -80,31 +87,51 @@ public static class VLCFourCC
     }
 
     /// <summary>
-    /// Check if a chroma format uses BGRA byte ordering (vs RGBA).
-    /// RV32 and RV24 are actually BGR(A) in VLC.
+    /// Gets the byte offsets of the R, G, B and A components of a packed RGB chroma,
+    /// as laid out in memory (VLC names these formats by memory address order).
     /// </summary>
-    public static bool IsBgraFormat(uint chroma)
+    /// <param name="chroma">VLC chroma fourcc.</param>
+    /// <param name="r">Byte offset of red within a pixel.</param>
+    /// <param name="g">Byte offset of green within a pixel.</param>
+    /// <param name="b">Byte offset of blue within a pixel.</param>
+    /// <param name="a">Byte offset of alpha, or -1 when the format has no alpha channel
+    /// (an ignored "X" byte counts as no alpha).</param>
+    /// <returns>True for XRGB (RV32), RGBX, BGRX, XBGR, RGB24 (RV24), BGR24, RGBA, BGRA, ARGB and ABGR.</returns>
+    public static bool TryGetRgbLayout(uint chroma, out int r, out int g, out int b, out int a)
     {
-        return chroma switch
+        switch (chroma)
         {
-            RV32 => true,  // BGRX
-            RV24 => true,  // BGR
-            BGRA => true,
-            _ => false
-        };
+            case XRGB: r = 1; g = 2; b = 3; a = -1; return true;
+            case RGBX: r = 0; g = 1; b = 2; a = -1; return true;
+            case BGRX: r = 2; g = 1; b = 0; a = -1; return true;
+            case XBGR: r = 3; g = 2; b = 1; a = -1; return true;
+            case RGB24: r = 0; g = 1; b = 2; a = -1; return true;
+            case BGR24: r = 2; g = 1; b = 0; a = -1; return true;
+            case RGBA: r = 0; g = 1; b = 2; a = 3; return true;
+            case BGRA: r = 2; g = 1; b = 0; a = 3; return true;
+            case ARGB: r = 1; g = 2; b = 3; a = 0; return true;
+            case ABGR: r = 3; g = 2; b = 1; a = 0; return true;
+            default: r = g = b = a = -1; return false;
+        }
     }
 
     /// <summary>
-    /// Check if a chroma format has an alpha channel.
+    /// Check if a chroma format stores its colour bytes in B,G,R order at byte offsets 0..2
+    /// (BGRA, BGRX, BGR24). RV32 (XRGB) and RV24 (RGB24) are not BGR; use
+    /// <see cref="TryGetRgbLayout"/> for the exact component positions.
+    /// </summary>
+    public static bool IsBgraFormat(uint chroma)
+    {
+        return chroma is BGRA or BGRX or BGR24;
+    }
+
+    /// <summary>
+    /// Check if a chroma format has an alpha channel (RGBA, BGRA, ARGB, ABGR).
+    /// Formats with an ignored X byte (RV32, RGBX, BGRX, XBGR) have none.
     /// </summary>
     public static bool HasAlphaChannel(uint chroma)
     {
-        return chroma switch
-        {
-            RGBA => true,
-            BGRA => true,
-            _ => false
-        };
+        return chroma is RGBA or BGRA or ARGB or ABGR;
     }
 
     /// <summary>
