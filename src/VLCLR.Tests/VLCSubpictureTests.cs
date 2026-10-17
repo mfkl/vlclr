@@ -191,9 +191,9 @@ public class VLCSubpictureTests
     #region VLCTick Constants Tests
 
     [Fact]
-    public void VLCTick_Invalid_IsLongMinValue()
+    public void VLCTick_Invalid_IsVlcTickInvalidZero()
     {
-        Assert.Equal(long.MinValue, VLCTick.Invalid);
+        Assert.Equal(0L, VLCTick.Invalid);
     }
 
     [Fact]
