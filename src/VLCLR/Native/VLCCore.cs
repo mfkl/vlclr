@@ -783,80 +783,85 @@ public static class VLCPlayerCapabilities
 }
 
 /// <summary>
-/// VLC player callbacks structure.
-/// Has 35 callback function pointers - all must be defined even if unused.
+/// VLC player callbacks structure (vlc_player_cbs), laid out from the generated
+/// <c>Interop.PlayerCbs</c>: 37 callback slots, all of which must exist even if
+/// unused. Each field holds a C function pointer, or zero for no callback.
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = Gen.PlayerCbs.MaxSizeOf)]
 public struct VLCPlayerCbs
 {
-    // Callback 1: void (*on_current_media_changed)(player, new_media, data)
-    public nint OnCurrentMediaChanged;
-    // Callback 2: void (*on_state_changed)(player, new_state, data)
-    public nint OnStateChanged;
-    // Callback 3: void (*on_error_changed)(player, error, data)
-    public nint OnErrorChanged;
-    // Callback 4: void (*on_buffering_changed)(player, new_buffering, data)
-    public nint OnBufferingChanged;
-    // Callback 5: void (*on_rate_changed)(player, new_rate, data)
-    public nint OnRateChanged;
-    // Callback 6: void (*on_capabilities_changed)(player, old_caps, new_caps, data)
-    public nint OnCapabilitiesChanged;
-    // Callback 7: void (*on_position_changed)(player, new_time, new_pos, data)
-    public nint OnPositionChanged;
-    // Callback 8: void (*on_length_changed)(player, new_length, data)
-    public nint OnLengthChanged;
-    // Callback 9: void (*on_track_list_changed)(player, type, action, track, data)
-    public nint OnTrackListChanged;
-    // Callback 10: void (*on_track_selection_changed)(player, unselected_id, selected_id, data)
-    public nint OnTrackSelectionChanged;
-    // Callback 11: void (*on_track_delay_changed)(player, es_id, delay, data)
-    public nint OnTrackDelayChanged;
-    // Callback 12: void (*on_program_list_changed)(player, action, prgm, data)
-    public nint OnProgramListChanged;
-    // Callback 13: void (*on_program_selection_changed)(player, unselected_id, selected_id, data)
-    public nint OnProgramSelectionChanged;
-    // Callback 14: void (*on_titles_changed)(player, titles, data)
-    public nint OnTitlesChanged;
-    // Callback 15: void (*on_title_selection_changed)(player, new_title, new_idx, data)
-    public nint OnTitleSelectionChanged;
-    // Callback 16: void (*on_chapter_selection_changed)(player, title, new_chapter_idx, data)
-    public nint OnChapterSelectionChanged;
-    // Callback 17: void (*on_teletext_menu_changed)(player, has_teletext_menu, data)
-    public nint OnTeletextMenuChanged;
-    // Callback 18: void (*on_teletext_enabled_changed)(player, enabled, data)
-    public nint OnTeletextEnabledChanged;
-    // Callback 19: void (*on_teletext_page_changed)(player, new_page, data)
-    public nint OnTeletextPageChanged;
-    // Callback 20: void (*on_teletext_transparency_changed)(player, enabled, data)
-    public nint OnTeletextTransparencyChanged;
-    // Callback 21: void (*on_category_delay_changed)(player, cat, new_delay, data)
-    public nint OnCategoryDelayChanged;
-    // Callback 22: void (*on_associated_subs_fps_changed)(player, fps, data)
-    public nint OnAssociatedSubsFpsChanged;
-    // Callback 23: void (*on_renderer_changed)(player, new_renderer, data)
-    public nint OnRendererChanged;
-    // Callback 24: void (*on_record_changed)(player, recording, data)
-    public nint OnRecordChanged;
-    // Callback 25: void (*on_signal_changed)(player, quality, strength, data)
-    public nint OnSignalChanged;
-    // Callback 26: void (*on_statistics_changed)(player, stats, data)
-    public nint OnStatisticsChanged;
-    // Callback 27: void (*on_atobloop_changed)(player, state, time_a, time_b, data)
-    public nint OnAtobloopChanged;
-    // Callback 28: void (*on_media_meta_changed)(player, media, data)
-    public nint OnMediaMetaChanged;
-    // Callback 29: void (*on_media_epg_changed)(player, media, data)
-    public nint OnMediaEpgChanged;
-    // Callback 30: void (*on_subitems_changed)(player, media, new_subitems, data)
-    public nint OnSubitemsChanged;
-    // Callback 31: void (*on_vout_changed)(player, action, vout, order, es_id, data)
-    public nint OnVoutChanged;
-    // Callback 32: void (*on_corks_changed)(player, corks, data)
-    public nint OnCorksChanged;
-    // Callback 33: void (*on_playback_restore_queried)(player, data)
-    public nint OnPlaybackRestoreQueried;
-    // Callback 34: void (*on_stopping_current_media)(player, current_media, data)
-    public nint OnStoppingCurrentMedia;
-    // Callback 35: void (*on_media_attachments_added)(player, media, attachments, count, data)
-    public nint OnMediaAttachmentsAdded;
+    // Slot 1: on_current_media_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnCurrentMediaChanged)] public nint OnCurrentMediaChanged;
+    // Slot 2: on_state_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnStateChanged)] public nint OnStateChanged;
+    // Slot 3: on_error_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnErrorChanged)] public nint OnErrorChanged;
+    // Slot 4: on_buffering_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnBufferingChanged)] public nint OnBufferingChanged;
+    // Slot 5: on_rate_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnRateChanged)] public nint OnRateChanged;
+    // Slot 6: on_capabilities_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnCapabilitiesChanged)] public nint OnCapabilitiesChanged;
+    // Slot 7: on_position_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnPositionChanged)] public nint OnPositionChanged;
+    // Slot 8: on_length_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnLengthChanged)] public nint OnLengthChanged;
+    // Slot 9: on_track_list_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTrackListChanged)] public nint OnTrackListChanged;
+    // Slot 10: on_track_selection_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTrackSelectionChanged)] public nint OnTrackSelectionChanged;
+    // Slot 11: on_track_delay_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTrackDelayChanged)] public nint OnTrackDelayChanged;
+    // Slot 12: on_program_list_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnProgramListChanged)] public nint OnProgramListChanged;
+    // Slot 13: on_program_selection_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnProgramSelectionChanged)] public nint OnProgramSelectionChanged;
+    // Slot 14: on_titles_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTitlesChanged)] public nint OnTitlesChanged;
+    // Slot 15: on_title_selection_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTitleSelectionChanged)] public nint OnTitleSelectionChanged;
+    // Slot 16: on_chapter_selection_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnChapterSelectionChanged)] public nint OnChapterSelectionChanged;
+    // Slot 17: on_teletext_menu_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTeletextMenuChanged)] public nint OnTeletextMenuChanged;
+    // Slot 18: on_teletext_enabled_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTeletextEnabledChanged)] public nint OnTeletextEnabledChanged;
+    // Slot 19: on_teletext_page_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTeletextPageChanged)] public nint OnTeletextPageChanged;
+    // Slot 20: on_teletext_transparency_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnTeletextTransparencyChanged)] public nint OnTeletextTransparencyChanged;
+    // Slot 21: on_category_delay_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnCategoryDelayChanged)] public nint OnCategoryDelayChanged;
+    // Slot 22: on_associated_subs_fps_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnAssociatedSubsFpsChanged)] public nint OnAssociatedSubsFpsChanged;
+    // Slot 23: on_renderer_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnRendererChanged)] public nint OnRendererChanged;
+    // Slot 24: on_recording_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnRecordingChanged)] public nint OnRecordChanged;
+    // Slot 25: on_signal_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnSignalChanged)] public nint OnSignalChanged;
+    // Slot 26: on_statistics_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnStatisticsChanged)] public nint OnStatisticsChanged;
+    // Slot 27: on_atobloop_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnAtobloopChanged)] public nint OnAtobloopChanged;
+    // Slot 28: on_media_meta_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnMediaMetaChanged)] public nint OnMediaMetaChanged;
+    // Slot 29: on_media_epg_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnMediaEpgChanged)] public nint OnMediaEpgChanged;
+    // Slot 30: on_media_subitems_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnMediaSubitemsChanged)] public nint OnSubitemsChanged;
+    // Slot 31: on_media_attachments_added
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnMediaAttachmentsAdded)] public nint OnMediaAttachmentsAdded;
+    // Slot 32: on_vout_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnVoutChanged)] public nint OnVoutChanged;
+    // Slot 33: on_cork_changed
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnCorkChanged)] public nint OnCorksChanged;
+    // Slot 34: on_playback_restore_queried
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnPlaybackRestoreQueried)] public nint OnPlaybackRestoreQueried;
+    // Slot 35: on_stopping_current_media
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnStoppingCurrentMedia)] public nint OnStoppingCurrentMedia;
+    // Slot 36: on_next_frame_status
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnNextFrameStatus)] public nint OnNextFrameStatus;
+    // Slot 37: on_prev_frame_status
+    [FieldOffset(Gen.PlayerCbs.Offsets.OnPrevFrameStatus)] public nint OnPrevFrameStatus;
 }

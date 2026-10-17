@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using VLCLR.Types;
 using VLCLR.Native;
@@ -380,7 +381,7 @@ public sealed class VLCPlayer : IDisposable
 
     /// <summary>
     /// Starts listening for player events.
-    /// Uses the VLC player callbacks structure with 35 callback slots.
+    /// Uses the VLC player callbacks structure (37 callback slots).
     /// </summary>
     /// <returns>True if listener was added successfully</returns>
     public bool StartListening()
@@ -394,26 +395,28 @@ public sealed class VLCPlayer : IDisposable
         // Keep static reference for callbacks
         s_currentInstance = this;
 
-        // Set up the callbacks structure - all 35 slots must be present
-        // We only populate the ones we need
-        _callbacks = new VLCPlayerCbs
+        // Set up the callbacks structure - all 37 slots exist in the C struct.
+        // We only populate the ones we need; the rest stay null.
+        // The callbacks are UnmanagedCallersOnly methods, so their function pointers
+        // are static addresses that need no delegate to be kept alive.
+        // The slot layout comes from the generated Interop.PlayerCbs.
+        unsafe
         {
-            // Callback 1: on_current_media_changed(player, new_media, data)
-            OnCurrentMediaChanged = Marshal.GetFunctionPointerForDelegate(
-                (OnCurrentMediaChangedDelegate)OnCurrentMediaChangedStatic),
-            // Callback 2: on_state_changed(player, new_state, data)
-            OnStateChanged = Marshal.GetFunctionPointerForDelegate(
-                (OnStateChangedDelegate)OnStateChangedStatic),
-            // Callback 7: on_position_changed(player, new_time, new_pos, data)
-            OnPositionChanged = Marshal.GetFunctionPointerForDelegate(
-                (OnPositionChangedDelegate)OnPositionChangedStatic),
-            // All other callbacks remain null (nint.Zero)
-        };
+            _callbacks = new VLCPlayerCbs
+            {
+                // on_current_media_changed(player, new_media, data)
+                OnCurrentMediaChanged = (nint)(delegate* unmanaged[Cdecl]<nint, nint, nint, void>)&OnCurrentMediaChangedStatic,
+                // on_state_changed(player, new_state, data)
+                OnStateChanged = (nint)(delegate* unmanaged[Cdecl]<nint, int, nint, void>)&OnStateChangedStatic,
+                // on_position_changed(player, new_time, new_pos, data)
+                OnPositionChanged = (nint)(delegate* unmanaged[Cdecl]<nint, long, double, nint, void>)&OnPositionChangedStatic,
+            };
+        }
 
-        // Allocate and pin the callbacks structure
+        // Allocate the callbacks structure at its full C size; VLC keeps the
+        // pointer for the lifetime of the listener.
         _callbacksPtr = Marshal.AllocHGlobal(Marshal.SizeOf<VLCPlayerCbs>());
         Marshal.StructureToPtr(_callbacks, _callbacksPtr, false);
-
         VLCCore.PlayerLock(_player);
         try
         {
@@ -468,17 +471,8 @@ public sealed class VLCPlayer : IDisposable
         _logger.Info(".NET plugin Stopped listening to player events");
     }
 
-    // Delegate types matching VLC's callback signatures
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void OnCurrentMediaChangedDelegate(nint player, nint newMedia, nint userData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void OnStateChangedDelegate(nint player, int newState, nint userData);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void OnPositionChangedDelegate(nint player, long newTime, double newPos, nint userData);
-
     // Static callback methods that forward to instance methods
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static void OnCurrentMediaChangedStatic(nint player, nint newMedia, nint userData)
     {
         try
@@ -496,6 +490,7 @@ public sealed class VLCPlayer : IDisposable
         }
     }
 
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static void OnStateChangedStatic(nint player, int newState, nint userData)
     {
         try
@@ -514,6 +509,7 @@ public sealed class VLCPlayer : IDisposable
         }
     }
 
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static void OnPositionChangedStatic(nint player, long newTime, double newPos, nint userData)
     {
         try
