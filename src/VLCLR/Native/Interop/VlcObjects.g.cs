@@ -19,6 +19,12 @@ public unsafe partial struct ObjectHeader
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
     /// <summary>logger</summary>
     [FieldOffset(0)] public Logger* Logger;
 
@@ -33,6 +39,21 @@ public unsafe partial struct ObjectHeader
 
     /// <summary>force</summary>
     [FieldOffset(17)] public byte Force;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_object_t, logger)</summary>
+        public const int Logger = 0;
+        /// <summary>offsetof(vlc_object_t, priv)</summary>
+        public const int Priv = 8;
+        /// <summary>offsetof(vlc_object_t, obj)</summary>
+        public const int Obj = 8;
+        /// <summary>offsetof(vlc_object_t, no_interact)</summary>
+        public const int NoInteract = 16;
+        /// <summary>offsetof(vlc_object_t, force)</summary>
+        public const int Force = 17;
+    }
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

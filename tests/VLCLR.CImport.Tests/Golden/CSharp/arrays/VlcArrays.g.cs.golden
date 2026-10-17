@@ -13,6 +13,12 @@ public unsafe partial struct Arrays
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 160;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 160;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 160;
+
     /// <summary>data</summary>
     [FieldOffset(0)] public DataArray Data;
 
@@ -109,6 +115,29 @@ public unsafe partial struct Arrays
     {
         private Mode _e0;
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(arrays_t, data)</summary>
+        public const int Data = 0;
+        /// <summary>offsetof(arrays_t, name)</summary>
+        public const int Name = 16;
+        /// <summary>offsetof(arrays_t, pts)</summary>
+        public const int Pts = 24;
+        /// <summary>offsetof(arrays_t, names)</summary>
+        public const int Names = 56;
+        /// <summary>offsetof(arrays_t, cbs)</summary>
+        public const int Cbs = 80;
+        /// <summary>offsetof(arrays_t, m)</summary>
+        public const int M = 96;
+        /// <summary>offsetof(arrays_t, sizes)</summary>
+        public const int Sizes = 120;
+        /// <summary>offsetof(arrays_t, rgb)</summary>
+        public const int Rgb = 136;
+        /// <summary>offsetof(arrays_t, modes)</summary>
+        public const int Modes = 140;
+    }
 }
 
 /// <summary>darr_t</summary>
@@ -117,6 +146,12 @@ public unsafe partial struct Darr
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 24 : 40;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
 
     /// <summary>l_before</summary>
     [FieldOffset(0)] public CLong LBefore;
@@ -142,6 +177,17 @@ public unsafe partial struct Darr
     {
         private CLong _e0;
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(darr_t, l_before)</summary>
+        public const int LBefore = 0;
+        /// <summary>offsetof(darr_t, i_arr)</summary>
+        public static int IArr => OperatingSystem.IsWindows() ? 4 : 8;
+        /// <summary>offsetof(darr_t, longs)</summary>
+        public static int Longs => OperatingSystem.IsWindows() ? 16 : 24;
+    }
 }
 
 /// <summary>dv_holder_t</summary>
@@ -150,6 +196,12 @@ public unsafe partial struct DvHolder
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 8 : 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
 }
 
 /// <summary>dv_t</summary>
@@ -159,8 +211,21 @@ public unsafe partial struct Dv
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 4 : 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>l</summary>
     [FieldOffset(0)] public CLong L;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(dv_t, l)</summary>
+        public const int L = 0;
+    }
 }
 
 /// <summary>vec_t</summary>
@@ -170,11 +235,26 @@ public unsafe partial struct Vec
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>x</summary>
     [FieldOffset(0)] public int X;
 
     /// <summary>y</summary>
     [FieldOffset(4)] public int Y;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vec_t, x)</summary>
+        public const int X = 0;
+        /// <summary>offsetof(vec_t, y)</summary>
+        public const int Y = 4;
+    }
 }
 
 /// <summary>mode_e</summary>

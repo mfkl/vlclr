@@ -13,6 +13,12 @@ public unsafe partial struct EsFormat
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 72 : 64;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 64;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 72;
+
     /// <summary>i_cat</summary>
     [FieldOffset(0)] public EsFormatCategory ICat;
 
@@ -43,6 +49,25 @@ public unsafe partial struct EsFormat
     {
         private uint _e0;
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(es_format_t, i_cat)</summary>
+        public const int ICat = 0;
+        /// <summary>offsetof(es_format_t, i_codec)</summary>
+        public const int ICodec = 4;
+        /// <summary>offsetof(es_format_t, video)</summary>
+        public const int Video = 8;
+        /// <summary>offsetof(es_format_t, i_raw)</summary>
+        public const int IRaw = 8;
+        /// <summary>offsetof(es_format_t, p_extra)</summary>
+        public static int PExtra => OperatingSystem.IsWindows() ? 48 : 40;
+        /// <summary>offsetof(es_format_t, i_extra)</summary>
+        public static int IExtra => OperatingSystem.IsWindows() ? 56 : 48;
+        /// <summary>offsetof(es_format_t, psz_language)</summary>
+        public static int PszLanguage => OperatingSystem.IsWindows() ? 64 : 56;
+    }
 }
 
 /// <summary>video_format_t</summary>
@@ -51,6 +76,12 @@ public unsafe partial struct VideoFormat
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 40 : 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
 
     /// <summary>i_chroma</summary>
     [FieldOffset(0)] public uint IChroma;
@@ -73,6 +104,23 @@ public unsafe partial struct VideoFormat
     /// <summary>orientation</summary>
     [UnscopedRef]
     public ref VideoOrientation Orientation => ref CImportHelpers.FieldAt<VideoFormat, VideoOrientation>(ref this, OperatingSystem.IsWindows() ? 32 : 24);
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t, i_chroma)</summary>
+        public const int IChroma = 0;
+        /// <summary>offsetof(video_format_t, dovi)</summary>
+        public const int Dovi = 4;
+        /// <summary>offsetof(video_format_t, i_width)</summary>
+        public static int IWidth => OperatingSystem.IsWindows() ? 12 : 8;
+        /// <summary>offsetof(video_format_t, i_height)</summary>
+        public static int IHeight => OperatingSystem.IsWindows() ? 16 : 12;
+        /// <summary>offsetof(video_format_t, p_palette)</summary>
+        public static int PPalette => OperatingSystem.IsWindows() ? 24 : 16;
+        /// <summary>offsetof(video_format_t, orientation)</summary>
+        public static int Orientation => OperatingSystem.IsWindows() ? 32 : 24;
+    }
 }
 
 /// <summary>video_format_t::dovi</summary>
@@ -81,6 +129,12 @@ public unsafe partial struct VideoFormatDovi
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 8 : 4;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
 
     /// <summary>version_major</summary>
     [FieldOffset(0)] public byte VersionMajor;
@@ -107,6 +161,15 @@ public unsafe partial struct VideoFormatDovi
     {
         readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 45 : 29), 1));
         set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 45 : 29), 1, (ulong)value);
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_format_t::dovi, version_major)</summary>
+        public const int VersionMajor = 0;
+        /// <summary>offsetof(video_format_t::dovi, version_minor)</summary>
+        public const int VersionMinor = 1;
     }
 }
 

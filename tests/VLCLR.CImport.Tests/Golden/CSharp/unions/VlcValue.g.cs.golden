@@ -13,6 +13,12 @@ public unsafe partial struct Rec
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
     /// <summary>i_tag</summary>
     [FieldOffset(0)] public int ITag;
 
@@ -33,6 +39,25 @@ public unsafe partial struct Rec
 
     /// <summary>val</summary>
     [FieldOffset(16)] public Value Val;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(rec_t, i_tag)</summary>
+        public const int ITag = 0;
+        /// <summary>offsetof(rec_t, i_a)</summary>
+        public const int IA = 4;
+        /// <summary>offsetof(rec_t, f_a)</summary>
+        public const int FA = 4;
+        /// <summary>offsetof(rec_t, s_lo)</summary>
+        public const int SLo = 4;
+        /// <summary>offsetof(rec_t, s_hi)</summary>
+        public const int SHi = 6;
+        /// <summary>offsetof(rec_t, stats)</summary>
+        public const int Stats = 8;
+        /// <summary>offsetof(rec_t, val)</summary>
+        public const int Val = 16;
+    }
 }
 
 /// <summary>rec_t::stats</summary>
@@ -42,11 +67,26 @@ public unsafe partial struct RecStats
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>i_count</summary>
     [FieldOffset(0)] public int ICount;
 
     /// <summary>i_sum</summary>
     [FieldOffset(4)] public int ISum;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(rec_t::stats, i_count)</summary>
+        public const int ICount = 0;
+        /// <summary>offsetof(rec_t::stats, i_sum)</summary>
+        public const int ISum = 4;
+    }
 }
 
 /// <summary>value_t</summary>
@@ -55,6 +95,12 @@ public unsafe partial struct Value
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
 
     /// <summary>i_int</summary>
     [FieldOffset(0)] public int IInt;
@@ -67,4 +113,17 @@ public unsafe partial struct Value
 
     /// <summary>psz_string</summary>
     [FieldOffset(0)] public byte* PszString;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(value_t, i_int)</summary>
+        public const int IInt = 0;
+        /// <summary>offsetof(value_t, i_ll)</summary>
+        public const int ILl = 0;
+        /// <summary>offsetof(value_t, f_float)</summary>
+        public const int FFloat = 0;
+        /// <summary>offsetof(value_t, psz_string)</summary>
+        public const int PszString = 0;
+    }
 }

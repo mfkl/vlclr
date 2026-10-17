@@ -16,6 +16,12 @@ public unsafe partial struct Frame
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 104;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 104;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 104;
+
     /// <summary>p_next</summary>
     [FieldOffset(0)] public Frame* Next;
 
@@ -51,6 +57,35 @@ public unsafe partial struct Frame
 
     /// <summary>cbs</summary>
     [FieldOffset(96)] public FrameCallbacks* Cbs;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_frame_t, p_next)</summary>
+        public const int Next = 0;
+        /// <summary>offsetof(vlc_frame_t, p_buffer)</summary>
+        public const int Buffer = 8;
+        /// <summary>offsetof(vlc_frame_t, i_buffer)</summary>
+        public const int BufferSize = 16;
+        /// <summary>offsetof(vlc_frame_t, p_start)</summary>
+        public const int Start = 24;
+        /// <summary>offsetof(vlc_frame_t, i_size)</summary>
+        public const int Size = 32;
+        /// <summary>offsetof(vlc_frame_t, i_flags)</summary>
+        public const int Flags = 40;
+        /// <summary>offsetof(vlc_frame_t, i_nb_samples)</summary>
+        public const int NbSamples = 44;
+        /// <summary>offsetof(vlc_frame_t, i_pts)</summary>
+        public const int Pts = 48;
+        /// <summary>offsetof(vlc_frame_t, i_dts)</summary>
+        public const int Dts = 56;
+        /// <summary>offsetof(vlc_frame_t, i_length)</summary>
+        public const int Length = 64;
+        /// <summary>offsetof(vlc_frame_t, ancillaries)</summary>
+        public const int Ancillaries = 72;
+        /// <summary>offsetof(vlc_frame_t, cbs)</summary>
+        public const int Cbs = 96;
+    }
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

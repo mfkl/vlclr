@@ -13,6 +13,12 @@ public unsafe partial struct TextSegmentRuby
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
     /// <summary>psz_base</summary>
     [FieldOffset(0)] public byte* Base;
 
@@ -21,6 +27,17 @@ public unsafe partial struct TextSegmentRuby
 
     /// <summary>p_next</summary>
     [FieldOffset(16)] public TextSegmentRuby* Next;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(text_segment_ruby_t, psz_base)</summary>
+        public const int Base = 0;
+        /// <summary>offsetof(text_segment_ruby_t, psz_rt)</summary>
+        public const int Rt = 8;
+        /// <summary>offsetof(text_segment_ruby_t, p_next)</summary>
+        public const int Next = 16;
+    }
 }
 
 /// <summary>text_segment_t</summary>
@@ -29,6 +46,12 @@ public unsafe partial struct TextSegment
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
 
     /// <summary>psz_text</summary>
     [FieldOffset(0)] public byte* Text;
@@ -41,6 +64,19 @@ public unsafe partial struct TextSegment
 
     /// <summary>p_ruby</summary>
     [FieldOffset(24)] public TextSegmentRuby* Ruby;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(text_segment_t, psz_text)</summary>
+        public const int Text = 0;
+        /// <summary>offsetof(text_segment_t, style)</summary>
+        public const int Style = 8;
+        /// <summary>offsetof(text_segment_t, p_next)</summary>
+        public const int Next = 16;
+        /// <summary>offsetof(text_segment_t, p_ruby)</summary>
+        public const int Ruby = 24;
+    }
 }
 
 /// <summary>text_style_t</summary>
@@ -49,6 +85,12 @@ public unsafe partial struct TextStyle
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 80;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 80;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 80;
 
     /// <summary>psz_fontname</summary>
     [FieldOffset(0)] public byte* Fontname;
@@ -103,6 +145,47 @@ public unsafe partial struct TextStyle
 
     /// <summary>e_wrapinfo</summary>
     [FieldOffset(72)] public int Wrapinfo;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(text_style_t, psz_fontname)</summary>
+        public const int Fontname = 0;
+        /// <summary>offsetof(text_style_t, psz_monofontname)</summary>
+        public const int Monofontname = 8;
+        /// <summary>offsetof(text_style_t, i_features)</summary>
+        public const int Features = 16;
+        /// <summary>offsetof(text_style_t, i_style_flags)</summary>
+        public const int StyleFlags = 18;
+        /// <summary>offsetof(text_style_t, f_font_relsize)</summary>
+        public const int FontRelsize = 20;
+        /// <summary>offsetof(text_style_t, i_font_size)</summary>
+        public const int FontSize = 24;
+        /// <summary>offsetof(text_style_t, i_font_color)</summary>
+        public const int FontColor = 28;
+        /// <summary>offsetof(text_style_t, i_font_alpha)</summary>
+        public const int FontAlpha = 32;
+        /// <summary>offsetof(text_style_t, i_spacing)</summary>
+        public const int Spacing = 36;
+        /// <summary>offsetof(text_style_t, i_outline_color)</summary>
+        public const int OutlineColor = 40;
+        /// <summary>offsetof(text_style_t, i_outline_alpha)</summary>
+        public const int OutlineAlpha = 44;
+        /// <summary>offsetof(text_style_t, i_outline_width)</summary>
+        public const int OutlineWidth = 48;
+        /// <summary>offsetof(text_style_t, i_shadow_color)</summary>
+        public const int ShadowColor = 52;
+        /// <summary>offsetof(text_style_t, i_shadow_alpha)</summary>
+        public const int ShadowAlpha = 56;
+        /// <summary>offsetof(text_style_t, i_shadow_width)</summary>
+        public const int ShadowWidth = 60;
+        /// <summary>offsetof(text_style_t, i_background_color)</summary>
+        public const int BackgroundColor = 64;
+        /// <summary>offsetof(text_style_t, i_background_alpha)</summary>
+        public const int BackgroundAlpha = 68;
+        /// <summary>offsetof(text_style_t, e_wrapinfo)</summary>
+        public const int Wrapinfo = 72;
+    }
 }
 
 public unsafe partial struct TextSegment

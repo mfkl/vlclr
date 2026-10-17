@@ -13,6 +13,19 @@ public unsafe partial struct Weird
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 96;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 96;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 96;
+
     /// <summary>ok</summary>
     [FieldOffset(52)] public int Ok;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(weird_t, ok)</summary>
+        public const int Ok = 52;
+    }
 }

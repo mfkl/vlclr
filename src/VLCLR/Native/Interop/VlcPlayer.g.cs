@@ -13,6 +13,12 @@ public unsafe partial struct PlayerCbs
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 296;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 296;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 296;
+
     /// <summary>on_current_media_changed</summary>
     [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Player*, InputItem*, void*, void> OnCurrentMediaChanged;
 
@@ -123,6 +129,85 @@ public unsafe partial struct PlayerCbs
 
     /// <summary>on_prev_frame_status</summary>
     [FieldOffset(288)] public delegate* unmanaged[Cdecl]<Player*, int, void*, void> OnPrevFrameStatus;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_cbs, on_current_media_changed)</summary>
+        public const int OnCurrentMediaChanged = 0;
+        /// <summary>offsetof(vlc_player_cbs, on_state_changed)</summary>
+        public const int OnStateChanged = 8;
+        /// <summary>offsetof(vlc_player_cbs, on_error_changed)</summary>
+        public const int OnErrorChanged = 16;
+        /// <summary>offsetof(vlc_player_cbs, on_buffering_changed)</summary>
+        public const int OnBufferingChanged = 24;
+        /// <summary>offsetof(vlc_player_cbs, on_rate_changed)</summary>
+        public const int OnRateChanged = 32;
+        /// <summary>offsetof(vlc_player_cbs, on_capabilities_changed)</summary>
+        public const int OnCapabilitiesChanged = 40;
+        /// <summary>offsetof(vlc_player_cbs, on_position_changed)</summary>
+        public const int OnPositionChanged = 48;
+        /// <summary>offsetof(vlc_player_cbs, on_length_changed)</summary>
+        public const int OnLengthChanged = 56;
+        /// <summary>offsetof(vlc_player_cbs, on_track_list_changed)</summary>
+        public const int OnTrackListChanged = 64;
+        /// <summary>offsetof(vlc_player_cbs, on_track_selection_changed)</summary>
+        public const int OnTrackSelectionChanged = 72;
+        /// <summary>offsetof(vlc_player_cbs, on_track_delay_changed)</summary>
+        public const int OnTrackDelayChanged = 80;
+        /// <summary>offsetof(vlc_player_cbs, on_program_list_changed)</summary>
+        public const int OnProgramListChanged = 88;
+        /// <summary>offsetof(vlc_player_cbs, on_program_selection_changed)</summary>
+        public const int OnProgramSelectionChanged = 96;
+        /// <summary>offsetof(vlc_player_cbs, on_titles_changed)</summary>
+        public const int OnTitlesChanged = 104;
+        /// <summary>offsetof(vlc_player_cbs, on_title_selection_changed)</summary>
+        public const int OnTitleSelectionChanged = 112;
+        /// <summary>offsetof(vlc_player_cbs, on_chapter_selection_changed)</summary>
+        public const int OnChapterSelectionChanged = 120;
+        /// <summary>offsetof(vlc_player_cbs, on_teletext_menu_changed)</summary>
+        public const int OnTeletextMenuChanged = 128;
+        /// <summary>offsetof(vlc_player_cbs, on_teletext_enabled_changed)</summary>
+        public const int OnTeletextEnabledChanged = 136;
+        /// <summary>offsetof(vlc_player_cbs, on_teletext_page_changed)</summary>
+        public const int OnTeletextPageChanged = 144;
+        /// <summary>offsetof(vlc_player_cbs, on_teletext_transparency_changed)</summary>
+        public const int OnTeletextTransparencyChanged = 152;
+        /// <summary>offsetof(vlc_player_cbs, on_category_delay_changed)</summary>
+        public const int OnCategoryDelayChanged = 160;
+        /// <summary>offsetof(vlc_player_cbs, on_associated_subs_fps_changed)</summary>
+        public const int OnAssociatedSubsFpsChanged = 168;
+        /// <summary>offsetof(vlc_player_cbs, on_renderer_changed)</summary>
+        public const int OnRendererChanged = 176;
+        /// <summary>offsetof(vlc_player_cbs, on_recording_changed)</summary>
+        public const int OnRecordingChanged = 184;
+        /// <summary>offsetof(vlc_player_cbs, on_signal_changed)</summary>
+        public const int OnSignalChanged = 192;
+        /// <summary>offsetof(vlc_player_cbs, on_statistics_changed)</summary>
+        public const int OnStatisticsChanged = 200;
+        /// <summary>offsetof(vlc_player_cbs, on_atobloop_changed)</summary>
+        public const int OnAtobloopChanged = 208;
+        /// <summary>offsetof(vlc_player_cbs, on_media_meta_changed)</summary>
+        public const int OnMediaMetaChanged = 216;
+        /// <summary>offsetof(vlc_player_cbs, on_media_epg_changed)</summary>
+        public const int OnMediaEpgChanged = 224;
+        /// <summary>offsetof(vlc_player_cbs, on_media_subitems_changed)</summary>
+        public const int OnMediaSubitemsChanged = 232;
+        /// <summary>offsetof(vlc_player_cbs, on_media_attachments_added)</summary>
+        public const int OnMediaAttachmentsAdded = 240;
+        /// <summary>offsetof(vlc_player_cbs, on_vout_changed)</summary>
+        public const int OnVoutChanged = 248;
+        /// <summary>offsetof(vlc_player_cbs, on_cork_changed)</summary>
+        public const int OnCorkChanged = 256;
+        /// <summary>offsetof(vlc_player_cbs, on_playback_restore_queried)</summary>
+        public const int OnPlaybackRestoreQueried = 264;
+        /// <summary>offsetof(vlc_player_cbs, on_stopping_current_media)</summary>
+        public const int OnStoppingCurrentMedia = 272;
+        /// <summary>offsetof(vlc_player_cbs, on_next_frame_status)</summary>
+        public const int OnNextFrameStatus = 280;
+        /// <summary>offsetof(vlc_player_cbs, on_prev_frame_status)</summary>
+        public const int OnPrevFrameStatus = 288;
+    }
 }
 
 /// <summary>vlc_player_chapter</summary>

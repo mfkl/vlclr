@@ -13,6 +13,12 @@ public unsafe partial struct AudioReplayGain
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 32;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
     /// <summary>pb_reference_loudness</summary>
     [FieldOffset(0)] public byte PbReferenceLoudness;
 
@@ -57,5 +63,22 @@ public unsafe partial struct AudioReplayGain
     public struct PeakArray
     {
         private float _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(audio_replay_gain_t, pb_reference_loudness)</summary>
+        public const int PbReferenceLoudness = 0;
+        /// <summary>offsetof(audio_replay_gain_t, pf_reference_loudness)</summary>
+        public const int ReferenceLoudness = 4;
+        /// <summary>offsetof(audio_replay_gain_t, pb_gain)</summary>
+        public const int PbGain = 8;
+        /// <summary>offsetof(audio_replay_gain_t, pf_gain)</summary>
+        public const int Gain = 12;
+        /// <summary>offsetof(audio_replay_gain_t, pb_peak)</summary>
+        public const int PbPeak = 20;
+        /// <summary>offsetof(audio_replay_gain_t, pf_peak)</summary>
+        public const int Peak = 24;
     }
 }

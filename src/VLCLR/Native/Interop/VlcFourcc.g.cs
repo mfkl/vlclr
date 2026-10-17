@@ -13,6 +13,12 @@ public unsafe partial struct ChromaDescription
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 88;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 88;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 88;
+
     /// <summary>fcc</summary>
     [FieldOffset(0)] public uint Fcc;
 
@@ -40,6 +46,25 @@ public unsafe partial struct ChromaDescription
     {
         private ChromaDescriptionP _e0;
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_chroma_description_t, fcc)</summary>
+        public const int Fcc = 0;
+        /// <summary>offsetof(vlc_chroma_description_t, subtype)</summary>
+        public const int Subtype = 4;
+        /// <summary>offsetof(vlc_chroma_description_t, plane_count)</summary>
+        public const int PlaneCount = 8;
+        /// <summary>offsetof(vlc_chroma_description_t, p)</summary>
+        public const int P = 12;
+        /// <summary>offsetof(vlc_chroma_description_t, pixel_size)</summary>
+        public const int PixelSize = 76;
+        /// <summary>offsetof(vlc_chroma_description_t, pixel_bits)</summary>
+        public const int PixelBits = 80;
+        /// <summary>offsetof(vlc_chroma_description_t, color_bits)</summary>
+        public const int ColorBits = 84;
+    }
 }
 
 /// <summary>vlc_chroma_description_t::p</summary>
@@ -49,11 +74,26 @@ public unsafe partial struct ChromaDescriptionP
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>w</summary>
     [FieldOffset(0)] public Rational W;
 
     /// <summary>h</summary>
     [FieldOffset(8)] public Rational H;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_chroma_description_t::p, w)</summary>
+        public const int W = 0;
+        /// <summary>offsetof(vlc_chroma_description_t::p, h)</summary>
+        public const int H = 8;
+    }
 }
 
 /// <summary>vlc_chroma_subtype</summary>
