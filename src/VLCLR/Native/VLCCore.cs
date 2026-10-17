@@ -738,7 +738,7 @@ public static partial class VLCCore
 /// Uses explicit field layout to match C union behavior: 8 bytes, the same
 /// size and offsets as the generated <c>Interop.Value</c>.
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 16)]
+[StructLayout(LayoutKind.Explicit, Size = 8)]
 public struct VLCValueNative
 {
     [FieldOffset(0)]
