@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Generates VLCLR.Native.Interop from the VLC headers.
+    extract: libclang parses the pinned headers into a per-ABI JSON snapshot.
+    emit: merges the windows and sysv snapshots into C#, a C++ probe and C# layout tests.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>VLCLR.CImport</RootNamespace>
+    <AssemblyName>vlclr-cimport</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="VLCLR.CImport.Tests" />
+  </ItemGroup>
+
+  <!-- libclang and libClangSharp natives for the two hosts that produce snapshots. -->
+  <ItemGroup>
+    <PackageReference Include="ClangSharp" Version="21.1.8.4" />
+    <PackageReference Include="libclang.runtime.win-x64" Version="21.1.8" />
+    <PackageReference Include="libclang.runtime.linux-x64" Version="21.1.8" />
+    <PackageReference Include="libClangSharp.runtime.win-x64" Version="21.1.8.2" />
+    <PackageReference Include="libClangSharp.runtime.linux-x64" Version="21.1.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="vlc.cimport.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

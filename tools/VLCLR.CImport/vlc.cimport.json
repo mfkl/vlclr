@@ -1,0 +1,42 @@
+{
+  // Pinned VLC headers. fetch-headers.ps1 / fetch-headers.sh fill includeDir.
+  "vlc": {
+    "repository": "https://code.videolan.org/videolan/vlc.git",
+    "commit": "dc69496e",
+    "includeDir": "../../artifacts/vlc-headers/include"
+  },
+  "headers": [
+    "vlc_common.h",
+    "vlc_es.h",
+    "vlc_fourcc.h",
+    "vlc_filter.h",
+    "vlc_picture.h",
+    "vlc_subpicture.h",
+    "vlc_text_style.h",
+    "vlc_configuration.h"
+  ],
+  "defines": [],
+  "abiDefines": {},
+  "prelude": {
+    "windows": [ "typedef long long ssize_t;" ]
+  },
+  "roots": [
+    "filter_t"
+  ],
+  "excludes": [],
+  "output": {
+    "namespace": "VLCLR.Native.Interop",
+    "library": "libvlccore",
+    "directory": "../../src/VLCLR/Native/Interop",
+    "probe": "../../tests/AbiValidation/vlclr_abi.g.cpp",
+    "layoutTests": "../../src/VLCLR.Tests/Interop/InteropLayoutTests.g.cs"
+  },
+  "names": {
+    "types": {},
+    "fields": {},
+    "enumMembers": {},
+    "functions": {},
+    "constants": {},
+    "headers": {}
+  }
+}
