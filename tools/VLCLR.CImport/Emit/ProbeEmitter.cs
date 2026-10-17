@@ -57,6 +57,7 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
         Line("// C# bindings disagrees with the C compiler. Build with: cl /std:c++17 /TP /c, or g++ -std=c++17 -c.");
         Line("// </auto-generated>");
         Line();
+        WriteAbiPrelude();
         Line("#include <cstddef>");
         Line("#include <atomic>");
         Line("#include <cstdio>");
@@ -74,7 +75,11 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
         Line();
     }
 
-    private void WritePrelude()
+    /// <summary>
+    /// The manifest's per-ABI prelude, first, as extract places it: guards such
+    /// as <c>_OFF_T_DEFINED</c> must precede the system headers.
+    /// </summary>
+    private void WriteAbiPrelude()
     {
         var windows = PreludeLines(Abis.Windows);
         var sysv = PreludeLines(Abis.SysV);
@@ -89,7 +94,10 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
             Line("#endif");
             Line();
         }
+    }
 
+    private void WritePrelude()
+    {
         foreach (var header in options.Headers)
             Line($"#include <{header}>");
         Line();
@@ -152,9 +160,10 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
             if (e.Members.Count == 0)
                 continue;
             var unsigned = e.UnderlyingType.Values.Any(IsUnsigned64);
+            var scope = e.IsAnonymous ? EnclosingRecord(e.Name) : null;
             Line($"// enum {e.Name}");
             foreach (var m in e.Members)
-                Line($"{(unsigned ? "VLCLR_UVALUE" : "VLCLR_VALUE")}({m.Name}, {Value(m.Value.Values, unsigned)});");
+                Line($"{(unsigned ? "VLCLR_UVALUE" : "VLCLR_VALUE")}({scope}{m.Name}, {Value(m.Value.Values, unsigned)});");
             Line();
         }
     }
@@ -176,6 +185,24 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
             Line($"{(unsigned ? "VLCLR_UVALUE" : "VLCLR_VALUE")}({c.Name}, {Value(values, unsigned)});");
         }
         Line();
+    }
+
+    /// <summary>
+    /// <c>struct s { enum { A } f; }</c>: in C++ the enumerators are members of
+    /// the record, so they are spelled <c>s::A</c>. Returns "s::" or null.
+    /// </summary>
+    private string? EnclosingRecord(string enumName)
+    {
+        var owner = merged.Types.FirstOrDefault(t => t.Fields.Any(f => EnumOf(f.Type) == enumName));
+        return owner is null ? null : TypeExpression(owner) + "::";
+
+        static string? EnumOf(TypeRef type)
+        {
+            var t = type.Desugar();
+            while (t.Kind == TypeRefKind.Array)
+                t = t.Element!.Desugar();
+            return t.Kind == TypeRefKind.Enum ? t.Name : null;
+        }
     }
 
     private static bool IsUnsigned64(TypeRef type)

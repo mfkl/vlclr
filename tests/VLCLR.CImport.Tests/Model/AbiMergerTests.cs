@@ -117,4 +117,16 @@ public class AbiMergerTests
         Assert.Equal([Abis.Windows, Abis.SysV], skipped[0].Abis);
         Assert.Equal([Abis.SysV], skipped[1].Abis);
     }
+
+    [Fact]
+    public void TypedefChainsMayDifferBetweenCLibraries()
+    {
+        var msvc = TypeRef.Typedef("uint32_t", TypeRef.Of(BuiltinType.UInt));
+        var glibc = TypeRef.Typedef("uint32_t", TypeRef.Typedef("__uint32_t", TypeRef.Of(BuiltinType.UInt)));
+
+        Assert.True(AbiMerger.SameShape(msvc, glibc));
+        Assert.True(AbiMerger.SameShape(TypeRef.PointerTo(msvc), TypeRef.PointerTo(glibc)));
+        Assert.False(AbiMerger.SameShape(msvc, TypeRef.Typedef("uint32_t", TypeRef.PointerTo(TypeRef.Of(BuiltinType.UInt)))));
+        Assert.False(AbiMerger.SameShape(msvc, TypeRef.Typedef("int32_t", TypeRef.Of(BuiltinType.Int))));
+    }
 }
