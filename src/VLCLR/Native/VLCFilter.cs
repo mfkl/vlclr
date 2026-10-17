@@ -10,62 +10,68 @@ namespace VLCLR.Native;
 /// <summary>
 /// Filter structure (filter_t from vlc_filter.h)
 /// IMPORTANT: The first 3 members must match decoder_t layout
-/// es_format_t is 240 bytes on Windows and 232 on Linux and macOS (see
-/// <see cref="VLCAbi"/>), so every member after fmt_in is a ref property
-/// placed for the running ABI: ops is at 560 on Windows, 544 elsewhere.
-/// The managed struct is sized for the larger, Windows layout.
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 592)]
+/// <remarks>
+/// es_format_t is 240 bytes on Windows and 232 on Linux and macOS, so every
+/// member after fmt_in is a ref property placed for the running ABI from
+/// <see cref="Interop.Filter.Offsets"/>. The managed struct is sized for the
+/// larger, Windows layout (<see cref="Interop.Filter.MaxSizeOf"/>;
+/// <see cref="Interop.Filter.MinSizeOf"/> elsewhere).
+/// </remarks>
+[StructLayout(LayoutKind.Explicit, Size = Interop.Filter.MaxSizeOf)]
 public struct VLCFilter
 {
     /// <summary>VLC object header (struct vlc_object_t obj) - 24 bytes</summary>
-    [FieldOffset(0)]
+    [FieldOffset(Interop.Filter.Offsets.Obj)]
     public VLCObjectHeader Obj;
 
     /// <summary>Module pointer (p_module)</summary>
-    [FieldOffset(24)]
+    [FieldOffset(Interop.Filter.Offsets.Module)]
     public nint Module;
 
     /// <summary>Private system data (p_sys) - filter implementation stores its state here</summary>
-    [FieldOffset(32)]
+    [FieldOffset(Interop.Filter.Offsets.Sys)]
     public nint Sys;
 
     /// <summary>Input format (fmt_in)</summary>
-    [FieldOffset(40)]
+    [FieldOffset(Interop.Filter.Offsets.FmtIn)]
     public VLCEsFormat FormatIn;
-
-    private static int VideoContextInOffset => 40 + VLCAbi.EsFormatSize;
-    private static int FormatOutEndOffset => 48 + 2 * VLCAbi.EsFormatSize;
 
     /// <summary>Video context input (vctx_in)</summary>
     [UnscopedRef]
-    public ref nint VideoContextIn => ref VLCAbi.Field<VLCFilter, nint>(ref this, VideoContextInOffset);
+    public ref nint VideoContextIn => ref Interop.CImportHelpers.FieldAt<VLCFilter, nint>(ref this, Interop.Filter.Offsets.VctxIn);
 
     /// <summary>Output format (fmt_out)</summary>
+    /// <remarks>
+    /// VLCEsFormat is sized for Windows (240 bytes) but es_format_t is 232 bytes
+    /// on Linux and macOS, so assigning a whole VLCEsFormat through this
+    /// reference there writes 8 bytes past fmt_out, into vctx_out. Write
+    /// individual members instead.
+    /// </remarks>
     [UnscopedRef]
-    public ref VLCEsFormat FormatOut => ref VLCAbi.Field<VLCFilter, VLCEsFormat>(ref this, VideoContextInOffset + 8);
+    public ref VLCEsFormat FormatOut => ref Interop.CImportHelpers.FieldAt<VLCFilter, VLCEsFormat>(ref this, Interop.Filter.Offsets.FmtOut);
 
     /// <summary>Video context output (vctx_out)</summary>
     [UnscopedRef]
-    public ref nint VideoContextOut => ref VLCAbi.Field<VLCFilter, nint>(ref this, FormatOutEndOffset);
+    public ref nint VideoContextOut => ref Interop.CImportHelpers.FieldAt<VLCFilter, nint>(ref this, Interop.Filter.Offsets.VctxOut);
 
     /// <summary>Allow format out change flag (b_allow_fmt_out_change)</summary>
     [UnscopedRef]
-    public ref byte AllowFormatOutChange => ref VLCAbi.Field<VLCFilter, byte>(ref this, FormatOutEndOffset + 8);
+    public ref byte AllowFormatOutChange => ref Interop.CImportHelpers.FieldAt<VLCFilter, byte>(ref this, Interop.Filter.Offsets.AllowFmtOutChange);
 
     /// <summary>Requested filter shortcut name (psz_name)</summary>
     [UnscopedRef]
-    public ref nint Name => ref VLCAbi.Field<VLCFilter, nint>(ref this, FormatOutEndOffset + 16);
+    public ref nint Name => ref Interop.CImportHelpers.FieldAt<VLCFilter, nint>(ref this, Interop.Filter.Offsets.Name);
 
     /// <summary>Filter configuration chain (p_cfg)</summary>
     [UnscopedRef]
-    public ref nint Config => ref VLCAbi.Field<VLCFilter, nint>(ref this, FormatOutEndOffset + 24);
+    public ref nint Config => ref Interop.CImportHelpers.FieldAt<VLCFilter, nint>(ref this, Interop.Filter.Offsets.Cfg);
 
     /// <summary>Filter operations pointer (ops) - MUST be set by Open callback</summary>
     [UnscopedRef]
-    public ref nint Operations => ref VLCAbi.Field<VLCFilter, nint>(ref this, FormatOutEndOffset + 32);
+    public ref nint Operations => ref Interop.CImportHelpers.FieldAt<VLCFilter, nint>(ref this, Interop.Filter.Offsets.Ops);
 
     /// <summary>Filter owner (owner) - 24 bytes</summary>
     [UnscopedRef]
-    public ref VLCFilterOwner Owner => ref VLCAbi.Field<VLCFilter, VLCFilterOwner>(ref this, FormatOutEndOffset + 40);
+    public ref VLCFilterOwner Owner => ref Interop.CImportHelpers.FieldAt<VLCFilter, VLCFilterOwner>(ref this, Interop.Filter.Offsets.Owner);
 }
