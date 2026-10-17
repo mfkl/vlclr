@@ -78,7 +78,11 @@ play() {
     shift 2
     local out="$work/out/$name"
     mkdir -p "$out"
+    # The launcher turns the media library on. It and preparsing run in
+    # vlc-preparser child processes, which the macOS arm64 nightly fails to
+    # spawn; the test needs neither.
     VLC_PLUGIN_PATH="$(native_path "$work/plugins")" "$vlc" -I dummy --ignore-config --no-plugins-cache \
+        --no-media-library --no-auto-preparse \
         --no-audio --vout=vdummy --video-filter="$chain" \
         --scene-format=png --scene-path="$(native_path "$out")" --scene-prefix=f --scene-ratio=1 --scene-replace \
         --play-and-exit -vv "$@" "$(native_path "$clip")" > "$work/out/$name.log" 2>&1 &
