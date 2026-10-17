@@ -8,27 +8,25 @@ namespace VLCLR.Native;
 
 /// <summary>
 /// VLC object header - first member of all VLC objects
-/// This is struct vlc_object_t from vlc_objects.h
-/// Size on 64-bit: 24 bytes
+/// This is struct vlc_object_t from vlc_objects.h.
+/// Layout and size come from <see cref="Interop.ObjectHeader"/>.
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = 24)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.ObjectHeader.MaxSizeOf)]
 public struct VLCObjectHeader
 {
     /// <summary>Logger pointer (struct vlc_logger*)</summary>
-    [FieldOffset(0)]
+    [FieldOffset(Interop.ObjectHeader.Offsets.Logger)]
     public nint Logger;
 
     /// <summary>Private/Object union (struct vlc_object_internals* or struct vlc_object_marker*)</summary>
-    [FieldOffset(8)]
+    [FieldOffset(Interop.ObjectHeader.Offsets.Priv)]
     public nint PrivOrObj;
 
     /// <summary>No interact flag</summary>
-    [FieldOffset(16)]
+    [FieldOffset(Interop.ObjectHeader.Offsets.NoInteract)]
     public byte NoInteract;
 
     /// <summary>Module probe force flag</summary>
-    [FieldOffset(17)]
+    [FieldOffset(Interop.ObjectHeader.Offsets.Force)]
     public byte Force;
-
-    // Implicit padding from offset 18 to 24 (6 bytes) due to Size = 24
 }
