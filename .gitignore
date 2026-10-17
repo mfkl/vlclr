@@ -58,3 +58,6 @@ artifacts/live-sync-real/
 
 artifacts/vlc/
 artifacts/vlc-e2e/
+
+# Pinned VLC headers fetched by tools/VLCLR.CImport/fetch-headers
+artifacts/vlc-headers/
