@@ -2,8 +2,7 @@
 // x86-64. Same arithmetic result as VLC's C (bit-exact), restructured:
 //
 // 1. Interior vs border: pixels where the C uses the full kernel take a fast
-//    path; border pixels run the C's exact bounds (including its horizontal
-//    read of up to two bytes past the visible width).
+//    path; border pixels run the C's exact bounds.
 // 2. Symmetric kernel: distribution[-k] == distribution[k] (checked at setup,
 //    with a fallback), so each pair of taps costs one multiply: w*(a+b).
 // 3. Row-wise vertical pass: accumulate one output line from whole buffer
@@ -76,10 +75,11 @@ internal static unsafe class GaussianBlurTuned
     {
         int* center = distribution + dim;
         int step = xFactor + 1;
-        // Columns where the C bounds are exactly [-dim, dim].
+        // Columns where the C bounds are exactly [-dim, dim]: col * step >= dim
+        // and (visiblePitch - col) * step - 1 >= dim.
         int interiorStart = Math.Min(visiblePitch, (dim + step - 1) / step);
         int interiorEnd = Math.Min(visiblePitch,
-            Math.Max(interiorStart, visiblePitch - Math.Max(0, (dim - 1 + step - 1) / step) + 1));
+            Math.Max(interiorStart, visiblePitch - (dim + step) / step + 1));
 
         // Tap offsets of -k and +k for this plane's subsampling.
         int* negative = stackalloc int[dim + 1];
@@ -142,7 +142,7 @@ internal static unsafe class GaussianBlurTuned
     private static int BorderPixel(byte* row, int col, int visiblePitch, int xFactor, int* center, int dim)
     {
         int lo = Math.Max(-dim, -col * (xFactor + 1));
-        int hi = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) + 1);
+        int hi = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) - 1);
         byte* p = row + col;
         int value = 0;
         for (int x = lo; x <= hi; x++)

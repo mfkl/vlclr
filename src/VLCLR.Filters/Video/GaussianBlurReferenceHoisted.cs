@@ -24,7 +24,7 @@ internal static unsafe class GaussianBlurReferenceHoisted
                 int value = 0;
                 nint c = (nint)line * inPitch + col;
                 nint xStart = Math.Max(-dim, -col * (xFactor + 1));
-                nint xEnd = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) + 1);
+                nint xEnd = Math.Min(dim, (visiblePitch - col) * (xFactor + 1) - 1);
                 for (nint x = xStart; x <= xEnd; x++)
                 {
                     value += distribution[x + dim] * input[c + (x >> xFactor)];
