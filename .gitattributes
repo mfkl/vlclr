@@ -1,0 +1,5 @@
+*.sh text eol=lf
+*.g.cs text eol=lf
+*.g.cpp text eol=lf
+src/VLCLR/Native/Interop/abi/*.json text eol=lf
+src/VLCLR/Native/Interop/cimport-report.md text eol=lf
