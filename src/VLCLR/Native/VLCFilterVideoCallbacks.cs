@@ -10,18 +10,18 @@ namespace VLCLR.Native;
 /// Filter video callbacks structure (filter_video_callbacks from vlc_filter.h)
 /// Used in filter_owner_t
 /// </summary>
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Explicit, Size = Interop.FilterVideoCallbacks.MaxSizeOf)]
 public struct VLCFilterVideoCallbacks
 {
     /// <summary>
     /// Allocate new picture buffer
     /// Signature: picture_t* (*buffer_new)(filter_t*)
     /// </summary>
-    public nint BufferNew;
+    [FieldOffset(Interop.FilterVideoCallbacks.Offsets.BufferNew)] public nint BufferNew;
 
     /// <summary>
     /// Hold decoder device
     /// Signature: vlc_decoder_device* (*hold_device)(vlc_object_t*, void* sys)
     /// </summary>
-    public nint HoldDevice;
+    [FieldOffset(Interop.FilterVideoCallbacks.Offsets.HoldDevice)] public nint HoldDevice;
 }
