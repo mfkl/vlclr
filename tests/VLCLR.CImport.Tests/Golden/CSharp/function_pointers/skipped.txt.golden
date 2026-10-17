@@ -1,0 +1,2 @@
+vlc_cb.h	field	callbacks_t.pf_dv	record 'dv_t' passed by value has an ABI-dependent size (4 | 8)
+vlc_cb.h	field	callbacks_t.pf_va	variadic function pointer
