@@ -57,15 +57,15 @@ public unsafe partial struct ObjectHeader
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
-public static unsafe partial class VlcObjects
+public static unsafe partial class VlcObject
 {
     /// <summary>vlc_object_parent</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_object_parent")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ObjectHeader* VlcObjectParent(ObjectHeader* obj);
+    public static partial ObjectHeader* Parent(ObjectHeader* obj);
 
     /// <summary>vlc_object_typename</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_object_typename")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcObjectTypename(ObjectHeader* obj);
+    public static partial byte* Typename(ObjectHeader* obj);
 }

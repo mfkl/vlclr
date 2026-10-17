@@ -205,7 +205,12 @@
       "subs_format_t::spu.b_palette": "HasPalette"
     },
     "enumMembers": {},
-    "functions": {},
+    "functions": {
+      // No prefix_Verb split: the rules would file these under their header class.
+      "vlc_object_parent": "VlcObject.Parent",
+      "vlc_object_typename": "VlcObject.Typename",
+      "vlc_tick_now": "VlcTick.Now"
+    },
     "constants": {},
     "headers": {}
   }
