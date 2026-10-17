@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Include="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Golden\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Emit\Probe\Headers\**\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Emit\Probe\Headers" />
   </ItemGroup>
 
 </Project>

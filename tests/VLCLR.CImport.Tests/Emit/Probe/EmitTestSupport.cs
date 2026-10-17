@@ -6,31 +6,39 @@ namespace VLCLR.CImport.Tests.Emit;
 /// <summary>Golden file comparison. Set CIMPORT_UPDATE_GOLDEN=1 to rewrite the goldens in the source tree.</summary>
 internal static class GoldenFile
 {
-    public static string TestProjectDirectory { get; } = FindTestProjectDirectory();
+    /// <summary>
+    /// The test project's source directory when the build output sits under it,
+    /// else the build output (which holds copies of Golden/ and the probe
+    /// headers), e.g. with <c>dotnet test --artifacts-path</c>.
+    /// </summary>
+    public static string TestProjectDirectory { get; } = FindTestProjectDirectory() ?? AppContext.BaseDirectory;
 
     public static void Verify(string relativePath, string actual)
     {
-        var path = Path.Combine(TestProjectDirectory, relativePath);
         if (Environment.GetEnvironmentVariable("CIMPORT_UPDATE_GOLDEN") == "1")
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            File.WriteAllText(path, actual, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            var source = FindTestProjectDirectory()
+                ?? throw new InvalidOperationException("CIMPORT_UPDATE_GOLDEN needs the build output under the VLCLR.CImport.Tests source directory.");
+            var target = Path.Combine(source, relativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.WriteAllText(target, actual, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
             return;
         }
 
+        var path = Path.Combine(TestProjectDirectory, relativePath);
         Assert.True(File.Exists(path), $"Golden file {relativePath} is missing. Run with CIMPORT_UPDATE_GOLDEN=1 to create it.");
-        var expected = File.ReadAllText(path).Replace("\r\n", "\n");
+        var expected = File.ReadAllText(path).ReplaceLineEndings("\n");
         Assert.Equal(expected, actual);
     }
 
-    private static string FindTestProjectDirectory()
+    private static string? FindTestProjectDirectory()
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {
             if (File.Exists(Path.Combine(dir.FullName, "VLCLR.CImport.Tests.csproj")))
                 return dir.FullName;
         }
-        throw new InvalidOperationException("Cannot locate the VLCLR.CImport.Tests source directory.");
+        return null;
     }
 }
 
