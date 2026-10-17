@@ -13,6 +13,12 @@ public unsafe partial struct Rect
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 104;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 104;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 104;
+
     /// <summary>origin</summary>
     [FieldOffset(0)] public Point Origin;
 
@@ -21,4 +27,15 @@ public unsafe partial struct Rect
 
     /// <summary>p_next</summary>
     [FieldOffset(96)] public Point* PNext;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(rect_t, origin)</summary>
+        public const int Origin = 0;
+        /// <summary>offsetof(rect_t, corner)</summary>
+        public const int Corner = 48;
+        /// <summary>offsetof(rect_t, p_next)</summary>
+        public const int PNext = 96;
+    }
 }

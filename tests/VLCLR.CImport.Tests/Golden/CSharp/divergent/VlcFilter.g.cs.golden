@@ -13,6 +13,12 @@ public unsafe partial struct Filter
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 168 : 152;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 152;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 168;
+
     /// <summary>psz_name</summary>
     [FieldOffset(0)] public byte* PszName;
 
@@ -30,6 +36,21 @@ public unsafe partial struct Filter
     /// <summary>ops</summary>
     [UnscopedRef]
     public ref VlcFilterOperations* Ops => ref *(VlcFilterOperations**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 160 : 144));
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_t, psz_name)</summary>
+        public const int PszName = 0;
+        /// <summary>offsetof(filter_t, fmt_in)</summary>
+        public const int FmtIn = 8;
+        /// <summary>offsetof(filter_t, fmt_out)</summary>
+        public static int FmtOut => OperatingSystem.IsWindows() ? 80 : 72;
+        /// <summary>offsetof(filter_t, p_sys)</summary>
+        public static int PSys => OperatingSystem.IsWindows() ? 152 : 136;
+        /// <summary>offsetof(filter_t, ops)</summary>
+        public static int Ops => OperatingSystem.IsWindows() ? 160 : 144;
+    }
 }
 
 /// <summary>vlc_filter_operations</summary>
@@ -39,9 +60,24 @@ public unsafe partial struct VlcFilterOperations
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 16;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
     /// <summary>close</summary>
     [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Filter*, void> Close;
 
     /// <summary>filter_video</summary>
     [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Filter*, Picture*, Picture*> FilterVideo;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_filter_operations, close)</summary>
+        public const int Close = 0;
+        /// <summary>offsetof(vlc_filter_operations, filter_video)</summary>
+        public const int FilterVideo = 8;
+    }
 }

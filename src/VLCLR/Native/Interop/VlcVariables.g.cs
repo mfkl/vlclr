@@ -13,6 +13,12 @@ public unsafe partial struct Value
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>i_int</summary>
     [FieldOffset(0)] public long Int;
 
@@ -30,6 +36,23 @@ public unsafe partial struct Value
 
     /// <summary>coords</summary>
     [FieldOffset(0)] public ValueCoords Coords;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_value_t, i_int)</summary>
+        public const int Int = 0;
+        /// <summary>offsetof(vlc_value_t, b_bool)</summary>
+        public const int Bool = 0;
+        /// <summary>offsetof(vlc_value_t, f_float)</summary>
+        public const int Float = 0;
+        /// <summary>offsetof(vlc_value_t, psz_string)</summary>
+        public const int String = 0;
+        /// <summary>offsetof(vlc_value_t, p_address)</summary>
+        public const int Address = 0;
+        /// <summary>offsetof(vlc_value_t, coords)</summary>
+        public const int Coords = 0;
+    }
 }
 
 /// <summary>vlc_value_t::coords</summary>
@@ -39,11 +62,26 @@ public unsafe partial struct ValueCoords
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>x</summary>
     [FieldOffset(0)] public int X;
 
     /// <summary>y</summary>
     [FieldOffset(4)] public int Y;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_value_t::coords, x)</summary>
+        public const int X = 0;
+        /// <summary>offsetof(vlc_value_t::coords, y)</summary>
+        public const int Y = 4;
+    }
 }
 
 /// <summary>vlc_var_atomic_op</summary>

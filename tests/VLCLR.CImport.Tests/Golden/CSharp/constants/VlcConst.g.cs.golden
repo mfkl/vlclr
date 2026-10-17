@@ -13,11 +13,26 @@ public unsafe partial struct Point
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 8;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
     /// <summary>x</summary>
     [FieldOffset(0)] public int X;
 
     /// <summary>y</summary>
     [FieldOffset(4)] public int Y;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(point_t, x)</summary>
+        public const int X = 0;
+        /// <summary>offsetof(point_t, y)</summary>
+        public const int Y = 4;
+    }
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

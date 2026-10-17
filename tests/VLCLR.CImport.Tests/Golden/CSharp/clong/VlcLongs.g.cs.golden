@@ -13,6 +13,12 @@ public unsafe partial struct Longs
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 40 : 48;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 40;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 48;
+
     /// <summary>l</summary>
     [FieldOffset(0)] public CLong L;
 
@@ -37,5 +43,20 @@ public unsafe partial struct Longs
     {
         readonly get => new CLong(unchecked((nint)CImportHelpers.ReadSignedBits(in this, (OperatingSystem.IsWindows() ? 256 : 320), 5)));
         set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 256 : 320), 5, unchecked((ulong)(long)value.Value));
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(longs_t, l)</summary>
+        public const int L = 0;
+        /// <summary>offsetof(longs_t, ul)</summary>
+        public static int Ul => OperatingSystem.IsWindows() ? 4 : 8;
+        /// <summary>offsetof(longs_t, ll)</summary>
+        public static int Ll => OperatingSystem.IsWindows() ? 8 : 16;
+        /// <summary>offsetof(longs_t, size)</summary>
+        public static int Size => OperatingSystem.IsWindows() ? 16 : 24;
+        /// <summary>offsetof(longs_t, tick)</summary>
+        public static int Tick => OperatingSystem.IsWindows() ? 24 : 32;
     }
 }

@@ -13,6 +13,12 @@ public unsafe partial struct Holder
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 32;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
     /// <summary>n</summary>
     [FieldOffset(0)] public Neg N;
 
@@ -27,6 +33,21 @@ public unsafe partial struct Holder
 
     /// <summary>kind</summary>
     [FieldOffset(20)] public int Kind;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(holder_t, n)</summary>
+        public const int N = 0;
+        /// <summary>offsetof(holder_t, s)</summary>
+        public const int S = 4;
+        /// <summary>offsetof(holder_t, b)</summary>
+        public const int B = 8;
+        /// <summary>offsetof(holder_t, y)</summary>
+        public const int Y = 16;
+        /// <summary>offsetof(holder_t, kind)</summary>
+        public const int Kind = 20;
+    }
 }
 
 /// <summary>big_e</summary>

@@ -13,6 +13,12 @@ public unsafe partial struct PictureContext
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 24;
 
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
     /// <summary>destroy</summary>
     [FieldOffset(0)] public delegate* unmanaged[Cdecl]<PictureContext*, void> Destroy;
 
@@ -21,6 +27,17 @@ public unsafe partial struct PictureContext
 
     /// <summary>vctx</summary>
     [FieldOffset(16)] public VideoContext* Vctx;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(picture_context_t, destroy)</summary>
+        public const int Destroy = 0;
+        /// <summary>offsetof(picture_context_t, copy)</summary>
+        public const int Copy = 8;
+        /// <summary>offsetof(picture_context_t, vctx)</summary>
+        public const int Vctx = 16;
+    }
 }
 
 /// <summary>picture_t</summary>
@@ -29,6 +46,12 @@ public unsafe partial struct Picture
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => OperatingSystem.IsWindows() ? 376 : 368;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 368;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 376;
 
     /// <summary>format</summary>
     [FieldOffset(0)] public VideoFormat Format;
@@ -91,6 +114,39 @@ public unsafe partial struct Picture
     {
         private Plane _e0;
     }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(picture_t, format)</summary>
+        public const int Format = 0;
+        /// <summary>offsetof(picture_t, p)</summary>
+        public static int P => OperatingSystem.IsWindows() ? 152 : 144;
+        /// <summary>offsetof(picture_t, i_planes)</summary>
+        public static int Planes => OperatingSystem.IsWindows() ? 312 : 304;
+        /// <summary>offsetof(picture_t, date)</summary>
+        public static int Date => OperatingSystem.IsWindows() ? 320 : 312;
+        /// <summary>offsetof(picture_t, b_force)</summary>
+        public static int Force => OperatingSystem.IsWindows() ? 328 : 320;
+        /// <summary>offsetof(picture_t, b_still)</summary>
+        public static int Still => OperatingSystem.IsWindows() ? 329 : 321;
+        /// <summary>offsetof(picture_t, b_progressive)</summary>
+        public static int Progressive => OperatingSystem.IsWindows() ? 330 : 322;
+        /// <summary>offsetof(picture_t, b_top_field_first)</summary>
+        public static int TopFieldFirst => OperatingSystem.IsWindows() ? 331 : 323;
+        /// <summary>offsetof(picture_t, b_multiview_left_eye)</summary>
+        public static int MultiviewLeftEye => OperatingSystem.IsWindows() ? 332 : 324;
+        /// <summary>offsetof(picture_t, i_nb_fields)</summary>
+        public static int NbFields => OperatingSystem.IsWindows() ? 336 : 328;
+        /// <summary>offsetof(picture_t, context)</summary>
+        public static int Context => OperatingSystem.IsWindows() ? 344 : 336;
+        /// <summary>offsetof(picture_t, p_sys)</summary>
+        public static int Sys => OperatingSystem.IsWindows() ? 352 : 344;
+        /// <summary>offsetof(picture_t, p_next)</summary>
+        public static int Next => OperatingSystem.IsWindows() ? 360 : 352;
+        /// <summary>offsetof(picture_t, refs)</summary>
+        public static int Refs => OperatingSystem.IsWindows() ? 368 : 360;
+    }
 }
 
 /// <summary>plane_t</summary>
@@ -99,6 +155,12 @@ public unsafe partial struct Plane
 {
     /// <summary>Size of the C struct in bytes on the running platform.</summary>
     public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
 
     /// <summary>p_pixels</summary>
     [FieldOffset(0)] public byte* Pixels;
@@ -117,6 +179,23 @@ public unsafe partial struct Plane
 
     /// <summary>i_visible_pitch</summary>
     [FieldOffset(24)] public int VisiblePitch;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(plane_t, p_pixels)</summary>
+        public const int Pixels = 0;
+        /// <summary>offsetof(plane_t, i_lines)</summary>
+        public const int Lines = 8;
+        /// <summary>offsetof(plane_t, i_pitch)</summary>
+        public const int Pitch = 12;
+        /// <summary>offsetof(plane_t, i_pixel_pitch)</summary>
+        public const int PixelPitch = 16;
+        /// <summary>offsetof(plane_t, i_visible_lines)</summary>
+        public const int VisibleLines = 20;
+        /// <summary>offsetof(plane_t, i_visible_pitch)</summary>
+        public const int VisiblePitch = 24;
+    }
 }
 
 /// <summary>vlc_video_context</summary>
