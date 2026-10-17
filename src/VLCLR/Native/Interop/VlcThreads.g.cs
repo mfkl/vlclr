@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 namespace VLCLR.Native.Interop;
 
 /// <summary>Constants and functions from the C headers.</summary>
-public static unsafe partial class VlcThreads
+public static unsafe partial class VlcTick
 {
     /// <summary>vlc_tick_now</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_tick_now")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial long VlcTickNow();
+    public static partial long Now();
 }
