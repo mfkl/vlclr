@@ -19,6 +19,13 @@ public unsafe class ConfigurationParityTests
         }
     }
 
+    /// <summary>
+    /// Keeps the union's other bytes as noise but makes the b_bool byte a valid
+    /// _Bool (0 or 1). Any other value is undefined behaviour in C: Apple clang
+    /// tests only bit 0, MSVC and gcc test the whole byte. VLC stores 0 or 1.
+    /// </summary>
+    private static long CanonicalBool(long raw) => (raw & ~0xFFL) | ((raw & 0xFF) != 0 ? 1 : 0);
+
     private static readonly long[] BoolPatterns = [0, 1, 0x100, 0x101, 0xFF, 0x7F00, 0x0100_0000_0000_0001, unchecked((long)0xFFFF_FFFF_FFFF_FF00)];
 
     [SkippableFact]
@@ -32,8 +39,9 @@ public unsafe class ConfigurationParityTests
             var configuration = new VLCConfiguration(obj);
             IEnumerable<(string, long, int)> inputs = BoolPatterns.SelectMany(p => new[] { 0, -1 }.Select(r => ("bool-opt", p, r)))
                 .Concat(Scripts(50));
-            foreach ((string name, long raw, int result) in inputs)
+            foreach ((string name, long anyRaw, int result) in inputs)
             {
+                long raw = CanonicalBool(anyRaw);
                 ParityNative.ScriptSetup script = s => { s->InheritResult = result; s->InheritValue = raw; };
 
                 var (c, cLog) = Harness.Run(script, () => ParityNative.parity_var_InheritBool(obj, name) != 0);
