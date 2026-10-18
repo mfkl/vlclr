@@ -501,3 +501,11 @@ PARITY_API int parity_create_string(vlc_object_t *o, const char *n, const char *
         var_SetString(o, n, init);
     return r;
 }
+
+/* libvlc_free (vlc/libvlc.h, exported by libvlc): VLCCore.Free hands VLC memory
+ * back with it. The managed side resolves "libvlc" to this library too, so the
+ * strings the stand-ins above allocate go back to the same C runtime. */
+PARITY_API void libvlc_free(void *ptr)
+{
+    free(ptr);
+}
