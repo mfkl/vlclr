@@ -56,35 +56,13 @@ internal static class ParityLibrary
         switch (libraryName)
         {
             case "libvlccore":
+            case "libvlc": // VLCCore.Free -> libvlc_free
             case Name:
                 return s_result.Value.Handle;
-
-            // VLCCore.Free imports "free" from msvcrt. Memory handed out by the
-            // C library comes from the C runtime it links, so answer with that.
-            case "msvcrt":
-                return LoadCRuntime();
 
             default:
                 return 0;
         }
-    }
-
-    private static nint LoadCRuntime()
-    {
-        string[] candidates = OperatingSystem.IsWindows()
-            ? ["ucrtbase.dll"]
-            : OperatingSystem.IsMacOS()
-                ? ["libSystem.dylib"]
-                : ["libc.so.6", "libc"];
-        foreach (string candidate in candidates)
-        {
-            if (NativeLibrary.TryLoad(candidate, out nint handle))
-            {
-                return handle;
-            }
-        }
-
-        return 0;
     }
 
     private static Result Build()

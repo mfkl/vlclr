@@ -498,14 +498,45 @@ public static partial class VLCCore
 
     #region Memory Management
 
+    /// <summary>libvlc_free from the process's global symbols, once "libvlc" did not resolve by name.</summary>
+    private static unsafe delegate* unmanaged[Cdecl]<nint, void> s_globalLibvlcFree;
+
     /// <summary>
     /// Free memory allocated by VLC.
     /// Used to free strings returned by var_GetString and similar functions.
-    /// Note: VLC uses msvcrt.dll for memory allocation, so we must use the same runtime.
+    /// Calls libvlc_free, which frees with the C runtime of the VLC build
+    /// (msvcrt or the UCRT on Windows, libc elsewhere).
     /// </summary>
     /// <param name="ptr">Pointer to free</param>
-    [LibraryImport("msvcrt", EntryPoint = "free")]
-    public static partial void Free(nint ptr);
+    public static unsafe void Free(nint ptr)
+    {
+        if (s_globalLibvlcFree != null)
+        {
+            s_globalLibvlcFree(ptr);
+            return;
+        }
+
+        try
+        {
+            LibvlcFree(ptr);
+        }
+        catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException && !OperatingSystem.IsWindows())
+        {
+            // Linux and macOS installs ship libvlc.so.5 / libvlc.dylib without the
+            // unversioned name; the VLC process has libvlc among its global symbols.
+            if (!NativeLibrary.TryGetExport(NativeLibrary.GetMainProgramHandle(), "libvlc_free", out var free))
+                throw;
+            s_globalLibvlcFree = (delegate* unmanaged[Cdecl]<nint, void>)free;
+            s_globalLibvlcFree(ptr);
+        }
+    }
+
+    /// <summary>
+    /// libvlc_free (vlc/libvlc.h) is exported by libvlc, not libvlccore, so plugins
+    /// don't link it: it binds on first use to the libvlc the VLC process loaded.
+    /// </summary>
+    [LibraryImport("libvlc", EntryPoint = "libvlc_free")]
+    private static partial void LibvlcFree(nint ptr);
 
     #endregion
 
