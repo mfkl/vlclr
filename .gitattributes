@@ -3,3 +3,5 @@
 *.g.cpp text eol=lf
 src/VLCLR/Native/Interop/abi/*.json text eol=lf
 src/VLCLR/Native/Interop/cimport-report.md text eol=lf
+tests/VLCLR.CImport.Tests/Golden/** text eol=lf
+tests/VLCLR.CImport.Tests/Fixtures/** text eol=lf

@@ -42,7 +42,7 @@ public class CSharpEmitterGoldenTests
         var expectedFiles = Directory.GetFiles(goldenDirectory).Select(f => Path.GetFileName(f)![..^GoldenExtension.Length]).Order(StringComparer.Ordinal).ToList();
         Assert.Equal(expectedFiles, actual.Keys.ToList());
         foreach (var (file, text) in actual)
-            Assert.Equal(File.ReadAllText(Path.Combine(goldenDirectory, file + GoldenExtension)), text);
+            Assert.Equal(File.ReadAllText(Path.Combine(goldenDirectory, file + GoldenExtension)).ReplaceLineEndings("\n"), text);
     }
 
     [Theory]
