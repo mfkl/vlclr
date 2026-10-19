@@ -498,9 +498,6 @@ public static partial class VLCCore
 
     #region Memory Management
 
-    /// <summary>libvlc_free from the process's global symbols, once "libvlc" did not resolve by name.</summary>
-    private static unsafe delegate* unmanaged[Cdecl]<nint, void> s_globalLibvlcFree;
-
     /// <summary>
     /// Free memory allocated by VLC.
     /// Used to free strings returned by var_GetString and similar functions.
@@ -510,30 +507,30 @@ public static partial class VLCCore
     /// <param name="ptr">Pointer to free</param>
     public static unsafe void Free(nint ptr)
     {
-        if (s_globalLibvlcFree != null)
-        {
-            s_globalLibvlcFree(ptr);
-            return;
-        }
-
-        try
-        {
+        if (GlobalLibvlcFree.Pointer != null)
+            GlobalLibvlcFree.Pointer(ptr);
+        else
             LibvlcFree(ptr);
-        }
-        catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException && !OperatingSystem.IsWindows())
-        {
-            // Linux and macOS installs ship libvlc.so.5 / libvlc.dylib without the
-            // unversioned name; the VLC process has libvlc among its global symbols.
-            if (!NativeLibrary.TryGetExport(NativeLibrary.GetMainProgramHandle(), "libvlc_free", out var free))
-                throw;
-            s_globalLibvlcFree = (delegate* unmanaged[Cdecl]<nint, void>)free;
-            s_globalLibvlcFree(ptr);
-        }
+    }
+
+    /// <summary>
+    /// libvlc_free among the process's global symbols: on Linux and macOS, the
+    /// libvlc the VLC process runs on. Looked up before loading "libvlc" by
+    /// name, which could open a different libvlc (a distro VLC 3, say) and pull
+    /// a second libvlc and libvlccore into the process. Null on Windows, where
+    /// loading by name finds the libvlc.dll already loaded.
+    /// </summary>
+    private static unsafe class GlobalLibvlcFree
+    {
+        public static readonly delegate* unmanaged[Cdecl]<nint, void> Pointer =
+            NativeLibrary.TryGetExport(NativeLibrary.GetMainProgramHandle(), "libvlc_free", out var free)
+                ? (delegate* unmanaged[Cdecl]<nint, void>)free
+                : null;
     }
 
     /// <summary>
     /// libvlc_free (vlc/libvlc.h) is exported by libvlc, not libvlccore, so plugins
-    /// don't link it: it binds on first use to the libvlc the VLC process loaded.
+    /// don't link it: it binds on first use to the libvlc of that name.
     /// </summary>
     [LibraryImport("libvlc", EntryPoint = "libvlc_free")]
     private static partial void LibvlcFree(nint ptr);
