@@ -2,10 +2,12 @@
 """Compare two raw I420 videos frame by frame (stdlib only).
 
 EXPECTED and ACTUAL are what VLC's transcode wrote: every frame's Y, U and V
-planes, no padding. With --again, each side was run twice: values that differ
-between the two runs of a side (filters that read uninitialized padding past
-the visible width) are skipped and counted, and the check fails when more
-than --max-unstable of the values are skipped.
+planes, no padding. With --again, each side was run twice. Values of EXPECTED
+that differ between its two runs (a filter that reads uninitialized padding
+past the visible width) are skipped and counted, and the check fails when more
+than --max-unstable of the values are skipped. Any value of ACTUAL that
+differs between its two runs fails the check: the filter under test must not
+read uninitialized memory.
 
 Usage: framediff.py WIDTH HEIGHT EXPECTED ACTUAL [--again EXPECTED2 ACTUAL2]
                     [--tolerance N] [--max-unstable FRACTION] [--expect-different]
@@ -53,7 +55,8 @@ def main():
     expected2, actual2 = (videos[2], videos[3]) if args.again else (expected, actual)
 
     frames = len(expected) // frame_size
-    differing, unstable, largest, first = 0, 0, 0, None
+    differing, unstable, actual_unstable, largest, first = 0, 0, 0, 0, None
+    first_actual_unstable = None
     for frame in range(frames):
         for name, offset, width, height in layout:
             for y in range(height):
@@ -63,7 +66,12 @@ def main():
                 if e == a and e == e2 and a == a2:
                     continue
                 for x in range(width):
-                    if e[x] != e2[x] or a[x] != a2[x]:
+                    if a[x] != a2[x]:
+                        actual_unstable += 1
+                        if first_actual_unstable is None:
+                            first_actual_unstable = f"frame {frame} {name} x {x} y {y}: {a[x]} vs {a2[x]}"
+                        continue
+                    if e[x] != e2[x]:
                         unstable += 1
                         continue
                     delta = abs(e[x] - a[x])
@@ -77,9 +85,13 @@ def main():
     print(f"{frames} frames {args.width}x{args.height}: {differing} of {total} values differ"
           + (f" by more than {args.tolerance}" if args.tolerance else "")
           + (f" (max delta {largest}, first at {first})" if differing else "")
-          + (f", {unstable} unstable between runs skipped" if args.again else ""))
+          + (f", {unstable} unstable between runs of EXPECTED skipped" if args.again else ""))
     if args.expect_different:
         return 0 if differing else 1
+    if actual_unstable:
+        print(f"FAIL: {actual_unstable} values of ACTUAL differ between its two runs "
+              f"(first at {first_actual_unstable})")
+        return 1
     if unstable > args.max_unstable * total:
         print(f"FAIL: {unstable / total:.2%} of the values are unstable between runs, "
               f"more than {args.max_unstable:.2%}")
