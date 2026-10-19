@@ -55,6 +55,21 @@ public class CSharpEmitterGoldenTests
 
     [Theory]
     [MemberData(nameof(Cases))]
+    public void Every_accessor_that_picks_a_per_abi_value_is_inlined(string name)
+    {
+        // Native AOT folds OperatingSystem.IsWindows() to a constant only where the accessor is inlined.
+        var notInlined = Emit(name).Files
+            .SelectMany(f => f.Value.Split('\n').Select(line => (File: f.Key, Line: line.Trim())))
+            .Where(l => l.Line.Contains("OperatingSystem.IsWindows()", StringComparison.Ordinal)
+                && !l.Line.Contains("[MethodImpl(MethodImplOptions.AggressiveInlining)]", StringComparison.Ordinal))
+            .Select(l => $"{l.File}: {l.Line}")
+            .ToList();
+
+        Assert.Equal([], notInlined);
+    }
+
+    [Theory]
+    [MemberData(nameof(Cases))]
     public void Output_is_deterministic_with_lf_line_endings(string name)
     {
         var first = Emit(name);
