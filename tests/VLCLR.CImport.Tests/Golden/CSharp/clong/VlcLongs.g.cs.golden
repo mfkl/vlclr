@@ -41,8 +41,8 @@ public unsafe partial struct Longs
     /// <summary>bl : 5</summary>
     public CLong Bl
     {
-        readonly get => new CLong(unchecked((nint)CImportHelpers.ReadSignedBits(in this, (OperatingSystem.IsWindows() ? 256 : 320), 5)));
-        set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 256 : 320), 5, unchecked((ulong)(long)value.Value));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => new CLong(unchecked((nint)CImportHelpers.ReadSignedBits(in this, (OperatingSystem.IsWindows() ? 256 : 320), 5)));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 256 : 320), 5, unchecked((ulong)(long)value.Value));
     }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>

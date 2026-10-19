@@ -223,6 +223,13 @@ internal sealed partial class CSharpGeneration
     private IReadOnlyList<string>? Bitfield(MergedField m, string csName, out string reason)
     {
         string type;
+        if (m.Type.Desugar() is { Kind: TypeRefKind.Builtin, Builtin: BuiltinType.Char })
+        {
+            // Signed on x86 and on Windows and Apple ARM64, unsigned on Linux ARM64:
+            // no single read matches C everywhere.
+            reason = "plain char bitfield: its signedness depends on the target";
+            return null;
+        }
         if (m.Type.Desugar() is { Kind: TypeRefKind.Builtin, Builtin: BuiltinType.Bool })
         {
             type = "bool";
@@ -277,26 +284,36 @@ internal sealed partial class CSharpGeneration
         }
 
         reason = "";
+        var inline = Inline(offset);
         return
         [
             $"/// <summary>{CSharpLiterals.Xml(m.Name)} : {width}</summary>",
             $"public {type} {csName}",
             "{",
-            $"    readonly get => {get};",
-            $"    set => {CSharpHelpers.ClassName}.WriteBits(ref this, {offset}, {width}, {set});",
+            $"    {inline}readonly get => {get};",
+            $"    {inline}set => {CSharpHelpers.ClassName}.WriteBits(ref this, {offset}, {width}, {set});",
             "}",
         ];
     }
 
     /// <summary>
     /// <c>signature => body;</c>, or a getter marked AggressiveInlining when the
-    /// body picks a per-ABI value: Native AOT only folds
-    /// <c>OperatingSystem.IsWindows()</c> to a constant where the getter is inlined.
+    /// body picks a per-ABI value (see <see cref="Inline"/>).
     /// </summary>
     internal static string Getter(string signature, string body)
-        => body.Contains("OperatingSystem.IsWindows()", StringComparison.Ordinal)
-            ? $"{signature} {{ [MethodImpl(MethodImplOptions.AggressiveInlining)] get => {body}; }}"
+        => Inline(body) is { Length: > 0 } inline
+            ? $"{signature} {{ {inline}get => {body}; }}"
             : $"{signature} => {body};";
+
+    /// <summary>
+    /// The AggressiveInlining attribute (with a trailing space) for an accessor
+    /// whose body picks a per-ABI value, else empty: Native AOT only folds
+    /// <c>OperatingSystem.IsWindows()</c> to a constant where the accessor is inlined.
+    /// </summary>
+    internal static string Inline(string body)
+        => body.Contains("OperatingSystem.IsWindows()", StringComparison.Ordinal)
+            ? "[MethodImpl(MethodImplOptions.AggressiveInlining)] "
+            : "";
 
     /// <summary>One C# expression for a per-ABI value: the literal when the ABIs agree, else a platform conditional.</summary>
     private static string Choice<T>(PerAbi<T> values, Func<T, string> format, bool parenthesize = false)
