@@ -3,6 +3,7 @@
 // VLC Version: 4.0.6
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace VLCLR.Native;
@@ -16,10 +17,11 @@ namespace VLCLR.Native;
 /// member after fmt_in is a ref property placed for the running ABI from
 /// <see cref="Interop.Filter.Offsets"/>. The managed struct is sized for the
 /// larger, Windows layout (<see cref="Interop.Filter.MaxSizeOf"/>;
-/// <see cref="Interop.Filter.MinSizeOf"/> elsewhere).
+/// <see cref="Interop.Filter.MinSizeOf"/> elsewhere), so don't copy a whole
+/// VLCFilter out of or into VLC memory: use a pointer to it.
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = Interop.Filter.MaxSizeOf)]
-public struct VLCFilter
+public unsafe struct VLCFilter
 {
     /// <summary>VLC object header (struct vlc_object_t obj) - 24 bytes</summary>
     [FieldOffset(Interop.Filter.Offsets.Obj)]
@@ -34,8 +36,12 @@ public struct VLCFilter
     public nint Sys;
 
     /// <summary>Input format (fmt_in)</summary>
-    [FieldOffset(Interop.Filter.Offsets.FmtIn)]
-    public VLCEsFormat FormatIn;
+    /// <remarks>
+    /// A pointer because VLCEsFormat is sized for Windows (240 bytes) and
+    /// es_format_t is 232 bytes on Linux and macOS: assigning a whole
+    /// VLCEsFormat would write past fmt_in there. Write its members instead.
+    /// </remarks>
+    public VLCEsFormat* FormatIn => (VLCEsFormat*)((byte*)Unsafe.AsPointer(ref this) + Interop.Filter.Offsets.FmtIn);
 
     /// <summary>Video context input (vctx_in)</summary>
     [UnscopedRef]
@@ -43,13 +49,12 @@ public struct VLCFilter
 
     /// <summary>Output format (fmt_out)</summary>
     /// <remarks>
-    /// VLCEsFormat is sized for Windows (240 bytes) but es_format_t is 232 bytes
-    /// on Linux and macOS, so assigning a whole VLCEsFormat through this
-    /// reference there writes 8 bytes past fmt_out, into vctx_out. Write
-    /// individual members instead.
+    /// A pointer because VLCEsFormat is sized for Windows (240 bytes) and
+    /// es_format_t is 232 bytes on Linux and macOS: assigning a whole
+    /// VLCEsFormat would write past fmt_out, into vctx_out, there. Write its
+    /// members instead.
     /// </remarks>
-    [UnscopedRef]
-    public ref VLCEsFormat FormatOut => ref Interop.CImportHelpers.FieldAt<VLCFilter, VLCEsFormat>(ref this, Interop.Filter.Offsets.FmtOut);
+    public VLCEsFormat* FormatOut => (VLCEsFormat*)((byte*)Unsafe.AsPointer(ref this) + Interop.Filter.Offsets.FmtOut);
 
     /// <summary>Video context output (vctx_out)</summary>
     [UnscopedRef]

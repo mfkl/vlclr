@@ -135,7 +135,7 @@ public partial class SubtitleTextRenderer : VLCTextRendererBase
 
         // Get video dimensions from filter's format
         ref VLCFilter filter = ref Unsafe.AsRef<VLCFilter>((void*)Context.NativePtr);
-        uint videoWidth = filter.FormatOut.Video.Width > 0 ? filter.FormatOut.Video.Width : (uint)DefaultWidth;
+        uint videoWidth = filter.FormatOut->Video.Width > 0 ? filter.FormatOut->Video.Width : (uint)DefaultWidth;
         int viewportWidth = Math.Max((int)videoWidth, 320);
         int maximumRegionWidth = request.MaxWidth > 0
             ? Math.Min(request.MaxWidth, viewportWidth)

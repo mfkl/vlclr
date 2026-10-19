@@ -326,7 +326,7 @@ public class VLCFilterTypesTests
     {
         VLCFilter filter = default;
         byte* basePtr = (byte*)&filter;
-        byte* fieldPtr = (byte*)&filter.FormatIn;
+        byte* fieldPtr = (byte*)filter.FormatIn;
         Assert.Equal(40, (int)(fieldPtr - basePtr));
     }
 
@@ -336,7 +336,7 @@ public class VLCFilterTypesTests
         // FormatIn (40) + Video offset within EsFormat (56) = 96
         VLCFilter filter = default;
         byte* basePtr = (byte*)&filter;
-        byte* fieldPtr = (byte*)&filter.FormatIn.Video.Chroma;
+        byte* fieldPtr = (byte*)&filter.FormatIn->Video.Chroma;
         Assert.Equal(96, (int)(fieldPtr - basePtr));
     }
 
@@ -345,7 +345,7 @@ public class VLCFilterTypesTests
     {
         VLCFilter filter = default;
         byte* basePtr = (byte*)&filter;
-        byte* fieldPtr = (byte*)&filter.FormatIn.Video.Width;
+        byte* fieldPtr = (byte*)&filter.FormatIn->Video.Width;
         Assert.Equal(100, (int)(fieldPtr - basePtr));
     }
 
@@ -542,7 +542,7 @@ public class VLCFilterTypesTests
 
             // Read it back using struct access
             ref VLCFilter filter = ref *(VLCFilter*)filterMemory;
-            Assert.Equal(testChroma, filter.FormatIn.Video.Chroma);
+            Assert.Equal(testChroma, filter.FormatIn->Video.Chroma);
         }
         finally
         {
