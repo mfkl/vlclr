@@ -56,14 +56,8 @@ public static partial class VLCCore
     /// <returns>0 on success, error code on failure</returns>
     public static unsafe int VarCreate(nint obj, string name, int type)
     {
-        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
-        try
-        {
-            utf8.FromManaged(name, buffer);
-            return Gen.Var.Create((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type);
-        }
-        finally { utf8.Free(); }
+        using var utf8 = new Utf8Argument(name, stackalloc byte[Utf8Argument.BufferSize]);
+        return Gen.Var.Create((Gen.ObjectHeader*)obj, utf8.Pointer, type);
     }
 
     /// <summary>
@@ -73,14 +67,8 @@ public static partial class VLCCore
     /// <param name="name">Variable name</param>
     public static unsafe void VarDestroy(nint obj, string name)
     {
-        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
-        try
-        {
-            utf8.FromManaged(name, buffer);
-            Gen.Var.Destroy((Gen.ObjectHeader*)obj, utf8.ToUnmanaged());
-        }
-        finally { utf8.Free(); }
+        using var utf8 = new Utf8Argument(name, stackalloc byte[Utf8Argument.BufferSize]);
+        Gen.Var.Destroy((Gen.ObjectHeader*)obj, utf8.Pointer);
     }
 
     /// <summary>
@@ -93,15 +81,9 @@ public static partial class VLCCore
     /// <returns>0 on success, error code on failure</returns>
     public static unsafe int VarSetChecked(nint obj, string name, int type, VLCValueNative value)
     {
-        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
-        try
-        {
-            utf8.FromManaged(name, buffer);
-            return Gen.Var.SetChecked((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type,
-                Unsafe.As<VLCValueNative, Gen.Value>(ref value));
-        }
-        finally { utf8.Free(); }
+        using var utf8 = new Utf8Argument(name, stackalloc byte[Utf8Argument.BufferSize]);
+        return Gen.Var.SetChecked((Gen.ObjectHeader*)obj, utf8.Pointer, type,
+            Unsafe.As<VLCValueNative, Gen.Value>(ref value));
     }
 
     /// <summary>
@@ -115,16 +97,10 @@ public static partial class VLCCore
     public static unsafe int VarGetChecked(nint obj, string name, int type, out VLCValueNative value)
     {
         Gen.Value native = default;
-        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
-        try
-        {
-            utf8.FromManaged(name, buffer);
-            int result = Gen.Var.GetChecked((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type, &native);
-            value = Unsafe.As<Gen.Value, VLCValueNative>(ref native);
-            return result;
-        }
-        finally { utf8.Free(); }
+        using var utf8 = new Utf8Argument(name, stackalloc byte[Utf8Argument.BufferSize]);
+        int result = Gen.Var.GetChecked((Gen.ObjectHeader*)obj, utf8.Pointer, type, &native);
+        value = Unsafe.As<Gen.Value, VLCValueNative>(ref native);
+        return result;
     }
 
     /// <summary>
@@ -138,16 +114,30 @@ public static partial class VLCCore
     public static unsafe int VarInherit(nint obj, string name, int type, out VLCValueNative value)
     {
         Gen.Value native = default;
-        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
-        try
-        {
-            utf8.FromManaged(name, buffer);
-            int result = Gen.Var.Inherit((Gen.ObjectHeader*)obj, utf8.ToUnmanaged(), type, &native);
-            value = Unsafe.As<Gen.Value, VLCValueNative>(ref native);
-            return result;
-        }
-        finally { utf8.Free(); }
+        using var utf8 = new Utf8Argument(name, stackalloc byte[Utf8Argument.BufferSize]);
+        int result = Gen.Var.Inherit((Gen.ObjectHeader*)obj, utf8.Pointer, type, &native);
+        value = Unsafe.As<Gen.Value, VLCValueNative>(ref native);
+        return result;
+    }
+
+    /// <summary>
+    /// A string passed to a generated import as a NUL-terminated UTF-8
+    /// <c>char*</c>, the conversion <c>StringMarshalling.Utf8</c> would make:
+    /// in the caller's stack buffer when it fits, else allocated and freed on
+    /// <see cref="Dispose"/>.
+    /// </summary>
+    private unsafe ref struct Utf8Argument
+    {
+        public static int BufferSize => Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize;
+
+        private Utf8StringMarshaller.ManagedToUnmanagedIn _marshaller;
+
+        public Utf8Argument(string? value, Span<byte> buffer) => _marshaller.FromManaged(value, buffer);
+
+        /// <summary>The UTF-8 bytes, or null for a null string.</summary>
+        public byte* Pointer => _marshaller.ToUnmanaged();
+
+        public void Dispose() => _marshaller.Free();
     }
 
     #endregion
@@ -725,14 +715,8 @@ public static partial class VLCCore
     /// <returns>Pointer to text_segment_t, or IntPtr.Zero on failure</returns>
     public static unsafe nint TextSegmentNew(string? text)
     {
-        Span<byte> buffer = stackalloc byte[Utf8StringMarshaller.ManagedToUnmanagedIn.BufferSize];
-        scoped Utf8StringMarshaller.ManagedToUnmanagedIn utf8 = new();
-        try
-        {
-            utf8.FromManaged(text, buffer);
-            return (nint)Gen.TextSegment.New(utf8.ToUnmanaged());
-        }
-        finally { utf8.Free(); }
+        using var utf8 = new Utf8Argument(text, stackalloc byte[Utf8Argument.BufferSize]);
+        return (nint)Gen.TextSegment.New(utf8.Pointer);
     }
 
     /// <summary>
