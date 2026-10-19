@@ -7,18 +7,26 @@ namespace InlineParity;
 /// <summary>VLCCore.PictureRelease and VLCFilterContext.NewPicture against picture_Release and filter_NewPicture.</summary>
 public unsafe class PictureParityTests
 {
-    private static IEnumerable<uint> RefCounts()
+    private static IEnumerable<nuint> RefCounts()
     {
-        // vlc_atomic_rc_t is a uintptr_t, VLCPicture.Refs a uint: only counts that fit 32 bits are comparable.
-        foreach (uint v in new uint[] { 1, 2, 3, 4, 7, 100, 0x7FFFFFFF, 0x80000000, 0x80000001, 0xFFFFFFFF })
+        foreach (ulong v in new ulong[] { 1, 2, 3, 4, 7, 100, 0x7FFFFFFF, 0x80000000, 0x80000001, 0xFFFFFFFF })
         {
-            yield return v;
+            yield return (nuint)v;
+        }
+
+        if (nint.Size == 8)
+        {
+            // vlc_atomic_rc_t is a uintptr_t: a zero low half borrows from the high half.
+            foreach (ulong v in new ulong[] { 0x1_0000_0000, 0x1_0000_0001, 0xFFFF_FFFF_0000_0000, 0xFFFF_FFFF_FFFF_FFFF })
+            {
+                yield return (nuint)v;
+            }
         }
 
         Random random = Cases.NewRandom(30);
         for (int i = 0; i < Cases.RandomCount; i++)
         {
-            yield return (uint)random.NextInt64(1, 1L << random.Next(2, 33));
+            yield return (nuint)random.NextInt64(1, 1L << random.Next(2, nint.Size == 8 ? 63 : 33));
         }
     }
 
@@ -30,7 +38,7 @@ public unsafe class PictureParityTests
         nint picture = ParityNative.parity_picture_new(1);
         try
         {
-            foreach (uint refs in RefCounts())
+            foreach (nuint refs in RefCounts())
             {
                 ParityNative.parity_picture_set_refs(picture, refs);
                 var (_, cLog) = Harness.Run<int>(null, () => { ParityNative.parity_picture_Release(picture); return 0; });
