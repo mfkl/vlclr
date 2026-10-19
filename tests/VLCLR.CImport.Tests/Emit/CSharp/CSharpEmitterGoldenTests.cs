@@ -1,6 +1,7 @@
 using System.Text;
 using VLCLR.CImport.Emit;
 using VLCLR.CImport.Tests.Emit.CSharp.Cases;
+using VLCLR.Tests.Interop;
 
 namespace VLCLR.CImport.Tests.Emit.CSharp;
 
@@ -51,6 +52,15 @@ public class CSharpEmitterGoldenTests
     {
         var result = CSharpCompilationHelper.Compile(Emit(name).Files);
         Assert.True(result.Diagnostics.Count == 0, "Generated code does not compile cleanly:\n" + string.Join("\n", result.Diagnostics));
+    }
+
+    [Theory]
+    [MemberData(nameof(Cases))]
+    public void No_record_whose_size_differs_is_held_or_passed_by_value(string name)
+    {
+        var assembly = CSharpCompilationHelper.Compile(Emit(name).Files).Load();
+
+        Assert.Equal([], AbiSizedRecords.Violations(assembly.GetTypes(), AbiSizedRecords.IsGeneratedAbiSized));
     }
 
     [Theory]

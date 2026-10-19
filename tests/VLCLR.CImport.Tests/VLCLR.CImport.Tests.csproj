@@ -21,6 +21,8 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <ProjectReference Include="..\..\tools\VLCLR.CImport\VLCLR.CImport.csproj" />
+    <!-- The rule VLCLR.Tests applies to the shipped assembly, applied here to every emitter case. -->
+    <Compile Include="..\..\src\VLCLR.Tests\Interop\AbiSizedRecords.cs" Link="Emit\CSharp\AbiSizedRecords.cs" />
   </ItemGroup>
 
   <!-- Fixture headers, golden JSON and golden C# are read from the build output. -->
