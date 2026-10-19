@@ -131,8 +131,9 @@ expect_log() {
 
 # parity NAME VLC_FILTER DOTNET_FILTER VLC_OPTION DOTNET_OPTION: the ported
 # filter must give the output of VLC's on every frame. Each runs twice:
-# values that change between two runs of the same filter (a read of
-# uninitialized padding) are left out of the comparison.
+# values that change between two runs of VLC's filter (a read of
+# uninitialized padding) are left out of the comparison; any that change
+# between two runs of the ported filter fail it.
 parity() {
     local name="$1" vlc_filter="$2" dotnet_filter="$3" vlc_option="$4" dotnet_option="$5" run
     for run in 1 2; do
