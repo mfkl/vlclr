@@ -557,36 +557,36 @@ public unsafe partial struct VideoFormatDovi
     /// <summary>profile : 7</summary>
     public uint Profile
     {
-        readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 32 : 16), 7));
-        set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 32 : 16), 7, (ulong)value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 32 : 16), 7));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 32 : 16), 7, (ulong)value);
     }
 
     /// <summary>level : 6</summary>
     public uint Level
     {
-        readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 39 : 23), 6));
-        set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 39 : 23), 6, (ulong)value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 39 : 23), 6));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 39 : 23), 6, (ulong)value);
     }
 
     /// <summary>rpu_present : 1</summary>
     public uint RpuPresent
     {
-        readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 45 : 29), 1));
-        set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 45 : 29), 1, (ulong)value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 45 : 29), 1));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 45 : 29), 1, (ulong)value);
     }
 
     /// <summary>el_present : 1</summary>
     public uint ElPresent
     {
-        readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 46 : 30), 1));
-        set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 46 : 30), 1, (ulong)value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 46 : 30), 1));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 46 : 30), 1, (ulong)value);
     }
 
     /// <summary>bl_present : 1</summary>
     public uint BlPresent
     {
-        readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 47 : 31), 1));
-        set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 47 : 31), 1, (ulong)value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 47 : 31), 1));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 47 : 31), 1, (ulong)value);
     }
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>

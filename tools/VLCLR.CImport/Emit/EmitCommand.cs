@@ -83,7 +83,7 @@ public static class EmitCommand
         if (manifest.Output.LayoutTests is { } layoutTests)
         {
             var options = new LayoutTestOptions(LayoutTestsNamespace, LayoutTestsClass);
-            written.Add(Write(manifest.Resolve(layoutTests), new LayoutTestEmitter(merged, names, options).Emit()));
+            written.Add(Write(manifest.Resolve(layoutTests), new LayoutTestEmitter(merged, names, options, csharp.Skipped).Emit()));
         }
 
         return written;

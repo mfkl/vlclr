@@ -96,6 +96,26 @@ public class CSharpEmitterBehaviorTests
     }
 
     [Fact]
+    public void Plain_char_bitfields_are_skipped()
+    {
+        var merged = Merge(w => Snapshot(w, types: [Struct("a_t", "vlc_a.h", 4, 4, Bits("c", CharT, 0, 4), Bits("u", U8, 4, 4))]));
+
+        var result = Emit(merged);
+
+        Assert.Contains(new SkippedSymbol("a_t.c", "vlc_a.h", "field", "plain char bitfield: its signedness depends on the target"), result.Skipped);
+        Assert.Contains("public byte U", result.Files["VlcA.g.cs"]);
+    }
+
+    [Fact]
+    public void Bitfield_accessors_that_pick_a_per_abi_offset_are_inlined()
+    {
+        var text = string.Concat(CSharpGeneration("divergent").Files.Values);
+
+        Assert.Contains("    [MethodImpl(MethodImplOptions.AggressiveInlining)] readonly get => unchecked((uint)CImportHelpers.ReadBits(in this, (OperatingSystem.IsWindows() ? 32 : 16), 7));", text);
+        Assert.Contains("    [MethodImpl(MethodImplOptions.AggressiveInlining)] set => CImportHelpers.WriteBits(ref this, (OperatingSystem.IsWindows() ? 32 : 16), 7, (ulong)value);", text);
+    }
+
+    [Fact]
     public void Enum_value_and_type_decisions_are_reported()
     {
         var result = CSharpGeneration("enums");

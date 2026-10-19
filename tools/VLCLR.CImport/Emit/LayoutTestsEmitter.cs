@@ -15,11 +15,13 @@ public sealed record LayoutTestOptions(string Namespace, string ClassName);
 /// the running ABI: <c>SizeOf</c>, <c>Unsafe.SizeOf</c>, every member offset, and
 /// the exact bits each bitfield property touches. One <c>[Fact]</c>
 /// <c>{CSharpType}_Layout</c> per emitted record (the suffix keeps the method name
-/// from shadowing the type inside the class).
+/// from shadowing the type inside the class). Members the C# emitter skipped
+/// (<paramref name="skipped"/>) are left out.
 /// </summary>
-public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, LayoutTestOptions options)
+public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, LayoutTestOptions options, IReadOnlyCollection<SkippedSymbol>? skipped = null)
 {
     private readonly StringBuilder _sb = new();
+    private readonly HashSet<string> _skippedFields = [.. (skipped ?? []).Where(s => s.Kind == "field").Select(s => s.Symbol)];
 
     public string Emit()
     {
@@ -61,7 +63,8 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         Line($"        AssertEqual({Abi(type.Size!)}, {csType}.SizeOf, \"{Escape(type.Name)} sizeof\");");
         Line($"        AssertEqual({type.Size!.Values.Max()}, Unsafe.SizeOf<{csType}>(), \"{Escape(type.Name)} Unsafe.SizeOf\");");
 
-        foreach (var member in type.Members.Where(m => !m.IsBitfield))
+        var members = type.Members.Where(m => !_skippedFields.Contains($"{type.Name}.{m.Name}")).ToList();
+        foreach (var member in members.Where(m => !m.IsBitfield))
         {
             var csName = names.Field(member.DeclaringType, member.Name);
             var label = $"\"{Escape(type.Name)}.{Escape(member.Name)} offset\"";
@@ -72,7 +75,7 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
                 Line($"        AssertEqual({Abi(member.Offset)}, Offset(ref s, ref s.{csName}), {label});");
         }
 
-        foreach (var member in type.Members.Where(m => m.IsBitfield))
+        foreach (var member in members.Where(m => m.IsBitfield))
         {
             var csName = names.Field(member.DeclaringType, member.Name);
             var value = AllOnes(member);
