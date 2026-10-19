@@ -32,6 +32,17 @@ internal static class EmittedRecords
         return t.Kind == TypeRefKind.Record ? t.Name : null;
     }
 
+    /// <summary>
+    /// True when a non-array field holds, by value, a record whose size differs
+    /// between ABIs. The C# emitter exposes such a member as a pointer: the
+    /// managed struct has the largest size, so a field or a ref would let
+    /// <c>owner.Member = value</c> write past the C member on the other ABIs.
+    /// </summary>
+    public static bool IsAbiSizedRecord(TypeRef type, IReadOnlyDictionary<string, MergedType> records)
+        => type.Desugar() is { Kind: TypeRefKind.Record } record
+            && records.TryGetValue(record.Name!, out var target)
+            && target.Size is { IsUniform: false };
+
     /// <summary>Every record a field type names, through pointers, arrays, typedefs and function signatures.</summary>
     private static void CollectRecords(TypeRef type, HashSet<string> into)
     {

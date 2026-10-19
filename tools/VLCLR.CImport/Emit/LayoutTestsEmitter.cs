@@ -22,6 +22,7 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
 {
     private readonly StringBuilder _sb = new();
     private readonly HashSet<string> _skippedFields = [.. (skipped ?? []).Where(s => s.Kind == "field").Select(s => s.Symbol)];
+    private readonly Dictionary<string, MergedType> _records = merged.Types.ToDictionary(t => t.Name, StringComparer.Ordinal);
 
     public string Emit()
     {
@@ -68,8 +69,11 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         {
             var csName = names.Field(member.DeclaringType, member.Name);
             var label = $"\"{Escape(type.Name)}.{Escape(member.Name)} offset\"";
+            // The C# emitter returns these as a pointer to the member.
+            if (EmittedRecords.IsAbiSizedRecord(member.Type, _records))
+                Line($"        AssertEqual({Abi(member.Offset)}, PointerOffset(ref s, s.{csName}), {label});");
             // Pointers can't be generic arguments: pin the member and subtract addresses.
-            if (member.Type.Desugar().Kind == TypeRefKind.Pointer)
+            else if (member.Type.Desugar().Kind == TypeRefKind.Pointer)
                 Line($"        {{ ref var r = ref s.{csName}; fixed (void* p = &r) AssertEqual({Abi(member.Offset)}, PointerOffset(ref s, p), {label}); }}");
             else
                 Line($"        AssertEqual({Abi(member.Offset)}, Offset(ref s, ref s.{csName}), {label});");

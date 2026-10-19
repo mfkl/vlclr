@@ -96,6 +96,20 @@ public class CSharpEmitterBehaviorTests
     }
 
     [Fact]
+    public void Members_holding_a_record_whose_size_differs_are_pointers()
+    {
+        var text = string.Concat(CSharpGeneration("divergent").Files.Values);
+
+        // A field or a ref would let a whole-value assignment write past the C member on sysv.
+        Assert.Contains("public EsFormat* FmtIn => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + 8);", text);
+        Assert.Contains("public EsFormat* FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 80 : 72)); }", text);
+        Assert.Contains("public VideoFormat* Video =>", text);
+        Assert.DoesNotContain(" EsFormat FmtIn;", text);
+        Assert.DoesNotContain("ref EsFormat ", text);
+        Assert.DoesNotContain(" VideoFormat Video;", text);
+    }
+
+    [Fact]
     public void Plain_char_bitfields_are_skipped()
     {
         var merged = Merge(w => Snapshot(w, types: [Struct("a_t", "vlc_a.h", 4, 4, Bits("c", CharT, 0, 4), Bits("u", U8, 4, 4))]));

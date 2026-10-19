@@ -143,6 +143,16 @@ internal sealed partial class CSharpGeneration
         }
 
         var doc = $"/// <summary>{CSharpLiterals.Xml(m.Name)}</summary>";
+        if (EmittedRecords.IsAbiSizedRecord(m.Type, records))
+        {
+            return
+            [
+                doc,
+                $"/// <remarks>A pointer because <see cref=\"{type}\"/> has a different size on each ABI: assign its members, not a whole value.</remarks>",
+                Getter($"public {type}* {csName}", $"({type}*)((byte*)Unsafe.AsPointer(ref this) + {Choice(m.Offset, v => v.ToString(), parenthesize: true)})"),
+            ];
+        }
+
         if (m.Offset.IsUniform)
             return [doc, $"[FieldOffset({m.Offset[0]})] public {type} {csName};"];
 

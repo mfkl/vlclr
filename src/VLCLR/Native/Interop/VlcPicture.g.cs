@@ -54,7 +54,8 @@ public unsafe partial struct Picture
     public const int MaxSizeOf = 376;
 
     /// <summary>format</summary>
-    [FieldOffset(0)] public VideoFormat Format;
+    /// <remarks>A pointer because <see cref="VideoFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public VideoFormat* Format => (VideoFormat*)((byte*)Unsafe.AsPointer(ref this) + 0);
 
     /// <summary>p</summary>
     [UnscopedRef]
