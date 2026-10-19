@@ -14,15 +14,15 @@ public sealed class FilterStructMigrationTests
     }
 
     [Fact]
-    public void OffsetsMatchGenerated()
+    public unsafe void OffsetsMatchGenerated()
     {
         VLCFilter f = default;
         Assert.Equal(Gen.Filter.Offsets.Obj, Off(ref f, ref f.Obj));
         Assert.Equal(Gen.Filter.Offsets.Module, Off(ref f, ref f.Module));
         Assert.Equal(Gen.Filter.Offsets.Sys, Off(ref f, ref f.Sys));
-        Assert.Equal(Gen.Filter.Offsets.FmtIn, Off(ref f, ref f.FormatIn));
+        Assert.Equal(Gen.Filter.Offsets.FmtIn, Off(ref f, ref *f.FormatIn));
         Assert.Equal(Gen.Filter.Offsets.VctxIn, Off(ref f, ref f.VideoContextIn));
-        Assert.Equal(Gen.Filter.Offsets.FmtOut, Off(ref f, ref f.FormatOut));
+        Assert.Equal(Gen.Filter.Offsets.FmtOut, Off(ref f, ref *f.FormatOut));
         Assert.Equal(Gen.Filter.Offsets.VctxOut, Off(ref f, ref f.VideoContextOut));
         Assert.Equal(Gen.Filter.Offsets.AllowFmtOutChange, Off(ref f, ref f.AllowFormatOutChange));
         Assert.Equal(Gen.Filter.Offsets.Name, Off(ref f, ref f.Name));

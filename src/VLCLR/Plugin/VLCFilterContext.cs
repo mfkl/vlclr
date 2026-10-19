@@ -32,24 +32,24 @@ public readonly struct VLCFilterContext
     /// <summary>
     /// Gets the input video format.
     /// </summary>
-    public VLCVideoFormat InputFormat
+    public unsafe VLCVideoFormat InputFormat
     {
         get
         {
             if (_filterPtr == 0) return default;
-            return GetFilter().FormatIn.Video;
+            return Filter->FormatIn->Video;
         }
     }
 
     /// <summary>
     /// Gets the output video format.
     /// </summary>
-    public VLCVideoFormat OutputFormat
+    public unsafe VLCVideoFormat OutputFormat
     {
         get
         {
             if (_filterPtr == 0) return default;
-            return GetFilter().FormatOut.Video;
+            return Filter->FormatOut->Video;
         }
     }
 
@@ -148,12 +148,12 @@ public readonly struct VLCFilterContext
     /// Gets the private system data pointer (p_sys) from the filter.
     /// This is typically used to store a GCHandle to the managed instance.
     /// </summary>
-    public nint Sys
+    public unsafe nint Sys
     {
         get
         {
             if (_filterPtr == 0) return 0;
-            return GetFilter().Sys;
+            return Filter->Sys;
         }
     }
 
@@ -200,7 +200,7 @@ public readonly struct VLCFilterContext
         if (picture == 0)
         {
             // Owners that set no allocator (legacy), as in filter_NewPicture.
-            picture = VLCCore.PictureNewFromFormat((nint)Unsafe.AsPointer(ref filter->FormatOut.Video));
+            picture = VLCCore.PictureNewFromFormat((nint)Unsafe.AsPointer(ref filter->FormatOut->Video));
         }
         if (picture == 0)
         {
@@ -209,9 +209,7 @@ public readonly struct VLCFilterContext
         return picture;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private unsafe VLCFilter GetFilter()
-    {
-        return *(VLCFilter*)_filterPtr;
-    }
+    // A pointer, not a copy: VLCFilter is sized for Windows, larger than
+    // filter_t on Linux and macOS.
+    private unsafe VLCFilter* Filter => (VLCFilter*)_filterPtr;
 }

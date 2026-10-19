@@ -50,19 +50,6 @@ public sealed class AbiSizedRecordTests
         [typeof(VLCVideoFormat)] = typeof(Gen.VideoFormat),
     };
 
-    /// <summary>
-    /// Public members that predate this test. VLCEsFormat is sized for Windows
-    /// (240 bytes, es_format_t is 232 on Linux and macOS), so assigning a whole
-    /// one to either overruns fmt_in or fmt_out there; VLCFilter.FormatOut says
-    /// so. Turning them into pointers changes the public API. Remove an entry
-    /// once the member is fixed: the test fails while an entry no longer matches.
-    /// </summary>
-    private static readonly string[] KnownViolations =
-    [
-        "VLCFilter.FormatIn holds VLCEsFormat by value",
-        "VLCFilter.FormatOut returns a ref to VLCEsFormat",
-    ];
-
     private static readonly Assembly Vlclr = typeof(VLCCore).Assembly;
 
     [Fact]
@@ -80,10 +67,7 @@ public sealed class AbiSizedRecordTests
     [Fact]
     public void No_struct_holds_or_passes_an_abi_sized_struct_by_value()
     {
-        var violations = AbiSizedRecords.Violations(Vlclr.GetTypes(), IsAbiSized);
-
-        Assert.Equal([], violations.Except(KnownViolations));
-        Assert.Equal([], KnownViolations.Except(violations));
+        Assert.Equal([], AbiSizedRecords.Violations(Vlclr.GetTypes(), IsAbiSized));
     }
 
     private static bool IsAbiSized(Type type)
