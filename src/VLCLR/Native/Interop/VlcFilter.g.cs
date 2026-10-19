@@ -79,15 +79,16 @@ public unsafe partial struct Filter
     [FieldOffset(32)] public void* Sys;
 
     /// <summary>fmt_in</summary>
-    [FieldOffset(40)] public EsFormat FmtIn;
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* FmtIn => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + 40);
 
     /// <summary>vctx_in</summary>
     [UnscopedRef]
     public ref VideoContext* VctxIn { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(VideoContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 280 : 272)); }
 
     /// <summary>fmt_out</summary>
-    [UnscopedRef]
-    public ref EsFormat FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Filter, EsFormat>(ref this, OperatingSystem.IsWindows() ? 288 : 280); }
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 288 : 280)); }
 
     /// <summary>vctx_out</summary>
     [UnscopedRef]

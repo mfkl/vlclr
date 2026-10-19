@@ -125,7 +125,8 @@ public unsafe partial struct EsFormat
     [FieldOffset(92)] public AudioReplayGain AudioReplayGain;
 
     /// <summary>video</summary>
-    [FieldOffset(56)] public VideoFormat Video;
+    /// <remarks>A pointer because <see cref="VideoFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public VideoFormat* Video => (VideoFormat*)((byte*)Unsafe.AsPointer(ref this) + 56);
 
     /// <summary>subs</summary>
     [FieldOffset(56)] public SubsFormat Subs;
@@ -471,7 +472,8 @@ public unsafe partial struct VideoFormat
     [FieldOffset(132)] public VideoFormatLighting Lighting;
 
     /// <summary>dovi</summary>
-    [FieldOffset(136)] public VideoFormatDovi Dovi;
+    /// <remarks>A pointer because <see cref="VideoFormatDovi"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public VideoFormatDovi* Dovi => (VideoFormatDovi*)((byte*)Unsafe.AsPointer(ref this) + 136);
 
     /// <summary>i_cubemap_padding</summary>
     [UnscopedRef]

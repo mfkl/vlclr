@@ -26,7 +26,8 @@ public unsafe partial struct EsFormat
     [FieldOffset(4)] public uint ICodec;
 
     /// <summary>video</summary>
-    [FieldOffset(8)] public VideoFormat Video;
+    /// <remarks>A pointer because <see cref="VideoFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public VideoFormat* Video => (VideoFormat*)((byte*)Unsafe.AsPointer(ref this) + 8);
 
     /// <summary>i_raw</summary>
     [FieldOffset(8)] public IRawArray IRaw;
@@ -87,7 +88,8 @@ public unsafe partial struct VideoFormat
     [FieldOffset(0)] public uint IChroma;
 
     /// <summary>dovi</summary>
-    [FieldOffset(4)] public VideoFormatDovi Dovi;
+    /// <remarks>A pointer because <see cref="VideoFormatDovi"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public VideoFormatDovi* Dovi => (VideoFormatDovi*)((byte*)Unsafe.AsPointer(ref this) + 4);
 
     /// <summary>i_width</summary>
     [UnscopedRef]

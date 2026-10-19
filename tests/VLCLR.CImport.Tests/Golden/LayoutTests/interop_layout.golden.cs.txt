@@ -19,7 +19,7 @@ public unsafe class InteropLayoutTests
         AssertEqual(36, Unsafe.SizeOf<EsFormat>(), "es_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.ICat), "es_format_t.i_cat offset");
         AssertEqual(4, Offset(ref s, ref s.IArray), "es_format_t.i_array offset");
-        AssertEqual(16, Offset(ref s, ref s.Video), "es_format_t.video offset");
+        AssertEqual(16, PointerOffset(ref s, s.Video), "es_format_t.video offset");
         AssertEqual(16, Offset(ref s, ref s.ICodecData), "es_format_t.i_codec_data offset");
         AssertEqual(Abi(32, 28), Offset(ref s, ref s.IBitrate), "es_format_t.i_bitrate offset");
     }
@@ -152,7 +152,7 @@ public unsafe class InteropLayoutTests
         AssertEqual(Abi(16, 12), VideoFormat.SizeOf, "video_format_t sizeof");
         AssertEqual(16, Unsafe.SizeOf<VideoFormat>(), "video_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.IChroma), "video_format_t.i_chroma offset");
-        AssertEqual(4, Offset(ref s, ref s.Dovi), "video_format_t.dovi offset");
+        AssertEqual(4, PointerOffset(ref s, s.Dovi), "video_format_t.dovi offset");
         AssertEqual(Abi(12, 8), Offset(ref s, ref s.ICubemapPadding), "video_format_t.i_cubemap_padding offset");
     }
 

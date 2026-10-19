@@ -89,6 +89,9 @@ the `.g.cs` files before committing.
   can place fields with `[FieldOffset(Plane.Offsets.Pixels)]`.
 - `StructLayout.Size` is the largest ABI size. Do not copy a record whose size
   differs between ABIs by value into VLC memory: on the smaller ABI it writes
-  past the C struct.
+  past the C struct. For that reason a member holding such a record
+  (`filter_t.fmt_in`, `picture_t.format`, ...) is a pointer to it
+  (`filter->FmtIn->Video->Width`), and such records are never passed by value
+  or used as inline array elements (those are skipped and reported).
 - Variadic functions and anything extract or emit could not represent are
   listed in `cimport-report.md` with the reason.

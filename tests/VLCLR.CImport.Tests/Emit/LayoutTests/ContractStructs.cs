@@ -35,7 +35,8 @@ internal sealed class TestNameMap(string ns = "Probe.Interop") : INameMap
 /// <summary>
 /// Writes C# structs that follow the generated-code shape contract for the
 /// running ABI: explicit layout sized to the maximum, FieldOffset fields,
-/// InlineArray array members, bitfield properties, a static SizeOf.
+/// InlineArray array members, bitfield properties, pointer properties for
+/// records whose size differs between ABIs, a static SizeOf.
 /// The real C# emitter is written elsewhere; this is the minimum the layout
 /// tests need to run against.
 /// </summary>
@@ -47,6 +48,7 @@ internal static class ContractStructs
     {
         var abi = RunningAbi;
         var arrays = new Dictionary<string, string>();
+        var records = merged.Types.ToDictionary(t => t.Name, StringComparer.Ordinal);
         var body = new StringBuilder();
 
         foreach (var e in merged.Enums.Where(e => !e.IsAnonymous))
@@ -67,6 +69,11 @@ internal static class ContractStructs
             foreach (var m in type.Members)
             {
                 var csName = names.Field(m.DeclaringType, m.Name);
+                if (VLCLR.CImport.Emit.EmittedRecords.IsAbiSizedRecord(m.Type, records))
+                {
+                    body.Append($"    public unsafe {names.Type(m.Type.Desugar().Name!)}* {csName} => ({names.Type(m.Type.Desugar().Name!)}*)((byte*)Unsafe.AsPointer(ref this) + {m.Offset[abi]});\n");
+                    continue;
+                }
                 if (!m.IsBitfield)
                 {
                     body.Append($"    [FieldOffset({m.Offset[abi]})] public {CsType(m.Type, names, abi, arrays)} {csName};\n");
