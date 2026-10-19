@@ -595,10 +595,13 @@ public static partial class VLCCore
             return;
         }
 
-        VLCPicture* picturePointer = (VLCPicture*)picture;
-        ref int references = ref Unsafe.As<uint, int>(
-            ref picturePointer->Refs);
-        if (Interlocked.Decrement(ref references) == 0)
+        // vlc_atomic_rc_t is an atomic_uintptr_t: decrement all of it, as
+        // vlc_atomic_rc_dec does, so a borrow reaches the high half.
+        ref nuint references = ref ((Gen.Picture*)picture)->Refs.Refs;
+        bool last = nint.Size == 8
+            ? Interlocked.Decrement(ref Unsafe.As<nuint, long>(ref references)) == 0
+            : Interlocked.Decrement(ref Unsafe.As<nuint, int>(ref references)) == 0;
+        if (last)
         {
             PictureDestroy(picture);
         }
