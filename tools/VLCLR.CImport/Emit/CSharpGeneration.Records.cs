@@ -37,7 +37,7 @@ internal sealed partial class CSharpGeneration
             new[]
             {
                 "/// <summary>Size of the C struct in bytes on the running platform.</summary>",
-                Getter("public static int SizeOf", Choice(t.Size!, v => v.ToString())),
+                Getter("public static int SizeOf", AbiText.Choice(t.Size!, v => v.ToString())),
             },
             new[]
             {
@@ -84,7 +84,7 @@ internal sealed partial class CSharpGeneration
                 offsets.Add($"/// <summary>offsetof({CSharpLiterals.Xml(t.Name)}, {CSharpLiterals.Xml(m.Name)})</summary>");
                 offsets.Add(m.Offset.IsUniform
                     ? $"public const int {csNames[i]} = {m.Offset[0]};"
-                    : Getter($"public static int {csNames[i]}", Choice(m.Offset, v => v.ToString())));
+                    : Getter($"public static int {csNames[i]}", AbiText.Choice(m.Offset, v => v.ToString())));
             }
         }
 
@@ -143,13 +143,14 @@ internal sealed partial class CSharpGeneration
         }
 
         var doc = $"/// <summary>{CSharpLiterals.Xml(m.Name)}</summary>";
+        var offset = AbiText.Choice(m.Offset, v => v.ToString(), parenthesize: true);
         if (EmittedRecords.IsAbiSizedRecord(m.Type, records))
         {
             return
             [
                 doc,
                 $"/// <remarks>A pointer because <see cref=\"{type}\"/> has a different size on each ABI: assign its members, not a whole value.</remarks>",
-                Getter($"public {type}* {csName}", $"({type}*)((byte*)Unsafe.AsPointer(ref this) + {Choice(m.Offset, v => v.ToString(), parenthesize: true)})"),
+                Getter($"public {type}* {csName}", offset.Map(o => $"({type}*)((byte*)Unsafe.AsPointer(ref this) + {o})")),
             ];
         }
 
@@ -162,14 +163,14 @@ internal sealed partial class CSharpGeneration
             [
                 doc,
                 "[UnscopedRef]",
-                Getter($"public ref {type} {csName}", $"ref *({type}*)((byte*)Unsafe.AsPointer(ref this) + {Choice(m.Offset, v => v.ToString(), parenthesize: true)})"),
+                Getter($"public ref {type} {csName}", offset.Map(o => $"ref *({type}*)((byte*)Unsafe.AsPointer(ref this) + {o})")),
             ];
         }
         return
         [
             doc,
             "[UnscopedRef]",
-            Getter($"public ref {type} {csName}", $"ref {CSharpHelpers.ClassName}.FieldAt<{ownerName}, {type}>(ref this, {Choice(m.Offset, v => v.ToString())})"),
+            Getter($"public ref {type} {csName}", AbiText.Choice(m.Offset, v => v.ToString()).Map(o => $"ref {CSharpHelpers.ClassName}.FieldAt<{ownerName}, {type}>(ref this, {o})")),
         ];
     }
 
@@ -250,34 +251,34 @@ internal sealed partial class CSharpGeneration
             return null;
         }
 
-        var offset = Choice(m.BitOffset!, v => v.ToString(), parenthesize: true);
+        var offset = AbiText.Choice(m.BitOffset!, v => v.ToString(), parenthesize: true);
         var width = m.BitWidth!.Value;
-        var read = $"{CSharpHelpers.ClassName}.ReadBits(in this, {offset}, {width})";
-        var readSigned = $"{CSharpHelpers.ClassName}.ReadSignedBits(in this, {offset}, {width})";
+        var read = offset.Map(o => $"{CSharpHelpers.ClassName}.ReadBits(in this, {o}, {width})");
+        var readSigned = offset.Map(o => $"{CSharpHelpers.ClassName}.ReadSignedBits(in this, {o}, {width})");
 
-        string get;
+        AbiText get;
         string set;
         var enumInfo = enums.Values.FirstOrDefault(e => e.TypeName == type);
         switch (type)
         {
             case "bool":
-                get = $"{read} != 0";
+                get = read.Map(r => $"{r} != 0");
                 set = "value ? 1UL : 0UL";
                 break;
             case "sbyte" or "short" or "int" or "long" or "nint":
-                get = $"unchecked(({type}){readSigned})";
+                get = readSigned.Map(r => $"unchecked(({type}){r})");
                 set = "unchecked((ulong)(long)value)";
                 break;
             case "byte" or "ushort" or "uint" or "ulong" or "nuint":
-                get = $"unchecked(({type}){read})";
+                get = read.Map(r => $"unchecked(({type}){r})");
                 set = "(ulong)value";
                 break;
             case "CLong":
-                get = $"new CLong(unchecked((nint){readSigned}))";
+                get = readSigned.Map(r => $"new CLong(unchecked((nint){r}))");
                 set = "unchecked((ulong)(long)value.Value)";
                 break;
             case "CULong":
-                get = $"new CULong(unchecked((nuint){read}))";
+                get = read.Map(r => $"new CULong(unchecked((nuint){r}))");
                 set = "(ulong)value.Value";
                 break;
             default:
@@ -287,50 +288,36 @@ internal sealed partial class CSharpGeneration
                     return null;
                 }
                 get = enumInfo.Signed
-                    ? $"unchecked(({type})({enumInfo.Underlying}){readSigned})"
-                    : $"unchecked(({type})({enumInfo.Underlying}){read})";
+                    ? readSigned.Map(r => $"unchecked(({type})({enumInfo.Underlying}){r})")
+                    : read.Map(r => $"unchecked(({type})({enumInfo.Underlying}){r})");
                 set = enumInfo.Signed ? "unchecked((ulong)(long)value)" : "(ulong)value";
                 break;
         }
 
         reason = "";
-        var inline = Inline(offset);
         return
         [
             $"/// <summary>{CSharpLiterals.Xml(m.Name)} : {width}</summary>",
             $"public {type} {csName}",
             "{",
-            $"    {inline}readonly get => {get};",
-            $"    {inline}set => {CSharpHelpers.ClassName}.WriteBits(ref this, {offset}, {width}, {set});",
+            "    " + Accessor("readonly get", get),
+            "    " + Accessor("set", offset.Map(o => $"{CSharpHelpers.ClassName}.WriteBits(ref this, {o}, {width}, {set})")),
             "}",
         ];
     }
 
+    private const string AggressiveInlining = "[MethodImpl(MethodImplOptions.AggressiveInlining)] ";
+
     /// <summary>
     /// <c>signature => body;</c>, or a getter marked AggressiveInlining when the
-    /// body picks a per-ABI value (see <see cref="Inline"/>).
+    /// body picks a per-ABI value (see <see cref="AbiText"/>).
     /// </summary>
-    internal static string Getter(string signature, string body)
-        => Inline(body) is { Length: > 0 } inline
-            ? $"{signature} {{ {inline}get => {body}; }}"
-            : $"{signature} => {body};";
+    internal static string Getter(string signature, AbiText body)
+        => body.PerAbi
+            ? $"{signature} {{ {AggressiveInlining}get => {body.Text}; }}"
+            : $"{signature} => {body.Text};";
 
-    /// <summary>
-    /// The AggressiveInlining attribute (with a trailing space) for an accessor
-    /// whose body picks a per-ABI value, else empty: Native AOT only folds
-    /// <c>OperatingSystem.IsWindows()</c> to a constant where the accessor is inlined.
-    /// </summary>
-    internal static string Inline(string body)
-        => body.Contains("OperatingSystem.IsWindows()", StringComparison.Ordinal)
-            ? "[MethodImpl(MethodImplOptions.AggressiveInlining)] "
-            : "";
-
-    /// <summary>One C# expression for a per-ABI value: the literal when the ABIs agree, else a platform conditional.</summary>
-    private static string Choice<T>(PerAbi<T> values, Func<T, string> format, bool parenthesize = false)
-    {
-        if (values.IsUniform)
-            return format(values[0]);
-        var expression = $"OperatingSystem.IsWindows() ? {format(values.Windows)} : {format(values.SysV)}";
-        return parenthesize ? $"({expression})" : expression;
-    }
+    /// <summary><c>accessor => body;</c> inside a property, marked AggressiveInlining when the body picks a per-ABI value.</summary>
+    internal static string Accessor(string accessor, AbiText body)
+        => $"{(body.PerAbi ? AggressiveInlining : "")}{accessor} => {body.Text};";
 }
