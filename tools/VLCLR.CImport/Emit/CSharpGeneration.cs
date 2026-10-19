@@ -114,7 +114,7 @@ internal sealed partial class CSharpGeneration
         var lines = new List<string> { $"/// <summary>{CSharpLiterals.Xml(cName)}</summary>" };
         lines.Add(values.IsUniform
             ? $"public const {type} {q.Member} = {values[0]};"
-            : Getter($"public static {type} {q.Member}", $"OperatingSystem.IsWindows() ? {values.Windows} : {values.SysV}"));
+            : Getter($"public static {type} {q.Member}", AbiText.Choice(values, v => v)));
         Class(header, q.Class).Entries.Add((0, cName, lines));
     }
 
