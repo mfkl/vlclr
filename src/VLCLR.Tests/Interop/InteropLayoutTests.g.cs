@@ -61,7 +61,7 @@ public unsafe class InteropLayoutTests
         { ref var r = ref s.ExtraLanguages; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "es_format_t.p_extra_languages offset"); }
         AssertEqual(56, Offset(ref s, ref s.Audio), "es_format_t.audio offset");
         AssertEqual(92, Offset(ref s, ref s.AudioReplayGain), "es_format_t.audio_replay_gain offset");
-        AssertEqual(56, Offset(ref s, ref s.Video), "es_format_t.video offset");
+        AssertEqual(56, PointerOffset(ref s, s.Video), "es_format_t.video offset");
         AssertEqual(56, Offset(ref s, ref s.Subs), "es_format_t.subs offset");
         AssertEqual(Abi(208, 200), Offset(ref s, ref s.Bitrate), "es_format_t.i_bitrate offset");
         AssertEqual(Abi(212, 204), Offset(ref s, ref s.Profile), "es_format_t.i_profile offset");
@@ -93,9 +93,9 @@ public unsafe class InteropLayoutTests
         AssertEqual(0, Offset(ref s, ref s.Obj), "filter_t.obj offset");
         { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "filter_t.p_module offset"); }
         { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "filter_t.p_sys offset"); }
-        AssertEqual(40, Offset(ref s, ref s.FmtIn), "filter_t.fmt_in offset");
+        AssertEqual(40, PointerOffset(ref s, s.FmtIn), "filter_t.fmt_in offset");
         { ref var r = ref s.VctxIn; fixed (void* p = &r) AssertEqual(Abi(280, 272), PointerOffset(ref s, p), "filter_t.vctx_in offset"); }
-        AssertEqual(Abi(288, 280), Offset(ref s, ref s.FmtOut), "filter_t.fmt_out offset");
+        AssertEqual(Abi(288, 280), PointerOffset(ref s, s.FmtOut), "filter_t.fmt_out offset");
         { ref var r = ref s.VctxOut; fixed (void* p = &r) AssertEqual(Abi(528, 512), PointerOffset(ref s, p), "filter_t.vctx_out offset"); }
         AssertEqual(Abi(536, 520), Offset(ref s, ref s.AllowFmtOutChange), "filter_t.b_allow_fmt_out_change offset");
         { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(Abi(544, 528), PointerOffset(ref s, p), "filter_t.psz_name offset"); }
@@ -131,7 +131,7 @@ public unsafe class InteropLayoutTests
         var s = default(Picture);
         AssertEqual(Abi(376, 368), Picture.SizeOf, "picture_t sizeof");
         AssertEqual(376, Unsafe.SizeOf<Picture>(), "picture_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Format), "picture_t.format offset");
+        AssertEqual(0, PointerOffset(ref s, s.Format), "picture_t.format offset");
         AssertEqual(Abi(152, 144), Offset(ref s, ref s.P), "picture_t.p offset");
         AssertEqual(Abi(312, 304), Offset(ref s, ref s.Planes), "picture_t.i_planes offset");
         AssertEqual(Abi(320, 312), Offset(ref s, ref s.Date), "picture_t.date offset");
@@ -167,7 +167,7 @@ public unsafe class InteropLayoutTests
         var s = default(SubpictureRegion);
         AssertEqual(Abi(224, 216), SubpictureRegion.SizeOf, "subpicture_region_t sizeof");
         AssertEqual(224, Unsafe.SizeOf<SubpictureRegion>(), "subpicture_region_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Fmt), "subpicture_region_t.fmt offset");
+        AssertEqual(0, PointerOffset(ref s, s.Fmt), "subpicture_region_t.fmt offset");
         { ref var r = ref s.Picture; fixed (void* p = &r) AssertEqual(Abi(152, 144), PointerOffset(ref s, p), "subpicture_region_t.p_picture offset"); }
         AssertEqual(Abi(160, 152), Offset(ref s, ref s.Absolute), "subpicture_region_t.b_absolute offset");
         AssertEqual(Abi(161, 153), Offset(ref s, ref s.InWindow), "subpicture_region_t.b_in_window offset");
@@ -349,7 +349,7 @@ public unsafe class InteropLayoutTests
         AssertEqual(92, Offset(ref s, ref s.Pose), "video_format_t.pose offset");
         AssertEqual(108, Offset(ref s, ref s.Mastering), "video_format_t.mastering offset");
         AssertEqual(132, Offset(ref s, ref s.Lighting), "video_format_t.lighting offset");
-        AssertEqual(136, Offset(ref s, ref s.Dovi), "video_format_t.dovi offset");
+        AssertEqual(136, PointerOffset(ref s, s.Dovi), "video_format_t.dovi offset");
         AssertEqual(Abi(144, 140), Offset(ref s, ref s.CubemapPadding), "video_format_t.i_cubemap_padding offset");
     }
 

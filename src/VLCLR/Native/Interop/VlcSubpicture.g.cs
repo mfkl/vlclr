@@ -23,7 +23,8 @@ public unsafe partial struct SubpictureRegion
     public const int MaxSizeOf = 224;
 
     /// <summary>fmt</summary>
-    [FieldOffset(0)] public VideoFormat Fmt;
+    /// <remarks>A pointer because <see cref="VideoFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public VideoFormat* Fmt => (VideoFormat*)((byte*)Unsafe.AsPointer(ref this) + 0);
 
     /// <summary>p_picture</summary>
     [UnscopedRef]

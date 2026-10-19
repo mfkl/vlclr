@@ -41,11 +41,11 @@ public class CSharpEmitterRuntimeTests
                     long palette, pextra, fmtOutExtra, ops, psys;
                     fixed (VideoPalette** p = &v.PPalette) palette = Off(&v, p);
                     fixed (void** p = &e.PExtra) pextra = Off(&e, p);
-                    fixed (void** p = &f.FmtOut.PExtra) fmtOutExtra = Off(&f, p);
+                    fixed (void** p = &f.FmtOut->PExtra) fmtOutExtra = Off(&f, p);
                     fixed (void** p = &f.PSys) psys = Off(&f, p);
                     fixed (VlcFilterOperations** p = &f.Ops) ops = Off(&f, p);
 
-                    f.FmtOut.PExtra = (void*)5;
+                    f.FmtOut->PExtra = (void*)5;
                     d.Profile = 100;
                     d.Level = 33;
                     d.BlPresent = 1;
@@ -56,9 +56,9 @@ public class CSharpEmitterRuntimeTests
                         sizeof(Filter), sizeof(EsFormat),                                                  // 4-5
                         Off(&v, Unsafe.AsPointer(ref v.IWidth)), Off(&v, Unsafe.AsPointer(ref v.IHeight)), // 6-7
                         palette, Off(&v, Unsafe.AsPointer(ref v.Orientation)),                             // 8-9
-                        pextra, Off(&e, Unsafe.AsPointer(ref e.IExtra)), Off(&e, Unsafe.AsPointer(ref e.Video)), // 10-12
-                        Off(&f, Unsafe.AsPointer(ref f.FmtOut)), psys, ops, fmtOutExtra,                   // 13-16
-                        *(long*)((byte*)&f + (OperatingSystem.IsWindows() ? 80 + 48 : 72 + 40)),           // 17: what we wrote through the ref
+                        pextra, Off(&e, Unsafe.AsPointer(ref e.IExtra)), Off(&e, e.Video), // 10-12
+                        Off(&f, f.FmtOut), psys, ops, fmtOutExtra,                   // 13-16
+                        *(long*)((byte*)&f + (OperatingSystem.IsWindows() ? 80 + 48 : 72 + 40)),           // 17: what we wrote through the pointer
                         d.Profile, d.Level, d.BlPresent,                                                   // 18-20
                         OperatingSystem.IsWindows() ? raw[1] & 0x7F : (raw[0] >> 16) & 0x7F,              // 21: raw storage of Profile
                     };
