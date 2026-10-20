@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Runs the VLCLR sample plugins inside a real VLC 4 on this machine.
 #
-# Publishes GaussianBlur, VideoOverlay and SubtitleRenderer with Native AOT
-# for the host, checks their VLC entry points, then runs a generated I420
-# clip through each one:
+# Publishes GaussianBlur, Yadif, VideoOverlay and SubtitleRenderer with
+# Native AOT for the host, checks their VLC entry points, then runs generated
+# I420 clips through each one:
 #   - dotnet_gaussianblur must give the output of VLC's own gaussianblur on
 #     every frame (VLC transcodes the clip through each filter, twice),
+#   - dotnet_yadif must give the output of VLC's deinterlace filter in yadif
+#     mode on every frame of an interlaced clip, the same way,
 #   - dotnet_overlay must process every frame and change the picture,
 #   - dotnet_subtitle must render the subtitles.
 # A struct layout that does not match the platform ABI makes these fail
@@ -53,7 +55,7 @@ case "$(uname -s)" in
 esac
 
 echo "== Publishing plugins"
-for sample in GaussianBlur VideoOverlay SubtitleRenderer; do
+for sample in GaussianBlur Yadif VideoOverlay SubtitleRenderer; do
     dotnet publish "$repo/samples/$sample" -c Release -o "$work/plugins/$sample" --nologo -v quiet \
         > "$work/publish-$sample.log" 2>&1 \
         || { grep -E ' error ' "$work/publish-$sample.log" | sort -u; fail "publishing $sample"; continue; }
@@ -129,13 +131,16 @@ expect_log() {
     grep -aqE "$2" "$work/out/$1.log" || fail "$1: $3 (see $work/out/$1.log)"
 }
 
-# parity NAME VLC_FILTER DOTNET_FILTER VLC_OPTION DOTNET_OPTION: the ported
-# filter must give the output of VLC's on every frame. Each runs twice:
+# parity NAME VLC_FILTER DOTNET_FILTER VLC_OPTION DOTNET_OPTION [FRAMEDIFF
+# OPTIONS...]: the ported filter must give the output of VLC's on every frame
+# of the clip, and change it (out/$unfiltered.yuv is the clip unfiltered).
+# Each runs twice:
 # values that change between two runs of VLC's filter (a read of
 # uninitialized padding) are left out of the comparison; any that change
 # between two runs of the ported filter fail it.
 parity() {
     local name="$1" vlc_filter="$2" dotnet_filter="$3" vlc_option="$4" dotnet_option="$5" run
+    shift 5
     for run in 1 2; do
         transcode "$name-vlc-$run" "$vlc_filter" $vlc_option
         transcode "$name-dotnet-$run" "$dotnet_filter" $dotnet_option
@@ -143,16 +148,17 @@ parity() {
     expect_log "$name-vlc-1" "using video filter module \"$vlc_filter\"" "VLC's filter did not open"
     expect_log "$name-dotnet-1" 'Filter [A-Za-z]+ initialized successfully' "filter did not open"
     local out="$work/out/$name" result status=0
-    "$python" -I "$here/framediff.py" $width $height "$work/out/unfiltered.yuv" "$out-dotnet-1.yuv" \
+    "$python" -I "$here/framediff.py" $width $height "$work/out/$unfiltered.yuv" "$out-dotnet-1.yuv" \
         --expect-different > /dev/null || fail "$name: $dotnet_filter left the video unchanged"
     result="$("$python" -I "$here/framediff.py" $width $height "$out-vlc-1.yuv" "$out-dotnet-1.yuv" \
-        --again "$out-vlc-2.yuv" "$out-dotnet-2.yuv")" || status=$?
+        --again "$out-vlc-2.yuv" "$out-dotnet-2.yuv" "$@")" || status=$?
     echo "   $name: $result"
     [ "$status" -eq 0 ] || fail "$name: $dotnet_filter does not give the output of VLC's $vlc_filter"
 }
 
 echo "== Comparing the ported filters with VLC's in $("$vlc" --version 2> /dev/null | head -n 1 || echo VLC)"
 transcode unfiltered ""
+unfiltered=unfiltered
 
 # dotnet_gaussianblur's sigma defaults to 2: this run also checks that a
 # float config default reaches VLC.
@@ -160,6 +166,19 @@ parity blur-2 gaussianblur dotnet_gaussianblur --gaussianblur-sigma=2 ""
 expect_log blur-2-dotnet-1 'distribution is 13 pixels wide' "the sigma default (a float config value) did not reach VLC"
 parity blur-0.5 gaussianblur dotnet_gaussianblur --gaussianblur-sigma=0.5 --dotnet-gaussianblur-sigma=0.5
 parity blur-6 gaussianblur dotnet_gaussianblur --gaussianblur-sigma=6 --dotnet-gaussianblur-sigma=6
+
+# Yadif on a moving, interlaced clip: VLC's first picture is X's, the
+# second is dropped, then each output is yadif's of the previous input.
+# Yadif reads three samples past each end of the lines it rebuilds, in the
+# picture padding: those columns are left out.
+progressive_clip="$clip"
+clip="$work/interlaced.y4m"
+"$python" -I "$here/make-y4m.py" "$clip" $width $height 25 interlaced
+transcode unfiltered-interlaced ""
+unfiltered=unfiltered-interlaced
+parity yadif deinterlace dotnet_yadif --sout-deinterlace-mode=yadif "" --skip-edges 3
+expect_log yadif-vlc-1 'using yadif deinterlace method' "VLC's deinterlace filter did not use yadif"
+clip="$progressive_clip"
 
 echo "== Playing the clip"
 play original "scene"
