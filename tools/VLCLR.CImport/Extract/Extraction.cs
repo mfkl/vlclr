@@ -89,6 +89,8 @@ internal sealed partial class Extraction : IDisposable
         var args = new List<string> { "-x", "c", "-std=gnu11", "--target=" + _triple, "-w" };
         if (_options.ResourceDir is { } resourceDir)
             args.Add("-resource-dir=" + resourceDir);
+        if (_options.Sysroot is { } sysroot)
+            args.Add("--sysroot=" + sysroot);
         args.AddRange(_includeDirs.Select(d => "-I" + d));
         args.AddRange(_options.Defines.Select(d => "-D" + d));
         args.AddRange(_options.ExtraArgs);
@@ -239,7 +241,8 @@ internal sealed partial class Extraction : IDisposable
         foreach (var (cursor, header, file, start, nameOffset) in pendingFunctions)
         {
             var name = cursor.Text();
-            var exported = exportMarks.Any(m => m.File == file && m.Offset >= start && m.Offset < nameOffset);
+            var exported = exportMarks.Any(m => m.File == file && m.Offset >= start && m.Offset < nameOffset)
+                           && (_options.ExportedSymbols is null || _options.ExportedSymbols.Contains(name));
             if (!_functionEntries.TryGetValue(name, out var known))
                 _functionEntries[name] = new FunctionEntry(cursor, header, exported);
             else if (exported && !known.Exported)
@@ -382,6 +385,7 @@ internal sealed partial class Extraction : IDisposable
             Target = _triple,
             VlcCommit = _options.VlcCommit,
             PointerSize = (int)(_tu.TargetInfo.PointerWidth / 8),
+            Headers = [.. _options.Headers.Select(h => h.Replace('\\', '/'))],
             Types = types,
             Enums = [.. _enums.Values],
             Typedefs = [.. _typedefs.Values],

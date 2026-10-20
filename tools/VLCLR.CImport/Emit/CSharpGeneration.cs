@@ -108,10 +108,13 @@ internal sealed partial class CSharpGeneration
         AddConstant(c.Header, q, c.Name, line.Type!, line.Values!);
     }
 
-    private void AddConstant(string header, QualifiedName q, string cName, string type, PerAbi<string> values)
+    /// <param name="platformOf">The C name whose platforms the constant has (an anonymous enum's for its members); default <paramref name="cName"/>.</param>
+    private void AddConstant(string header, QualifiedName q, string cName, string type, PerAbi<string> values, string? platformOf = null)
     {
         RegisterMember(q.Class, q.Member, cName);
         var lines = new List<string> { $"/// <summary>{CSharpLiterals.Xml(cName)}</summary>" };
+        if (PlatformAttribute(platformOf ?? cName) is { } platform)
+            lines.Add(platform);
         lines.Add(values.IsUniform
             ? $"public const {type} {q.Member} = {values[0]};"
             : Getter($"public static {type} {q.Member}", AbiText.Choice(values, v => v)));
@@ -281,17 +284,32 @@ internal sealed partial class CSharpGeneration
         var q = names.Function(d.Name);
         RegisterMember(q.Class, q.Member, d.Name);
         var convention = d.CallingConvention == Model.CallingConvention.Stdcall ? "CallConvStdcall" : "CallConvCdecl";
-        var lines = new List<string>
-        {
-            $"/// <summary>{CSharpLiterals.Xml(d.Name)}</summary>",
+        var lines = new List<string> { $"/// <summary>{CSharpLiterals.Xml(d.Name)}</summary>" };
+        if (PlatformAttribute(d.Name) is { } platform)
+            lines.Add(platform);
+        lines.AddRange(
+        [
             $"[LibraryImport({CSharpLiterals.String(options.Library)}, EntryPoint = {CSharpLiterals.String(d.Name)})]",
             $"[UnmanagedCallConv(CallConvs = [typeof({convention})])]",
             $"public static partial {returnType} {q.Member}({string.Join(", ", parameters)});",
-        };
+        ]);
         var unit = Class(d.Header, q.Class);
         unit.HasFunctions = true;
         unit.Entries.Add((1, d.Name, lines));
     }
+
+    /// <summary>
+    /// The attribute that limits a symbol to the platforms of the ABIs it
+    /// exists on, so callers get CA1416 where it may be missing; null when it
+    /// exists on every ABI.
+    /// </summary>
+    private string? PlatformAttribute(string cName) => merged.PlatformsOf(cName) switch
+    {
+        null => null,
+        [Abis.Windows] => "[SupportedOSPlatform(\"windows\")]",
+        [Abis.SysV] => "[UnsupportedOSPlatform(\"windows\")]",
+        var abis => throw new InvalidOperationException($"'{cName}' exists on {string.Join(", ", abis)} only, which no platform attribute expresses."),
+    };
 
     // ---- naming ----------------------------------------------------------------------------------
 
@@ -340,6 +358,7 @@ internal sealed partial class CSharpGeneration
             w.Line("using System.Diagnostics.CodeAnalysis;");
             w.Line("using System.Runtime.CompilerServices;");
             w.Line("using System.Runtime.InteropServices;");
+            w.Line("using System.Runtime.Versioning;");
             w.Line();
             w.Line($"namespace {names.Namespace};");
             w.Line();

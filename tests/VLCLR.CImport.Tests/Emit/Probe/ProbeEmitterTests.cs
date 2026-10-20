@@ -18,7 +18,7 @@ public class ProbeEmitterTests
 
     [Fact]
     public void MatchesGolden()
-        => GoldenFile.Verify(Path.Combine("Golden", "Probe", "probe_sample.golden.cpp"), Emit(ProbeSampleIr.Merged));
+        => GoldenFile.Verify(Path.Combine("Golden", "Probe", "probe_sample.golden.c"), Emit(ProbeSampleIr.Merged));
 
     [Fact]
     public void OutputIsDeterministicWithLfLineEndings()
@@ -39,9 +39,9 @@ public class ProbeEmitterTests
         var text = Emit(ProbeSampleIr.Merged);
 
         Assert.Contains("VLCLR_OFFSET(cimport_video_format_t_dovi, \"video_format_t::dovi\", version_minor, 1);", text);
-        Assert.Contains("VLCLR_OFFSET(es_format_t, \"es_format_t\", i_codec_data, 16);", text);
-        Assert.Contains("VLCLR_SIZE(probe_long_t, \"probe_long_t\", VLCLR_ABI(16, 24));", text);
-        Assert.Contains("VLCLR_OFFSET(probe_bits_t, \"probe_bits_t\", c, 4);", text);
+        Assert.Contains("VLCLR_OFFSET(struct es_format_t, \"es_format_t\", i_codec_data, 16);", text);
+        Assert.Contains("VLCLR_SIZE(struct probe_long_t, \"probe_long_t\", VLCLR_ABI(16, 24));", text);
+        Assert.Contains("VLCLR_OFFSET(struct probe_bits_t, \"probe_bits_t\", c, 4);", text);
         Assert.DoesNotContain("es_format_t::@0", text.Replace("// es_format_t::@0", ""));
         Assert.DoesNotContain("probe_opaque_t", text);
         Assert.DoesNotContain(", profile,", text);
@@ -122,7 +122,7 @@ public class ProbeEmitterTests
         Directory.CreateDirectory(directory);
         try
         {
-            var source = Path.Combine(directory, "probe.cpp");
+            var source = Path.Combine(directory, "probe.c");
             File.WriteAllText(source, Emit(merged));
             return compiler(source, HeaderDirectory);
         }

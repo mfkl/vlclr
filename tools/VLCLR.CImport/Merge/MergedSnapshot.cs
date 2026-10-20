@@ -52,6 +52,17 @@ public sealed record MergedSnapshot
     /// <summary>Union of every snapshot's <see cref="Snapshot.Skipped"/>, with the ABIs that skipped each.</summary>
     public IReadOnlyList<MergedSkipped> Skipped { get; init; } = [];
 
+    /// <summary>
+    /// C names of the symbols that exist on some ABIs only, with those ABIs
+    /// (in <see cref="Abis"/> order). Their values on the other ABIs are the
+    /// ones of the first ABI that has them; the generated code marks them for
+    /// their platforms.
+    /// </summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<string>> Platforms { get; init; } = new Dictionary<string, IReadOnlyList<string>>();
+
+    /// <summary>The ABIs <paramref name="cName"/> exists on, or null when it exists on all of them.</summary>
+    public IReadOnlyList<string>? PlatformsOf(string cName) => Platforms.GetValueOrDefault(cName);
+
     /// <summary>Symbols that could not be merged cleanly. Errors must stop emission; warnings go to the report.</summary>
     public IReadOnlyList<MergeDiagnostic> Diagnostics { get; init; } = [];
 

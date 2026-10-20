@@ -48,6 +48,13 @@ public readonly record struct QualifiedName(string Class, string Member)
 }
 
 /// <summary>Two C symbols map to one C# name in the same scope.</summary>
+/// <summary>Several <see cref="NameCollisionException"/>s, reported together so all overrides can be added at once.</summary>
+public sealed class NameCollisionsException(IReadOnlyList<NameCollisionException> collisions)
+    : Exception($"{collisions.Count} C# name collisions:\n  " + string.Join("\n  ", collisions.Select(c => c.Message)))
+{
+    public IReadOnlyList<NameCollisionException> Collisions { get; } = collisions;
+}
+
 public sealed class NameCollisionException(string scope, string csharpName, string firstCName, string secondCName)
     : Exception($"C# name '{csharpName}' in {scope} is produced by both '{firstCName}' and '{secondCName}'. Add an override to vlc.cimport.json.")
 {

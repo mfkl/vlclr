@@ -1,9 +1,12 @@
 {
   "schemaVersion": 1,
   "abi": "windows",
-  "target": "x86_64-pc-windows-msvc",
+  "target": "x86_64-w64-windows-gnu",
   "vlcCommit": "fixture",
   "pointerSize": 8,
+  "headers": [
+    "enums.h"
+  ],
   "types": [
     {
       "name": "uses_enums",
@@ -50,7 +53,7 @@
       "isAnonymous": true,
       "underlyingType": {
         "kind": "builtin",
-        "builtin": "int"
+        "builtin": "uInt"
       },
       "members": [
         {
@@ -113,7 +116,7 @@
       "header": "enums.h",
       "underlyingType": {
         "kind": "builtin",
-        "builtin": "int"
+        "builtin": "uInt"
       },
       "members": [
         {
@@ -131,12 +134,12 @@
       "header": "enums.h",
       "underlyingType": {
         "kind": "builtin",
-        "builtin": "int"
+        "builtin": "uInt"
       },
       "members": [
         {
           "name": "UNSIGNED_BIG",
-          "value": -1
+          "value": 4294967295
         }
       ]
     },
@@ -145,7 +148,7 @@
       "header": "enums.h",
       "underlyingType": {
         "kind": "builtin",
-        "builtin": "int"
+        "builtin": "uLongLong"
       },
       "members": [
         {
@@ -154,7 +157,7 @@
         },
         {
           "name": "WIDE_BIG",
-          "value": 0
+          "value": 4294967296
         }
       ]
     }

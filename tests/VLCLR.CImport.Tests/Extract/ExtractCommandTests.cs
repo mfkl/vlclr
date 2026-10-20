@@ -34,14 +34,15 @@ public sealed class ExtractCommandTests : IDisposable
     }
 
     [Theory]
-    [InlineData(Abis.Windows, "x86_64-pc-windows-msvc")]
+    [InlineData(Abis.Windows, "x86_64-w64-windows-gnu")]
     [InlineData(Abis.SysV, "x86_64-pc-linux-gnu")]
     public void ManifestDrivesTheExtraction(string abi, string triple)
     {
         var manifest = WriteManifest("\"outer\", \"holder\"");
         var output = Path.Combine(_directory, "snapshots", $"{abi}.json");
+        string[] sysroot = abi == Abis.Windows ? ["--sysroot", FakeMingwSysroot()] : [];
 
-        Assert.Equal(0, ExtractCommand.Run(["--abi", abi, "--manifest", manifest, "--out", output]));
+        Assert.Equal(0, ExtractCommand.Run(["--abi", abi, "--manifest", manifest, .. sysroot, "--out", output]));
 
         var snapshot = SnapshotJson.Load(output);
         Assert.Equal(abi, snapshot.Abi);
@@ -51,6 +52,27 @@ public sealed class ExtractCommandTests : IDisposable
         Assert.Equal("nested.h", snapshot.Types.Single(t => t.Name == "outer").Header);
         Assert.True(snapshot.Types.Single(t => t.Name == "hidden").IsOpaque);
         Assert.Equal(File.ReadAllText(output), SnapshotJson.Serialize(snapshot));
+    }
+
+    [Fact]
+    public void WindowsNeedsAMingwSysroot()
+    {
+        var manifest = WriteManifest("\"outer\"");
+        var notMingw = Path.Combine(_directory, "not-mingw");
+        Directory.CreateDirectory(notMingw);
+
+        var e = Assert.Throws<CommandException>(() => ExtractCommand.Run(
+            ["--abi", Abis.Windows, "--manifest", manifest, "--sysroot", notMingw, "--out", Path.Combine(_directory, "w.json")]));
+        Assert.Contains("not a mingw-w64 toolchain", e.Message);
+    }
+
+    // The fixture headers include nothing from the system: mingw's marker header is enough.
+    private string FakeMingwSysroot()
+    {
+        var root = Path.Combine(_directory, "mingw");
+        Directory.CreateDirectory(Path.Combine(root, "include"));
+        File.WriteAllText(Path.Combine(root, "include", "_mingw.h"), "");
+        return root;
     }
 
     [Fact]

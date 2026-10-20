@@ -99,7 +99,7 @@ internal static class Ir
         => new()
         {
             Abi = windows ? Abis.Windows : Abis.SysV,
-            Target = windows ? "x86_64-pc-windows-msvc" : "x86_64-pc-linux-gnu",
+            Target = windows ? "x86_64-w64-windows-gnu" : "x86_64-pc-linux-gnu",
             VlcCommit = "dc69496e0c1b2a3f",
             PointerSize = 8,
             Types = [.. types ?? []],

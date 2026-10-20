@@ -32,12 +32,29 @@ internal sealed partial class Extraction
 
             var name = macro.Text();
             // The first token is the macro name; a function-like macro continues with its parameter list.
-            _macroEntries[name] = new MacroEntry(name, header, macro.IsMacroFunctionLike, spellings.Skip(1).ToList());
+            var body = spellings.Skip(1).ToList();
+            if (!macro.IsMacroFunctionLike && IsIncludeGuard(macro, name, body))
+                return;
+            _macroEntries[name] = new MacroEntry(name, header, macro.IsMacroFunctionLike, body);
         }
         finally
         {
             _tu.DisposeTokens(tokens);
         }
+    }
+
+    /// <summary>
+    /// The guard of an include-guarded header (<c>#define VLC_COMMON_H 1</c>):
+    /// named <c>*_H</c>, empty or <c>1</c>, in a file clang saw guarded. Not
+    /// part of the API, so never a constant.
+    /// </summary>
+    private bool IsIncludeGuard(CXCursor macro, string name, IReadOnlyList<string> body)
+    {
+        if (!(name.EndsWith("_H", StringComparison.Ordinal) || name.EndsWith("_H_", StringComparison.Ordinal))
+            || body is not ([] or ["1"]))
+            return false;
+        macro.Location.GetFileLocation(out var file, out _, out _, out _);
+        return _tu.IsFileMultipleIncludeGuarded(file);
     }
 
     /// <summary>

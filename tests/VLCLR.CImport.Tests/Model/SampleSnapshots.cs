@@ -24,7 +24,7 @@ internal static class SampleSnapshots
         return new Snapshot
         {
             Abi = abi,
-            Target = windows ? "x86_64-pc-windows-msvc" : "x86_64-pc-linux-gnu",
+            Target = windows ? "x86_64-w64-windows-gnu" : "x86_64-pc-linux-gnu",
             VlcCommit = "dc69496e",
             PointerSize = 8,
             Types =

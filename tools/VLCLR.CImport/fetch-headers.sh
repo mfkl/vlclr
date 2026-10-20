@@ -2,10 +2,11 @@
 # Fetches the VLC headers pinned in vlc.cimport.json.
 #
 # Reads vlc.repository, vlc.commit and vlc.includeDir from the manifest,
-# fetches only the include/ directory of that exact commit (shallow, blobless
-# fetch plus sparse checkout, kept in a .vlc-src directory next to the include
-# directory) and copies it to the include directory, so that
-# <includeDir>/vlc_common.h exists.
+# fetches only the include/ directory and src/libvlccore.sym of that exact
+# commit (shallow, blobless fetch plus sparse checkout, kept in a .vlc-src
+# directory next to the include directory) and copies them next to each
+# other, so that <includeDir>/vlc_common.h and <includeDir>/../libvlccore.sym
+# exist.
 #
 # Re-running is cheap: nothing happens when the include directory is already at
 # the pinned commit, and a different pinned commit is fetched into the same
@@ -84,8 +85,9 @@ else
 fi
 include_dir=$(normalize "$include_dir")
 stamp=$include_dir/.vlc-commit
+symbols=$(dirname "$include_dir")/libvlccore.sym
 
-if [ -f "$stamp" ] && [ -f "$include_dir/vlc_common.h" ]; then
+if [ -f "$stamp" ] && [ -f "$include_dir/vlc_common.h" ] && [ -f "$symbols" ]; then
   current=$(tr -d '[:space:]' < "$stamp")
   case "$current" in
     "$commit"*) echo "fetch-headers: $include_dir is already at $current"; exit 0 ;;
@@ -111,9 +113,10 @@ case " $(g remote | tr '\n' ' ') " in
   *" origin "*) g remote set-url origin "$repository" ;;
   *) g remote add origin "$repository" ;;
 esac
-g sparse-checkout set --cone include
+# MSYS (Git Bash) would turn the leading slashes into Windows paths.
+MSYS_NO_PATHCONV=1 g sparse-checkout set --no-cone /include/ /src/libvlccore.sym
 
-echo "fetch-headers: fetching include/ of $commit from $repository"
+echo "fetch-headers: fetching include/ and src/libvlccore.sym of $commit from $repository"
 g fetch --quiet --depth 1 --filter=blob:none origin "$commit" \
   || die "git fetch of $commit from $repository failed."
 g checkout --quiet --force --detach FETCH_HEAD
@@ -129,6 +132,7 @@ esac
 rm -rf "$include_dir"
 mkdir -p "$include_dir"
 cp -R "$src_dir/include/." "$include_dir/"
+cp "$src_dir/src/libvlccore.sym" "$symbols"
 printf '%s' "$head" > "$stamp"
 
 count=$(find "$include_dir" -type f | wc -l | tr -d ' ')
