@@ -576,6 +576,31 @@ public static partial class VLCCore
         => Gen.Picture.Destroy((Gen.Picture*)picture);
 
     /// <summary>
+    /// Take a picture reference, mirroring VLC's inline picture_Hold.
+    /// Release it with PictureRelease.
+    /// </summary>
+    /// <returns>The picture, or zero for a null picture.</returns>
+    public static unsafe nint PictureHold(nint picture)
+    {
+        if (picture == 0)
+        {
+            return 0;
+        }
+
+        // vlc_atomic_rc_inc: increment all of the atomic_uintptr_t.
+        ref nuint references = ref ((Gen.Picture*)picture)->Refs.Refs;
+        if (nint.Size == 8)
+        {
+            Interlocked.Increment(ref Unsafe.As<nuint, long>(ref references));
+        }
+        else
+        {
+            Interlocked.Increment(ref Unsafe.As<nuint, int>(ref references));
+        }
+        return picture;
+    }
+
+    /// <summary>
     /// Release a picture reference, mirroring VLC's inline picture_Release.
     /// </summary>
     public static unsafe void PictureRelease(nint picture)
