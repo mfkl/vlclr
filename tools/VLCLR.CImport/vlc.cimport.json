@@ -2,7 +2,7 @@
   // Pinned VLC headers. fetch-headers.ps1 / fetch-headers.sh fill includeDir.
   "vlc": {
     "repository": "https://code.videolan.org/videolan/vlc.git",
-    "commit": "dc69496e8a7d273a29b095b94bea403cfac7c1f5",
+    "commit": "942cdaea17fc2daa9cb2b8098a3c9b8560aef1fb",
     "includeDir": "../../artifacts/vlc-headers/include"
   },
   // One translation unit, in this order (vlc_common.h first). Every header
