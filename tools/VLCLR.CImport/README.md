@@ -56,6 +56,41 @@ extract looks for them in `$CIMPORT_RESOURCE_DIR`, then an installed LLVM
 CI (`.github/workflows/cimport.yml`) repeats steps 1 to 3 and fails when the
 committed files differ.
 
+## Bump the VLC commit
+
+`vlc.commit` in `vlc.cimport.json` is the only place to edit by hand. The
+generated files carry the commit too (the `*.g.cs` headers, `vlcCommit` in
+`abi/*.json`, `cimport-report.md`, the probe), and extract and emit rewrite them.
+
+1. Pick the commit, usually the one of the latest VLC 4 nightly. The nightly
+   file names on artifacts.videolan.org carry a short SHA
+   (`vlc-4.0.0-dev-win64-942cdaea.7z`, `vlc_4.0.0-dev-39450-g942cdaea17_amd64.snap`);
+   the full one is the `id` of
+   `https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/commits/<short sha>`.
+2. Set `vlc.commit` to the full 40-character SHA.
+3. Run the three steps of [Regenerate](#regenerate), both ABIs. In WSL, run
+   extract from a separate clone: sharing `bin/` and `obj/` with a Windows
+   build breaks the Linux build.
+4. Review the diff without the lines that only carry the commit:
+
+   ```sh
+   git diff -I '<old sha>|<new sha>'
+   ```
+
+   Nothing left means the VLC change touched nothing VLCLR imports. Otherwise
+   read the `cimport-report.md` and `.g.cs` changes:
+
+   | VLC change | What happens |
+   |---|---|
+   | New fields, constants, functions | Generated, nothing else to do |
+   | Field offsets or record sizes | Absorbed by the generated offsets; layout tests and probe check them |
+   | Rename, removal, signature change | Hand-written wrappers in `src/VLCLR` stop compiling; fix them |
+   | Inline function body | `tests/InlineParity` fails; update the C# reimplementation |
+
+5. Build, run the unit tests, `tests/InlineParity` and `tests/VLCLR.CImport.Tests`,
+   then open a PR. The `Cross-platform` workflow probes the layouts against
+   the new pin on every OS and runs the plugins in VLC.
+
 ## Change what is generated
 
 Everything is driven by `vlc.cimport.json`:
@@ -75,10 +110,6 @@ common prefix from enum members, `VLC_` from constants (grouped per header:
 `VLC_CODEC_I420` → `VlcFourcc.CodecI420`), and functions are grouped by their
 prefix (`vlc_player_GetTime` → `VlcPlayer.GetTime`). Two C names that end up
 with the same C# name stop emit with an error naming both; add an override.
-
-After a VLC bump: update `vlc.commit`, fetch, extract both ABIs, emit, then
-read the diff of `cimport-report.md` (skipped symbols, ABI differences) and of
-the `.g.cs` files before committing.
 
 ## Layout of the generated code
 
