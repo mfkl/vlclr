@@ -46,6 +46,7 @@ callbacks, exception handling, and per-instance state. Advanced plugins can use
 | [VideoOverlay](samples/VideoOverlay/README.md) | CPU video filter with ImageSharp text and graphics | Windows, Linux, macOS |
 | [SubtitleRenderer](samples/SubtitleRenderer/README.md) | ImageSharp text renderer | Windows, Linux, macOS |
 | [GaussianBlur](samples/GaussianBlur/README.md) | Port of VLC's Gaussian blur video filter with the same output, SIMD included | Windows, Linux, macOS |
+| [Yadif](samples/Yadif/README.md) | Port of VLC's yadif deinterlacer with the same output, SIMD included | Windows, Linux, macOS |
 
 ### Advanced samples
 
