@@ -8,6 +8,8 @@ on:
 
 env:
   VLC_NIGHTLY_INDEX: https://artifacts.videolan.org/vlc/nightly-win64/
+  FFMPEG_VERSION: 9.0.2
+  FFMPEG_SHA256: 60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba
 
 jobs:
   build:
@@ -152,11 +154,37 @@ jobs:
             Write-Host "Size: $((Get-Item $plugin).Length) bytes"
           }
 
+      - name: Cache ffmpeg
+        id: ffmpeg-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/ffmpeg
+          key: ffmpeg-${{ env.FFMPEG_VERSION }}-${{ env.FFMPEG_SHA256 }}
+
+      - name: Download ffmpeg
+        if: steps.ffmpeg-cache.outputs.cache-hit != 'true'
+        run: |
+          $ErrorActionPreference = "Stop"
+          $name = "ffmpeg-$env:FFMPEG_VERSION-essentials_build"
+          $zip = Join-Path $env:RUNNER_TEMP "$name.zip"
+          Invoke-WebRequest -Uri "https://github.com/GyanD/codexffmpeg/releases/download/$env:FFMPEG_VERSION/$name.zip" -OutFile $zip
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+          if ($hash -ne $env:FFMPEG_SHA256) {
+            throw "ffmpeg archive SHA256 mismatch: expected $env:FFMPEG_SHA256, got $hash"
+          }
+          Expand-Archive $zip -DestinationPath $env:RUNNER_TEMP
+          Move-Item (Join-Path $env:RUNNER_TEMP $name) (Join-Path $env:RUNNER_TEMP "ffmpeg")
+
+      - name: Add ffmpeg to PATH
+        run: |
+          $bin = Join-Path $env:RUNNER_TEMP "ffmpeg/bin"
+          if (-not (Test-Path (Join-Path $bin "ffmpeg.exe"))) {
+            throw "ffmpeg.exe was not found in $bin"
+          }
+          echo $bin | Out-File -FilePath $env:GITHUB_PATH -Append
+
       - name: Run filter integration test
         run: |
-          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
-            choco install ffmpeg -y --no-progress
-          }
           $fixture = Join-Path $PWD "tests/fixtures/filter-integration.mp4"
           New-Item -ItemType Directory -Force -Path (Split-Path $fixture) | Out-Null
           ffmpeg -hide_banner -loglevel error -y -f lavfi -i "testsrc2=s=1280x720:r=30:d=12" `
