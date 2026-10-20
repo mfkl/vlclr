@@ -36,18 +36,31 @@ public sealed record ExtractOptions
     public string? ResourceDir { get; init; }
 
     /// <summary>
+    /// System root of the C library headers (<c>--sysroot</c>): a mingw-w64
+    /// toolchain for <see cref="Abis.Windows"/>. Null: the host's.
+    /// </summary>
+    public string? Sysroot { get; init; }
+
+    /// <summary>
     /// Symbols to keep (C names, trailing <c>*</c> allowed). Null keeps every
     /// symbol declared in <see cref="Headers"/>.
     /// </summary>
     public IReadOnlyList<string>? Roots { get; init; }
 
     public IReadOnlyList<string> Excludes { get; init; } = [];
+
+    /// <summary>Names libvlccore exports. Null: every <c>VLC_API</c> function counts as exported.</summary>
+    public IReadOnlySet<string>? ExportedSymbols { get; init; }
 }
 
 /// <summary>Clang triples used per ABI.</summary>
 public static class AbiTargets
 {
-    public const string WindowsTriple = "x86_64-pc-windows-msvc";
+    /// <summary>
+    /// mingw-w64, as VLC's Windows builds are made (llvm-mingw): libvlccore's
+    /// layouts come from its headers, not MSVC's.
+    /// </summary>
+    public const string WindowsTriple = "x86_64-w64-windows-gnu";
     public const string SysVTriple = "x86_64-pc-linux-gnu";
 
     public static string TripleFor(string abi) => abi switch

@@ -20,7 +20,15 @@ public class ShippedManifestTests
     public void HeadersAreVlcHeadersWithCommonFirst()
     {
         Assert.Equal("vlc_common.h", Manifest.Headers[0]);
-        Assert.All(Manifest.Headers, h => Assert.Matches(@"^vlc_[a-z0-9_]+\.h$", h));
+        Assert.All(Manifest.Headers.Where(h => h != "*"), h => Assert.Matches(@"^vlc_[a-z0-9_]+\.h$", h));
+        Assert.All(Manifest.ExcludeHeaders, h => Assert.Matches(@"^vlc_[a-z0-9_]+\.h$", h));
+    }
+
+    [Fact]
+    public void BindsEverySymbolOfTheHeaders()
+    {
+        Assert.Contains("*", Manifest.Headers);
+        Assert.True(Manifest.AllRoots);
     }
 
     [Fact]
@@ -53,10 +61,10 @@ public class ShippedManifestTests
     }
 
     /// <summary>
-    /// With the headers fetched (fetch-headers.ps1/.sh), every header exists and every root
-    /// shows up in them: as a #define for constants, as a word for types and functions.
-    /// A cheap stand-in for extract's own "a root that matches nothing is an error".
-    /// Does nothing when the headers have not been fetched.
+    /// With the headers fetched (fetch-headers.ps1/.sh), every header the manifest names
+    /// exists, and every root shows up in them: as a #define for constants, as a word for
+    /// types and functions. A cheap stand-in for extract's own "a root that matches nothing
+    /// is an error". Does nothing when the headers have not been fetched.
     /// </summary>
     [Fact]
     public void HeadersAndRootsExistInFetchedHeaders()
@@ -65,8 +73,14 @@ public class ShippedManifestTests
         if (includeDir is null)
             return;
 
-        foreach (var header in Manifest.Headers)
+        var named = Manifest.ExpandHeaders(includeDir)
+            .Concat(Manifest.ExcludeHeaders)
+            .Concat(Manifest.Output.ProbeExcludeHeaders)
+            .Concat(Manifest.Output.ProbeMsvcExcludeHeaders);
+        foreach (var header in named)
             Assert.True(File.Exists(Path.Combine(includeDir, header)), $"{header} is not in {includeDir}.");
+        if (Manifest.AllRoots)
+            return;
 
         var text = string.Join('\n', Directory
             .EnumerateFiles(includeDir, "*.h", SearchOption.AllDirectories)

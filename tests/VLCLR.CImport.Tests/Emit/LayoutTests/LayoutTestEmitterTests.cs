@@ -26,8 +26,8 @@ public class LayoutTestEmitterTests
         Assert.Contains("public void VideoFormatTDovi_Layout()", text);
         Assert.DoesNotContain("EsFormatTAnon0", text);
         Assert.DoesNotContain("ProbeOpaque", text);
-        Assert.Contains("AssertEqual(Abi(16, 24), ProbeLong.SizeOf", text);
-        Assert.Contains("AssertEqual(24, Unsafe.SizeOf<ProbeLong>()", text);
+        Assert.Contains("AssertEqual(Abi(16, 24), global::Probe.Interop.ProbeLong.SizeOf", text);
+        Assert.Contains("AssertEqual(24, Unsafe.SizeOf<global::Probe.Interop.ProbeLong>()", text);
     }
 
     [Fact]

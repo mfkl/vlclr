@@ -16,7 +16,9 @@ public sealed record LayoutTestOptions(string Namespace, string ClassName);
 /// the exact bits each bitfield property touches. One <c>[Fact]</c>
 /// <c>{CSharpType}_Layout</c> per emitted record (the suffix keeps the method name
 /// from shadowing the type inside the class). Members the C# emitter skipped
-/// (<paramref name="skipped"/>) are left out.
+/// (<paramref name="skipped"/>) are left out. Generated types are written in
+/// full (<c>global::Namespace.Type</c>): names like <c>Guid</c> or
+/// <c>Mutex</c> would be ambiguous with the BCL's under implicit usings.
 /// </summary>
 public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, LayoutTestOptions options, IReadOnlyCollection<SkippedSymbol>? skipped = null)
 {
@@ -33,8 +35,9 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         Line();
         Line("using System;");
         Line("using System.Runtime.CompilerServices;");
+        Line("using System.Runtime.InteropServices;");
+        Line("using System.Runtime.Versioning;");
         Line("using Xunit;");
-        Line($"using {names.Namespace};");
         Line();
         Line($"namespace {options.Namespace};");
         Line();
@@ -56,9 +59,13 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
 
     private void WriteRecord(MergedType type)
     {
-        var csType = names.Type(type.Name);
+        var typeName = names.Type(type.Name);
+        var csType = Qualified(typeName);
         Line("    [Fact]");
-        Line($"    public void {csType}_Layout()");
+        // Only the analyzer cares: the test is managed code and runs anywhere.
+        if (merged.PlatformsOf(type.Name) is { } platforms)
+            Line(platforms is [Abis.Windows] ? "    [SupportedOSPlatform(\"windows\")]" : "    [UnsupportedOSPlatform(\"windows\")]");
+        Line($"    public void {typeName}_Layout()");
         Line("    {");
         Line($"        var s = default({csType});");
         Line($"        AssertEqual({Abi(type.Size!)}, {csType}.SizeOf, \"{Escape(type.Name)} sizeof\");");
@@ -109,11 +116,16 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
             case TypeRefKind.Builtin:
                 if (type.Builtin == BuiltinType.Bool)
                     return "true";
+                // C long is 32 bits on windows: the C# emitter maps it to CLong / CULong.
+                if (type.Builtin == BuiltinType.Long)
+                    return "new CLong(-1)";
+                if (type.Builtin == BuiltinType.ULong)
+                    return $"new CULong(unchecked((nuint){hex}))";
                 var (cs, signed) = Map(type.Builtin!.Value);
                 return signed ? $"({cs})(-1)" : $"unchecked(({cs}){hex})";
 
             case TypeRefKind.Enum:
-                var enumName = names.Type(type.Name!);
+                var enumName = Qualified(names.Type(type.Name!));
                 var declared = merged.Enums.FirstOrDefault(e => e.Name == type.Name);
                 var enumSigned = declared is not null
                     && declared.UnderlyingType.Values[0].Desugar().Builtin is BuiltinType.Char or BuiltinType.SChar or BuiltinType.Short or BuiltinType.Int or BuiltinType.Long or BuiltinType.LongLong;
@@ -132,10 +144,12 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         BuiltinType.UShort => ("ushort", false),
         BuiltinType.Int => ("int", true),
         BuiltinType.UInt => ("uint", false),
-        BuiltinType.Long or BuiltinType.LongLong => ("long", true),
-        BuiltinType.ULong or BuiltinType.ULongLong => ("ulong", false),
+        BuiltinType.LongLong => ("long", true),
+        BuiltinType.ULongLong => ("ulong", false),
         _ => throw new InvalidOperationException($"Unsupported bitfield type {builtin}."),
     };
+
+    private string Qualified(string csType) => $"global::{names.Namespace}.{csType}";
 
     private static string Abi(PerAbi<long> value)
         => value.IsUniform

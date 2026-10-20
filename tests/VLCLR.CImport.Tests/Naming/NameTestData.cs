@@ -51,7 +51,7 @@ internal static class NameTestData
         var windows = new Snapshot
         {
             Abi = Abis.Windows,
-            Target = "x86_64-pc-windows-msvc",
+            Target = "x86_64-w64-windows-gnu",
             VlcCommit = "dc69496e",
             PointerSize = 8,
             Types = [.. types ?? []],

@@ -15,13 +15,16 @@ public sealed record Snapshot
     /// <summary><see cref="Abis.Windows"/> or <see cref="Abis.SysV"/>.</summary>
     public required string Abi { get; init; }
 
-    /// <summary>Clang target triple the headers were parsed for, e.g. x86_64-pc-windows-msvc.</summary>
+    /// <summary>Clang target triple the headers were parsed for, e.g. x86_64-w64-windows-gnu.</summary>
     public required string Target { get; init; }
 
     /// <summary>VLC commit the headers come from (manifest <c>vlc.commit</c>).</summary>
     public required string VlcCommit { get; init; }
 
     public required int PointerSize { get; init; }
+
+    /// <summary>Headers the translation unit included, in order (the manifest's, with <c>*</c> expanded).</summary>
+    public IReadOnlyList<string> Headers { get; init; } = [];
 
     public IReadOnlyList<TypeDecl> Types { get; init; } = [];
     public IReadOnlyList<EnumDecl> Enums { get; init; } = [];

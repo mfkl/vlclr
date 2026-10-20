@@ -73,11 +73,46 @@ public class ManifestTests
         }
     }
 
+    [Fact]
+    public void StarAloneKeepsEveryRoot()
+    {
+        var m = CImportManifest.Parse(Valid.Replace("\"roots\": [ \"filter_t\", \"VLC_CODEC_*\" ]", "\"roots\": [ \"*\" ]"));
+
+        Assert.True(m.AllRoots);
+        Assert.Null(m.RootPatterns);
+        Assert.False(CImportManifest.Parse(Valid).AllRoots);
+    }
+
+    [Fact]
+    public void StarInHeadersExpandsToTheOtherHeadersInNameOrder()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"cimport-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        try
+        {
+            foreach (var h in new[] { "vlc_common.h", "vlc_es.h", "vlc_b.h", "vlc_a.h", "vlc_skip.h" })
+                File.WriteAllText(Path.Combine(dir, h), "");
+            File.WriteAllText(Path.Combine(dir, "notes.txt"), "");
+            var m = CImportManifest.Parse(Valid.Replace(
+                "\"headers\": [ \"vlc_common.h\", \"vlc_es.h\" ],",
+                "\"headers\": [ \"vlc_common.h\", \"*\", \"vlc_es.h\" ], \"excludeHeaders\": [ \"vlc_skip.h\" ],"));
+
+            Assert.Equal(["vlc_common.h", "vlc_a.h", "vlc_b.h", "vlc_es.h"], m.ExpandHeaders(dir));
+            Assert.Equal(["vlc_common.h", "vlc_es.h"], CImportManifest.Parse(Valid).ExpandHeaders(dir));
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
+
     [Theory]
     [InlineData("\"commit\": \"dc69496e\"", "\"commit\": \"main\"", "vlc.commit")]
+    [InlineData("\"headers\": [ \"vlc_common.h\", \"vlc_es.h\" ]", "\"headers\": [ \"vlc_common.h\" ], \"excludeHeaders\": [ \"vlc_es.h\" ]", "needs '*'")]
+    [InlineData("\"headers\": [ \"vlc_common.h\", \"vlc_es.h\" ]", "\"headers\": [ \"*\", \"*\" ]", "listed twice")]
     [InlineData("\"roots\": [ \"filter_t\", \"VLC_CODEC_*\" ]", "\"roots\": []", "roots")]
     [InlineData("\"roots\": [ \"filter_t\", \"VLC_CODEC_*\" ]", "\"roots\": [ \"VLC_*_X\" ]", "not a valid pattern")]
-    [InlineData("\"roots\": [ \"filter_t\", \"VLC_CODEC_*\" ]", "\"roots\": [ \"*\" ]", "not a valid pattern")]
+    [InlineData("\"roots\": [ \"filter_t\", \"VLC_CODEC_*\" ]", "\"roots\": [ \"*\", \"filter_t\" ]", "not a valid pattern")]
     [InlineData("\"roots\": [ \"filter_t\", \"VLC_CODEC_*\" ]", "\"roots\": [ \"a\", \"a\" ]", "listed twice")]
     [InlineData("\"headers\": [ \"vlc_common.h\", \"vlc_es.h\" ]", "\"headers\": []", "headers")]
     [InlineData("\"abiDefines\": { \"windows\"", "\"abiDefines\": { \"macos\"", "Unknown ABI")]

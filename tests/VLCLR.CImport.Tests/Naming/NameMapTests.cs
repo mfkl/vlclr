@@ -435,12 +435,47 @@ public class NameMapTests
     [Fact]
     public void Collision_StructFields()
     {
-        var merged = Merged(types: [Record("foo_t", "vlc_common.h", Field("i_x"), Field("p_x"))]);
+        var merged = Merged(types: [Record("foo_t", "vlc_common.h", Field("psz_x"), Field("p_x"))]);
 
         var e = Assert.Throws<NameCollisionException>(() => Map(merged));
         Assert.Equal("X", e.CSharpName);
-        Assert.Contains("foo_t.i_x", e.Message);
+        Assert.Contains("foo_t.psz_x", e.Message);
         Assert.Contains("foo_t.p_x", e.Message);
+    }
+
+    [Fact]
+    public void CountAndItems_TheCountGetsCount()
+    {
+        var merged = Merged(types: [Record("foo_t", "vlc_common.h", Field("i_slaves"), Field("pp_slaves"), Field("i_other"))]);
+
+        var map = Map(merged);
+        Assert.Equal("SlavesCount", map.Field("foo_t", "i_slaves"));
+        Assert.Equal("Slaves", map.Field("foo_t", "pp_slaves"));
+        Assert.Equal("Other", map.Field("foo_t", "i_other"));
+    }
+
+    [Fact]
+    public void CountAndItems_OverrideWins()
+    {
+        var merged = Merged(types: [Record("foo_t", "vlc_common.h", Field("i_x"), Field("p_x"))]);
+        var overrides = new NameOverrides { Fields = new Dictionary<string, string> { ["foo_t.i_x"] = "XSize" } };
+
+        Assert.Equal("XSize", Map(merged, overrides).Field("foo_t", "i_x"));
+    }
+
+    [Fact]
+    public void Collisions_AreReportedTogether()
+    {
+        var merged = Merged(types:
+        [
+            Record("foo_t", "vlc_common.h", Field("psz_x"), Field("p_x")),
+            Record("bar_t", "vlc_common.h", Field("psz_y"), Field("p_y")),
+        ]);
+
+        var e = Assert.Throws<NameCollisionsException>(() => Map(merged));
+        Assert.Equal(2, e.Collisions.Count);
+        Assert.Contains("foo_t.p_x", e.Message);
+        Assert.Contains("bar_t.p_y", e.Message);
     }
 
     [Fact]
@@ -448,12 +483,12 @@ public class NameMapTests
     {
         var merged = Merged(types:
         [
-            Record("foo_t", "vlc_common.h", Field("i_x"), Anonymous("foo_t::@0")),
+            Record("foo_t", "vlc_common.h", Field("psz_x"), Anonymous("foo_t::@0")),
             AnonRecord("foo_t::@0", "foo_t", "vlc_common.h", Field("p_x")),
         ]);
 
         var e = Assert.Throws<NameCollisionException>(() => Map(merged));
-        Assert.Contains("foo_t.i_x", e.Message);
+        Assert.Contains("foo_t.psz_x", e.Message);
         Assert.Contains("foo_t::@0.p_x", e.Message);
     }
 
@@ -507,11 +542,22 @@ public class NameMapTests
     {
         var merged = Merged(functions: [Function("var_Var", "vlc_variables.h")]);
 
-        var e = Assert.Throws<InvalidOperationException>(() => Map(merged));
+        var e = Assert.Throws<NameCollisionException>(() => Map(merged));
         Assert.Contains("var_Var", e.Message);
 
         var overrides = new NameOverrides { Functions = new Dictionary<string, string> { ["var_Var"] = "Var.Get" } };
         Assert.Equal(new QualifiedName("Var", "Get"), Map(merged, overrides).Function("var_Var"));
+    }
+
+    [Fact]
+    public void FunctionsNeverBound_TakePartInNoCollision()
+    {
+        // static inline: the C# emitter skips it, so it cannot clash with the field.
+        var merged = Merged(
+            types: [Record("video_splitter_t", "vlc_splitter.h", Field("pf_filter"))],
+            functions: [Function("video_splitter_Filter", "vlc_splitter.h") with { IsInline = true, IsExported = false }]);
+
+        Assert.Equal("Filter", Map(merged).Field("video_splitter_t", "pf_filter"));
     }
 
     // Unknown names

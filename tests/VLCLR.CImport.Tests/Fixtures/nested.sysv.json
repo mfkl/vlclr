@@ -4,6 +4,9 @@
   "target": "x86_64-pc-linux-gnu",
   "vlcCommit": "fixture",
   "pointerSize": 8,
+  "headers": [
+    "nested.h"
+  ],
   "types": [
     {
       "name": "inner",
