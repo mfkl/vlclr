@@ -5,10 +5,11 @@
 
 .DESCRIPTION
     Reads vlc.repository, vlc.commit and vlc.includeDir from the manifest,
-    fetches only the include/ directory of that exact commit (shallow,
-    blobless fetch plus sparse checkout, kept in a .vlc-src directory next to
-    the include directory) and copies it to the include directory, so that
-    <includeDir>/vlc_common.h exists.
+    fetches only the include/ directory and src/libvlccore.sym of that exact
+    commit (shallow, blobless fetch plus sparse checkout, kept in a .vlc-src
+    directory next to the include directory) and copies them next to each
+    other, so that <includeDir>/vlc_common.h and <includeDir>/../libvlccore.sym
+    exist.
 
     Re-running is cheap: nothing happens when the include directory is already
     at the pinned commit, and a different pinned commit is fetched into the
@@ -72,8 +73,10 @@ try {
     }
     $includeDir = $includeDir.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
     $stamp = Join-Path $includeDir '.vlc-commit'
+    $symbols = Join-Path (Split-Path -Parent $includeDir) 'libvlccore.sym'
 
-    if ((Test-Path -LiteralPath $stamp) -and (Test-Path -LiteralPath (Join-Path $includeDir 'vlc_common.h'))) {
+    if ((Test-Path -LiteralPath $stamp) -and (Test-Path -LiteralPath (Join-Path $includeDir 'vlc_common.h')) `
+            -and (Test-Path -LiteralPath $symbols)) {
         $current = (Get-Content -Raw -LiteralPath $stamp).Trim()
         if ($current.StartsWith($commit)) {
             Write-Host "fetch-headers: $includeDir is already at $current"
@@ -105,9 +108,9 @@ try {
     } else {
         Invoke-Git $srcDir @('remote', 'add', 'origin', $repository) | Out-Null
     }
-    Invoke-Git $srcDir @('sparse-checkout', 'set', '--cone', 'include') | Out-Null
+    Invoke-Git $srcDir @('sparse-checkout', 'set', '--no-cone', '/include/', '/src/libvlccore.sym') | Out-Null
 
-    Write-Host "fetch-headers: fetching include/ of $commit from $repository"
+    Write-Host "fetch-headers: fetching include/ and src/libvlccore.sym of $commit from $repository"
     Invoke-Git $srcDir @('fetch', '--quiet', '--depth', '1', '--filter=blob:none', 'origin', $commit) | Out-Null
     Invoke-Git $srcDir @('checkout', '--quiet', '--force', '--detach', 'FETCH_HEAD') | Out-Null
 
@@ -125,6 +128,7 @@ try {
     }
     New-Item -ItemType Directory -Force -Path $includeDir | Out-Null
     Copy-Item -Path (Join-Path $srcInclude '*') -Destination $includeDir -Recurse -Force
+    Copy-Item -LiteralPath (Join-Path $srcDir 'src\libvlccore.sym') -Destination $symbols -Force
     Set-Content -LiteralPath $stamp -Value $head -NoNewline
 
     $count = (Get-ChildItem -LiteralPath $includeDir -Recurse -File).Count

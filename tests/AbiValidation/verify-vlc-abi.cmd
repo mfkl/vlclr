@@ -27,5 +27,5 @@ call "%VS_INSTALLATION%\VC\Auxiliary\Build\vcvars64.bat" >nul
 if errorlevel 1 exit /b %errorlevel%
 
 set "ABI_OBJECT=%TEMP%\vlclr_abi_probe_%RANDOM%.obj"
-cl /nologo /std:c++17 /TP /W0 /c /I"%VLC_INCLUDE%" "%~dp0vlclr_abi.g.cpp" /Fo"%ABI_OBJECT%"
+cl /nologo /std:clatest /experimental:c11atomics /TC /W0 /c /I"%VLC_INCLUDE%" "%~dp0vlclr_abi.g.c" /Fo"%ABI_OBJECT%"
 exit /b %errorlevel%

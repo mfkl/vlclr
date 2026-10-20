@@ -84,6 +84,7 @@ dotnet publish samples/VideoOverlay -c Release
 | Path | Purpose |
 |---|---|
 | `src/VLCLR/` | Core bindings, wrappers, module registration, and plugin base classes |
+| `src/VLCLR/Native/Interop/` | The whole libvlccore C API, generated from VLC's headers by `tools/VLCLR.CImport`: raw, and changing when the headers do |
 | `src/VLCLR.Generators/` | Attribute-based VLC module source generator |
 | `src/VLCLR.ImageSharp/` | Frame and text-rendering helpers |
 | `src/VLCLR.Filters/` | Ports of VLC's video filters |

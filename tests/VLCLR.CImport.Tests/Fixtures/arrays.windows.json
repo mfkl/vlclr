@@ -1,9 +1,12 @@
 {
   "schemaVersion": 1,
   "abi": "windows",
-  "target": "x86_64-pc-windows-msvc",
+  "target": "x86_64-w64-windows-gnu",
   "vlcCommit": "fixture",
   "pointerSize": 8,
+  "headers": [
+    "arrays.h"
+  ],
   "types": [
     {
       "name": "arrays",

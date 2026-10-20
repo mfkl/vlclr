@@ -66,17 +66,36 @@ public class AbiMergerTests
     }
 
     [Fact]
-    public void SymbolOnOneAbiOnlyIsAnError()
+    public void SymbolOnOneAbiOnlyIsKeptForThatAbi()
     {
         var sysv = SampleSnapshots.SysV;
         sysv = sysv with { Types = [.. sysv.Types.Where(t => t.Name != "vlc_filter_operations")] };
 
         var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv);
 
+        var type = merged.FindType("vlc_filter_operations");
+        Assert.NotNull(type);
+        Assert.True(type.Size!.IsUniform, "the windows values stand in for sysv");
+        Assert.Equal([Abis.Windows], merged.PlatformsOf("vlc_filter_operations"));
+        Assert.Null(merged.PlatformsOf("filter_t"));
+        Assert.DoesNotContain(merged.Diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+    }
+
+    [Fact]
+    public void RecordShapedDifferentlyIsLeftOutWithAWarning()
+    {
+        var sysv = SampleSnapshots.SysV;
+        sysv = sysv with
+        {
+            Types = [.. sysv.Types.Select(t => t.Name == "vlc_filter_operations" ? t with { Fields = [.. t.Fields.Skip(1)] } : t)],
+        };
+
+        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv);
+
         Assert.Null(merged.FindType("vlc_filter_operations"));
-        var error = Assert.Single(merged.Diagnostics, d => d.Severity == DiagnosticSeverity.Error);
-        Assert.Equal("vlc_filter_operations", error.Symbol);
-        Assert.Contains("sysv", error.Message);
+        var warning = Assert.Single(merged.Diagnostics, d => d.Symbol == "vlc_filter_operations");
+        Assert.Equal(DiagnosticSeverity.Warning, warning.Severity);
+        Assert.Contains("left out", warning.Message);
     }
 
     [Fact]

@@ -12,8 +12,16 @@ public sealed record CImportManifest
 {
     public required VlcSource Vlc { get; init; }
 
-    /// <summary>Headers included, in this order, by the single translation unit extract parses (<c>vlc_common.h</c> first).</summary>
+    /// <summary>
+    /// Headers included, in this order, by the single translation unit extract
+    /// parses (<c>vlc_common.h</c> first). <c>*</c> stands for every other
+    /// header directly in the include directory, in ordinal order, except
+    /// <see cref="ExcludeHeaders"/> (see <see cref="ExpandHeaders"/>).
+    /// </summary>
     public required IReadOnlyList<string> Headers { get; init; }
+
+    /// <summary>Headers <c>*</c> in <see cref="Headers"/> leaves out (they do not parse on their own).</summary>
+    public IReadOnlyList<string> ExcludeHeaders { get; init; } = [];
 
     /// <summary>Preprocessor definitions for every ABI, <c>NAME</c> or <c>NAME=VALUE</c>.</summary>
     public IReadOnlyList<string> Defines { get; init; } = [];
@@ -32,9 +40,18 @@ public sealed record CImportManifest
     /// Symbols to keep: record tags, typedefs, enums, functions or constant
     /// macros, by C name. A trailing <c>*</c> matches a prefix
     /// (<c>VLC_CODEC_*</c>). Types reachable from a root are kept too. A root
-    /// that matches nothing is an error.
+    /// that matches nothing is an error. <c>*</c> alone keeps every symbol the
+    /// headers declare.
     /// </summary>
     public required IReadOnlyList<string> Roots { get; init; }
+
+    /// <summary>True when <see cref="Roots"/> is <c>*</c> alone: every symbol the headers declare.</summary>
+    [JsonIgnore]
+    public bool AllRoots => Roots is ["*"];
+
+    /// <summary><see cref="Roots"/> as extract takes them: null for <see cref="AllRoots"/>.</summary>
+    [JsonIgnore]
+    public IReadOnlyList<string>? RootPatterns => AllRoots ? null : Roots;
 
     /// <summary>Symbols removed even when a root or the transitive closure reaches them. Same pattern syntax.</summary>
     public IReadOnlyList<string> Excludes { get; init; } = [];
@@ -78,6 +95,25 @@ public sealed record CImportManifest
     public IReadOnlyList<string> PreludeFor(string abi)
         => Prelude.TryGetValue(abi, out var lines) ? lines : [];
 
+    /// <summary>
+    /// <see cref="Headers"/> with <c>*</c> replaced by the headers directly in
+    /// <paramref name="includeDir"/> that are neither listed nor excluded, in
+    /// ordinal order.
+    /// </summary>
+    public IReadOnlyList<string> ExpandHeaders(string includeDir)
+    {
+        if (!Headers.Contains("*"))
+            return Headers;
+        var listed = new HashSet<string>(Headers, StringComparer.Ordinal);
+        var rest = Directory.GetFiles(includeDir, "*.h")
+            .Select(Path.GetFileName)
+            .OfType<string>()
+            .Where(h => !listed.Contains(h) && !ExcludeHeaders.Contains(h, StringComparer.Ordinal))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+        return [.. Headers.SelectMany(h => h == "*" ? rest : [h])];
+    }
+
     public static bool Matches(string pattern, string name)
         => pattern.EndsWith('*')
             ? name.StartsWith(pattern[..^1], StringComparison.Ordinal)
@@ -94,7 +130,12 @@ public sealed record CImportManifest
         if (Roots.Count == 0)
             throw new ManifestException("roots must list at least one symbol.");
 
-        foreach (var (field, patterns) in new[] { ("roots", Roots), ("excludes", Excludes) })
+        if (Headers.Count(h => h == "*") > 1)
+            throw new ManifestException("headers: '*' is listed twice.");
+        if (ExcludeHeaders.Count > 0 && !Headers.Contains("*"))
+            throw new ManifestException("excludeHeaders needs '*' in headers.");
+
+        foreach (var (field, patterns) in new[] { ("roots", AllRoots ? [] : Roots), ("excludes", Excludes) })
         {
             foreach (var p in patterns)
             {
@@ -104,7 +145,7 @@ public sealed record CImportManifest
             }
         }
 
-        foreach (var (field, duplicates) in new[] { ("headers", Headers), ("roots", Roots), ("excludes", Excludes) })
+        foreach (var (field, duplicates) in new[] { ("headers", Headers), ("excludeHeaders", ExcludeHeaders), ("roots", Roots), ("excludes", Excludes) })
         {
             var dup = duplicates.GroupBy(x => x, StringComparer.Ordinal).FirstOrDefault(g => g.Count() > 1);
             if (dup is not null)
@@ -143,6 +184,13 @@ public sealed record VlcSource
 
     /// <summary>Directory holding the VLC headers (<c>vlc_common.h</c>), filled by fetch-headers.</summary>
     public required string IncludeDir { get; init; }
+
+    /// <summary>
+    /// libvlccore's export list (<c>src/libvlccore.sym</c>), filled by
+    /// fetch-headers. When set, a <c>VLC_API</c> function missing from it is
+    /// not exported: the binding would only fail when called.
+    /// </summary>
+    public string? Symbols { get; init; }
 }
 
 public sealed record Output
@@ -157,6 +205,12 @@ public sealed record Output
 
     /// <summary>Generated C++ ABI probe file.</summary>
     public string? Probe { get; init; }
+
+    /// <summary>Headers the probe does not include, nor check the records of: they are C only.</summary>
+    public IReadOnlyList<string> ProbeExcludeHeaders { get; init; } = [];
+
+    /// <summary>Headers MSVC cannot parse (POSIX ones): the probe includes and checks them for the other compilers only.</summary>
+    public IReadOnlyList<string> ProbeMsvcExcludeHeaders { get; init; } = [];
 
     /// <summary>Generated C# layout test file.</summary>
     public string? LayoutTests { get; init; }

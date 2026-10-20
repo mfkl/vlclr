@@ -5,7 +5,7 @@ namespace VLCLR.CImport.Emit;
 
 /// <summary>
 /// cimport-report.md: what was selected from the headers but is not in the
-/// generated C#, and where the two ABIs disagree.
+/// generated C#, where the two ABIs disagree, and what exists on one only.
 /// </summary>
 public static class ReportWriter
 {
@@ -51,6 +51,19 @@ public static class ReportWriter
             sb.Append("| Symbol | Difference |\n|---|---|\n");
             foreach (var d in warnings)
                 sb.Append($"| `{d.Symbol}` | {Cell(d.Message)} |\n");
+        }
+
+        sb.Append("\n## Platform-specific\n\n");
+        if (merged.Platforms.Count == 0)
+        {
+            sb.Append("Nothing: every symbol exists on every ABI.\n");
+        }
+        else
+        {
+            sb.Append("Symbols that exist on some ABIs only; the C# marks them with `[SupportedOSPlatform]` or `[UnsupportedOSPlatform]`.\n\n");
+            sb.Append("| Symbol | Only on |\n|---|---|\n");
+            foreach (var (name, abis) in merged.Platforms.OrderBy(p => p.Key, StringComparer.Ordinal))
+                sb.Append($"| `{name}` | {string.Join(", ", abis)} |\n");
         }
 
         var divergent = merged.Types.Where(t => t.Size is { IsUniform: false }).Select(t => $"`{t.Name}` ({t.Size})").ToList();

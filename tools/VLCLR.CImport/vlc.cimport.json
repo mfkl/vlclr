@@ -1,215 +1,80 @@
 {
-  // Pinned VLC headers. fetch-headers.ps1 / fetch-headers.sh fill includeDir.
+  // Pinned VLC headers. fetch-headers.ps1 / fetch-headers.sh fill includeDir
+  // and symbols (libvlccore's export list).
   "vlc": {
     "repository": "https://code.videolan.org/videolan/vlc.git",
     "commit": "942cdaea17fc2daa9cb2b8098a3c9b8560aef1fb",
-    "includeDir": "../../artifacts/vlc-headers/include"
+    "includeDir": "../../artifacts/vlc-headers/include",
+    "symbols": "../../artifacts/vlc-headers/libvlccore.sym"
   },
-  // One translation unit, in this order (vlc_common.h first). Every header
-  // holds at least one root below; the rest of VLC's include tree is reached
-  // through #include and stays out of the output unless a root or a kept
-  // record needs it.
-  "headers": [
-    "vlc_common.h",       // vlc_rational_t, VLC_SUCCESS, VLC_EGENERIC
-    "vlc_config.h",       // VOUT_MAX_PLANES, VLC_TICK_INVALID, VLC_TICK_0, CLOCK_FREQ
-    "vlc_tick.h",         // vlc_tick_t
-    "vlc_threads.h",      // vlc_tick_now (declared here, not in vlc_tick.h)
-    "vlc_objects.h",      // vlc_object_t, vlc_object_parent, vlc_object_typename
-    "vlc_messages.h",     // vlc_object_Log (variadic), vlc_log_t, enum vlc_log_type
-    "vlc_variables.h",    // vlc_value_t, var_*, VLC_VAR_* constants
-    "vlc_es.h",           // audio_format_t, video_format_t, es_format_t and their enums
-    "vlc_fourcc.h",       // VLC_CODEC_*, vlc_chroma_description_t
-    "vlc_frame.h",        // vlc_frame_t (block_t), VLC_FRAME_FLAG_*
-    "vlc_list.h",         // struct vlc_list, embedded in subpicture_region_t
-    "vlc_picture.h",      // picture_t, plane_t, picture_context_t, picture_* functions
-    "vlc_filter.h",       // filter_t, filter_owner_t, vlc_filter_operations
-    "vlc_subpicture.h",   // subpicture_t, subpicture_region_t, SUBPICTURE_ALIGN_*
-    "vlc_text_style.h",   // text_style_t, text_segment_t, STYLE_*
-    "vlc_plugin.h",       // module property and config enums, CONFIG_ITEM_*
-    "vlc_interface.h",    // vlc_intf_GetMainPlaylist
-    "vlc_playlist.h",     // vlc_playlist_*
-    "vlc_player.h"        // vlc_player_*, vlc_player_cbs
+  // One translation unit: vlc_common.h first, then every other public header
+  // ("*", in name order), but the ones that do not parse on their own.
+  "headers": ["vlc_common.h", "*"],
+  "excludeHeaders": [
+    "vlc_fixups.h",   // the replacement functions of VLC's own build, needs its config.h
+    "vlc_gcrypt.h",   // needs libgcrypt's headers
+    "vlc_xlib.h"      // needs Xlib's headers
   ],
-  "defines": [],
-  "abiDefines": {},
-  "prelude": {
-    // The MSVC CRT has no ssize_t, and its sys/types.h hides off_t under
-    // clang's __STDC__ (vlc_picture.h uses it). 64-bit like mingw with
-    // _FILE_OFFSET_BITS=64; the guard stops sys/types.h redefining it.
-    "windows": [
-      "typedef long long ssize_t;",
-      "#define _OFF_T_DEFINED",
-      "typedef long long _off_t;",
-      "typedef long long off_t;"
-    ]
+  // As VLC's build defines them (configure.ac, meson.build): libvlccore's
+  // layouts are those of these settings.
+  "defines": ["_FILE_OFFSET_BITS=64", "HAVE_ATTRIBUTE_PACKED"],
+  "abiDefines": {
+    "windows": ["WIN32_LEAN_AND_MEAN", "UNICODE"]
   },
-  "roots": [
-    // Records and typedefs mirrored by src/VLCLR/Native. Records embedded by
-    // value (vlc_object_t in filter_t, video_format_t in es_format_t, ...) are
-    // listed anyway so each root says what the managed side depends on.
-    "vlc_object_t",
-    "audio_format_t",
-    "video_format_t",
-    "es_format_t",
-    "vlc_rational_t",
-    "vlc_chroma_description_t",
-    "vlc_frame_t",
-    "plane_t",
-    "picture_t",
-    "picture_context_t",
-    "filter_t",
-    "filter_owner_t",
-    "filter_video_callbacks",
-    "vlc_filter_operations",
-    "vlc_list",
-    "subpicture_t",
-    "subpicture_region_t",
-    "subpicture_updater_t",
-    "vlc_spu_updater_ops",
-    "text_style_t",
-    "text_segment_t",
-    "text_segment_ruby_t",
-    "vlc_value_t",
-    "vlc_log_t",
-    "vlc_player_cbs",
-
-    // Enums the managed side repeats as int constants or enums
-    "vlc_log_type",
-    "vlc_var_atomic_op",
-    "vlc_player_state",
-    "vlc_player_seek_speed",
-    "vlc_player_whence",
-    "vlc_playlist_playback_order",
-    "vlc_playlist_playback_repeat",
-    "vlc_module_properties",
-    "vlc_config_cat",
-    "vlc_config_subcat",
-    "vlc_chroma_subtype",
-
-    // Exported functions imported by src/VLCLR/Native/VLCCore.cs
-    "vlc_tick_now",
-    "vlc_object_Log",
-    "vlc_object_parent",
-    "vlc_object_typename",
-    "var_Create",
-    "var_Destroy",
-    "var_SetChecked",
-    "var_GetChecked",
-    "var_Inherit",
-    "vlc_intf_GetMainPlaylist",
-    "vlc_playlist_GetPlayer",
-    "vlc_playlist_Lock",
-    "vlc_playlist_Unlock",
-    "vlc_playlist_Start",
-    "vlc_playlist_Stop",
-    "vlc_playlist_Pause",
-    "vlc_playlist_Resume",
-    "vlc_playlist_Next",
-    "vlc_playlist_Prev",
-    "vlc_playlist_HasNext",
-    "vlc_playlist_HasPrev",
-    "vlc_playlist_Count",
-    "vlc_playlist_GetCurrentIndex",
-    "vlc_playlist_GoTo",
-    "vlc_player_Lock",
-    "vlc_player_Unlock",
-    "vlc_player_GetState",
-    "vlc_player_GetTime",
-    "vlc_player_GetLength",
-    "vlc_player_GetPosition",
-    "vlc_player_GetCapabilities",
-    "vlc_player_Pause",
-    "vlc_player_Resume",
-    "vlc_player_SeekByTime",
-    "vlc_player_SeekByPos",
-    "vlc_player_AddListener",
-    "vlc_player_RemoveListener",
-    "vlc_player_aout_GetVolume",
-    "vlc_player_aout_SetVolume",
-    "vlc_player_aout_IsMuted",
-    "vlc_player_aout_Mute",
-    "vlc_video_context_Hold",
-    "vlc_video_context_Release",
-    "picture_NewFromFormat",
-    "picture_Copy",
-    "picture_CopyProperties",
-    "picture_Destroy",
-    "vlc_fourcc_GetChromaDescription",
-    "subpicture_Delete",
-    "subpicture_region_New",
-    "subpicture_region_NewText",
-    "subpicture_region_ForPicture",
-    "subpicture_region_Delete",
-    "text_style_New",
-    "text_style_Create",
-    "text_style_Copy",
-    "text_style_Duplicate",
-    "text_style_Merge",
-    "text_style_Delete",
-    "text_segment_New",
-    "text_segment_NewInheritStyle",
-    "text_segment_Delete",
-    "text_segment_ChainDelete",
-    "text_segment_Copy",
-
-    // Exported initialisers a plugin needs when it builds formats itself
-    // (the managed side has no import for them yet)
-    "video_format_Setup",
-    "es_format_Init",
-    "es_format_Copy",
-    "es_format_Clean",
-
-    // Constants repeated in src/VLCLR (families as prefixes)
-    "VLC_CODEC_*",
-    "STYLE_*",
-    "SUBPICTURE_ALIGN_*",
-    "VLC_SUBPIC_TEXT_FLAG_*",
-    "VLC_FRAME_FLAG_*",
-    "VLC_VAR_*",
-    "VLC_PLAYER_CAP_*",
-    "CONFIG_ITEM_*",
-    "CONFIG_HINT_*",
-    "CONFIG_SUBCATEGORY",
-    "CONFIG_SECTION",
-    "PICTURE_PLANE_MAX",
-    "VLC_TICK_INVALID",
-    "VLC_TICK_0",
-    "CLOCK_FREQ",
-    "VLC_SUCCESS",
-    "VLC_EGENERIC",
-    "VLC_API_VERSION_STRING",
-    "VLC_COPYRIGHT_VIDEOLAN",
-    "VLC_LICENSE_LGPL_2_1_PLUS",
-    "VLC_LICENSE_GPL_2_PLUS"
-  ],
-  "excludes": [
-    // Include guard of vlc_codec.h that VLC_CODEC_* would otherwise catch
-    "VLC_CODEC_H"
-  ],
+  "prelude": {},
+  // Every symbol the headers declare. Records reached only through pointers
+  // stay opaque, unless a header defines them.
+  "roots": ["*"],
+  "excludes": [],
   "output": {
     "namespace": "VLCLR.Native.Interop",
     "library": "libvlccore",
     "directory": "../../src/VLCLR/Native/Interop",
-    "probe": "../../tests/AbiValidation/vlclr_abi.g.cpp",
+    "probe": "../../tests/AbiValidation/vlclr_abi.g.c",
+    // MSVC is not a VLC compiler; it checks what it can parse.
+    "probeMsvcExcludeHeaders": [
+      "vlc_codecs.h",    // GCC's packed attribute
+      "vlc_cpu.h",       // x86 constants under __x86_64__, which MSVC does not define
+      "vlc_network.h",   // POSIX headers (unistd.h)
+      "vlc_opengl_picture.h", // C99 array parameters
+      "vlc_opengl_sampler.h", // includes vlc_opengl_picture.h
+      "vlc_poll.h",
+      "vlc_spawn.h",
+      "vlc_tls.h"
+    ],
     "layoutTests": "../../src/VLCLR.Tests/Interop/InteropLayoutTests.g.cs"
   },
   "names": {
     // vlc_object_t would become "Object", which reads as System.Object. The
     // hand-written equivalent is VLCObjectHeader.
-    "types": { "vlc_object_t": "ObjectHeader" },
+    "types": {
+      "vlc_object_t": "ObjectHeader",
+      // The rules give these the name of another type.
+      "vlc_sockaddr": "VlcSockaddr",            // struct sockaddr is Sockaddr
+      "vlc_thread_t": "ThreadHandle",           // struct vlc_thread (windows) is Thread
+      "vlc_tracer_value": "TracerValueType"     // the enum; the union vlc_tracer_value_t is TracerValue
+    },
     "fields": {
-      // i_count / p_items pairs strip to the same name.
+      // i_count / p_items pairs strip to the same name; the rules add Count
+      // to the i_ field, these sizes read better as Size.
       "es_format_t.i_extra_languages": "ExtraLanguagesCount",
       "es_format_t.i_extra": "ExtraSize",
       "vlc_frame_t.i_buffer": "BufferSize",
-      "subs_format_t::spu.b_palette": "HasPalette"
+      "subs_format_t::spu.b_palette": "HasPalette",
+      // Pairs the rules do not settle.
+      "module_config_t.psz_type": "Subtype",   // i_type is the type, psz_type its subtype
+      "sout_input_t.p_fmt": "FmtPointer",      // fmt is the es_format_t itself
+      "sout_mux_t.pf_mux": "MuxCallback"       // psz_mux is the muxer's name
     },
     "enumMembers": {},
     "functions": {
       // No prefix_Verb split: the rules would file these under their header class.
       "vlc_object_parent": "VlcObject.Parent",
       "vlc_object_typename": "VlcObject.Typename",
-      "vlc_tick_now": "VlcTick.Now"
+      "vlc_tick_now": "VlcTick.Now",
+      // Named like their class, which C# does not allow.
+      "demux_Demux": "Demux.Run",
+      "vlc_spawn": "VlcSpawn.Spawn"
     },
     "constants": {},
     "headers": {}

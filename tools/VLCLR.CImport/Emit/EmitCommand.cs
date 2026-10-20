@@ -56,7 +56,7 @@ public static class EmitCommand
         {
             names = NameMap.Create(merged, manifest.Names, manifest.Output.Namespace);
         }
-        catch (Exception e) when (e is NameCollisionException or StaleNameOverrideException or InvalidOperationException)
+        catch (Exception e) when (e is NameCollisionException or NameCollisionsException or StaleNameOverrideException or InvalidOperationException)
         {
             throw new CommandException(e.Message, e);
         }
@@ -77,7 +77,13 @@ public static class EmitCommand
         if (manifest.Output.Probe is { } probe)
         {
             var prelude = Abis.All.ToDictionary(abi => abi, manifest.PreludeFor);
-            written.Add(Write(manifest.Resolve(probe), new ProbeEmitter(merged, new ProbeOptions(manifest.Headers, prelude)).Emit()));
+            var options = new ProbeOptions(snapshots[0].Headers is { Count: > 0 } parsed ? parsed : manifest.Headers, prelude)
+            {
+                Defines = Abis.All.ToDictionary(abi => abi, manifest.DefinesFor),
+                ExcludeHeaders = manifest.Output.ProbeExcludeHeaders,
+                MsvcExcludeHeaders = manifest.Output.ProbeMsvcExcludeHeaders,
+            };
+            written.Add(Write(manifest.Resolve(probe), new ProbeEmitter(merged, options).Emit()));
         }
 
         if (manifest.Output.LayoutTests is { } layoutTests)

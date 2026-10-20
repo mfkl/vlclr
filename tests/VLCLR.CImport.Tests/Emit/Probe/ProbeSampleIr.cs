@@ -24,7 +24,7 @@ internal static class ProbeSampleIr
         return new Snapshot
         {
             Abi = abi,
-            Target = w ? "x86_64-pc-windows-msvc" : "x86_64-pc-linux-gnu",
+            Target = w ? "x86_64-w64-windows-gnu" : "x86_64-pc-linux-gnu",
             VlcCommit = "0123abcd",
             PointerSize = 8,
             Types =

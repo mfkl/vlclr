@@ -207,6 +207,7 @@ public sealed class NameMap : INameMap
 
         private void NameFields()
         {
+            var overridden = new HashSet<(string, string)>();
             foreach (var type in merged.Types)
             {
                 foreach (var field in type.Fields.Concat(type.Members).Where(f => !f.IsAnonymousMember))
@@ -218,6 +219,7 @@ public sealed class NameMap : INameMap
                     if (TryOverride(overrides.Fields, "fields", $"{field.DeclaringType}.{field.Name}", out var over))
                     {
                         map._fields[key] = NameRules.Escape(over, $"field '{field.DeclaringType}.{field.Name}'");
+                        overridden.Add(key);
                         continue;
                     }
 
@@ -225,6 +227,22 @@ public sealed class NameMap : INameMap
                     if (name == EnclosingTypeName(field.DeclaringType).TrimStart('@'))
                         name += "Value";
                     map._fields[key] = NameRules.Escape(name, $"field '{field.DeclaringType}.{field.Name}'");
+                }
+            }
+
+            // An i_ count and the items it counts (i_attachments, attachments; i_slaves,
+            // pp_slaves) strip to the same name: the count gets "Count".
+            foreach (var type in merged.Types)
+            {
+                var clashes = type.Members
+                    .Where(f => !f.IsAnonymousMember)
+                    .GroupBy(f => map._fields[(f.DeclaringType, f.Name)], StringComparer.Ordinal)
+                    .Where(g => g.Count() > 1);
+                foreach (var field in clashes.SelectMany(g => g))
+                {
+                    var key = (field.DeclaringType, field.Name);
+                    if (field.Name.StartsWith("i_", StringComparison.Ordinal) && !overridden.Contains(key))
+                        map._fields[key] = NameRules.Escape(map._fields[key] + "Count", $"field '{field.DeclaringType}.{field.Name}'");
                 }
             }
         }
@@ -311,7 +329,20 @@ public sealed class NameMap : INameMap
 
         // Collisions
 
+        private readonly List<NameCollisionException> _collisions = [];
+
+        private void Collide(NameCollisionException collision) => _collisions.Add(collision);
+
         private void CheckScopes()
+        {
+            CollectCollisions();
+            if (_collisions.Count == 1)
+                throw _collisions[0];
+            if (_collisions.Count > 1)
+                throw new NameCollisionsException(_collisions);
+        }
+
+        private void CollectCollisions()
         {
             // 1. Namespace: emitted records, enums, static classes.
             var typeScope = new Dictionary<string, (string CName, bool IsRecord)>(StringComparer.Ordinal);
@@ -320,8 +351,13 @@ public sealed class NameMap : INameMap
             foreach (var e in merged.Enums.Where(e => !e.IsAnonymous))
                 AddType(typeScope, map._types[e.Name], e.Name, isRecord: false);
 
+            // Functions the C# never binds (static inline, not exported, variadic) take no name.
+            var unbound = merged.Functions
+                .Where(f => f.Declaration.IsInline || !f.Declaration.IsExported || f.Declaration.IsVariadic)
+                .Select(f => f.Name)
+                .ToHashSet(StringComparer.Ordinal);
             var classMembers = new Dictionary<string, List<(string Member, string CName)>>(StringComparer.Ordinal);
-            foreach (var (cName, q) in map._functions.Concat(map._constants))
+            foreach (var (cName, q) in map._functions.Where(f => !unbound.Contains(f.Key)).Concat(map._constants))
             {
                 if (!classMembers.TryGetValue(q.Class, out var list))
                     classMembers[q.Class] = list = [];
@@ -331,7 +367,7 @@ public sealed class NameMap : INameMap
             foreach (var (className, members) in classMembers)
             {
                 if (typeScope.TryGetValue(className, out var existing) && !existing.IsRecord)
-                    throw new NameCollisionException("the namespace", className, existing.CName, members[0].CName);
+                    Collide(new NameCollisionException("the namespace", className, existing.CName, members[0].CName));
             }
 
             // 2. Struct members, shared with a static class of the same name.
@@ -342,7 +378,7 @@ public sealed class NameMap : INameMap
                 if (!_records.TryGetValue(name, out var type))
                     continue;
 
-                var scope = new Scope($"struct {csName}");
+                var scope = new Scope($"struct {csName}", Collide);
                 structScopes[csName] = scope;
                 foreach (var member in type.Members)
                     scope.Add(map._fields[(member.DeclaringType, member.Name)], $"{member.DeclaringType}.{member.Name}");
@@ -352,11 +388,11 @@ public sealed class NameMap : INameMap
             foreach (var (className, members) in classMembers)
             {
                 if (!structScopes.TryGetValue(className, out var scope))
-                    scope = new Scope($"static class {className}");
+                    scope = new Scope($"static class {className}", Collide);
                 foreach (var (member, cName) in members)
                 {
                     if (member == className)
-                        throw new InvalidOperationException($"C# name '{member}' of '{cName}' equals its class '{className}'. Add an override to vlc.cimport.json.");
+                        Collide(new NameCollisionException($"static class {className}", member, $"the class {className}", cName));
                     scope.Add(member, cName);
                 }
             }
@@ -364,27 +400,27 @@ public sealed class NameMap : INameMap
             // 3. Enum members.
             foreach (var e in merged.Enums.Where(e => !e.IsAnonymous))
             {
-                var scope = new Scope($"enum {map._types[e.Name]}");
+                var scope = new Scope($"enum {map._types[e.Name]}", Collide);
                 foreach (var member in e.Members)
                     scope.Add(map._enumMembers[(e.Name, member.Name)], member.Name);
             }
         }
 
-        private static void AddType(Dictionary<string, (string CName, bool IsRecord)> scope, string csName, string cName, bool isRecord)
+        private void AddType(Dictionary<string, (string CName, bool IsRecord)> scope, string csName, string cName, bool isRecord)
         {
             if (!scope.TryAdd(csName, (cName, isRecord)))
-                throw new NameCollisionException("the namespace", csName, scope[csName].CName, cName);
+                Collide(new NameCollisionException("the namespace", csName, scope[csName].CName, cName));
         }
     }
 
-    private sealed class Scope(string description)
+    private sealed class Scope(string description, Action<NameCollisionException> collide)
     {
         private readonly Dictionary<string, string> _names = new(StringComparer.Ordinal);
 
         public void Add(string csName, string cName)
         {
             if (!_names.TryAdd(csName, cName))
-                throw new NameCollisionException(description, csName, _names[csName], cName);
+                collide(new NameCollisionException(description, csName, _names[csName], cName));
         }
     }
 }

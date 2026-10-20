@@ -120,13 +120,15 @@ internal sealed partial class CSharpGeneration
                     continue;
                 }
                 AddConstant(e.Header, names.Constant(member.Source.Name), member.Source.Name, info.Underlying,
-                    new PerAbi<string>([member.Value!, member.Value!]));
+                    new PerAbi<string>([member.Value!, member.Value!]), platformOf: e.Name);
             }
             return;
         }
 
         var w = new CSharpWriter();
         w.Line($"/// <summary>{CSharpLiterals.Xml(e.Name)}</summary>");
+        if (PlatformAttribute(e.Name) is { } platform)
+            w.Line(platform);
         w.Open($"public enum {info.TypeName} : {info.Underlying}");
         var blocks = new List<IReadOnlyList<string>>();
         var used = new HashSet<string>(StringComparer.Ordinal);

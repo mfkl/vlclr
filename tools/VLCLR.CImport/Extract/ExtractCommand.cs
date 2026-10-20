@@ -9,8 +9,11 @@ namespace VLCLR.CImport.Extract;
 public static class ExtractCommand
 {
     public const string Usage = """
-        extract --abi <windows|sysv> [--manifest <vlc.cimport.json>] [--include <dir>] [--resource-dir <dir>] --out <snapshot.json>
+        extract --abi <windows|sysv> [--manifest <vlc.cimport.json>] [--include <dir>] [--symbols <file>] [--resource-dir <dir>] [--sysroot <dir>] --out <snapshot.json>
           --include       VLC header directory (default: vlc.includeDir of the manifest)
+          --symbols       libvlccore.sym (default: vlc.symbols of the manifest)
+          --sysroot       windows only: a mingw-w64 toolchain (llvm-mingw), the system headers VLC is built with.
+                          Default: $CIMPORT_MINGW_SYSROOT, then the toolchain of x86_64-w64-mingw32-clang on PATH.
           --resource-dir  clang resource directory holding the builtin headers (include/stddef.h ...).
                           The libclang NuGet package ships without them. Default: $CIMPORT_RESOURCE_DIR,
                           then an installed LLVM (C:\Program Files\LLVM, Visual Studio's LLVM, /usr/lib/llvm-*).
@@ -22,7 +25,7 @@ public static class ExtractCommand
         string abi, outPath;
         try
         {
-            commandLine = new CommandLine(args, "abi", "manifest", "include", "resource-dir", "out");
+            commandLine = new CommandLine(args, "abi", "manifest", "include", "symbols", "resource-dir", "sysroot", "out");
             abi = commandLine.Require("abi");
             outPath = commandLine.Require("out");
         }
@@ -51,17 +54,43 @@ public static class ExtractCommand
             throw new CommandException($"'{resourceDir}' is not a clang resource directory (no include/stddef.h).");
         resourceDir ??= ResourceDirectory.Find();
 
+        string? sysroot = null;
+        if (abi == Abis.Windows)
+        {
+            sysroot = commandLine.Get("sysroot") ?? MingwSysroot.Find()
+                ?? throw new CommandException("No mingw-w64 toolchain for the windows ABI: pass --sysroot <llvm-mingw directory>, "
+                                              + $"set {MingwSysroot.EnvironmentVariable} or put llvm-mingw's bin directory on PATH.");
+            if (!MingwSysroot.IsSysroot(sysroot))
+                throw new CommandException($"'{sysroot}' is not a mingw-w64 toolchain (no include/_mingw.h).");
+            sysroot = Path.GetFullPath(sysroot);
+        }
+        else if (commandLine.Get("sysroot") is not null)
+            throw new CommandException("--sysroot is for the windows ABI only.");
+
+        HashSet<string>? exported = null;
+        var symbolsPath = commandLine.Get("symbols") is { } givenSymbols ? Path.GetFullPath(givenSymbols)
+            : manifest.Vlc.Symbols is { } symbolsFile ? manifest.Resolve(symbolsFile)
+            : null;
+        if (symbolsPath is { } path)
+        {
+            if (!File.Exists(path))
+                throw new CommandException($"Export list '{path}' does not exist. Run fetch-headers.");
+            exported = [.. File.ReadLines(path).Select(l => l.Trim()).Where(l => l.Length > 0 && !l.StartsWith('#'))];
+        }
+
         var snapshot = SnapshotExtractor.Extract(new ExtractOptions
         {
             Abi = abi,
             Target = triple,
             VlcCommit = manifest.Vlc.Commit,
-            Headers = manifest.Headers,
+            Headers = manifest.ExpandHeaders(includeDir),
             IncludeDirs = [includeDir],
             Defines = manifest.DefinesFor(abi),
             Prelude = manifest.PreludeFor(abi),
             ResourceDir = resourceDir,
-            Roots = manifest.Roots,
+            Sysroot = sysroot,
+            Roots = manifest.RootPatterns,
+            ExportedSymbols = exported,
             Excludes = manifest.Excludes,
         });
 

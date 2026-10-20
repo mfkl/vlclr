@@ -4,8 +4,9 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Xunit;
-using Probe.Interop;
 
 namespace VLCLR.Tests.Interop;
 
@@ -14,9 +15,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void EsFormat_Layout()
     {
-        var s = default(EsFormat);
-        AssertEqual(Abi(36, 32), EsFormat.SizeOf, "es_format_t sizeof");
-        AssertEqual(36, Unsafe.SizeOf<EsFormat>(), "es_format_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.EsFormat);
+        AssertEqual(Abi(36, 32), global::Probe.Interop.EsFormat.SizeOf, "es_format_t sizeof");
+        AssertEqual(36, Unsafe.SizeOf<global::Probe.Interop.EsFormat>(), "es_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.ICat), "es_format_t.i_cat offset");
         AssertEqual(4, Offset(ref s, ref s.IArray), "es_format_t.i_array offset");
         AssertEqual(16, PointerOffset(ref s, s.Video), "es_format_t.video offset");
@@ -27,9 +28,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void Plane_Layout()
     {
-        var s = default(Plane);
-        AssertEqual(16, Plane.SizeOf, "plane_t sizeof");
-        AssertEqual(16, Unsafe.SizeOf<Plane>(), "plane_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.Plane);
+        AssertEqual(16, global::Probe.Interop.Plane.SizeOf, "plane_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::Probe.Interop.Plane>(), "plane_t Unsafe.SizeOf");
         { ref var r = ref s.PPixels; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "plane_t.p_pixels offset"); }
         AssertEqual(8, Offset(ref s, ref s.ILines), "plane_t.i_lines offset");
         AssertEqual(12, Offset(ref s, ref s.IPitch), "plane_t.i_pitch offset");
@@ -38,19 +39,19 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void ProbeBits_Layout()
     {
-        var s = default(ProbeBits);
-        AssertEqual(8, ProbeBits.SizeOf, "probe_bits_t sizeof");
-        AssertEqual(8, Unsafe.SizeOf<ProbeBits>(), "probe_bits_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.ProbeBits);
+        AssertEqual(8, global::Probe.Interop.ProbeBits.SizeOf, "probe_bits_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::Probe.Interop.ProbeBits>(), "probe_bits_t Unsafe.SizeOf");
         AssertEqual(4, Offset(ref s, ref s.C), "probe_bits_t.c offset");
         {
-            var b = default(ProbeBits);
+            var b = default(global::Probe.Interop.ProbeBits);
             var ones = unchecked((uint)0x7);
             b.A = ones;
             AssertBits(ref b, 0, 3, "probe_bits_t.a");
             Assert.Equal(ones, b.A);
         }
         {
-            var b = default(ProbeBits);
+            var b = default(global::Probe.Interop.ProbeBits);
             var ones = unchecked((uint)0x1F);
             b.B = ones;
             AssertBits(ref b, 3, 5, "probe_bits_t.b");
@@ -61,9 +62,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void ProbeLong_Layout()
     {
-        var s = default(ProbeLong);
-        AssertEqual(Abi(16, 24), ProbeLong.SizeOf, "probe_long_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<ProbeLong>(), "probe_long_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.ProbeLong);
+        AssertEqual(Abi(16, 24), global::Probe.Interop.ProbeLong.SizeOf, "probe_long_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::Probe.Interop.ProbeLong>(), "probe_long_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.L), "probe_long_t.l offset");
         AssertEqual(Abi(4, 8), Offset(ref s, ref s.I), "probe_long_t.i offset");
         AssertEqual(Abi(8, 16), Offset(ref s, ref s.U), "probe_long_t.u offset");
@@ -72,9 +73,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void ProbeValue_Layout()
     {
-        var s = default(ProbeValue);
-        AssertEqual(8, ProbeValue.SizeOf, "probe_value_t sizeof");
-        AssertEqual(8, Unsafe.SizeOf<ProbeValue>(), "probe_value_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.ProbeValue);
+        AssertEqual(8, global::Probe.Interop.ProbeValue.SizeOf, "probe_value_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::Probe.Interop.ProbeValue>(), "probe_value_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.I), "probe_value_t.i offset");
         AssertEqual(0, Offset(ref s, ref s.D), "probe_value_t.d offset");
         AssertEqual(0, Offset(ref s, ref s.C), "probe_value_t.c offset");
@@ -83,61 +84,61 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void ProbeZoo_Layout()
     {
-        var s = default(ProbeZoo);
-        AssertEqual(16, ProbeZoo.SizeOf, "probe_zoo_t sizeof");
-        AssertEqual(16, Unsafe.SizeOf<ProbeZoo>(), "probe_zoo_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.ProbeZoo);
+        AssertEqual(16, global::Probe.Interop.ProbeZoo.SizeOf, "probe_zoo_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::Probe.Interop.ProbeZoo>(), "probe_zoo_t Unsafe.SizeOf");
         AssertEqual(12, Offset(ref s, ref s.ITail), "probe_zoo_t.i_tail offset");
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = true;
             b.FBool = ones;
             AssertBits(ref b, 0, 1, "probe_zoo_t.f_bool");
             Assert.Equal(ones, b.FBool);
         }
         {
-            var b = default(ProbeZoo);
-            var ones = unchecked((ProbeColor)(-1));
+            var b = default(global::Probe.Interop.ProbeZoo);
+            var ones = unchecked((global::Probe.Interop.ProbeColor)(-1));
             b.FEnum = ones;
             AssertBits(ref b, 1, 3, "probe_zoo_t.f_enum");
             Assert.Equal(ones, b.FEnum);
         }
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = (int)(-1);
             b.FSigned = ones;
             AssertBits(ref b, 4, 5, "probe_zoo_t.f_signed");
             Assert.Equal(ones, b.FSigned);
         }
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = unchecked((ushort)0x7F);
             b.FUshort = ones;
             AssertBits(ref b, 9, 7, "probe_zoo_t.f_ushort");
             Assert.Equal(ones, b.FUshort);
         }
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = unchecked((byte)0xFF);
             b.FByte = ones;
             AssertBits(ref b, 16, 8, "probe_zoo_t.f_byte");
             Assert.Equal(ones, b.FByte);
         }
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = unchecked((ulong)0xFFFFFFFFFFUL);
             b.FWide = ones;
             AssertBits(ref b, 24, 40, "probe_zoo_t.f_wide");
             Assert.Equal(ones, b.FWide);
         }
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = (sbyte)(-1);
             b.FSbyte = ones;
             AssertBits(ref b, 64, 4, "probe_zoo_t.f_sbyte");
             Assert.Equal(ones, b.FSbyte);
         }
         {
-            var b = default(ProbeZoo);
+            var b = default(global::Probe.Interop.ProbeZoo);
             var ones = unchecked((byte)0xF);
             b.FChar = ones;
             AssertBits(ref b, 68, 4, "probe_zoo_t.f_char");
@@ -148,9 +149,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void VideoFormat_Layout()
     {
-        var s = default(VideoFormat);
-        AssertEqual(Abi(16, 12), VideoFormat.SizeOf, "video_format_t sizeof");
-        AssertEqual(16, Unsafe.SizeOf<VideoFormat>(), "video_format_t Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.VideoFormat);
+        AssertEqual(Abi(16, 12), global::Probe.Interop.VideoFormat.SizeOf, "video_format_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::Probe.Interop.VideoFormat>(), "video_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.IChroma), "video_format_t.i_chroma offset");
         AssertEqual(4, PointerOffset(ref s, s.Dovi), "video_format_t.dovi offset");
         AssertEqual(Abi(12, 8), Offset(ref s, ref s.ICubemapPadding), "video_format_t.i_cubemap_padding offset");
@@ -159,20 +160,20 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void VideoFormatTDovi_Layout()
     {
-        var s = default(VideoFormatTDovi);
-        AssertEqual(Abi(8, 4), VideoFormatTDovi.SizeOf, "video_format_t::dovi sizeof");
-        AssertEqual(8, Unsafe.SizeOf<VideoFormatTDovi>(), "video_format_t::dovi Unsafe.SizeOf");
+        var s = default(global::Probe.Interop.VideoFormatTDovi);
+        AssertEqual(Abi(8, 4), global::Probe.Interop.VideoFormatTDovi.SizeOf, "video_format_t::dovi sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::Probe.Interop.VideoFormatTDovi>(), "video_format_t::dovi Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.VersionMajor), "video_format_t::dovi.version_major offset");
         AssertEqual(1, Offset(ref s, ref s.VersionMinor), "video_format_t::dovi.version_minor offset");
         {
-            var b = default(VideoFormatTDovi);
+            var b = default(global::Probe.Interop.VideoFormatTDovi);
             var ones = unchecked((uint)0x7F);
             b.Profile = ones;
             AssertBits(ref b, Abi(32, 16), 7, "video_format_t::dovi.profile");
             Assert.Equal(ones, b.Profile);
         }
         {
-            var b = default(VideoFormatTDovi);
+            var b = default(global::Probe.Interop.VideoFormatTDovi);
             var ones = unchecked((uint)0x3F);
             b.Level = ones;
             AssertBits(ref b, Abi(39, 23), 6, "video_format_t::dovi.level");

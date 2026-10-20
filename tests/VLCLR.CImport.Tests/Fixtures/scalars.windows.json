@@ -1,16 +1,19 @@
 {
   "schemaVersion": 1,
   "abi": "windows",
-  "target": "x86_64-pc-windows-msvc",
+  "target": "x86_64-w64-windows-gnu",
   "vlcCommit": "fixture",
   "pointerSize": 8,
+  "headers": [
+    "scalars.h"
+  ],
   "types": [
     {
       "name": "scalars",
       "kind": "struct",
       "header": "scalars.h",
-      "size": 96,
-      "alignment": 8,
+      "size": 112,
+      "alignment": 16,
       "fields": [
         {
           "name": "c",
@@ -118,7 +121,7 @@
               "builtin": "sChar"
             }
           },
-          "offset": 56
+          "offset": 64
         },
         {
           "name": "u8",
@@ -130,7 +133,7 @@
               "builtin": "uChar"
             }
           },
-          "offset": 57
+          "offset": 65
         },
         {
           "name": "i16",
@@ -142,7 +145,7 @@
               "builtin": "short"
             }
           },
-          "offset": 58
+          "offset": 66
         },
         {
           "name": "u16",
@@ -154,7 +157,7 @@
               "builtin": "uShort"
             }
           },
-          "offset": 60
+          "offset": 68
         },
         {
           "name": "i32",
@@ -166,7 +169,7 @@
               "builtin": "int"
             }
           },
-          "offset": 64
+          "offset": 72
         },
         {
           "name": "u32",
@@ -178,7 +181,7 @@
               "builtin": "uInt"
             }
           },
-          "offset": 68
+          "offset": 76
         },
         {
           "name": "i64",
@@ -190,7 +193,7 @@
               "builtin": "longLong"
             }
           },
-          "offset": 72
+          "offset": 80
         },
         {
           "name": "u64",
@@ -202,7 +205,7 @@
               "builtin": "uLongLong"
             }
           },
-          "offset": 80
+          "offset": 88
         },
         {
           "name": "wc",
@@ -214,7 +217,7 @@
               "builtin": "uShort"
             }
           },
-          "offset": 88
+          "offset": 96
         }
       ]
     }

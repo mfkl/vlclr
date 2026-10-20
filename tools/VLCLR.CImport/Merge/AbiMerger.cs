@@ -6,9 +6,11 @@ namespace VLCLR.CImport.Merge;
 /// Matches snapshots of the same headers taken on different ABIs. Records,
 /// enums, functions and constants are matched by C name, fields by name
 /// (anonymous members by their synthesised type name). A symbol present on
-/// one ABI only, or with a different shape, becomes an error diagnostic and is
-/// left out; values that may differ (sizes, offsets, enum values) become
-/// <see cref="PerAbi{T}"/>.
+/// some ABIs only is kept for those (<see cref="MergedSnapshot.Platforms"/>),
+/// with the values of the first ABI that has it standing in for the others; a
+/// symbol whose shape differs between ABIs becomes a warning and is left out,
+/// with the anonymous records inside it. Values that may differ (sizes,
+/// offsets, enum values) become <see cref="PerAbi{T}"/>.
 /// </summary>
 public static class AbiMerger
 {
@@ -24,29 +26,34 @@ public static class AbiMerger
                 $"Snapshots come from different VLC commits: {string.Join(", ", snapshots.Select(s => $"{s.Abi}={s.VlcCommit}"))}");
 
         var diagnostics = new List<MergeDiagnostic>();
+        var platforms = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
         var context = new Context(snapshots, diagnostics);
 
-        var types = Match(snapshots, s => s.Types, t => t.Name, "record", diagnostics)
+        var typeGroups = Match(snapshots, s => s.Types, t => t.Name, platforms);
+        var types = typeGroups
             .Select(context.MergeType)
             .OfType<MergedType>()
             .ToList();
+        // The anonymous records inside a record left out go with it.
+        var dropped = typeGroups.Select(g => g[0].Name).Except(types.Select(t => t.Name)).ToList();
+        types.RemoveAll(t => dropped.Any(d => t.Name.StartsWith(d + "::", StringComparison.Ordinal)));
         var byName = types.ToDictionary(t => t.Name);
         types = [.. types.Select(t => t with { Members = Flatten(t, byName) })];
 
-        var enums = Match(snapshots, s => s.Enums, e => e.Name, "enum", diagnostics)
+        var enums = Match(snapshots, s => s.Enums, e => e.Name, platforms)
             .Select(context.MergeEnum)
             .OfType<MergedEnum>()
             .ToList();
 
-        var typedefs = Match(snapshots, s => s.Typedefs, t => t.Name, "typedef", diagnostics)
+        var typedefs = Match(snapshots, s => s.Typedefs, t => t.Name, platforms)
             .Select(group => group[0])
             .ToList();
 
-        var functions = Match(snapshots, s => s.Functions, f => f.Name, "function", diagnostics)
+        var functions = Match(snapshots, s => s.Functions, f => f.Name, platforms)
             .Select(context.MergeFunction)
             .ToList();
 
-        var constants = Match(snapshots, s => s.Constants, c => c.Name, "constant", diagnostics)
+        var constants = Match(snapshots, s => s.Constants, c => c.Name, platforms)
             .Select(context.MergeConstant)
             .OfType<MergedConstant>()
             .ToList();
@@ -69,6 +76,8 @@ public static class AbiMerger
             Functions = functions,
             Constants = constants,
             Skipped = skipped,
+            Platforms = KeptPlatforms(platforms, [.. types.Select(t => t.Name), .. enums.Select(e => e.Name), .. typedefs.Select(t => t.Name),
+                .. functions.Select(f => f.Name), .. constants.Select(c => c.Name)]),
             Diagnostics = [.. diagnostics.OrderBy(d => d.Symbol, StringComparer.Ordinal).ThenBy(d => d.Message, StringComparer.Ordinal)],
         };
     }
@@ -103,27 +112,36 @@ public static class AbiMerger
            && a.Parameters.Count == b.Parameters.Count
            && a.Parameters.Zip(b.Parameters).All(p => SameShape(p.First.Type, p.Second.Type, underTypedef));
 
+    /// <summary>
+    /// The declarations of each name, one per ABI. Where an ABI lacks the
+    /// name, the first ABI that has it stands in, and the ABIs that do are
+    /// recorded in <paramref name="platforms"/>.
+    /// </summary>
     private static List<T[]> Match<T>(
         IReadOnlyList<Snapshot> snapshots,
         Func<Snapshot, IReadOnlyList<T>> list,
         Func<T, string> name,
-        string kind,
-        List<MergeDiagnostic> diagnostics)
+        Dictionary<string, IReadOnlyList<string>> platforms)
     {
         var maps = snapshots.Select(s => list(s).ToDictionary(name, StringComparer.Ordinal)).ToList();
         var names = maps.SelectMany(m => m.Keys).Distinct().Order(StringComparer.Ordinal);
         var result = new List<T[]>();
         foreach (var n in names)
         {
-            var missing = snapshots.Where((_, i) => !maps[i].ContainsKey(n)).Select(s => s.Abi).ToList();
-            if (missing.Count > 0)
-            {
-                diagnostics.Add(new(DiagnosticSeverity.Error, n, $"{kind} is missing on {string.Join(", ", missing)}"));
-                continue;
-            }
-            result.Add([.. maps.Select(m => m[n])]);
+            var present = maps.FindIndex(m => m.ContainsKey(n));
+            if (maps.Any(m => !m.ContainsKey(n)))
+                platforms[n] = [.. snapshots.Where((_, i) => maps[i].ContainsKey(n)).Select(s => s.Abi)];
+            result.Add([.. maps.Select(m => m.TryGetValue(n, out var decl) ? decl : maps[present][n])]);
         }
         return result;
+    }
+
+    /// <summary>The entries of <paramref name="platforms"/> for symbols that made it into the merged snapshot.</summary>
+    private static Dictionary<string, IReadOnlyList<string>> KeptPlatforms(
+        Dictionary<string, IReadOnlyList<string>> platforms, IReadOnlyList<string> kept)
+    {
+        var keptSet = new HashSet<string>(kept, StringComparer.Ordinal);
+        return platforms.Where(p => keptSet.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
     }
 
     /// <summary>Replaces anonymous members by their fields, recursively, with offsets relative to <paramref name="type"/>.</summary>
@@ -157,8 +175,6 @@ public static class AbiMerger
 
     private sealed class Context(IReadOnlyList<Snapshot> snapshots, List<MergeDiagnostic> diagnostics)
     {
-        private void Error(string symbol, string message) => diagnostics.Add(new(DiagnosticSeverity.Error, symbol, message));
-
         private void Warning(string symbol, string message) => diagnostics.Add(new(DiagnosticSeverity.Warning, symbol, message));
 
         private string Abi(int i) => snapshots[i].Abi;
@@ -168,7 +184,7 @@ public static class AbiMerger
             var first = decls[0];
             if (decls.Any(d => d.Kind != first.Kind || d.IsOpaque != first.IsOpaque || d.Fields.Count != first.Fields.Count))
             {
-                Error(first.Name, "record kind, completeness or field count differs between ABIs");
+                Warning(first.Name, "record kind, completeness or field count differs between ABIs: left out");
                 return null;
             }
 
@@ -179,7 +195,7 @@ public static class AbiMerger
                 var field = perAbi[0];
                 if (perAbi.Any(p => p.Name != field.Name || p.IsAnonymousMember != field.IsAnonymousMember || p.BitWidth != field.BitWidth))
                 {
-                    Error(first.Name, $"field #{f} ('{field.Name}') differs in name, anonymity or bit width between ABIs");
+                    Warning(first.Name, $"field #{f} ('{field.Name}') differs in name, anonymity or bit width between ABIs: left out");
                     return null;
                 }
 
@@ -220,7 +236,7 @@ public static class AbiMerger
             var first = decls[0];
             if (decls.Any(d => !d.Members.Select(m => m.Name).SequenceEqual(first.Members.Select(m => m.Name))))
             {
-                Error(first.Name, "enum members differ between ABIs");
+                Warning(first.Name, "enum members differ between ABIs: left out");
                 return null;
             }
 
@@ -264,7 +280,7 @@ public static class AbiMerger
             var first = decls[0];
             if (decls.Any(d => d.Kind != first.Kind))
             {
-                Error(first.Name, "constant kind differs between ABIs");
+                Warning(first.Name, "constant kind differs between ABIs: left out");
                 return null;
             }
 

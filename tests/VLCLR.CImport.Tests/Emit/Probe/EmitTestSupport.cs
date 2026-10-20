@@ -45,7 +45,7 @@ internal static class GoldenFile
 /// <summary>Result of a native compiler run.</summary>
 internal sealed record CompileResult(bool Succeeded, string Output);
 
-/// <summary>Locates MSVC (via vswhere) and g++ in WSL. Each Compile returns null when the toolchain is unavailable.</summary>
+/// <summary>Locates MSVC (via vswhere) and gcc in WSL, both compiling C. Each Compile returns null when the toolchain is unavailable.</summary>
 internal static class NativeToolchains
 {
     private const string WslDistro = "Ubuntu-24.04";
@@ -62,7 +62,7 @@ internal static class NativeToolchains
         var obj = Path.ChangeExtension(source, ".obj");
         File.WriteAllText(script,
             $"@echo off\r\ncall \"{vcvars}\" >nul\r\nif errorlevel 1 exit /b 1\r\n" +
-            $"cl /nologo /std:c++17 /TP /W0 /c /I\"{includeDir}\" \"{source}\" /Fo\"{obj}\"\r\n");
+            $"cl /nologo /std:clatest /experimental:c11atomics /TC /W0 /c /I\"{includeDir}\" \"{source}\" /Fo\"{obj}\"\r\n");
         return Run("cmd.exe", ["/c", script], Path.GetTempPath());
     }
 
@@ -71,7 +71,7 @@ internal static class NativeToolchains
         if (!Wsl.Value)
             return null;
 
-        return Run("wsl.exe", ["-d", WslDistro, "--", "g++", "-std=c++17", "-c", "-o", "/dev/null", $"-I{ToWslPath(includeDir)}", ToWslPath(source)], Path.GetTempPath());
+        return Run("wsl.exe", ["-d", WslDistro, "--", "gcc", "-std=gnu11", "-c", "-o", "/dev/null", $"-I{ToWslPath(includeDir)}", ToWslPath(source)], Path.GetTempPath());
     }
 
     private static string ToWslPath(string path)
@@ -101,7 +101,7 @@ internal static class NativeToolchains
             return false;
         try
         {
-            return Run("wsl.exe", ["-d", WslDistro, "--", "g++", "--version"], Path.GetTempPath()).Succeeded;
+            return Run("wsl.exe", ["-d", WslDistro, "--", "gcc", "--version"], Path.GetTempPath()).Succeeded;
         }
         catch (System.ComponentModel.Win32Exception)
         {
