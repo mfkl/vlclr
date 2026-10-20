@@ -7,12 +7,17 @@ that differ between its two runs (a filter that reads uninitialized padding
 past the visible width) are skipped and counted, and the check fails when more
 than --max-unstable of the values are skipped. Any value of ACTUAL that
 differs between its two runs fails the check: the filter under test must not
-read uninitialized memory.
+read uninitialized memory. --skip-edges N leaves out the N columns at each
+side of every plane, for filters that read past the ends of each line, as
+VLC's do there: those values depend on the picture padding, which VLC leaves
+uninitialized, so they differ from process to process.
 
 Usage: framediff.py WIDTH HEIGHT EXPECTED ACTUAL [--again EXPECTED2 ACTUAL2]
-                    [--tolerance N] [--max-unstable FRACTION] [--expect-different]
+                    [--tolerance N] [--max-unstable FRACTION] [--skip-edges N]
+                    [--expect-different]
 
-Exit status 0 when the videos match (or differ, with --expect-different).
+Exit status 0 when the videos match (or differ, with --expect-different:
+also when they do not have the same number of frames).
 """
 
 import argparse
@@ -36,6 +41,7 @@ def main():
     parser.add_argument("--again", nargs=2, metavar=("EXPECTED2", "ACTUAL2"))
     parser.add_argument("--tolerance", type=int, default=0, metavar="N")
     parser.add_argument("--max-unstable", type=float, default=0.01, metavar="FRACTION")
+    parser.add_argument("--skip-edges", type=int, default=0, metavar="N")
     parser.add_argument("--expect-different", action="store_true")
     args = parser.parse_args()
 
@@ -48,14 +54,14 @@ def main():
                   f"{args.width}x{args.height} I420 frames ({frame_size} bytes)")
             return 1
     if len({len(video) for video in videos}) != 1:
-        print("FAIL: frame counts differ: " + ", ".join(
+        print(("Frame counts differ: " if args.expect_different else "FAIL: frame counts differ: ") + ", ".join(
             f"{path} {len(video) // frame_size}" for path, video in zip(paths, videos)))
-        return 1
+        return 0 if args.expect_different else 1
     expected, actual = videos[0], videos[1]
     expected2, actual2 = (videos[2], videos[3]) if args.again else (expected, actual)
 
     frames = len(expected) // frame_size
-    differing, unstable, actual_unstable, largest, first = 0, 0, 0, 0, None
+    differing, unstable, actual_unstable, edges, largest, first = 0, 0, 0, 0, 0, None
     first_actual_unstable = None
     for frame in range(frames):
         for name, offset, width, height in layout:
@@ -74,6 +80,9 @@ def main():
                     if e[x] != e2[x]:
                         unstable += 1
                         continue
+                    if e[x] != a[x] and (x < args.skip_edges or x >= width - args.skip_edges):
+                        edges += 1
+                        continue
                     delta = abs(e[x] - a[x])
                     if delta > args.tolerance:
                         differing += 1
@@ -85,7 +94,8 @@ def main():
     print(f"{frames} frames {args.width}x{args.height}: {differing} of {total} values differ"
           + (f" by more than {args.tolerance}" if args.tolerance else "")
           + (f" (max delta {largest}, first at {first})" if differing else "")
-          + (f", {unstable} unstable between runs of EXPECTED skipped" if args.again else ""))
+          + (f", {unstable} unstable between runs of EXPECTED skipped" if args.again else "")
+          + (f", {edges} differing in the {args.skip_edges} edge columns skipped" if args.skip_edges else ""))
     if args.expect_different:
         return 0 if differing else 1
     if actual_unstable:
