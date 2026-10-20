@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -43,4 +44,32 @@ public unsafe partial struct Viewpoint
         /// <summary>offsetof(vlc_viewpoint_t, fov)</summary>
         public const int Fov = 12;
     }
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcViewpoint
+{
+    /// <summary>FIELD_OF_VIEW_DEGREES_DEFAULT</summary>
+    public const float FieldOfViewDegreesDefault = 80f;
+
+    /// <summary>FIELD_OF_VIEW_DEGREES_MAX</summary>
+    public const float FieldOfViewDegreesMax = 150f;
+
+    /// <summary>FIELD_OF_VIEW_DEGREES_MIN</summary>
+    public const float FieldOfViewDegreesMin = 20f;
+
+    /// <summary>vlc_viewpoint_from_euler</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_from_euler")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FromEuler(Viewpoint* vp, float yaw, float pitch, float roll);
+
+    /// <summary>vlc_viewpoint_to_4x4</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_to_4x4")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void To4x4(Viewpoint* vp, float* matrix);
+
+    /// <summary>vlc_viewpoint_to_euler</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_to_euler")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ToEuler(Viewpoint* vp, float* yaw, float* pitch, float* roll);
 }

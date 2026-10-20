@@ -4,19 +4,274 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Xunit;
-using VLCLR.Native.Interop;
 
 namespace VLCLR.Tests.Interop;
 
 public unsafe class InteropLayoutTests
 {
     [Fact]
+    public void VlcBitmapinfoheader_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlcBitmapinfoheader);
+        AssertEqual(40, global::VLCLR.Native.Interop.VlcBitmapinfoheader.SizeOf, "VLC_BITMAPINFOHEADER sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlcBitmapinfoheader>(), "VLC_BITMAPINFOHEADER Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.BiSize), "VLC_BITMAPINFOHEADER.biSize offset");
+        AssertEqual(4, Offset(ref s, ref s.BiWidth), "VLC_BITMAPINFOHEADER.biWidth offset");
+        AssertEqual(8, Offset(ref s, ref s.BiHeight), "VLC_BITMAPINFOHEADER.biHeight offset");
+        AssertEqual(12, Offset(ref s, ref s.BiPlanes), "VLC_BITMAPINFOHEADER.biPlanes offset");
+        AssertEqual(14, Offset(ref s, ref s.BiBitCount), "VLC_BITMAPINFOHEADER.biBitCount offset");
+        AssertEqual(16, Offset(ref s, ref s.BiCompression), "VLC_BITMAPINFOHEADER.biCompression offset");
+        AssertEqual(20, Offset(ref s, ref s.BiSizeImage), "VLC_BITMAPINFOHEADER.biSizeImage offset");
+        AssertEqual(24, Offset(ref s, ref s.BiXPelsPerMeter), "VLC_BITMAPINFOHEADER.biXPelsPerMeter offset");
+        AssertEqual(28, Offset(ref s, ref s.BiYPelsPerMeter), "VLC_BITMAPINFOHEADER.biYPelsPerMeter offset");
+        AssertEqual(32, Offset(ref s, ref s.BiClrUsed), "VLC_BITMAPINFOHEADER.biClrUsed offset");
+        AssertEqual(36, Offset(ref s, ref s.BiClrImportant), "VLC_BITMAPINFOHEADER.biClrImportant offset");
+    }
+
+    [Fact]
+    public void Guid_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Guid);
+        AssertEqual(16, global::VLCLR.Native.Interop.Guid.SizeOf, "_GUID sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Guid>(), "_GUID Unsafe.SizeOf");
+    }
+
+    [Fact]
+    [SupportedOSPlatform("windows")]
+    public void ScopeId_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ScopeId);
+        AssertEqual(4, global::VLCLR.Native.Interop.ScopeId.SizeOf, "_SCOPE_ID sizeof");
+        AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.ScopeId>(), "_SCOPE_ID Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Value), "_SCOPE_ID.Value offset");
+        {
+            var b = default(global::VLCLR.Native.Interop.ScopeId);
+            var ones = new CULong(unchecked((nuint)0xFFFFFFF));
+            b.Zone = ones;
+            AssertBits(ref b, 0, 28, "_SCOPE_ID.Zone");
+            Assert.Equal(ones, b.Zone);
+        }
+        {
+            var b = default(global::VLCLR.Native.Interop.ScopeId);
+            var ones = new CULong(unchecked((nuint)0xF));
+            b.Level = ones;
+            AssertBits(ref b, 28, 4, "_SCOPE_ID.Level");
+            Assert.Equal(ones, b.Level);
+        }
+    }
+
+    [Fact]
+    public void Waveformatex_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Waveformatex);
+        AssertEqual(18, global::VLCLR.Native.Interop.Waveformatex.SizeOf, "_WAVEFORMATEX sizeof");
+        AssertEqual(18, Unsafe.SizeOf<global::VLCLR.Native.Interop.Waveformatex>(), "_WAVEFORMATEX Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.WFormatTag), "_WAVEFORMATEX.wFormatTag offset");
+        AssertEqual(2, Offset(ref s, ref s.NChannels), "_WAVEFORMATEX.nChannels offset");
+        AssertEqual(4, Offset(ref s, ref s.NSamplesPerSec), "_WAVEFORMATEX.nSamplesPerSec offset");
+        AssertEqual(8, Offset(ref s, ref s.NAvgBytesPerSec), "_WAVEFORMATEX.nAvgBytesPerSec offset");
+        AssertEqual(12, Offset(ref s, ref s.NBlockAlign), "_WAVEFORMATEX.nBlockAlign offset");
+        AssertEqual(14, Offset(ref s, ref s.WBitsPerSample), "_WAVEFORMATEX.wBitsPerSample offset");
+        AssertEqual(16, Offset(ref s, ref s.CbSize), "_WAVEFORMATEX.cbSize offset");
+    }
+
+    [Fact]
+    public void Waveformatextensible_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Waveformatextensible);
+        AssertEqual(40, global::VLCLR.Native.Interop.Waveformatextensible.SizeOf, "_WAVEFORMATEXTENSIBLE sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.Waveformatextensible>(), "_WAVEFORMATEXTENSIBLE Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Format), "_WAVEFORMATEXTENSIBLE.Format offset");
+        AssertEqual(18, Offset(ref s, ref s.Samples), "_WAVEFORMATEXTENSIBLE.Samples offset");
+        AssertEqual(20, Offset(ref s, ref s.DwChannelMask), "_WAVEFORMATEXTENSIBLE.dwChannelMask offset");
+        AssertEqual(24, Offset(ref s, ref s.SubFormat), "_WAVEFORMATEXTENSIBLE.SubFormat offset");
+    }
+
+    [Fact]
+    public void WaveformatextensibleSamples_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WaveformatextensibleSamples);
+        AssertEqual(2, global::VLCLR.Native.Interop.WaveformatextensibleSamples.SizeOf, "_WAVEFORMATEXTENSIBLE::Samples sizeof");
+        AssertEqual(2, Unsafe.SizeOf<global::VLCLR.Native.Interop.WaveformatextensibleSamples>(), "_WAVEFORMATEXTENSIBLE::Samples Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.WValidBitsPerSample), "_WAVEFORMATEXTENSIBLE::Samples.wValidBitsPerSample offset");
+        AssertEqual(0, Offset(ref s, ref s.WSamplesPerBlock), "_WAVEFORMATEXTENSIBLE::Samples.wSamplesPerBlock offset");
+        AssertEqual(0, Offset(ref s, ref s.WReserved), "_WAVEFORMATEXTENSIBLE::Samples.wReserved offset");
+    }
+
+    [Fact]
+    public void WaveformatextensibleIec61937_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WaveformatextensibleIec61937);
+        AssertEqual(52, global::VLCLR.Native.Interop.WaveformatextensibleIec61937.SizeOf, "_WAVEFORMATEXTENSIBLE_IEC61937 sizeof");
+        AssertEqual(52, Unsafe.SizeOf<global::VLCLR.Native.Interop.WaveformatextensibleIec61937>(), "_WAVEFORMATEXTENSIBLE_IEC61937 Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.FormatExt), "_WAVEFORMATEXTENSIBLE_IEC61937.FormatExt offset");
+        AssertEqual(40, Offset(ref s, ref s.DwEncodedSamplesPerSec), "_WAVEFORMATEXTENSIBLE_IEC61937.dwEncodedSamplesPerSec offset");
+        AssertEqual(44, Offset(ref s, ref s.DwEncodedChannelCount), "_WAVEFORMATEXTENSIBLE_IEC61937.dwEncodedChannelCount offset");
+        AssertEqual(48, Offset(ref s, ref s.DwAverageBytesPerSec), "_WAVEFORMATEXTENSIBLE_IEC61937.dwAverageBytesPerSec offset");
+    }
+
+    [Fact]
+    public void Waveheader_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Waveheader);
+        AssertEqual(44, global::VLCLR.Native.Interop.Waveheader.SizeOf, "_WAVEHEADER sizeof");
+        AssertEqual(44, Unsafe.SizeOf<global::VLCLR.Native.Interop.Waveheader>(), "_WAVEHEADER Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.MainChunkID), "_WAVEHEADER.MainChunkID offset");
+        AssertEqual(4, Offset(ref s, ref s.Length), "_WAVEHEADER.Length offset");
+        AssertEqual(8, Offset(ref s, ref s.ChunkTypeID), "_WAVEHEADER.ChunkTypeID offset");
+        AssertEqual(12, Offset(ref s, ref s.SubChunkID), "_WAVEHEADER.SubChunkID offset");
+        AssertEqual(16, Offset(ref s, ref s.SubChunkLength), "_WAVEHEADER.SubChunkLength offset");
+        AssertEqual(20, Offset(ref s, ref s.Format), "_WAVEHEADER.Format offset");
+        AssertEqual(22, Offset(ref s, ref s.Modus), "_WAVEHEADER.Modus offset");
+        AssertEqual(24, Offset(ref s, ref s.SampleFreq), "_WAVEHEADER.SampleFreq offset");
+        AssertEqual(28, Offset(ref s, ref s.BytesPerSec), "_WAVEHEADER.BytesPerSec offset");
+        AssertEqual(32, Offset(ref s, ref s.BytesPerSample), "_WAVEHEADER.BytesPerSample offset");
+        AssertEqual(34, Offset(ref s, ref s.BitsPerSample), "_WAVEHEADER.BitsPerSample offset");
+        AssertEqual(36, Offset(ref s, ref s.DataChunkID), "_WAVEHEADER.DataChunkID offset");
+        AssertEqual(40, Offset(ref s, ref s.DataLength), "_WAVEHEADER.DataLength offset");
+    }
+
+    [Fact]
+    [UnsupportedOSPlatform("windows")]
+    public void VaListTag_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VaListTag);
+        AssertEqual(24, global::VLCLR.Native.Interop.VaListTag.SizeOf, "__va_list_tag sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.VaListTag>(), "__va_list_tag Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.GpOffset), "__va_list_tag.gp_offset offset");
+        AssertEqual(4, Offset(ref s, ref s.FpOffset), "__va_list_tag.fp_offset offset");
+        { ref var r = ref s.OverflowArgArea; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "__va_list_tag.overflow_arg_area offset"); }
+        { ref var r = ref s.RegSaveArea; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "__va_list_tag.reg_save_area offset"); }
+    }
+
+    [Fact]
+    public void AddonEntry_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonEntry);
+        AssertEqual(Abi(152, 168), global::VLCLR.Native.Interop.AddonEntry.SizeOf, "addon_entry_t sizeof");
+        AssertEqual(168, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonEntry>(), "addon_entry_t Unsafe.SizeOf");
+        AssertEqual(0, PointerOffset(ref s, s.Lock), "addon_entry_t.lock offset");
+        AssertEqual(Abi(12, 16), Offset(ref s, ref s.Type), "addon_entry_t.e_type offset");
+        AssertEqual(Abi(16, 20), Offset(ref s, ref s.State), "addon_entry_t.e_state offset");
+        AssertEqual(Abi(20, 24), Offset(ref s, ref s.Flags), "addon_entry_t.e_flags offset");
+        AssertEqual(Abi(24, 28), Offset(ref s, ref s.Uuid), "addon_entry_t.uuid offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(Abi(40, 48), PointerOffset(ref s, p), "addon_entry_t.psz_name offset"); }
+        { ref var r = ref s.Summary; fixed (void* p = &r) AssertEqual(Abi(48, 56), PointerOffset(ref s, p), "addon_entry_t.psz_summary offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(Abi(56, 64), PointerOffset(ref s, p), "addon_entry_t.psz_description offset"); }
+        { ref var r = ref s.Author; fixed (void* p = &r) AssertEqual(Abi(64, 72), PointerOffset(ref s, p), "addon_entry_t.psz_author offset"); }
+        { ref var r = ref s.SourceUri; fixed (void* p = &r) AssertEqual(Abi(72, 80), PointerOffset(ref s, p), "addon_entry_t.psz_source_uri offset"); }
+        { ref var r = ref s.ImageUri; fixed (void* p = &r) AssertEqual(Abi(80, 88), PointerOffset(ref s, p), "addon_entry_t.psz_image_uri offset"); }
+        { ref var r = ref s.ImageData; fixed (void* p = &r) AssertEqual(Abi(88, 96), PointerOffset(ref s, p), "addon_entry_t.psz_image_data offset"); }
+        { ref var r = ref s.Version; fixed (void* p = &r) AssertEqual(Abi(96, 104), PointerOffset(ref s, p), "addon_entry_t.psz_version offset"); }
+        AssertEqual(Abi(104, 112), Offset(ref s, ref s.Downloads), "addon_entry_t.i_downloads offset");
+        AssertEqual(Abi(108, 120), Offset(ref s, ref s.Score), "addon_entry_t.i_score offset");
+        { ref var r = ref s.SourceModule; fixed (void* p = &r) AssertEqual(Abi(112, 128), PointerOffset(ref s, p), "addon_entry_t.psz_source_module offset"); }
+        { ref var r = ref s.ArchiveUri; fixed (void* p = &r) AssertEqual(Abi(120, 136), PointerOffset(ref s, p), "addon_entry_t.psz_archive_uri offset"); }
+        AssertEqual(Abi(128, 144), Offset(ref s, ref s.Files), "addon_entry_t.files offset");
+        { ref var r = ref s.Custom; fixed (void* p = &r) AssertEqual(Abi(144, 160), PointerOffset(ref s, p), "addon_entry_t.p_custom offset"); }
+    }
+
+    [Fact]
+    public void AddonEntryFiles_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonEntryFiles);
+        AssertEqual(16, global::VLCLR.Native.Interop.AddonEntryFiles.SizeOf, "addon_entry_t::files sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonEntryFiles>(), "addon_entry_t::files Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Alloc), "addon_entry_t::files.i_alloc offset");
+        AssertEqual(4, Offset(ref s, ref s.Size), "addon_entry_t::files.i_size offset");
+        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "addon_entry_t::files.p_elems offset"); }
+    }
+
+    [Fact]
+    public void AddonFile_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonFile);
+        AssertEqual(24, global::VLCLR.Native.Interop.AddonFile.SizeOf, "addon_file_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonFile>(), "addon_file_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Filetype), "addon_file_t.e_filetype offset");
+        { ref var r = ref s.DownloadUri; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "addon_file_t.psz_download_uri offset"); }
+        { ref var r = ref s.Filename; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "addon_file_t.psz_filename offset"); }
+    }
+
+    [Fact]
+    public void AddonsFinder_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonsFinder);
+        AssertEqual(72, global::VLCLR.Native.Interop.AddonsFinder.SizeOf, "addons_finder_t sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonsFinder>(), "addons_finder_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "addons_finder_t.obj offset");
+        { ref var r = ref s.Find; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "addons_finder_t.pf_find offset"); }
+        { ref var r = ref s.Retrieve; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "addons_finder_t.pf_retrieve offset"); }
+        AssertEqual(40, Offset(ref s, ref s.Entries), "addons_finder_t.entries offset");
+        { ref var r = ref s.Uri; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "addons_finder_t.psz_uri offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "addons_finder_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void AddonsFinderEntries_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonsFinderEntries);
+        AssertEqual(16, global::VLCLR.Native.Interop.AddonsFinderEntries.SizeOf, "addons_finder_t::entries sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonsFinderEntries>(), "addons_finder_t::entries Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Alloc), "addons_finder_t::entries.i_alloc offset");
+        AssertEqual(4, Offset(ref s, ref s.Size), "addons_finder_t::entries.i_size offset");
+        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "addons_finder_t::entries.p_elems offset"); }
+    }
+
+    [Fact]
+    public void AddonsManagerOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonsManagerOwner);
+        AssertEqual(32, global::VLCLR.Native.Interop.AddonsManagerOwner.SizeOf, "addons_manager_owner sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonsManagerOwner>(), "addons_manager_owner Unsafe.SizeOf");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "addons_manager_owner.sys offset"); }
+        { ref var r = ref s.AddonFound; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "addons_manager_owner.addon_found offset"); }
+        { ref var r = ref s.DiscoveryEnded; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "addons_manager_owner.discovery_ended offset"); }
+        { ref var r = ref s.AddonChanged; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "addons_manager_owner.addon_changed offset"); }
+    }
+
+    [Fact]
+    public void AddonsManager_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonsManager);
+        AssertEqual(40, global::VLCLR.Native.Interop.AddonsManager.SizeOf, "addons_manager_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonsManager>(), "addons_manager_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Owner), "addons_manager_t.owner offset");
+        { ref var r = ref s.Priv; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "addons_manager_t.p_priv offset"); }
+    }
+
+    [Fact]
+    public void AddonsStorage_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AddonsStorage);
+        AssertEqual(56, global::VLCLR.Native.Interop.AddonsStorage.SizeOf, "addons_storage_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.AddonsStorage>(), "addons_storage_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "addons_storage_t.obj offset");
+        { ref var r = ref s.Install; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "addons_storage_t.pf_install offset"); }
+        { ref var r = ref s.Remove; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "addons_storage_t.pf_remove offset"); }
+        { ref var r = ref s.Catalog; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "addons_storage_t.pf_catalog offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "addons_storage_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void AoutFiltersCfg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AoutFiltersCfg);
+        AssertEqual(40, global::VLCLR.Native.Interop.AoutFiltersCfg.SizeOf, "aout_filters_cfg_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.AoutFiltersCfg>(), "aout_filters_cfg_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Remap), "aout_filters_cfg_t.remap offset");
+        AssertEqual(36, Offset(ref s, ref s.Headphones), "aout_filters_cfg_t.headphones offset");
+    }
+
+    [Fact]
     public void AudioFormat_Layout()
     {
-        var s = default(AudioFormat);
-        AssertEqual(36, AudioFormat.SizeOf, "audio_format_t sizeof");
-        AssertEqual(36, Unsafe.SizeOf<AudioFormat>(), "audio_format_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.AudioFormat);
+        AssertEqual(36, global::VLCLR.Native.Interop.AudioFormat.SizeOf, "audio_format_t sizeof");
+        AssertEqual(36, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioFormat>(), "audio_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Format), "audio_format_t.i_format offset");
         AssertEqual(4, Offset(ref s, ref s.Rate), "audio_format_t.i_rate offset");
         AssertEqual(8, Offset(ref s, ref s.PhysicalChannels), "audio_format_t.i_physical_channels offset");
@@ -30,11 +285,41 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void AudioOutput_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioOutput);
+        AssertEqual(120, global::VLCLR.Native.Interop.AudioOutput.SizeOf, "audio_output sizeof");
+        AssertEqual(120, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioOutput>(), "audio_output Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "audio_output.obj offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "audio_output.sys offset"); }
+        { ref var r = ref s.Start; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "audio_output.start offset"); }
+        { ref var r = ref s.Stop; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "audio_output.stop offset"); }
+        { ref var r = ref s.Play; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "audio_output.play offset"); }
+        { ref var r = ref s.Pause; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "audio_output.pause offset"); }
+        { ref var r = ref s.Flush; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "audio_output.flush offset"); }
+        { ref var r = ref s.Drain; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "audio_output.drain offset"); }
+        { ref var r = ref s.VolumeSet; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "audio_output.volume_set offset"); }
+        { ref var r = ref s.MuteSet; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "audio_output.mute_set offset"); }
+        { ref var r = ref s.DeviceSelect; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "audio_output.device_select offset"); }
+        AssertEqual(104, Offset(ref s, ref s.CurrentSinkInfo), "audio_output.current_sink_info offset");
+        { ref var r = ref s.Events; fixed (void* p = &r) AssertEqual(112, PointerOffset(ref s, p), "audio_output.events offset"); }
+    }
+
+    [Fact]
+    public void AudioOutputCurrentSinkInfo_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioOutputCurrentSinkInfo);
+        AssertEqual(1, global::VLCLR.Native.Interop.AudioOutputCurrentSinkInfo.SizeOf, "audio_output::current_sink_info sizeof");
+        AssertEqual(1, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioOutputCurrentSinkInfo>(), "audio_output::current_sink_info Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Headphones), "audio_output::current_sink_info.headphones offset");
+    }
+
+    [Fact]
     public void AudioReplayGain_Layout()
     {
-        var s = default(AudioReplayGain);
-        AssertEqual(32, AudioReplayGain.SizeOf, "audio_replay_gain_t sizeof");
-        AssertEqual(32, Unsafe.SizeOf<AudioReplayGain>(), "audio_replay_gain_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.AudioReplayGain);
+        AssertEqual(32, global::VLCLR.Native.Interop.AudioReplayGain.SizeOf, "audio_replay_gain_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioReplayGain>(), "audio_replay_gain_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.PbReferenceLoudness), "audio_replay_gain_t.pb_reference_loudness offset");
         AssertEqual(4, Offset(ref s, ref s.ReferenceLoudness), "audio_replay_gain_t.pf_reference_loudness offset");
         AssertEqual(8, Offset(ref s, ref s.PbGain), "audio_replay_gain_t.pb_gain offset");
@@ -44,11 +329,249 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void AudioVolume_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioVolume);
+        AssertEqual(40, global::VLCLR.Native.Interop.AudioVolume.SizeOf, "audio_volume sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioVolume>(), "audio_volume Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "audio_volume.obj offset");
+        AssertEqual(24, Offset(ref s, ref s.Format), "audio_volume.format offset");
+        { ref var r = ref s.Amplify; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "audio_volume.amplify offset"); }
+    }
+
+    [Fact]
+    public void BlockBytestream_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.BlockBytestream);
+        AssertEqual(48, global::VLCLR.Native.Interop.BlockBytestream.SizeOf, "block_bytestream_t sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.BlockBytestream>(), "block_bytestream_t Unsafe.SizeOf");
+        { ref var r = ref s.Chain; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "block_bytestream_t.p_chain offset"); }
+        { ref var r = ref s.Last; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "block_bytestream_t.pp_last offset"); }
+        { ref var r = ref s.Block; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "block_bytestream_t.p_block offset"); }
+        AssertEqual(24, Offset(ref s, ref s.BlockOffset), "block_bytestream_t.i_block_offset offset");
+        AssertEqual(32, Offset(ref s, ref s.BaseOffset), "block_bytestream_t.i_base_offset offset");
+        AssertEqual(40, Offset(ref s, ref s.Total), "block_bytestream_t.i_total offset");
+    }
+
+    [Fact]
+    public void Bo_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Bo);
+        AssertEqual(16, global::VLCLR.Native.Interop.Bo.SizeOf, "bo_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Bo>(), "bo_t Unsafe.SizeOf");
+        { ref var r = ref s.B; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "bo_t.b offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Basesize), "bo_t.basesize offset");
+    }
+
+    [Fact]
+    public void BsByteCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.BsByteCallbacks);
+        AssertEqual(16, global::VLCLR.Native.Interop.BsByteCallbacks.SizeOf, "bs_byte_callbacks_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.BsByteCallbacks>(), "bs_byte_callbacks_t Unsafe.SizeOf");
+        { ref var r = ref s.ByteForward; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "bs_byte_callbacks_t.pf_byte_forward offset"); }
+        { ref var r = ref s.BytePos; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "bs_byte_callbacks_t.pf_byte_pos offset"); }
+    }
+
+    [Fact]
+    public void BsS_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.BsS);
+        AssertEqual(56, global::VLCLR.Native.Interop.BsS.SizeOf, "bs_s sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.BsS>(), "bs_s Unsafe.SizeOf");
+        { ref var r = ref s.Start; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "bs_s.p_start offset"); }
+        { ref var r = ref s.P; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "bs_s.p offset"); }
+        { ref var r = ref s.End; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "bs_s.p_end offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Left), "bs_s.i_left offset");
+        AssertEqual(25, Offset(ref s, ref s.ReadOnly), "bs_s.b_read_only offset");
+        AssertEqual(26, Offset(ref s, ref s.Error), "bs_s.b_error offset");
+        AssertEqual(32, Offset(ref s, ref s.Cb), "bs_s.cb offset");
+        { ref var r = ref s.Priv; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "bs_s.p_priv offset"); }
+    }
+
+    [Fact]
+    public void ConfigCategory_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ConfigCategory);
+        AssertEqual(16, global::VLCLR.Native.Interop.ConfigCategory.SizeOf, "config_category_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ConfigCategory>(), "config_category_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "config_category_t.id offset");
+        AssertEqual(4, Offset(ref s, ref s.GeneralSubcat), "config_category_t.general_subcat offset");
+        { ref var r = ref s.Help; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "config_category_t.help offset"); }
+    }
+
+    [Fact]
+    public void ConfigChain_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ConfigChain);
+        AssertEqual(24, global::VLCLR.Native.Interop.ConfigChain.SizeOf, "config_chain_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ConfigChain>(), "config_chain_t Unsafe.SizeOf");
+        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "config_chain_t.p_next offset"); }
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "config_chain_t.psz_name offset"); }
+        { ref var r = ref s.Value; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "config_chain_t.psz_value offset"); }
+    }
+
+    [Fact]
+    public void ConfigSubcategory_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ConfigSubcategory);
+        AssertEqual(24, global::VLCLR.Native.Interop.ConfigSubcategory.SizeOf, "config_subcategory_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ConfigSubcategory>(), "config_subcategory_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "config_subcategory_t.id offset");
+        AssertEqual(4, Offset(ref s, ref s.Cat), "config_subcategory_t.cat offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "config_subcategory_t.name offset"); }
+        { ref var r = ref s.Help; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "config_subcategory_t.help offset"); }
+    }
+
+    [Fact]
+    public void Date_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Date);
+        AssertEqual(24, global::VLCLR.Native.Interop.Date.SizeOf, "date_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Date>(), "date_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.DateValue), "date_t.date offset");
+        AssertEqual(8, Offset(ref s, ref s.DividerNum), "date_t.i_divider_num offset");
+        AssertEqual(12, Offset(ref s, ref s.DividerDen), "date_t.i_divider_den offset");
+        AssertEqual(16, Offset(ref s, ref s.Remainder), "date_t.i_remainder offset");
+    }
+
+    [Fact]
+    public void DecoderCcDesc_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderCcDesc);
+        AssertEqual(24, global::VLCLR.Native.Interop.DecoderCcDesc.SizeOf, "decoder_cc_desc_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderCcDesc>(), "decoder_cc_desc_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.I608Channels), "decoder_cc_desc_t.i_608_channels offset");
+        AssertEqual(8, Offset(ref s, ref s.I708Channels), "decoder_cc_desc_t.i_708_channels offset");
+        AssertEqual(16, Offset(ref s, ref s.ReorderDepth), "decoder_cc_desc_t.i_reorder_depth offset");
+    }
+
+    [Fact]
+    public void DecoderOwnerCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderOwnerCallbacks);
+        AssertEqual(64, global::VLCLR.Native.Interop.DecoderOwnerCallbacks.SizeOf, "decoder_owner_callbacks sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderOwnerCallbacks>(), "decoder_owner_callbacks Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Video), "decoder_owner_callbacks.video offset");
+        AssertEqual(0, Offset(ref s, ref s.Audio), "decoder_owner_callbacks.audio offset");
+        AssertEqual(0, Offset(ref s, ref s.Spu), "decoder_owner_callbacks.spu offset");
+        { ref var r = ref s.GetAttachments; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "decoder_owner_callbacks.get_attachments offset"); }
+    }
+
+    [Fact]
+    public void DecoderOwnerCallbacksAnon0Audio_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Audio);
+        AssertEqual(16, global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Audio.SizeOf, "decoder_owner_callbacks::@0::audio sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Audio>(), "decoder_owner_callbacks::@0::audio Unsafe.SizeOf");
+        { ref var r = ref s.FormatUpdate; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::audio.format_update offset"); }
+        { ref var r = ref s.Queue; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::audio.queue offset"); }
+    }
+
+    [Fact]
+    public void DecoderOwnerCallbacksAnon0Spu_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Spu);
+        AssertEqual(16, global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Spu.SizeOf, "decoder_owner_callbacks::@0::spu sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Spu>(), "decoder_owner_callbacks::@0::spu Unsafe.SizeOf");
+        { ref var r = ref s.BufferNew; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::spu.buffer_new offset"); }
+        { ref var r = ref s.Queue; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::spu.queue offset"); }
+    }
+
+    [Fact]
+    public void DecoderOwnerCallbacksAnon0Video_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Video);
+        AssertEqual(56, global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Video.SizeOf, "decoder_owner_callbacks::@0::video sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderOwnerCallbacksAnon0Video>(), "decoder_owner_callbacks::@0::video Unsafe.SizeOf");
+        { ref var r = ref s.GetDevice; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.get_device offset"); }
+        { ref var r = ref s.FormatUpdate; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.format_update offset"); }
+        { ref var r = ref s.BufferNew; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.buffer_new offset"); }
+        { ref var r = ref s.Queue; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.queue offset"); }
+        { ref var r = ref s.QueueCc; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.queue_cc offset"); }
+        { ref var r = ref s.GetDisplayDate; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.get_display_date offset"); }
+        { ref var r = ref s.GetDisplayRate; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "decoder_owner_callbacks::@0::video.get_display_rate offset"); }
+    }
+
+    [Fact]
+    public void Decoder_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Decoder);
+        AssertEqual(Abi(336, 328), global::VLCLR.Native.Interop.Decoder.SizeOf, "decoder_t sizeof");
+        AssertEqual(336, Unsafe.SizeOf<global::VLCLR.Native.Interop.Decoder>(), "decoder_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "decoder_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "decoder_t.p_module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "decoder_t.p_sys offset"); }
+        { ref var r = ref s.FmtIn; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "decoder_t.fmt_in offset"); }
+        AssertEqual(48, PointerOffset(ref s, s.FmtOut), "decoder_t.fmt_out offset");
+        AssertEqual(Abi(288, 280), Offset(ref s, ref s.FrameDropAllowed), "decoder_t.b_frame_drop_allowed offset");
+        AssertEqual(Abi(292, 284), Offset(ref s, ref s.ExtraPictureBuffers), "decoder_t.i_extra_picture_buffers offset");
+        { ref var r = ref s.Decode; fixed (void* p = &r) AssertEqual(Abi(296, 288), PointerOffset(ref s, p), "decoder_t.pf_decode offset"); }
+        { ref var r = ref s.Packetize; fixed (void* p = &r) AssertEqual(Abi(296, 288), PointerOffset(ref s, p), "decoder_t.pf_packetize offset"); }
+        { ref var r = ref s.Flush; fixed (void* p = &r) AssertEqual(Abi(304, 296), PointerOffset(ref s, p), "decoder_t.pf_flush offset"); }
+        { ref var r = ref s.GetCc; fixed (void* p = &r) AssertEqual(Abi(312, 304), PointerOffset(ref s, p), "decoder_t.pf_get_cc offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(Abi(320, 312), PointerOffset(ref s, p), "decoder_t.p_description offset"); }
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(Abi(328, 320), PointerOffset(ref s, p), "decoder_t.cbs offset"); }
+    }
+
+    [Fact]
+    public void DemuxMeta_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DemuxMeta);
+        AssertEqual(56, global::VLCLR.Native.Interop.DemuxMeta.SizeOf, "demux_meta_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.DemuxMeta>(), "demux_meta_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "demux_meta_t.obj offset");
+        { ref var r = ref s.Item; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "demux_meta_t.p_item offset"); }
+        { ref var r = ref s.Meta; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "demux_meta_t.p_meta offset"); }
+        AssertEqual(40, Offset(ref s, ref s.AttachmentsCount), "demux_meta_t.i_attachments offset");
+        { ref var r = ref s.Attachments; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "demux_meta_t.attachments offset"); }
+    }
+
+    [Fact]
+    public void EncoderOwnerCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.EncoderOwnerCallbacks);
+        AssertEqual(8, global::VLCLR.Native.Interop.EncoderOwnerCallbacks.SizeOf, "encoder_owner_callbacks sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.EncoderOwnerCallbacks>(), "encoder_owner_callbacks Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Video), "encoder_owner_callbacks.video offset");
+    }
+
+    [Fact]
+    public void EncoderOwnerCallbacksVideo_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.EncoderOwnerCallbacksVideo);
+        AssertEqual(8, global::VLCLR.Native.Interop.EncoderOwnerCallbacksVideo.SizeOf, "encoder_owner_callbacks::video sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.EncoderOwnerCallbacksVideo>(), "encoder_owner_callbacks::video Unsafe.SizeOf");
+        { ref var r = ref s.GetDevice; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "encoder_owner_callbacks::video.get_device offset"); }
+    }
+
+    [Fact]
+    public void Encoder_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Encoder);
+        AssertEqual(Abi(568, 552), global::VLCLR.Native.Interop.Encoder.SizeOf, "encoder_t sizeof");
+        AssertEqual(568, Unsafe.SizeOf<global::VLCLR.Native.Interop.Encoder>(), "encoder_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "encoder_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "encoder_t.p_module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "encoder_t.p_sys offset"); }
+        AssertEqual(40, PointerOffset(ref s, s.FmtIn), "encoder_t.fmt_in offset");
+        { ref var r = ref s.VctxIn; fixed (void* p = &r) AssertEqual(Abi(280, 272), PointerOffset(ref s, p), "encoder_t.vctx_in offset"); }
+        AssertEqual(Abi(288, 280), PointerOffset(ref s, s.FmtOut), "encoder_t.fmt_out offset");
+        AssertEqual(Abi(528, 512), Offset(ref s, ref s.Threads), "encoder_t.i_threads offset");
+        AssertEqual(Abi(532, 516), Offset(ref s, ref s.Iframes), "encoder_t.i_iframes offset");
+        AssertEqual(Abi(536, 520), Offset(ref s, ref s.Bframes), "encoder_t.i_bframes offset");
+        AssertEqual(Abi(540, 524), Offset(ref s, ref s.Tolerance), "encoder_t.i_tolerance offset");
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(Abi(544, 528), PointerOffset(ref s, p), "encoder_t.p_cfg offset"); }
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(Abi(552, 536), PointerOffset(ref s, p), "encoder_t.ops offset"); }
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(Abi(560, 544), PointerOffset(ref s, p), "encoder_t.cbs offset"); }
+    }
+
+    [Fact]
     public void EsFormat_Layout()
     {
-        var s = default(EsFormat);
-        AssertEqual(Abi(240, 232), EsFormat.SizeOf, "es_format_t sizeof");
-        AssertEqual(240, Unsafe.SizeOf<EsFormat>(), "es_format_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.EsFormat);
+        AssertEqual(Abi(240, 232), global::VLCLR.Native.Interop.EsFormat.SizeOf, "es_format_t sizeof");
+        AssertEqual(240, Unsafe.SizeOf<global::VLCLR.Native.Interop.EsFormat>(), "es_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Cat), "es_format_t.i_cat offset");
         AssertEqual(4, Offset(ref s, ref s.Codec), "es_format_t.i_codec offset");
         AssertEqual(8, Offset(ref s, ref s.OriginalFourcc), "es_format_t.i_original_fourcc offset");
@@ -72,11 +595,183 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void EsOutCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.EsOutCallbacks);
+        AssertEqual(40, global::VLCLR.Native.Interop.EsOutCallbacks.SizeOf, "es_out_callbacks sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.EsOutCallbacks>(), "es_out_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.Add; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "es_out_callbacks.add offset"); }
+        { ref var r = ref s.Send; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "es_out_callbacks.send offset"); }
+        { ref var r = ref s.Del; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "es_out_callbacks.del offset"); }
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "es_out_callbacks.destroy offset"); }
+    }
+
+    [Fact]
+    public void EsOut_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.EsOut);
+        AssertEqual(8, global::VLCLR.Native.Interop.EsOut.SizeOf, "es_out_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.EsOut>(), "es_out_t Unsafe.SizeOf");
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "es_out_t.cbs offset"); }
+    }
+
+    [Fact]
+    public void ExtensionDialogCommand_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionDialogCommand);
+        AssertEqual(24, global::VLCLR.Native.Interop.ExtensionDialogCommand.SizeOf, "extension_dialog_command_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionDialogCommand>(), "extension_dialog_command_t Unsafe.SizeOf");
+        { ref var r = ref s.Dlg; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extension_dialog_command_t.p_dlg offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Event), "extension_dialog_command_t.event offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "extension_dialog_command_t.p_data offset"); }
+    }
+
+    [Fact]
+    public void ExtensionDialog_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionDialog);
+        AssertEqual(104, global::VLCLR.Native.Interop.ExtensionDialog.SizeOf, "extension_dialog_t sizeof");
+        AssertEqual(104, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionDialog>(), "extension_dialog_t Unsafe.SizeOf");
+        { ref var r = ref s.Object; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extension_dialog_t.p_object offset"); }
+        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_dialog_t.psz_title offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Width), "extension_dialog_t.i_width offset");
+        AssertEqual(20, Offset(ref s, ref s.Height), "extension_dialog_t.i_height offset");
+        AssertEqual(24, Offset(ref s, ref s.Widgets), "extension_dialog_t.widgets offset");
+        AssertEqual(40, Offset(ref s, ref s.Hide), "extension_dialog_t.b_hide offset");
+        AssertEqual(41, Offset(ref s, ref s.Kill), "extension_dialog_t.b_kill offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "extension_dialog_t.p_sys offset"); }
+        { ref var r = ref s.SysIntf; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "extension_dialog_t.p_sys_intf offset"); }
+        AssertEqual(64, PointerOffset(ref s, s.Lock), "extension_dialog_t.lock offset");
+        AssertEqual(80, Offset(ref s, ref s.Cond), "extension_dialog_t.cond offset");
+    }
+
+    [Fact]
+    public void ExtensionDialogWidgets_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionDialogWidgets);
+        AssertEqual(16, global::VLCLR.Native.Interop.ExtensionDialogWidgets.SizeOf, "extension_dialog_t::widgets sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionDialogWidgets>(), "extension_dialog_t::widgets Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Alloc), "extension_dialog_t::widgets.i_alloc offset");
+        AssertEqual(4, Offset(ref s, ref s.Size), "extension_dialog_t::widgets.i_size offset");
+        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_dialog_t::widgets.p_elems offset"); }
+    }
+
+    [Fact]
+    public void Extension_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Extension);
+        AssertEqual(88, global::VLCLR.Native.Interop.Extension.SizeOf, "extension_t sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.Extension>(), "extension_t Unsafe.SizeOf");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extension_t.p_sys offset"); }
+        { ref var r = ref s.Logger; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_t.logger offset"); }
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "extension_t.psz_name offset"); }
+        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "extension_t.psz_title offset"); }
+        { ref var r = ref s.Author; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "extension_t.psz_author offset"); }
+        { ref var r = ref s.Version; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "extension_t.psz_version offset"); }
+        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "extension_t.psz_url offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "extension_t.psz_description offset"); }
+        { ref var r = ref s.Shortdescription; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "extension_t.psz_shortdescription offset"); }
+        { ref var r = ref s.Icondata; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "extension_t.p_icondata offset"); }
+        AssertEqual(80, Offset(ref s, ref s.IcondataSize), "extension_t.i_icondata_size offset");
+    }
+
+    [Fact]
+    public void ExtensionWidget_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionWidget);
+        AssertEqual(88, global::VLCLR.Native.Interop.ExtensionWidget.SizeOf, "extension_widget_t sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionWidget>(), "extension_widget_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "extension_widget_t.type offset");
+        { ref var r = ref s.Text; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_widget_t.psz_text offset"); }
+        { ref var r = ref s.Values; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "extension_widget_t.p_values offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Checked), "extension_widget_t.b_checked offset");
+        AssertEqual(28, Offset(ref s, ref s.Row), "extension_widget_t.i_row offset");
+        AssertEqual(32, Offset(ref s, ref s.Column), "extension_widget_t.i_column offset");
+        AssertEqual(36, Offset(ref s, ref s.HorizSpan), "extension_widget_t.i_horiz_span offset");
+        AssertEqual(40, Offset(ref s, ref s.VertSpan), "extension_widget_t.i_vert_span offset");
+        AssertEqual(44, Offset(ref s, ref s.Width), "extension_widget_t.i_width offset");
+        AssertEqual(48, Offset(ref s, ref s.Height), "extension_widget_t.i_height offset");
+        AssertEqual(52, Offset(ref s, ref s.Hide), "extension_widget_t.b_hide offset");
+        AssertEqual(56, Offset(ref s, ref s.SpinLoops), "extension_widget_t.i_spin_loops offset");
+        AssertEqual(60, Offset(ref s, ref s.Kill), "extension_widget_t.b_kill offset");
+        AssertEqual(61, Offset(ref s, ref s.Update), "extension_widget_t.b_update offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "extension_widget_t.p_sys offset"); }
+        { ref var r = ref s.SysIntf; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "extension_widget_t.p_sys_intf offset"); }
+        { ref var r = ref s.Dialog; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "extension_widget_t.p_dialog offset"); }
+    }
+
+    [Fact]
+    public void ExtensionWidgetValue_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionWidgetValue);
+        AssertEqual(32, global::VLCLR.Native.Interop.ExtensionWidgetValue.SizeOf, "extension_widget_value_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionWidgetValue>(), "extension_widget_value_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "extension_widget_value_t.i_id offset");
+        { ref var r = ref s.Text; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_widget_value_t.psz_text offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Selected), "extension_widget_value_t.b_selected offset");
+        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "extension_widget_value_t.p_next offset"); }
+    }
+
+    [Fact]
+    public void ExtensionsManager_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionsManager);
+        AssertEqual(96, global::VLCLR.Native.Interop.ExtensionsManager.SizeOf, "extensions_manager_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionsManager>(), "extensions_manager_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "extensions_manager_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "extensions_manager_t.p_module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "extensions_manager_t.p_sys offset"); }
+        { ref var r = ref s.Player; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "extensions_manager_t.player offset"); }
+        AssertEqual(48, Offset(ref s, ref s.Extensions), "extensions_manager_t.extensions offset");
+        AssertEqual(64, PointerOffset(ref s, s.Lock), "extensions_manager_t.lock offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "extensions_manager_t.ops offset"); }
+    }
+
+    [Fact]
+    public void ExtensionsManagerExtensions_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionsManagerExtensions);
+        AssertEqual(16, global::VLCLR.Native.Interop.ExtensionsManagerExtensions.SizeOf, "extensions_manager_t::extensions sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionsManagerExtensions>(), "extensions_manager_t::extensions Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Alloc), "extensions_manager_t::extensions.i_alloc offset");
+        AssertEqual(4, Offset(ref s, ref s.Size), "extensions_manager_t::extensions.i_size offset");
+        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extensions_manager_t::extensions.p_elems offset"); }
+    }
+
+    [Fact]
+    public void ExtraLanguages_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtraLanguages);
+        AssertEqual(16, global::VLCLR.Native.Interop.ExtraLanguages.SizeOf, "extra_languages_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtraLanguages>(), "extra_languages_t Unsafe.SizeOf");
+        { ref var r = ref s.Language; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extra_languages_t.psz_language offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extra_languages_t.psz_description offset"); }
+    }
+
+    [Fact]
+    public void FilterAudioCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FilterAudioCallbacks);
+        AssertEqual(8, global::VLCLR.Native.Interop.FilterAudioCallbacks.SizeOf, "filter_audio_callbacks sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.FilterAudioCallbacks>(), "filter_audio_callbacks Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.MeterLoudness), "filter_audio_callbacks.meter_loudness offset");
+    }
+
+    [Fact]
+    public void FilterAudioCallbacksMeterLoudness_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FilterAudioCallbacksMeterLoudness);
+        AssertEqual(8, global::VLCLR.Native.Interop.FilterAudioCallbacksMeterLoudness.SizeOf, "filter_audio_callbacks::meter_loudness sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.FilterAudioCallbacksMeterLoudness>(), "filter_audio_callbacks::meter_loudness Unsafe.SizeOf");
+        { ref var r = ref s.OnChanged; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "filter_audio_callbacks::meter_loudness.on_changed offset"); }
+    }
+
+    [Fact]
     public void FilterOwner_Layout()
     {
-        var s = default(FilterOwner);
-        AssertEqual(24, FilterOwner.SizeOf, "filter_owner_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<FilterOwner>(), "filter_owner_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.FilterOwner);
+        AssertEqual(24, global::VLCLR.Native.Interop.FilterOwner.SizeOf, "filter_owner_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.FilterOwner>(), "filter_owner_t Unsafe.SizeOf");
         { ref var r = ref s.Video; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "filter_owner_t.video offset"); }
         { ref var r = ref s.Audio; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "filter_owner_t.audio offset"); }
         { ref var r = ref s.Sub; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "filter_owner_t.sub offset"); }
@@ -85,11 +780,20 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void FilterSubpictureCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FilterSubpictureCallbacks);
+        AssertEqual(8, global::VLCLR.Native.Interop.FilterSubpictureCallbacks.SizeOf, "filter_subpicture_callbacks sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.FilterSubpictureCallbacks>(), "filter_subpicture_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.BufferNew; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "filter_subpicture_callbacks.buffer_new offset"); }
+    }
+
+    [Fact]
     public void Filter_Layout()
     {
-        var s = default(Filter);
-        AssertEqual(Abi(592, 576), Filter.SizeOf, "filter_t sizeof");
-        AssertEqual(592, Unsafe.SizeOf<Filter>(), "filter_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Filter);
+        AssertEqual(Abi(592, 576), global::VLCLR.Native.Interop.Filter.SizeOf, "filter_t sizeof");
+        AssertEqual(592, Unsafe.SizeOf<global::VLCLR.Native.Interop.Filter>(), "filter_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Obj), "filter_t.obj offset");
         { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "filter_t.p_module offset"); }
         { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "filter_t.p_sys offset"); }
@@ -107,30 +811,470 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void FilterVideoCallbacks_Layout()
     {
-        var s = default(FilterVideoCallbacks);
-        AssertEqual(16, FilterVideoCallbacks.SizeOf, "filter_video_callbacks sizeof");
-        AssertEqual(16, Unsafe.SizeOf<FilterVideoCallbacks>(), "filter_video_callbacks Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.FilterVideoCallbacks);
+        AssertEqual(16, global::VLCLR.Native.Interop.FilterVideoCallbacks.SizeOf, "filter_video_callbacks sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.FilterVideoCallbacks>(), "filter_video_callbacks Unsafe.SizeOf");
         { ref var r = ref s.BufferNew; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "filter_video_callbacks.buffer_new offset"); }
         { ref var r = ref s.HoldDevice; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "filter_video_callbacks.hold_device offset"); }
     }
 
     [Fact]
+    public void FingerprintRequest_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FingerprintRequest);
+        AssertEqual(40, global::VLCLR.Native.Interop.FingerprintRequest.SizeOf, "fingerprint_request_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.FingerprintRequest>(), "fingerprint_request_t Unsafe.SizeOf");
+        { ref var r = ref s.Item; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "fingerprint_request_t.p_item offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Duration), "fingerprint_request_t.i_duration offset");
+        AssertEqual(16, Offset(ref s, ref s.Results), "fingerprint_request_t.results offset");
+    }
+
+    [Fact]
+    public void FingerprintRequestResults_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FingerprintRequestResults);
+        AssertEqual(24, global::VLCLR.Native.Interop.FingerprintRequestResults.SizeOf, "fingerprint_request_t::results sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.FingerprintRequestResults>(), "fingerprint_request_t::results Unsafe.SizeOf");
+        { ref var r = ref s.Fingerprint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "fingerprint_request_t::results.psz_fingerprint offset"); }
+        AssertEqual(8, Offset(ref s, ref s.MetasArray), "fingerprint_request_t::results.metas_array offset");
+    }
+
+    [Fact]
+    public void FingerprinterThread_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FingerprinterThread);
+        AssertEqual(64, global::VLCLR.Native.Interop.FingerprinterThread.SizeOf, "fingerprinter_thread_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.FingerprinterThread>(), "fingerprinter_thread_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "fingerprinter_thread_t.obj offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "fingerprinter_thread_t.p_sys offset"); }
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "fingerprinter_thread_t.p_module offset"); }
+        { ref var r = ref s.Enqueue; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "fingerprinter_thread_t.pf_enqueue offset"); }
+        { ref var r = ref s.Getresults; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "fingerprinter_thread_t.pf_getresults offset"); }
+        { ref var r = ref s.Apply; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "fingerprinter_thread_t.pf_apply offset"); }
+    }
+
+    [Fact]
+    public void HttpdHeader_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.HttpdHeader);
+        AssertEqual(16, global::VLCLR.Native.Interop.HttpdHeader.SizeOf, "httpd_header sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.HttpdHeader>(), "httpd_header Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "httpd_header.name offset"); }
+        { ref var r = ref s.Value; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "httpd_header.value offset"); }
+    }
+
+    [Fact]
+    public void HttpdMessage_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.HttpdMessage);
+        AssertEqual(72, global::VLCLR.Native.Interop.HttpdMessage.SizeOf, "httpd_message_t sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.HttpdMessage>(), "httpd_message_t Unsafe.SizeOf");
+        { ref var r = ref s.Cl; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "httpd_message_t.cl offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Type), "httpd_message_t.i_type offset");
+        AssertEqual(9, Offset(ref s, ref s.Proto), "httpd_message_t.i_proto offset");
+        AssertEqual(10, Offset(ref s, ref s.Version), "httpd_message_t.i_version offset");
+        AssertEqual(12, Offset(ref s, ref s.Status), "httpd_message_t.i_status offset");
+        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "httpd_message_t.psz_url offset"); }
+        { ref var r = ref s.Args; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "httpd_message_t.psz_args offset"); }
+        AssertEqual(32, Offset(ref s, ref s.HeadersCount), "httpd_message_t.i_headers offset");
+        { ref var r = ref s.Headers; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "httpd_message_t.p_headers offset"); }
+        AssertEqual(48, Offset(ref s, ref s.BodyOffset), "httpd_message_t.i_body_offset offset");
+        AssertEqual(56, Offset(ref s, ref s.BodyCount), "httpd_message_t.i_body offset");
+        { ref var r = ref s.Body; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "httpd_message_t.p_body offset"); }
+    }
+
+    [Fact]
+    public void ImageHandler_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ImageHandler);
+        AssertEqual(80, global::VLCLR.Native.Interop.ImageHandler.SizeOf, "image_handler_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.ImageHandler>(), "image_handler_t Unsafe.SizeOf");
+        { ref var r = ref s.Read; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "image_handler_t.pf_read offset"); }
+        { ref var r = ref s.ReadUrl; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "image_handler_t.pf_read_url offset"); }
+        { ref var r = ref s.Write; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "image_handler_t.pf_write offset"); }
+        { ref var r = ref s.WriteUrl; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "image_handler_t.pf_write_url offset"); }
+        { ref var r = ref s.Convert; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "image_handler_t.pf_convert offset"); }
+        { ref var r = ref s.Parent; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "image_handler_t.p_parent offset"); }
+        { ref var r = ref s.Dec; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "image_handler_t.p_dec offset"); }
+        { ref var r = ref s.Enc; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "image_handler_t.p_enc offset"); }
+        { ref var r = ref s.Converter; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "image_handler_t.p_converter offset"); }
+        { ref var r = ref s.Outfifo; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "image_handler_t.outfifo offset"); }
+    }
+
+    [Fact]
+    public void InfoCategory_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InfoCategory);
+        AssertEqual(40, global::VLCLR.Native.Interop.InfoCategory.SizeOf, "info_category_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.InfoCategory>(), "info_category_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "info_category_t.psz_name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Infos), "info_category_t.infos offset");
+        AssertEqual(24, Offset(ref s, ref s.Node), "info_category_t.node offset");
+    }
+
+    [Fact]
+    public void Info_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Info);
+        AssertEqual(32, global::VLCLR.Native.Interop.Info.SizeOf, "info_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.Info>(), "info_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "info_t.psz_name offset"); }
+        { ref var r = ref s.Value; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "info_t.psz_value offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Node), "info_t.node offset");
+    }
+
+    [Fact]
+    public void InputAttachment_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputAttachment);
+        AssertEqual(40, global::VLCLR.Native.Interop.InputAttachment.SizeOf, "input_attachment_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputAttachment>(), "input_attachment_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "input_attachment_t.psz_name offset"); }
+        { ref var r = ref s.Mime; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "input_attachment_t.psz_mime offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "input_attachment_t.psz_description offset"); }
+        AssertEqual(24, Offset(ref s, ref s.DataCount), "input_attachment_t.i_data offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "input_attachment_t.p_data offset"); }
+    }
+
+    [Fact]
+    public void InputItemEs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItemEs);
+        AssertEqual(Abi(256, 248), global::VLCLR.Native.Interop.InputItemEs.SizeOf, "input_item_es sizeof");
+        AssertEqual(256, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItemEs>(), "input_item_es Unsafe.SizeOf");
+        AssertEqual(0, PointerOffset(ref s, s.Es), "input_item_es.es offset");
+        { ref var r = ref s.Id; fixed (void* p = &r) AssertEqual(Abi(240, 232), PointerOffset(ref s, p), "input_item_es.id offset"); }
+        AssertEqual(Abi(248, 240), Offset(ref s, ref s.IdStable), "input_item_es.id_stable offset");
+    }
+
+    [Fact]
+    public void InputItemEsVector_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItemEsVector);
+        AssertEqual(24, global::VLCLR.Native.Interop.InputItemEsVector.SizeOf, "input_item_es_vector sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItemEsVector>(), "input_item_es_vector Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "input_item_es_vector.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "input_item_es_vector.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "input_item_es_vector.data offset"); }
+    }
+
+    [Fact]
+    public void InputItemNode_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItemNode);
+        AssertEqual(24, global::VLCLR.Native.Interop.InputItemNode.SizeOf, "input_item_node_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItemNode>(), "input_item_node_t Unsafe.SizeOf");
+        { ref var r = ref s.Item; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "input_item_node_t.p_item offset"); }
+        AssertEqual(8, Offset(ref s, ref s.ChildrenCount), "input_item_node_t.i_children offset");
+        { ref var r = ref s.Children; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "input_item_node_t.pp_children offset"); }
+    }
+
+    [Fact]
+    public void InputItemParserCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItemParserCbs);
+        AssertEqual(24, global::VLCLR.Native.Interop.InputItemParserCbs.SizeOf, "input_item_parser_cbs_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItemParserCbs>(), "input_item_parser_cbs_t Unsafe.SizeOf");
+        { ref var r = ref s.OnEnded; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "input_item_parser_cbs_t.on_ended offset"); }
+        { ref var r = ref s.OnSubtreeAdded; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "input_item_parser_cbs_t.on_subtree_added offset"); }
+        { ref var r = ref s.OnAttachmentsAdded; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "input_item_parser_cbs_t.on_attachments_added offset"); }
+    }
+
+    [Fact]
+    public void InputItemParserCfg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItemParserCfg);
+        AssertEqual(24, global::VLCLR.Native.Interop.InputItemParserCfg.SizeOf, "input_item_parser_cfg sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItemParserCfg>(), "input_item_parser_cfg Unsafe.SizeOf");
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "input_item_parser_cfg.cbs offset"); }
+        { ref var r = ref s.CbsData; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "input_item_parser_cfg.cbs_data offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Subitems), "input_item_parser_cfg.subitems offset");
+        AssertEqual(17, Offset(ref s, ref s.Interact), "input_item_parser_cfg.interact offset");
+    }
+
+    [Fact]
+    public void InputItemSlave_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItemSlave);
+        AssertEqual(12, global::VLCLR.Native.Interop.InputItemSlave.SizeOf, "input_item_slave sizeof");
+        AssertEqual(12, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItemSlave>(), "input_item_slave Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "input_item_slave.i_type offset");
+        AssertEqual(4, Offset(ref s, ref s.Priority), "input_item_slave.i_priority offset");
+        AssertEqual(8, Offset(ref s, ref s.Forced), "input_item_slave.b_forced offset");
+    }
+
+    [Fact]
+    public void InputItem_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputItem);
+        AssertEqual(192, global::VLCLR.Native.Interop.InputItem.SizeOf, "input_item_t sizeof");
+        AssertEqual(192, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputItem>(), "input_item_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "input_item_t.psz_name offset"); }
+        { ref var r = ref s.Uri; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "input_item_t.psz_uri offset"); }
+        AssertEqual(16, Offset(ref s, ref s.OptionsCount), "input_item_t.i_options offset");
+        { ref var r = ref s.Options; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "input_item_t.ppsz_options offset"); }
+        { ref var r = ref s.Optflagv; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "input_item_t.optflagv offset"); }
+        AssertEqual(40, Offset(ref s, ref s.Optflagc), "input_item_t.optflagc offset");
+        { ref var r = ref s.Opaques; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "input_item_t.opaques offset"); }
+        AssertEqual(56, Offset(ref s, ref s.Duration), "input_item_t.i_duration offset");
+        AssertEqual(64, Offset(ref s, ref s.Categories), "input_item_t.categories offset");
+        AssertEqual(80, Offset(ref s, ref s.EsVec), "input_item_t.es_vec offset");
+        { ref var r = ref s.Stats; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "input_item_t.p_stats offset"); }
+        { ref var r = ref s.Meta; fixed (void* p = &r) AssertEqual(112, PointerOffset(ref s, p), "input_item_t.p_meta offset"); }
+        AssertEqual(120, Offset(ref s, ref s.EpgCount), "input_item_t.i_epg offset");
+        { ref var r = ref s.Epg; fixed (void* p = &r) AssertEqual(128, PointerOffset(ref s, p), "input_item_t.pp_epg offset"); }
+        AssertEqual(136, Offset(ref s, ref s.EpgTime), "input_item_t.i_epg_time offset");
+        { ref var r = ref s.EpgTable; fixed (void* p = &r) AssertEqual(144, PointerOffset(ref s, p), "input_item_t.p_epg_table offset"); }
+        AssertEqual(152, Offset(ref s, ref s.SlavesCount), "input_item_t.i_slaves offset");
+        { ref var r = ref s.Slaves; fixed (void* p = &r) AssertEqual(160, PointerOffset(ref s, p), "input_item_t.pp_slaves offset"); }
+        AssertEqual(168, PointerOffset(ref s, s.Lock), "input_item_t.lock offset");
+        AssertEqual(Abi(180, 184), Offset(ref s, ref s.Type), "input_item_t.i_type offset");
+        AssertEqual(Abi(184, 188), Offset(ref s, ref s.Net), "input_item_t.b_net offset");
+    }
+
+    [Fact]
+    public void InputStats_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputStats);
+        AssertEqual(120, global::VLCLR.Native.Interop.InputStats.SizeOf, "input_stats_t sizeof");
+        AssertEqual(120, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputStats>(), "input_stats_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.ReadPackets), "input_stats_t.i_read_packets offset");
+        AssertEqual(8, Offset(ref s, ref s.ReadBytes), "input_stats_t.i_read_bytes offset");
+        AssertEqual(16, Offset(ref s, ref s.InputBitrate), "input_stats_t.f_input_bitrate offset");
+        AssertEqual(24, Offset(ref s, ref s.DemuxReadPackets), "input_stats_t.i_demux_read_packets offset");
+        AssertEqual(32, Offset(ref s, ref s.DemuxReadBytes), "input_stats_t.i_demux_read_bytes offset");
+        AssertEqual(40, Offset(ref s, ref s.DemuxBitrate), "input_stats_t.f_demux_bitrate offset");
+        AssertEqual(48, Offset(ref s, ref s.DemuxCorrupted), "input_stats_t.i_demux_corrupted offset");
+        AssertEqual(56, Offset(ref s, ref s.DemuxDiscontinuity), "input_stats_t.i_demux_discontinuity offset");
+        AssertEqual(64, Offset(ref s, ref s.DecodedAudio), "input_stats_t.i_decoded_audio offset");
+        AssertEqual(72, Offset(ref s, ref s.DecodedVideo), "input_stats_t.i_decoded_video offset");
+        AssertEqual(80, Offset(ref s, ref s.DisplayedPictures), "input_stats_t.i_displayed_pictures offset");
+        AssertEqual(88, Offset(ref s, ref s.LatePictures), "input_stats_t.i_late_pictures offset");
+        AssertEqual(96, Offset(ref s, ref s.LostPictures), "input_stats_t.i_lost_pictures offset");
+        AssertEqual(104, Offset(ref s, ref s.PlayedAbuffers), "input_stats_t.i_played_abuffers offset");
+        AssertEqual(112, Offset(ref s, ref s.LostAbuffers), "input_stats_t.i_lost_abuffers offset");
+    }
+
+    [Fact]
+    public void InputTitle_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InputTitle);
+        AssertEqual(32, global::VLCLR.Native.Interop.InputTitle.SizeOf, "input_title_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.InputTitle>(), "input_title_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "input_title_t.psz_name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Length), "input_title_t.i_length offset");
+        AssertEqual(16, Offset(ref s, ref s.Flags), "input_title_t.i_flags offset");
+        AssertEqual(20, Offset(ref s, ref s.SeekpointCount), "input_title_t.i_seekpoint offset");
+        { ref var r = ref s.Seekpoint; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "input_title_t.seekpoint offset"); }
+    }
+
+    [Fact]
+    public void InteractionDialog_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.InteractionDialog);
+        AssertEqual(112, global::VLCLR.Native.Interop.InteractionDialog.SizeOf, "interaction_dialog_t sizeof");
+        AssertEqual(112, Unsafe.SizeOf<global::VLCLR.Native.Interop.InteractionDialog>(), "interaction_dialog_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "interaction_dialog_t.i_type offset");
+        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "interaction_dialog_t.psz_title offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "interaction_dialog_t.psz_description offset"); }
+        { ref var r = ref s.DefaultButton; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "interaction_dialog_t.psz_default_button offset"); }
+        { ref var r = ref s.AlternateButton; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "interaction_dialog_t.psz_alternate_button offset"); }
+        { ref var r = ref s.OtherButton; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "interaction_dialog_t.psz_other_button offset"); }
+        AssertEqual(48, Offset(ref s, ref s.Returned), "interaction_dialog_t.psz_returned offset");
+        AssertEqual(56, Offset(ref s, ref s.TimeToGo), "interaction_dialog_t.i_timeToGo offset");
+        AssertEqual(60, Offset(ref s, ref s.Cancelled), "interaction_dialog_t.b_cancelled offset");
+        { ref var r = ref s.Private; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "interaction_dialog_t.p_private offset"); }
+        AssertEqual(72, Offset(ref s, ref s.Status), "interaction_dialog_t.i_status offset");
+        AssertEqual(76, Offset(ref s, ref s.Action), "interaction_dialog_t.i_action offset");
+        AssertEqual(80, Offset(ref s, ref s.Flags), "interaction_dialog_t.i_flags offset");
+        AssertEqual(84, Offset(ref s, ref s.Return), "interaction_dialog_t.i_return offset");
+        { ref var r = ref s.Parent; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "interaction_dialog_t.p_parent offset"); }
+        { ref var r = ref s.Interface; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "interaction_dialog_t.p_interface offset"); }
+        { ref var r = ref s.Lock; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "interaction_dialog_t.p_lock offset"); }
+    }
+
+    [Fact]
+    public void IntfDialogArgs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.IntfDialogArgs);
+        AssertEqual(72, global::VLCLR.Native.Interop.IntfDialogArgs.SizeOf, "intf_dialog_args_t sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.IntfDialogArgs>(), "intf_dialog_args_t Unsafe.SizeOf");
+        { ref var r = ref s.Intf; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "intf_dialog_args_t.p_intf offset"); }
+        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "intf_dialog_args_t.psz_title offset"); }
+        { ref var r = ref s.Results; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "intf_dialog_args_t.psz_results offset"); }
+        AssertEqual(24, Offset(ref s, ref s.ResultsCount), "intf_dialog_args_t.i_results offset");
+        { ref var r = ref s.Callback; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "intf_dialog_args_t.pf_callback offset"); }
+        { ref var r = ref s.Arg; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "intf_dialog_args_t.p_arg offset"); }
+        { ref var r = ref s.Extensions; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "intf_dialog_args_t.psz_extensions offset"); }
+        AssertEqual(56, Offset(ref s, ref s.Save), "intf_dialog_args_t.b_save offset");
+        AssertEqual(57, Offset(ref s, ref s.Multiple), "intf_dialog_args_t.b_multiple offset");
+        { ref var r = ref s.Dialog; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "intf_dialog_args_t.p_dialog offset"); }
+    }
+
+    [Fact]
+    public void IntfThread_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.IntfThread);
+        AssertEqual(64, global::VLCLR.Native.Interop.IntfThread.SizeOf, "intf_thread_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.IntfThread>(), "intf_thread_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "intf_thread_t.obj offset");
+        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "intf_thread_t.p_next offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "intf_thread_t.p_sys offset"); }
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "intf_thread_t.p_module offset"); }
+        { ref var r = ref s.ShowDialog; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "intf_thread_t.pf_show_dialog offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "intf_thread_t.p_cfg offset"); }
+    }
+
+    [Fact]
+    public void Iso639Lang_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Iso639Lang);
+        AssertEqual(24, global::VLCLR.Native.Interop.Iso639Lang.SizeOf, "iso639_lang_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Iso639Lang>(), "iso639_lang_t Unsafe.SizeOf");
+        { ref var r = ref s.EngName; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "iso639_lang_t.psz_eng_name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Iso6391), "iso639_lang_t.psz_iso639_1 offset");
+        AssertEqual(11, Offset(ref s, ref s.Iso6392T), "iso639_lang_t.psz_iso639_2T offset");
+        AssertEqual(15, Offset(ref s, ref s.Iso6392B), "iso639_lang_t.psz_iso639_2B offset");
+    }
+
+    [Fact]
+    public void LibvlcInt_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.LibvlcInt);
+        AssertEqual(24, global::VLCLR.Native.Interop.LibvlcInt.SizeOf, "libvlc_int_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.LibvlcInt>(), "libvlc_int_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "libvlc_int_t.obj offset");
+    }
+
+    [Fact]
+    public void Md5S_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Md5S);
+        AssertEqual(88, global::VLCLR.Native.Interop.Md5S.SizeOf, "md5_s sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.Md5S>(), "md5_s Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.A), "md5_s.A offset");
+        AssertEqual(4, Offset(ref s, ref s.B), "md5_s.B offset");
+        AssertEqual(8, Offset(ref s, ref s.C), "md5_s.C offset");
+        AssertEqual(12, Offset(ref s, ref s.D), "md5_s.D offset");
+        AssertEqual(16, Offset(ref s, ref s.Nblocks), "md5_s.nblocks offset");
+        AssertEqual(20, Offset(ref s, ref s.Buf), "md5_s.buf offset");
+        AssertEqual(84, Offset(ref s, ref s.Count), "md5_s.count offset");
+    }
+
+    [Fact]
+    public void MetaExport_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MetaExport);
+        AssertEqual(40, global::VLCLR.Native.Interop.MetaExport.SizeOf, "meta_export_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.MetaExport>(), "meta_export_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "meta_export_t.obj offset");
+        { ref var r = ref s.Item; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "meta_export_t.p_item offset"); }
+        { ref var r = ref s.File; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "meta_export_t.psz_file offset"); }
+    }
+
+    [Fact]
+    public void MetaFetcher_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MetaFetcher);
+        AssertEqual(40, global::VLCLR.Native.Interop.MetaFetcher.SizeOf, "meta_fetcher_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.MetaFetcher>(), "meta_fetcher_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "meta_fetcher_t.obj offset");
+        { ref var r = ref s.Item; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "meta_fetcher_t.p_item offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Scope), "meta_fetcher_t.e_scope offset");
+    }
+
+    [Fact]
+    public void ModuleConfig_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ModuleConfig);
+        AssertEqual(96, global::VLCLR.Native.Interop.ModuleConfig.SizeOf, "module_config_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.ModuleConfig>(), "module_config_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "module_config_t.i_type offset");
+        { ref var r = ref s.Subtype; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "module_config_t.psz_type offset"); }
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "module_config_t.psz_name offset"); }
+        { ref var r = ref s.Text; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "module_config_t.psz_text offset"); }
+        { ref var r = ref s.Longtext; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "module_config_t.psz_longtext offset"); }
+        AssertEqual(40, Offset(ref s, ref s.Value), "module_config_t.value offset");
+        AssertEqual(48, Offset(ref s, ref s.Orig), "module_config_t.orig offset");
+        AssertEqual(56, Offset(ref s, ref s.Min), "module_config_t.min offset");
+        AssertEqual(64, Offset(ref s, ref s.Max), "module_config_t.max offset");
+        AssertEqual(72, Offset(ref s, ref s.ListCount), "module_config_t.list_count offset");
+        AssertEqual(80, Offset(ref s, ref s.List), "module_config_t.list offset");
+        { ref var r = ref s.ListText; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "module_config_t.list_text offset"); }
+    }
+
+    [Fact]
+    public void ModuleConfigList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ModuleConfigList);
+        AssertEqual(8, global::VLCLR.Native.Interop.ModuleConfigList.SizeOf, "module_config_t::list sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ModuleConfigList>(), "module_config_t::list Unsafe.SizeOf");
+        { ref var r = ref s.Psz; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "module_config_t::list.psz offset"); }
+        { ref var r = ref s.I; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "module_config_t::list.i offset"); }
+    }
+
+    [Fact]
+    public void ModuleValue_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ModuleValue);
+        AssertEqual(8, global::VLCLR.Native.Interop.ModuleValue.SizeOf, "module_value_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ModuleValue>(), "module_value_t Unsafe.SizeOf");
+        { ref var r = ref s.Psz; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "module_value_t.psz offset"); }
+        AssertEqual(0, Offset(ref s, ref s.I), "module_value_t.i offset");
+        AssertEqual(0, Offset(ref s, ref s.F), "module_value_t.f offset");
+    }
+
+    [Fact]
+    public void PictureBuffer_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PictureBuffer);
+        AssertEqual(32, global::VLCLR.Native.Interop.PictureBuffer.SizeOf, "picture_buffer_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.PictureBuffer>(), "picture_buffer_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Fd), "picture_buffer_t.fd offset");
+        { ref var r = ref s.Base; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "picture_buffer_t.base offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Size), "picture_buffer_t.size offset");
+        AssertEqual(24, Offset(ref s, ref s.Offset), "picture_buffer_t.offset offset");
+    }
+
+    [Fact]
     public void PictureContext_Layout()
     {
-        var s = default(PictureContext);
-        AssertEqual(24, PictureContext.SizeOf, "picture_context_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<PictureContext>(), "picture_context_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.PictureContext);
+        AssertEqual(24, global::VLCLR.Native.Interop.PictureContext.SizeOf, "picture_context_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PictureContext>(), "picture_context_t Unsafe.SizeOf");
         { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "picture_context_t.destroy offset"); }
         { ref var r = ref s.Copy; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "picture_context_t.copy offset"); }
         { ref var r = ref s.Vctx; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "picture_context_t.vctx offset"); }
     }
 
     [Fact]
+    public void PictureResource_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PictureResource);
+        AssertEqual(96, global::VLCLR.Native.Interop.PictureResource.SizeOf, "picture_resource_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.PictureResource>(), "picture_resource_t Unsafe.SizeOf");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "picture_resource_t.p_sys offset"); }
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "picture_resource_t.pf_destroy offset"); }
+        AssertEqual(16, Offset(ref s, ref s.P), "picture_resource_t.p offset");
+    }
+
+    [Fact]
+    public void PictureResourceP_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PictureResourceP);
+        AssertEqual(16, global::VLCLR.Native.Interop.PictureResourceP.SizeOf, "picture_resource_t::p sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.PictureResourceP>(), "picture_resource_t::p Unsafe.SizeOf");
+        { ref var r = ref s.Pixels; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "picture_resource_t::p.p_pixels offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Lines), "picture_resource_t::p.i_lines offset");
+        AssertEqual(12, Offset(ref s, ref s.Pitch), "picture_resource_t::p.i_pitch offset");
+    }
+
+    [Fact]
     public void Picture_Layout()
     {
-        var s = default(Picture);
-        AssertEqual(Abi(376, 368), Picture.SizeOf, "picture_t sizeof");
-        AssertEqual(376, Unsafe.SizeOf<Picture>(), "picture_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Picture);
+        AssertEqual(Abi(376, 368), global::VLCLR.Native.Interop.Picture.SizeOf, "picture_t sizeof");
+        AssertEqual(376, Unsafe.SizeOf<global::VLCLR.Native.Interop.Picture>(), "picture_t Unsafe.SizeOf");
         AssertEqual(0, PointerOffset(ref s, s.Format), "picture_t.format offset");
         AssertEqual(Abi(152, 144), Offset(ref s, ref s.P), "picture_t.p offset");
         AssertEqual(Abi(312, 304), Offset(ref s, ref s.Planes), "picture_t.i_planes offset");
@@ -150,9 +1294,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void Plane_Layout()
     {
-        var s = default(Plane);
-        AssertEqual(32, Plane.SizeOf, "plane_t sizeof");
-        AssertEqual(32, Unsafe.SizeOf<Plane>(), "plane_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Plane);
+        AssertEqual(32, global::VLCLR.Native.Interop.Plane.SizeOf, "plane_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.Plane>(), "plane_t Unsafe.SizeOf");
         { ref var r = ref s.Pixels; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "plane_t.p_pixels offset"); }
         AssertEqual(8, Offset(ref s, ref s.Lines), "plane_t.i_lines offset");
         AssertEqual(12, Offset(ref s, ref s.Pitch), "plane_t.i_pitch offset");
@@ -162,11 +1306,251 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void Seek_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Seek);
+        AssertEqual(24, global::VLCLR.Native.Interop.Seek.SizeOf, "seek sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Seek>(), "seek Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "seek.type offset");
+        AssertEqual(8, Offset(ref s, ref s.Time), "seek.time offset");
+        AssertEqual(8, Offset(ref s, ref s.Pos), "seek.pos offset");
+        AssertEqual(16, Offset(ref s, ref s.Speed), "seek.speed offset");
+    }
+
+    [Fact]
+    public void Seekpoint_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Seekpoint);
+        AssertEqual(16, global::VLCLR.Native.Interop.Seekpoint.SizeOf, "seekpoint_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Seekpoint>(), "seekpoint_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.TimeOffset), "seekpoint_t.i_time_offset offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "seekpoint_t.psz_name offset"); }
+    }
+
+    [Fact]
+    public void ServicesDiscoveryCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ServicesDiscoveryCallbacks);
+        AssertEqual(16, global::VLCLR.Native.Interop.ServicesDiscoveryCallbacks.SizeOf, "services_discovery_callbacks sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ServicesDiscoveryCallbacks>(), "services_discovery_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.ItemAdded; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "services_discovery_callbacks.item_added offset"); }
+        { ref var r = ref s.ItemRemoved; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "services_discovery_callbacks.item_removed offset"); }
+    }
+
+    [Fact]
+    public void ServicesDiscoveryDescriptor_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ServicesDiscoveryDescriptor);
+        AssertEqual(32, global::VLCLR.Native.Interop.ServicesDiscoveryDescriptor.SizeOf, "services_discovery_descriptor_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.ServicesDiscoveryDescriptor>(), "services_discovery_descriptor_t Unsafe.SizeOf");
+        { ref var r = ref s.ShortDesc; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "services_discovery_descriptor_t.psz_short_desc offset"); }
+        { ref var r = ref s.IconUrl; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "services_discovery_descriptor_t.psz_icon_url offset"); }
+        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "services_discovery_descriptor_t.psz_url offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Capabilities), "services_discovery_descriptor_t.i_capabilities offset");
+    }
+
+    [Fact]
+    public void ServicesDiscoveryOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ServicesDiscoveryOwner);
+        AssertEqual(16, global::VLCLR.Native.Interop.ServicesDiscoveryOwner.SizeOf, "services_discovery_owner_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ServicesDiscoveryOwner>(), "services_discovery_owner_t Unsafe.SizeOf");
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "services_discovery_owner_t.cbs offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "services_discovery_owner_t.sys offset"); }
+    }
+
+    [Fact]
+    public void ServicesDiscovery_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ServicesDiscovery);
+        AssertEqual(88, global::VLCLR.Native.Interop.ServicesDiscovery.SizeOf, "services_discovery_t sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.ServicesDiscovery>(), "services_discovery_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "services_discovery_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "services_discovery_t.p_module offset"); }
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "services_discovery_t.psz_name offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "services_discovery_t.p_cfg offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "services_discovery_t.description offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "services_discovery_t.p_sys offset"); }
+        AssertEqual(72, Offset(ref s, ref s.Owner), "services_discovery_t.owner offset");
+    }
+
+    [Fact]
+    public void Sockaddr_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Sockaddr);
+        AssertEqual(16, global::VLCLR.Native.Interop.Sockaddr.SizeOf, "sockaddr sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Sockaddr>(), "sockaddr Unsafe.SizeOf");
+        AssertEqual(2, Offset(ref s, ref s.SaData), "sockaddr.sa_data offset");
+    }
+
+    [Fact]
+    public void SockaddrIn_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SockaddrIn);
+        AssertEqual(16, global::VLCLR.Native.Interop.SockaddrIn.SizeOf, "sockaddr_in sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.SockaddrIn>(), "sockaddr_in Unsafe.SizeOf");
+    }
+
+    [Fact]
+    public void SoutAccessOut_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SoutAccessOut);
+        AssertEqual(96, global::VLCLR.Native.Interop.SoutAccessOut.SizeOf, "sout_access_out_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.SoutAccessOut>(), "sout_access_out_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "sout_access_out_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "sout_access_out_t.p_module offset"); }
+        { ref var r = ref s.Access; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "sout_access_out_t.psz_access offset"); }
+        { ref var r = ref s.Path; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "sout_access_out_t.psz_path offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "sout_access_out_t.p_sys offset"); }
+        { ref var r = ref s.Seek; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "sout_access_out_t.pf_seek offset"); }
+        { ref var r = ref s.Read; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "sout_access_out_t.pf_read offset"); }
+        { ref var r = ref s.Write; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "sout_access_out_t.pf_write offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "sout_access_out_t.p_cfg offset"); }
+    }
+
+    [Fact]
+    public void SoutInput_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SoutInput);
+        AssertEqual(Abi(264, 256), global::VLCLR.Native.Interop.SoutInput.SizeOf, "sout_input_t sizeof");
+        AssertEqual(264, Unsafe.SizeOf<global::VLCLR.Native.Interop.SoutInput>(), "sout_input_t Unsafe.SizeOf");
+        { ref var r = ref s.FmtPointer; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "sout_input_t.p_fmt offset"); }
+        { ref var r = ref s.Fifo; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "sout_input_t.p_fifo offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "sout_input_t.p_sys offset"); }
+        AssertEqual(24, PointerOffset(ref s, s.Fmt), "sout_input_t.fmt offset");
+    }
+
+    [Fact]
+    public void SoutMux_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SoutMux);
+        AssertEqual(128, global::VLCLR.Native.Interop.SoutMux.SizeOf, "sout_mux_t sizeof");
+        AssertEqual(128, Unsafe.SizeOf<global::VLCLR.Native.Interop.SoutMux>(), "sout_mux_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "sout_mux_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "sout_mux_t.p_module offset"); }
+        { ref var r = ref s.Mux; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "sout_mux_t.psz_mux offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "sout_mux_t.p_cfg offset"); }
+        { ref var r = ref s.Access; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "sout_mux_t.p_access offset"); }
+        { ref var r = ref s.Addstream; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "sout_mux_t.pf_addstream offset"); }
+        { ref var r = ref s.Delstream; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "sout_mux_t.pf_delstream offset"); }
+        { ref var r = ref s.MuxCallback; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "sout_mux_t.pf_mux offset"); }
+        AssertEqual(88, Offset(ref s, ref s.NbInputs), "sout_mux_t.i_nb_inputs offset");
+        { ref var r = ref s.Inputs; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "sout_mux_t.pp_inputs offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "sout_mux_t.p_sys offset"); }
+        AssertEqual(112, Offset(ref s, ref s.AddStreamAnyTime), "sout_mux_t.b_add_stream_any_time offset");
+        AssertEqual(113, Offset(ref s, ref s.WaitingStream), "sout_mux_t.b_waiting_stream offset");
+        AssertEqual(120, Offset(ref s, ref s.AddStreamStart), "sout_mux_t.i_add_stream_start offset");
+    }
+
+    [Fact]
+    public void SoutStreamOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SoutStreamOperations);
+        AssertEqual(56, global::VLCLR.Native.Interop.SoutStreamOperations.SizeOf, "sout_stream_operations sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.SoutStreamOperations>(), "sout_stream_operations Unsafe.SizeOf");
+        { ref var r = ref s.Add; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "sout_stream_operations.add offset"); }
+        { ref var r = ref s.Del; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "sout_stream_operations.del offset"); }
+        { ref var r = ref s.Send; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "sout_stream_operations.send offset"); }
+        { ref var r = ref s.Flush; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "sout_stream_operations.flush offset"); }
+        { ref var r = ref s.SetPcr; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "sout_stream_operations.set_pcr offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "sout_stream_operations.close offset"); }
+    }
+
+    [Fact]
+    public void SoutStream_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SoutStream);
+        AssertEqual(64, global::VLCLR.Native.Interop.SoutStream.SizeOf, "sout_stream_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.SoutStream>(), "sout_stream_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "sout_stream_t.obj offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "sout_stream_t.psz_name offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "sout_stream_t.p_cfg offset"); }
+        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "sout_stream_t.p_next offset"); }
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "sout_stream_t.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "sout_stream_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void Spu_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Spu);
+        AssertEqual(24, global::VLCLR.Native.Interop.Spu.SizeOf, "spu_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Spu>(), "spu_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "spu_t.obj offset");
+    }
+
+    [Fact]
+    public void StreamDirectory_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.StreamDirectory);
+        AssertEqual(64, global::VLCLR.Native.Interop.StreamDirectory.SizeOf, "stream_directory_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.StreamDirectory>(), "stream_directory_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "stream_directory_t.obj offset");
+        { ref var r = ref s.Readdir; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "stream_directory_t.pf_readdir offset"); }
+        { ref var r = ref s.Volumes; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "stream_directory_t.volumes offset"); }
+        AssertEqual(40, Offset(ref s, ref s.VolumesCount), "stream_directory_t.volumes_count offset");
+        { ref var r = ref s.Source; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "stream_directory_t.source offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "stream_directory_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void StreamExtractor_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.StreamExtractor);
+        AssertEqual(96, global::VLCLR.Native.Interop.StreamExtractor.SizeOf, "stream_extractor_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.StreamExtractor>(), "stream_extractor_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "stream_extractor_t.obj offset");
+        { ref var r = ref s.Read; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "stream_extractor_t.pf_read offset"); }
+        { ref var r = ref s.Block; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "stream_extractor_t.pf_block offset"); }
+        { ref var r = ref s.Seek; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "stream_extractor_t.pf_seek offset"); }
+        { ref var r = ref s.Volumes; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "stream_extractor_t.volumes offset"); }
+        AssertEqual(64, Offset(ref s, ref s.VolumesCount), "stream_extractor_t.volumes_count offset");
+        { ref var r = ref s.Identifier; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "stream_extractor_t.identifier offset"); }
+        { ref var r = ref s.Source; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "stream_extractor_t.source offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "stream_extractor_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void Stream_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Stream);
+        AssertEqual(152, global::VLCLR.Native.Interop.Stream.SizeOf, "stream_t sizeof");
+        AssertEqual(152, Unsafe.SizeOf<global::VLCLR.Native.Interop.Stream>(), "stream_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "stream_t.obj offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "stream_t.psz_name offset"); }
+        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "stream_t.psz_url offset"); }
+        { ref var r = ref s.Location; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "stream_t.psz_location offset"); }
+        { ref var r = ref s.Filepath; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "stream_t.psz_filepath offset"); }
+        AssertEqual(56, Offset(ref s, ref s.Preparsing), "stream_t.b_preparsing offset");
+        { ref var r = ref s.InputItem; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "stream_t.p_input_item offset"); }
+        { ref var r = ref s.S; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "stream_t.s offset"); }
+        { ref var r = ref s.Out; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "stream_t.out offset"); }
+        { ref var r = ref s.Read; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "stream_t.pf_read offset"); }
+        { ref var r = ref s.Block; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "stream_t.pf_block offset"); }
+        { ref var r = ref s.Readdir; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "stream_t.pf_readdir offset"); }
+        { ref var r = ref s.Demux; fixed (void* p = &r) AssertEqual(112, PointerOffset(ref s, p), "stream_t.pf_demux offset"); }
+        { ref var r = ref s.Seek; fixed (void* p = &r) AssertEqual(120, PointerOffset(ref s, p), "stream_t.pf_seek offset"); }
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(136, PointerOffset(ref s, p), "stream_t.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(144, PointerOffset(ref s, p), "stream_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void SubpictureRegionRendered_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SubpictureRegionRendered);
+        AssertEqual(32, global::VLCLR.Native.Interop.SubpictureRegionRendered.SizeOf, "subpicture_region_rendered sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubpictureRegionRendered>(), "subpicture_region_rendered Unsafe.SizeOf");
+        { ref var r = ref s.Picture; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "subpicture_region_rendered.p_picture offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Place), "subpicture_region_rendered.place offset");
+        AssertEqual(24, Offset(ref s, ref s.Alpha), "subpicture_region_rendered.i_alpha offset");
+    }
+
+    [Fact]
     public void SubpictureRegion_Layout()
     {
-        var s = default(SubpictureRegion);
-        AssertEqual(Abi(224, 216), SubpictureRegion.SizeOf, "subpicture_region_t sizeof");
-        AssertEqual(224, Unsafe.SizeOf<SubpictureRegion>(), "subpicture_region_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubpictureRegion);
+        AssertEqual(Abi(224, 216), global::VLCLR.Native.Interop.SubpictureRegion.SizeOf, "subpicture_region_t sizeof");
+        AssertEqual(224, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubpictureRegion>(), "subpicture_region_t Unsafe.SizeOf");
         AssertEqual(0, PointerOffset(ref s, s.Fmt), "subpicture_region_t.fmt offset");
         { ref var r = ref s.Picture; fixed (void* p = &r) AssertEqual(Abi(152, 144), PointerOffset(ref s, p), "subpicture_region_t.p_picture offset"); }
         AssertEqual(Abi(160, 152), Offset(ref s, ref s.Absolute), "subpicture_region_t.b_absolute offset");
@@ -185,9 +1569,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void Subpicture_Layout()
     {
-        var s = default(Subpicture);
-        AssertEqual(96, Subpicture.SizeOf, "subpicture_t sizeof");
-        AssertEqual(96, Unsafe.SizeOf<Subpicture>(), "subpicture_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Subpicture);
+        AssertEqual(96, global::VLCLR.Native.Interop.Subpicture.SizeOf, "subpicture_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.Subpicture>(), "subpicture_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Channel), "subpicture_t.i_channel offset");
         AssertEqual(8, Offset(ref s, ref s.Order), "subpicture_t.i_order offset");
         { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "subpicture_t.p_next offset"); }
@@ -207,9 +1591,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void SubpictureUpdater_Layout()
     {
-        var s = default(SubpictureUpdater);
-        AssertEqual(16, SubpictureUpdater.SizeOf, "subpicture_updater_t sizeof");
-        AssertEqual(16, Unsafe.SizeOf<SubpictureUpdater>(), "subpicture_updater_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubpictureUpdater);
+        AssertEqual(16, global::VLCLR.Native.Interop.SubpictureUpdater.SizeOf, "subpicture_updater_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubpictureUpdater>(), "subpicture_updater_t Unsafe.SizeOf");
         { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "subpicture_updater_t.sys offset"); }
         { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "subpicture_updater_t.ops offset"); }
     }
@@ -217,9 +1601,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void SubsFormat_Layout()
     {
-        var s = default(SubsFormat);
-        AssertEqual(112, SubsFormat.SizeOf, "subs_format_t sizeof");
-        AssertEqual(112, Unsafe.SizeOf<SubsFormat>(), "subs_format_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubsFormat);
+        AssertEqual(112, global::VLCLR.Native.Interop.SubsFormat.SizeOf, "subs_format_t sizeof");
+        AssertEqual(112, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubsFormat>(), "subs_format_t Unsafe.SizeOf");
         { ref var r = ref s.Encoding; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "subs_format_t.psz_encoding offset"); }
         AssertEqual(8, Offset(ref s, ref s.XOrigin), "subs_format_t.i_x_origin offset");
         AssertEqual(12, Offset(ref s, ref s.YOrigin), "subs_format_t.i_y_origin offset");
@@ -233,9 +1617,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void SubsFormatCc_Layout()
     {
-        var s = default(SubsFormatCc);
-        AssertEqual(8, SubsFormatCc.SizeOf, "subs_format_t::cc sizeof");
-        AssertEqual(8, Unsafe.SizeOf<SubsFormatCc>(), "subs_format_t::cc Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubsFormatCc);
+        AssertEqual(8, global::VLCLR.Native.Interop.SubsFormatCc.SizeOf, "subs_format_t::cc sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubsFormatCc>(), "subs_format_t::cc Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Channel), "subs_format_t::cc.i_channel offset");
         AssertEqual(4, Offset(ref s, ref s.ReorderDepth), "subs_format_t::cc.i_reorder_depth offset");
     }
@@ -243,18 +1627,18 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void SubsFormatDvb_Layout()
     {
-        var s = default(SubsFormatDvb);
-        AssertEqual(4, SubsFormatDvb.SizeOf, "subs_format_t::dvb sizeof");
-        AssertEqual(4, Unsafe.SizeOf<SubsFormatDvb>(), "subs_format_t::dvb Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubsFormatDvb);
+        AssertEqual(4, global::VLCLR.Native.Interop.SubsFormatDvb.SizeOf, "subs_format_t::dvb sizeof");
+        AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubsFormatDvb>(), "subs_format_t::dvb Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Id), "subs_format_t::dvb.i_id offset");
     }
 
     [Fact]
     public void SubsFormatSpu_Layout()
     {
-        var s = default(SubsFormatSpu);
-        AssertEqual(76, SubsFormatSpu.SizeOf, "subs_format_t::spu sizeof");
-        AssertEqual(76, Unsafe.SizeOf<SubsFormatSpu>(), "subs_format_t::spu Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubsFormatSpu);
+        AssertEqual(76, global::VLCLR.Native.Interop.SubsFormatSpu.SizeOf, "subs_format_t::spu sizeof");
+        AssertEqual(76, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubsFormatSpu>(), "subs_format_t::spu Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.OriginalFrameWidth), "subs_format_t::spu.i_original_frame_width offset");
         AssertEqual(4, Offset(ref s, ref s.OriginalFrameHeight), "subs_format_t::spu.i_original_frame_height offset");
         AssertEqual(8, Offset(ref s, ref s.Palette), "subs_format_t::spu.palette offset");
@@ -264,9 +1648,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void SubsFormatTeletext_Layout()
     {
-        var s = default(SubsFormatTeletext);
-        AssertEqual(2, SubsFormatTeletext.SizeOf, "subs_format_t::teletext sizeof");
-        AssertEqual(2, Unsafe.SizeOf<SubsFormatTeletext>(), "subs_format_t::teletext Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SubsFormatTeletext);
+        AssertEqual(2, global::VLCLR.Native.Interop.SubsFormatTeletext.SizeOf, "subs_format_t::teletext sizeof");
+        AssertEqual(2, Unsafe.SizeOf<global::VLCLR.Native.Interop.SubsFormatTeletext>(), "subs_format_t::teletext Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Magazine), "subs_format_t::teletext.i_magazine offset");
         AssertEqual(1, Offset(ref s, ref s.Page), "subs_format_t::teletext.i_page offset");
     }
@@ -274,9 +1658,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void TextSegmentRuby_Layout()
     {
-        var s = default(TextSegmentRuby);
-        AssertEqual(24, TextSegmentRuby.SizeOf, "text_segment_ruby_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<TextSegmentRuby>(), "text_segment_ruby_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.TextSegmentRuby);
+        AssertEqual(24, global::VLCLR.Native.Interop.TextSegmentRuby.SizeOf, "text_segment_ruby_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.TextSegmentRuby>(), "text_segment_ruby_t Unsafe.SizeOf");
         { ref var r = ref s.Base; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "text_segment_ruby_t.psz_base offset"); }
         { ref var r = ref s.Rt; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "text_segment_ruby_t.psz_rt offset"); }
         { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "text_segment_ruby_t.p_next offset"); }
@@ -285,9 +1669,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void TextSegment_Layout()
     {
-        var s = default(TextSegment);
-        AssertEqual(32, TextSegment.SizeOf, "text_segment_t sizeof");
-        AssertEqual(32, Unsafe.SizeOf<TextSegment>(), "text_segment_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.TextSegment);
+        AssertEqual(32, global::VLCLR.Native.Interop.TextSegment.SizeOf, "text_segment_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.TextSegment>(), "text_segment_t Unsafe.SizeOf");
         { ref var r = ref s.Text; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "text_segment_t.psz_text offset"); }
         { ref var r = ref s.Style; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "text_segment_t.style offset"); }
         { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "text_segment_t.p_next offset"); }
@@ -297,9 +1681,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void TextStyle_Layout()
     {
-        var s = default(TextStyle);
-        AssertEqual(80, TextStyle.SizeOf, "text_style_t sizeof");
-        AssertEqual(80, Unsafe.SizeOf<TextStyle>(), "text_style_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.TextStyle);
+        AssertEqual(80, global::VLCLR.Native.Interop.TextStyle.SizeOf, "text_style_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.TextStyle>(), "text_style_t Unsafe.SizeOf");
         { ref var r = ref s.Fontname; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "text_style_t.psz_fontname offset"); }
         { ref var r = ref s.Monofontname; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "text_style_t.psz_monofontname offset"); }
         AssertEqual(16, Offset(ref s, ref s.Features), "text_style_t.i_features offset");
@@ -322,11 +1706,37 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void TimestampFifo_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TimestampFifo);
+        AssertEqual(24, global::VLCLR.Native.Interop.TimestampFifo.SizeOf, "timestamp_fifo_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.TimestampFifo>(), "timestamp_fifo_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Begin), "timestamp_fifo_t.begin offset");
+        AssertEqual(4, Offset(ref s, ref s.Size), "timestamp_fifo_t.size offset");
+        AssertEqual(8, Offset(ref s, ref s.Capacity), "timestamp_fifo_t.capacity offset");
+        { ref var r = ref s.Buffer; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "timestamp_fifo_t.buffer offset"); }
+    }
+
+    [Fact]
+    public void UpdateRelease_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.UpdateRelease);
+        AssertEqual(32, global::VLCLR.Native.Interop.UpdateRelease.SizeOf, "update_release_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.UpdateRelease>(), "update_release_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Major), "update_release_t.i_major offset");
+        AssertEqual(4, Offset(ref s, ref s.Minor), "update_release_t.i_minor offset");
+        AssertEqual(8, Offset(ref s, ref s.Revision), "update_release_t.i_revision offset");
+        AssertEqual(12, Offset(ref s, ref s.Extra), "update_release_t.i_extra offset");
+        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "update_release_t.psz_url offset"); }
+        { ref var r = ref s.Desc; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "update_release_t.psz_desc offset"); }
+    }
+
+    [Fact]
     public void VideoFormat_Layout()
     {
-        var s = default(VideoFormat);
-        AssertEqual(Abi(152, 144), VideoFormat.SizeOf, "video_format_t sizeof");
-        AssertEqual(152, Unsafe.SizeOf<VideoFormat>(), "video_format_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.VideoFormat);
+        AssertEqual(Abi(152, 144), global::VLCLR.Native.Interop.VideoFormat.SizeOf, "video_format_t sizeof");
+        AssertEqual(152, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoFormat>(), "video_format_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Chroma), "video_format_t.i_chroma offset");
         AssertEqual(4, Offset(ref s, ref s.Width), "video_format_t.i_width offset");
         AssertEqual(8, Offset(ref s, ref s.Height), "video_format_t.i_height offset");
@@ -358,41 +1768,41 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void VideoFormatDovi_Layout()
     {
-        var s = default(VideoFormatDovi);
-        AssertEqual(Abi(8, 4), VideoFormatDovi.SizeOf, "video_format_t::dovi sizeof");
-        AssertEqual(8, Unsafe.SizeOf<VideoFormatDovi>(), "video_format_t::dovi Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.VideoFormatDovi);
+        AssertEqual(Abi(8, 4), global::VLCLR.Native.Interop.VideoFormatDovi.SizeOf, "video_format_t::dovi sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoFormatDovi>(), "video_format_t::dovi Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.VersionMajor), "video_format_t::dovi.version_major offset");
         AssertEqual(1, Offset(ref s, ref s.VersionMinor), "video_format_t::dovi.version_minor offset");
         {
-            var b = default(VideoFormatDovi);
+            var b = default(global::VLCLR.Native.Interop.VideoFormatDovi);
             var ones = unchecked((uint)0x7F);
             b.Profile = ones;
             AssertBits(ref b, Abi(32, 16), 7, "video_format_t::dovi.profile");
             Assert.Equal(ones, b.Profile);
         }
         {
-            var b = default(VideoFormatDovi);
+            var b = default(global::VLCLR.Native.Interop.VideoFormatDovi);
             var ones = unchecked((uint)0x3F);
             b.Level = ones;
             AssertBits(ref b, Abi(39, 23), 6, "video_format_t::dovi.level");
             Assert.Equal(ones, b.Level);
         }
         {
-            var b = default(VideoFormatDovi);
+            var b = default(global::VLCLR.Native.Interop.VideoFormatDovi);
             var ones = unchecked((uint)0x1);
             b.RpuPresent = ones;
             AssertBits(ref b, Abi(45, 29), 1, "video_format_t::dovi.rpu_present");
             Assert.Equal(ones, b.RpuPresent);
         }
         {
-            var b = default(VideoFormatDovi);
+            var b = default(global::VLCLR.Native.Interop.VideoFormatDovi);
             var ones = unchecked((uint)0x1);
             b.ElPresent = ones;
             AssertBits(ref b, Abi(46, 30), 1, "video_format_t::dovi.el_present");
             Assert.Equal(ones, b.ElPresent);
         }
         {
-            var b = default(VideoFormatDovi);
+            var b = default(global::VLCLR.Native.Interop.VideoFormatDovi);
             var ones = unchecked((uint)0x1);
             b.BlPresent = ones;
             AssertBits(ref b, Abi(47, 31), 1, "video_format_t::dovi.bl_present");
@@ -403,9 +1813,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void VideoFormatLighting_Layout()
     {
-        var s = default(VideoFormatLighting);
-        AssertEqual(4, VideoFormatLighting.SizeOf, "video_format_t::lighting sizeof");
-        AssertEqual(4, Unsafe.SizeOf<VideoFormatLighting>(), "video_format_t::lighting Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.VideoFormatLighting);
+        AssertEqual(4, global::VLCLR.Native.Interop.VideoFormatLighting.SizeOf, "video_format_t::lighting sizeof");
+        AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoFormatLighting>(), "video_format_t::lighting Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.MaxCLL), "video_format_t::lighting.MaxCLL offset");
         AssertEqual(2, Offset(ref s, ref s.MaxFALL), "video_format_t::lighting.MaxFALL offset");
     }
@@ -413,9 +1823,9 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void VideoFormatMastering_Layout()
     {
-        var s = default(VideoFormatMastering);
-        AssertEqual(24, VideoFormatMastering.SizeOf, "video_format_t::mastering sizeof");
-        AssertEqual(24, Unsafe.SizeOf<VideoFormatMastering>(), "video_format_t::mastering Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.VideoFormatMastering);
+        AssertEqual(24, global::VLCLR.Native.Interop.VideoFormatMastering.SizeOf, "video_format_t::mastering sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoFormatMastering>(), "video_format_t::mastering Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Primaries), "video_format_t::mastering.primaries offset");
         AssertEqual(12, Offset(ref s, ref s.WhitePoint), "video_format_t::mastering.white_point offset");
         AssertEqual(16, Offset(ref s, ref s.MaxLuminance), "video_format_t::mastering.max_luminance offset");
@@ -423,31 +1833,172 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void VideoPalette_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoPalette);
+        AssertEqual(1028, global::VLCLR.Native.Interop.VideoPalette.SizeOf, "video_palette_t sizeof");
+        AssertEqual(1028, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoPalette>(), "video_palette_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Entries), "video_palette_t.i_entries offset");
+        AssertEqual(4, Offset(ref s, ref s.Palette), "video_palette_t.palette offset");
+    }
+
+    [Fact]
+    public void VideoSplitterOutput_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoSplitterOutput);
+        AssertEqual(Abi(160, 152), global::VLCLR.Native.Interop.VideoSplitterOutput.SizeOf, "video_splitter_output_t sizeof");
+        AssertEqual(160, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoSplitterOutput>(), "video_splitter_output_t Unsafe.SizeOf");
+        AssertEqual(0, PointerOffset(ref s, s.Fmt), "video_splitter_output_t.fmt offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(Abi(152, 144), PointerOffset(ref s, p), "video_splitter_output_t.psz_module offset"); }
+    }
+
+    [Fact]
+    public void VideoSplitter_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoSplitter);
+        AssertEqual(Abi(232, 224), global::VLCLR.Native.Interop.VideoSplitter.SizeOf, "video_splitter_t sizeof");
+        AssertEqual(232, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoSplitter>(), "video_splitter_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "video_splitter_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "video_splitter_t.p_module offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "video_splitter_t.p_cfg offset"); }
+        AssertEqual(40, PointerOffset(ref s, s.Fmt), "video_splitter_t.fmt offset");
+        AssertEqual(Abi(192, 184), Offset(ref s, ref s.OutputCount), "video_splitter_t.i_output offset");
+        { ref var r = ref s.Output; fixed (void* p = &r) AssertEqual(Abi(200, 192), PointerOffset(ref s, p), "video_splitter_t.p_output offset"); }
+        { ref var r = ref s.Mouse; fixed (void* p = &r) AssertEqual(Abi(216, 208), PointerOffset(ref s, p), "video_splitter_t.mouse offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(Abi(224, 216), PointerOffset(ref s, p), "video_splitter_t.p_sys offset"); }
+    }
+
+    [Fact]
     public void AncillaryArray_Layout()
     {
-        var s = default(AncillaryArray);
-        AssertEqual(24, AncillaryArray.SizeOf, "vlc_ancillary_array sizeof");
-        AssertEqual(24, Unsafe.SizeOf<AncillaryArray>(), "vlc_ancillary_array Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.AncillaryArray);
+        AssertEqual(24, global::VLCLR.Native.Interop.AncillaryArray.SizeOf, "vlc_ancillary_array sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.AncillaryArray>(), "vlc_ancillary_array Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_ancillary_array.cap offset");
         AssertEqual(8, Offset(ref s, ref s.Size), "vlc_ancillary_array.size offset");
         { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ancillary_array.data offset"); }
     }
 
     [Fact]
+    public void Array_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Array);
+        AssertEqual(16, global::VLCLR.Native.Interop.Array.SizeOf, "vlc_array_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Array>(), "vlc_array_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Count), "vlc_array_t.i_count offset");
+        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_array_t.pp_elems offset"); }
+    }
+
+    [Fact]
     public void AtomicRc_Layout()
     {
-        var s = default(AtomicRc);
-        AssertEqual(8, AtomicRc.SizeOf, "vlc_atomic_rc_t sizeof");
-        AssertEqual(8, Unsafe.SizeOf<AtomicRc>(), "vlc_atomic_rc_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.AtomicRc);
+        AssertEqual(8, global::VLCLR.Native.Interop.AtomicRc.SizeOf, "vlc_atomic_rc_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.AtomicRc>(), "vlc_atomic_rc_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Refs), "vlc_atomic_rc_t.refs offset");
+    }
+
+    [Fact]
+    public void AudioLoudness_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioLoudness);
+        AssertEqual(40, global::VLCLR.Native.Interop.AudioLoudness.SizeOf, "vlc_audio_loudness sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioLoudness>(), "vlc_audio_loudness Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.LoudnessMomentary), "vlc_audio_loudness.loudness_momentary offset");
+        AssertEqual(8, Offset(ref s, ref s.LoudnessShortterm), "vlc_audio_loudness.loudness_shortterm offset");
+        AssertEqual(16, Offset(ref s, ref s.LoudnessIntegrated), "vlc_audio_loudness.loudness_integrated offset");
+        AssertEqual(24, Offset(ref s, ref s.LoudnessRange), "vlc_audio_loudness.loudness_range offset");
+        AssertEqual(32, Offset(ref s, ref s.Truepeak), "vlc_audio_loudness.truepeak offset");
+    }
+
+    [Fact]
+    public void AudioMeter_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioMeter);
+        AssertEqual(48, global::VLCLR.Native.Interop.AudioMeter.SizeOf, "vlc_audio_meter sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioMeter>(), "vlc_audio_meter Unsafe.SizeOf");
+        AssertEqual(0, PointerOffset(ref s, s.Lock), "vlc_audio_meter.lock offset");
+        { ref var r = ref s.Parent; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_audio_meter.parent offset"); }
+        { ref var r = ref s.Fmt; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_audio_meter.fmt offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Plugins), "vlc_audio_meter.plugins offset");
+    }
+
+    [Fact]
+    public void AudioMeterCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioMeterCbs);
+        AssertEqual(8, global::VLCLR.Native.Interop.AudioMeterCbs.SizeOf, "vlc_audio_meter_cbs sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioMeterCbs>(), "vlc_audio_meter_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnLoudness; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_audio_meter_cbs.on_loudness offset"); }
+    }
+
+    [Fact]
+    public void AudioMeterPluginOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioMeterPluginOwner);
+        AssertEqual(16, global::VLCLR.Native.Interop.AudioMeterPluginOwner.SizeOf, "vlc_audio_meter_plugin_owner sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioMeterPluginOwner>(), "vlc_audio_meter_plugin_owner Unsafe.SizeOf");
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_audio_meter_plugin_owner.cbs offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_audio_meter_plugin_owner.sys offset"); }
+    }
+
+    [Fact]
+    public void AudioOutputEvents_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.AudioOutputEvents);
+        AssertEqual(72, global::VLCLR.Native.Interop.AudioOutputEvents.SizeOf, "vlc_audio_output_events sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.AudioOutputEvents>(), "vlc_audio_output_events Unsafe.SizeOf");
+        { ref var r = ref s.TimingReport; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_audio_output_events.timing_report offset"); }
+        { ref var r = ref s.DrainedReport; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_audio_output_events.drained_report offset"); }
+        { ref var r = ref s.VolumeReport; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_audio_output_events.volume_report offset"); }
+        { ref var r = ref s.MuteReport; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_audio_output_events.mute_report offset"); }
+        { ref var r = ref s.PolicyReport; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_audio_output_events.policy_report offset"); }
+        { ref var r = ref s.DeviceReport; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_audio_output_events.device_report offset"); }
+        { ref var r = ref s.HotplugReport; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_audio_output_events.hotplug_report offset"); }
+        { ref var r = ref s.RestartRequest; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_audio_output_events.restart_request offset"); }
+        { ref var r = ref s.GainRequest; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_audio_output_events.gain_request offset"); }
+    }
+
+    [Fact]
+    public void ChromaConvEntry_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ChromaConvEntry);
+        AssertEqual(12, global::VLCLR.Native.Interop.ChromaConvEntry.SizeOf, "vlc_chroma_conv_entry sizeof");
+        AssertEqual(12, Unsafe.SizeOf<global::VLCLR.Native.Interop.ChromaConvEntry>(), "vlc_chroma_conv_entry Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.CostFactor), "vlc_chroma_conv_entry.cost_factor offset");
+        AssertEqual(4, Offset(ref s, ref s.In), "vlc_chroma_conv_entry.in offset");
+        AssertEqual(8, Offset(ref s, ref s.Out), "vlc_chroma_conv_entry.out offset");
+    }
+
+    [Fact]
+    public void ChromaConvResult_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ChromaConvResult);
+        AssertEqual(32, global::VLCLR.Native.Interop.ChromaConvResult.SizeOf, "vlc_chroma_conv_result sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.ChromaConvResult>(), "vlc_chroma_conv_result Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Chain), "vlc_chroma_conv_result.chain offset");
+        AssertEqual(16, Offset(ref s, ref s.ChainCount), "vlc_chroma_conv_result.chain_count offset");
+        AssertEqual(24, Offset(ref s, ref s.Cost), "vlc_chroma_conv_result.cost offset");
+        AssertEqual(28, Offset(ref s, ref s.Quality), "vlc_chroma_conv_result.quality offset");
+    }
+
+    [Fact]
+    public void ChromaConvVec_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ChromaConvVec);
+        AssertEqual(24, global::VLCLR.Native.Interop.ChromaConvVec.SizeOf, "vlc_chroma_conv_vec sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ChromaConvVec>(), "vlc_chroma_conv_vec Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_chroma_conv_vec.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_chroma_conv_vec.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_chroma_conv_vec.data offset"); }
     }
 
     [Fact]
     public void ChromaDescription_Layout()
     {
-        var s = default(ChromaDescription);
-        AssertEqual(88, ChromaDescription.SizeOf, "vlc_chroma_description_t sizeof");
-        AssertEqual(88, Unsafe.SizeOf<ChromaDescription>(), "vlc_chroma_description_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.ChromaDescription);
+        AssertEqual(88, global::VLCLR.Native.Interop.ChromaDescription.SizeOf, "vlc_chroma_description_t sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.ChromaDescription>(), "vlc_chroma_description_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Fcc), "vlc_chroma_description_t.fcc offset");
         AssertEqual(4, Offset(ref s, ref s.Subtype), "vlc_chroma_description_t.subtype offset");
         AssertEqual(8, Offset(ref s, ref s.PlaneCount), "vlc_chroma_description_t.plane_count offset");
@@ -460,19 +2011,311 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void ChromaDescriptionP_Layout()
     {
-        var s = default(ChromaDescriptionP);
-        AssertEqual(16, ChromaDescriptionP.SizeOf, "vlc_chroma_description_t::p sizeof");
-        AssertEqual(16, Unsafe.SizeOf<ChromaDescriptionP>(), "vlc_chroma_description_t::p Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.ChromaDescriptionP);
+        AssertEqual(16, global::VLCLR.Native.Interop.ChromaDescriptionP.SizeOf, "vlc_chroma_description_t::p sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ChromaDescriptionP>(), "vlc_chroma_description_t::p Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.W), "vlc_chroma_description_t::p.w offset");
         AssertEqual(8, Offset(ref s, ref s.H), "vlc_chroma_description_t::p.h offset");
     }
 
     [Fact]
+    public void Cond_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Cond);
+        AssertEqual(24, global::VLCLR.Native.Interop.Cond.SizeOf, "vlc_cond_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Cond>(), "vlc_cond_t Unsafe.SizeOf");
+        { ref var r = ref s.Head; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_cond_t.head offset"); }
+        AssertEqual(8, PointerOffset(ref s, s.Lock), "vlc_cond_t.lock offset");
+    }
+
+    [Fact]
+    public void Credential_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Credential);
+        AssertEqual(120, global::VLCLR.Native.Interop.Credential.SizeOf, "vlc_credential sizeof");
+        AssertEqual(120, Unsafe.SizeOf<global::VLCLR.Native.Interop.Credential>(), "vlc_credential Unsafe.SizeOf");
+        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_credential.p_url offset"); }
+        { ref var r = ref s.Realm; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_credential.psz_realm offset"); }
+        { ref var r = ref s.Authtype; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_credential.psz_authtype offset"); }
+        { ref var r = ref s.Username; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_credential.psz_username offset"); }
+        { ref var r = ref s.Password; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_credential.psz_password offset"); }
+        AssertEqual(40, Offset(ref s, ref s.GetOrder), "vlc_credential.i_get_order offset");
+        { ref var r = ref s.Keystore; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_credential.p_keystore offset"); }
+        { ref var r = ref s.Entries; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_credential.p_entries offset"); }
+        AssertEqual(64, Offset(ref s, ref s.EntriesCount), "vlc_credential.i_entries_count offset");
+        { ref var r = ref s.SplitDomain; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_credential.psz_split_domain offset"); }
+        { ref var r = ref s.VarUsername; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_credential.psz_var_username offset"); }
+        { ref var r = ref s.VarPassword; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "vlc_credential.psz_var_password offset"); }
+        { ref var r = ref s.DialogUsername; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "vlc_credential.psz_dialog_username offset"); }
+        { ref var r = ref s.DialogPassword; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "vlc_credential.psz_dialog_password offset"); }
+        AssertEqual(112, Offset(ref s, ref s.FromKeystore), "vlc_credential.b_from_keystore offset");
+        AssertEqual(113, Offset(ref s, ref s.Store), "vlc_credential.b_store offset");
+    }
+
+    [Fact]
+    public void DecoderDevice_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderDevice);
+        AssertEqual(56, global::VLCLR.Native.Interop.DecoderDevice.SizeOf, "vlc_decoder_device sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderDevice>(), "vlc_decoder_device Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_decoder_device.obj offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_decoder_device.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_decoder_device.sys offset"); }
+        AssertEqual(40, Offset(ref s, ref s.Type), "vlc_decoder_device.type offset");
+        { ref var r = ref s.Opaque; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_decoder_device.opaque offset"); }
+    }
+
+    [Fact]
+    public void DecoderDeviceOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DecoderDeviceOperations);
+        AssertEqual(8, global::VLCLR.Native.Interop.DecoderDeviceOperations.SizeOf, "vlc_decoder_device_operations sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.DecoderDeviceOperations>(), "vlc_decoder_device_operations Unsafe.SizeOf");
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_decoder_device_operations.close offset"); }
+    }
+
+    [Fact]
+    public void DialogCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DialogCbs);
+        AssertEqual(40, global::VLCLR.Native.Interop.DialogCbs.SizeOf, "vlc_dialog_cbs sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.DialogCbs>(), "vlc_dialog_cbs Unsafe.SizeOf");
+        { ref var r = ref s.DisplayLogin; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_dialog_cbs.pf_display_login offset"); }
+        { ref var r = ref s.DisplayQuestion; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_dialog_cbs.pf_display_question offset"); }
+        { ref var r = ref s.DisplayProgress; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_dialog_cbs.pf_display_progress offset"); }
+        { ref var r = ref s.Cancel; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_dialog_cbs.pf_cancel offset"); }
+        { ref var r = ref s.UpdateProgress; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_dialog_cbs.pf_update_progress offset"); }
+    }
+
+    [Fact]
+    public void DictionaryEntry_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DictionaryEntry);
+        AssertEqual(24, global::VLCLR.Native.Interop.DictionaryEntry.SizeOf, "vlc_dictionary_entry_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.DictionaryEntry>(), "vlc_dictionary_entry_t Unsafe.SizeOf");
+        { ref var r = ref s.Key; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_dictionary_entry_t.psz_key offset"); }
+        { ref var r = ref s.Value; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_dictionary_entry_t.p_value offset"); }
+        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_dictionary_entry_t.p_next offset"); }
+    }
+
+    [Fact]
+    public void Dictionary_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Dictionary);
+        AssertEqual(16, global::VLCLR.Native.Interop.Dictionary.SizeOf, "vlc_dictionary_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Dictionary>(), "vlc_dictionary_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Size), "vlc_dictionary_t.i_size offset");
+        { ref var r = ref s.Entries; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_dictionary_t.p_entries offset"); }
+    }
+
+    [Fact]
+    public void DiffutilCallback_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilCallback);
+        AssertEqual(24, global::VLCLR.Native.Interop.DiffutilCallback.SizeOf, "vlc_diffutil_callback_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilCallback>(), "vlc_diffutil_callback_t Unsafe.SizeOf");
+        { ref var r = ref s.GetOldSize; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_diffutil_callback_t.getOldSize offset"); }
+        { ref var r = ref s.GetNewSize; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_diffutil_callback_t.getNewSize offset"); }
+        { ref var r = ref s.IsSame; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_diffutil_callback_t.isSame offset"); }
+    }
+
+    [Fact]
+    public void DiffutilChange_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilChange);
+        AssertEqual(24, global::VLCLR.Native.Interop.DiffutilChange.SizeOf, "vlc_diffutil_change_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilChange>(), "vlc_diffutil_change_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Op), "vlc_diffutil_change_t.op offset");
+        AssertEqual(16, Offset(ref s, ref s.Type), "vlc_diffutil_change_t.type offset");
+        AssertEqual(20, Offset(ref s, ref s.Count), "vlc_diffutil_change_t.count offset");
+    }
+
+    [Fact]
+    public void DiffutilChangeOp_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilChangeOp);
+        AssertEqual(16, global::VLCLR.Native.Interop.DiffutilChangeOp.SizeOf, "vlc_diffutil_change_t::op sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilChangeOp>(), "vlc_diffutil_change_t::op Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Insert), "vlc_diffutil_change_t::op.insert offset");
+        AssertEqual(0, Offset(ref s, ref s.Remove), "vlc_diffutil_change_t::op.remove offset");
+        AssertEqual(0, Offset(ref s, ref s.Move), "vlc_diffutil_change_t::op.move offset");
+    }
+
+    [Fact]
+    public void DiffutilChangelist_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilChangelist);
+        AssertEqual(24, global::VLCLR.Native.Interop.DiffutilChangelist.SizeOf, "vlc_diffutil_changelist_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilChangelist>(), "vlc_diffutil_changelist_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_diffutil_changelist_t.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_diffutil_changelist_t.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_diffutil_changelist_t.data offset"); }
+    }
+
+    [Fact]
+    public void DiffutilInsert_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilInsert);
+        AssertEqual(12, global::VLCLR.Native.Interop.DiffutilInsert.SizeOf, "vlc_diffutil_insert sizeof");
+        AssertEqual(12, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilInsert>(), "vlc_diffutil_insert Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.X), "vlc_diffutil_insert.x offset");
+        AssertEqual(4, Offset(ref s, ref s.Y), "vlc_diffutil_insert.y offset");
+        AssertEqual(8, Offset(ref s, ref s.Index), "vlc_diffutil_insert.index offset");
+    }
+
+    [Fact]
+    public void DiffutilMove_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilMove);
+        AssertEqual(16, global::VLCLR.Native.Interop.DiffutilMove.SizeOf, "vlc_diffutil_move sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilMove>(), "vlc_diffutil_move Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.From), "vlc_diffutil_move.from offset");
+        AssertEqual(4, Offset(ref s, ref s.To), "vlc_diffutil_move.to offset");
+        AssertEqual(8, Offset(ref s, ref s.X), "vlc_diffutil_move.x offset");
+        AssertEqual(12, Offset(ref s, ref s.Y), "vlc_diffutil_move.y offset");
+    }
+
+    [Fact]
+    public void DiffutilRemove_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilRemove);
+        AssertEqual(12, global::VLCLR.Native.Interop.DiffutilRemove.SizeOf, "vlc_diffutil_remove sizeof");
+        AssertEqual(12, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilRemove>(), "vlc_diffutil_remove Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.X), "vlc_diffutil_remove.x offset");
+        AssertEqual(4, Offset(ref s, ref s.Y), "vlc_diffutil_remove.y offset");
+        AssertEqual(8, Offset(ref s, ref s.Index), "vlc_diffutil_remove.index offset");
+    }
+
+    [Fact]
+    public void DiffutilSnakeCallback_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DiffutilSnakeCallback);
+        AssertEqual(24, global::VLCLR.Native.Interop.DiffutilSnakeCallback.SizeOf, "vlc_diffutil_snake_callback_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.DiffutilSnakeCallback>(), "vlc_diffutil_snake_callback_t Unsafe.SizeOf");
+        { ref var r = ref s.Insert; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_diffutil_snake_callback_t.insert offset"); }
+        { ref var r = ref s.Remove; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_diffutil_snake_callback_t.remove offset"); }
+        { ref var r = ref s.Equal; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_diffutil_snake_callback_t.equal offset"); }
+    }
+
+    [Fact]
+    public void DisplayOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DisplayOperations);
+        AssertEqual(104, global::VLCLR.Native.Interop.DisplayOperations.SizeOf, "vlc_display_operations sizeof");
+        AssertEqual(104, Unsafe.SizeOf<global::VLCLR.Native.Interop.DisplayOperations>(), "vlc_display_operations Unsafe.SizeOf");
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_display_operations.close offset"); }
+        { ref var r = ref s.Prepare; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_display_operations.prepare offset"); }
+        { ref var r = ref s.Display; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_display_operations.display offset"); }
+        { ref var r = ref s.SetDisplaySize; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_display_operations.set_display_size offset"); }
+        { ref var r = ref s.ResetPictures; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_display_operations.reset_pictures offset"); }
+        { ref var r = ref s.SetViewpoint; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_display_operations.set_viewpoint offset"); }
+        { ref var r = ref s.SetIccProfile; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_display_operations.set_icc_profile offset"); }
+        { ref var r = ref s.UpdateFormat; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_display_operations.update_format offset"); }
+        { ref var r = ref s.ChangeSourceProjection; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_display_operations.change_source_projection offset"); }
+        { ref var r = ref s.SetStereo; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_display_operations.set_stereo offset"); }
+        { ref var r = ref s.VideoPlaceChanged; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_display_operations.video_place_changed offset"); }
+        { ref var r = ref s.SetSourceAspect; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "vlc_display_operations.set_source_aspect offset"); }
+        { ref var r = ref s.SetSourceCrop; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "vlc_display_operations.set_source_crop offset"); }
+    }
+
+    [Fact]
+    public void DoviNlq_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DoviNlq);
+        AssertEqual(32, global::VLCLR.Native.Interop.DoviNlq.SizeOf, "vlc_dovi_nlq_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.DoviNlq>(), "vlc_dovi_nlq_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.OffsetDepth), "vlc_dovi_nlq_t.offset_depth offset");
+        AssertEqual(2, Offset(ref s, ref s.Offset), "vlc_dovi_nlq_t.offset offset");
+        AssertEqual(8, Offset(ref s, ref s.HdrInMax), "vlc_dovi_nlq_t.hdr_in_max offset");
+        AssertEqual(16, Offset(ref s, ref s.DzSlope), "vlc_dovi_nlq_t.dz_slope offset");
+        AssertEqual(24, Offset(ref s, ref s.DzThreshold), "vlc_dovi_nlq_t.dz_threshold offset");
+    }
+
+    [Fact]
+    public void DoviReshape_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.DoviReshape);
+        AssertEqual(1672, global::VLCLR.Native.Interop.DoviReshape.SizeOf, "vlc_dovi_reshape_t sizeof");
+        AssertEqual(1672, Unsafe.SizeOf<global::VLCLR.Native.Interop.DoviReshape>(), "vlc_dovi_reshape_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NumPivots), "vlc_dovi_reshape_t.num_pivots offset");
+        AssertEqual(2, Offset(ref s, ref s.Pivots), "vlc_dovi_reshape_t.pivots offset");
+        AssertEqual(20, Offset(ref s, ref s.MappingIdc), "vlc_dovi_reshape_t.mapping_idc offset");
+        AssertEqual(52, Offset(ref s, ref s.PolyOrder), "vlc_dovi_reshape_t.poly_order offset");
+        AssertEqual(64, Offset(ref s, ref s.PolyCoef), "vlc_dovi_reshape_t.poly_coef offset");
+        AssertEqual(256, Offset(ref s, ref s.MmrOrder), "vlc_dovi_reshape_t.mmr_order offset");
+        AssertEqual(264, Offset(ref s, ref s.MmrConstant), "vlc_dovi_reshape_t.mmr_constant offset");
+        AssertEqual(328, Offset(ref s, ref s.MmrCoef), "vlc_dovi_reshape_t.mmr_coef offset");
+    }
+
+    [Fact]
+    public void EncoderOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.EncoderOperations);
+        AssertEqual(16, global::VLCLR.Native.Interop.EncoderOperations.SizeOf, "vlc_encoder_operations sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.EncoderOperations>(), "vlc_encoder_operations Unsafe.SizeOf");
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_encoder_operations.close offset"); }
+        { ref var r = ref s.EncodeVideo; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_encoder_operations.encode_video offset"); }
+        { ref var r = ref s.EncodeAudio; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_encoder_operations.encode_audio offset"); }
+        { ref var r = ref s.EncodeSub; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_encoder_operations.encode_sub offset"); }
+    }
+
+    [Fact]
+    public void EpgEvent_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.EpgEvent);
+        AssertEqual(56, global::VLCLR.Native.Interop.EpgEvent.SizeOf, "vlc_epg_event_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.EpgEvent>(), "vlc_epg_event_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Start), "vlc_epg_event_t.i_start offset");
+        AssertEqual(8, Offset(ref s, ref s.Duration), "vlc_epg_event_t.i_duration offset");
+        AssertEqual(12, Offset(ref s, ref s.Id), "vlc_epg_event_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_epg_event_t.psz_name offset"); }
+        { ref var r = ref s.ShortDescription; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_epg_event_t.psz_short_description offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_epg_event_t.psz_description offset"); }
+        { ref var r = ref s.DescriptionItems; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_epg_event_t.description_items offset"); }
+        AssertEqual(48, Offset(ref s, ref s.DescriptionItemsCount), "vlc_epg_event_t.i_description_items offset");
+        AssertEqual(52, Offset(ref s, ref s.Rating), "vlc_epg_event_t.i_rating offset");
+    }
+
+    [Fact]
+    public void Epg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Epg);
+        AssertEqual(48, global::VLCLR.Native.Interop.Epg.SizeOf, "vlc_epg_t sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.Epg>(), "vlc_epg_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_epg_t.psz_name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Id), "vlc_epg_t.i_id offset");
+        AssertEqual(12, Offset(ref s, ref s.SourceId), "vlc_epg_t.i_source_id offset");
+        AssertEqual(16, Offset(ref s, ref s.EventCount), "vlc_epg_t.i_event offset");
+        { ref var r = ref s.Event; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_epg_t.pp_event offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Present), "vlc_epg_t.b_present offset");
+        { ref var r = ref s.Current; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_epg_t.p_current offset"); }
+    }
+
+    [Fact]
+    public void ExtensionsManagerOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ExtensionsManagerOperations);
+        AssertEqual(88, global::VLCLR.Native.Interop.ExtensionsManagerOperations.SizeOf, "vlc_extensions_manager_operations sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionsManagerOperations>(), "vlc_extensions_manager_operations Unsafe.SizeOf");
+        { ref var r = ref s.Activate; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_extensions_manager_operations.activate offset"); }
+        { ref var r = ref s.Deactivate; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_extensions_manager_operations.deactivate offset"); }
+        { ref var r = ref s.IsActivated; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_extensions_manager_operations.is_activated offset"); }
+        { ref var r = ref s.HasMenu; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_extensions_manager_operations.has_menu offset"); }
+        { ref var r = ref s.GetMenu; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_extensions_manager_operations.get_menu offset"); }
+        { ref var r = ref s.TriggerOnly; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_extensions_manager_operations.trigger_only offset"); }
+        { ref var r = ref s.Trigger; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_extensions_manager_operations.trigger offset"); }
+        { ref var r = ref s.TriggerMenu; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_extensions_manager_operations.trigger_menu offset"); }
+        { ref var r = ref s.SetInput; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_extensions_manager_operations.set_input offset"); }
+        { ref var r = ref s.PlayingChanged; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_extensions_manager_operations.playing_changed offset"); }
+        { ref var r = ref s.MetaChanged; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_extensions_manager_operations.meta_changed offset"); }
+    }
+
+    [Fact]
     public void FilterOperations_Layout()
     {
-        var s = default(FilterOperations);
-        AssertEqual(48, FilterOperations.SizeOf, "vlc_filter_operations sizeof");
-        AssertEqual(48, Unsafe.SizeOf<FilterOperations>(), "vlc_filter_operations Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.FilterOperations);
+        AssertEqual(48, global::VLCLR.Native.Interop.FilterOperations.SizeOf, "vlc_filter_operations sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.FilterOperations>(), "vlc_filter_operations Unsafe.SizeOf");
         { ref var r = ref s.FilterVideo; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_filter_operations.filter_video offset"); }
         { ref var r = ref s.FilterAudio; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_filter_operations.filter_audio offset"); }
         { ref var r = ref s.BlendVideo; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_filter_operations.blend_video offset"); }
@@ -487,11 +2330,20 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void FrameCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.FrameCallbacks);
+        AssertEqual(8, global::VLCLR.Native.Interop.FrameCallbacks.SizeOf, "vlc_frame_callbacks sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.FrameCallbacks>(), "vlc_frame_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.Free; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_frame_callbacks.free offset"); }
+    }
+
+    [Fact]
     public void Frame_Layout()
     {
-        var s = default(Frame);
-        AssertEqual(104, Frame.SizeOf, "vlc_frame_t sizeof");
-        AssertEqual(104, Unsafe.SizeOf<Frame>(), "vlc_frame_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Frame);
+        AssertEqual(104, global::VLCLR.Native.Interop.Frame.SizeOf, "vlc_frame_t sizeof");
+        AssertEqual(104, Unsafe.SizeOf<global::VLCLR.Native.Interop.Frame>(), "vlc_frame_t Unsafe.SizeOf");
         { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_frame_t.p_next offset"); }
         { ref var r = ref s.Buffer; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_frame_t.p_buffer offset"); }
         AssertEqual(16, Offset(ref s, ref s.BufferSize), "vlc_frame_t.i_buffer offset");
@@ -507,21 +2359,315 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void GlCfg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlCfg);
+        AssertEqual(1, global::VLCLR.Native.Interop.GlCfg.SizeOf, "vlc_gl_cfg sizeof");
+        AssertEqual(1, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlCfg>(), "vlc_gl_cfg Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NeedAlpha), "vlc_gl_cfg.need_alpha offset");
+    }
+
+    [Fact]
+    public void GlFilter_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlFilter);
+        AssertEqual(72, global::VLCLR.Native.Interop.GlFilter.SizeOf, "vlc_gl_filter sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlFilter>(), "vlc_gl_filter Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_gl_filter.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_filter.module offset"); }
+        { ref var r = ref s.Gl; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_filter.gl offset"); }
+        { ref var r = ref s.Sampler; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_gl_filter.sampler offset"); }
+        AssertEqual(48, Offset(ref s, ref s.Config), "vlc_gl_filter.config offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_gl_filter.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_gl_filter.sys offset"); }
+    }
+
+    [Fact]
+    public void GlFilterConfig_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlFilterConfig);
+        AssertEqual(8, global::VLCLR.Native.Interop.GlFilterConfig.SizeOf, "vlc_gl_filter::config sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlFilterConfig>(), "vlc_gl_filter::config Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.FilterPlanes), "vlc_gl_filter::config.filter_planes offset");
+        AssertEqual(1, Offset(ref s, ref s.Blend), "vlc_gl_filter::config.blend offset");
+        AssertEqual(4, Offset(ref s, ref s.MsaaLevel), "vlc_gl_filter::config.msaa_level offset");
+    }
+
+    [Fact]
+    public void GlFilterOps_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlFilterOps);
+        AssertEqual(32, global::VLCLR.Native.Interop.GlFilterOps.SizeOf, "vlc_gl_filter_ops sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlFilterOps>(), "vlc_gl_filter_ops Unsafe.SizeOf");
+        { ref var r = ref s.Draw; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_gl_filter_ops.draw offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_gl_filter_ops.close offset"); }
+        { ref var r = ref s.RequestOutputSize; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_gl_filter_ops.request_output_size offset"); }
+        { ref var r = ref s.OnInputSizeChange; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_filter_ops.on_input_size_change offset"); }
+    }
+
+    [Fact]
+    public void GlInputMeta_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlInputMeta);
+        AssertEqual(32, global::VLCLR.Native.Interop.GlInputMeta.SizeOf, "vlc_gl_input_meta sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlInputMeta>(), "vlc_gl_input_meta Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Pts), "vlc_gl_input_meta.pts offset");
+        AssertEqual(8, Offset(ref s, ref s.Plane), "vlc_gl_input_meta.plane offset");
+        { ref var r = ref s.DoviRpu; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_gl_input_meta.dovi_rpu offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Orientation), "vlc_gl_input_meta.orientation offset");
+    }
+
+    [Fact]
+    public void GlInterop_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlInterop);
+        AssertEqual(Abi(536, 520), global::VLCLR.Native.Interop.GlInterop.SizeOf, "vlc_gl_interop sizeof");
+        AssertEqual(536, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlInterop>(), "vlc_gl_interop Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_gl_interop.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_interop.module offset"); }
+        { ref var r = ref s.Gl; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_interop.gl offset"); }
+        AssertEqual(40, Offset(ref s, ref s.TexTarget), "vlc_gl_interop.tex_target offset");
+        AssertEqual(48, PointerOffset(ref s, s.FmtIn), "vlc_gl_interop.fmt_in offset");
+        AssertEqual(Abi(200, 192), PointerOffset(ref s, s.FmtOut), "vlc_gl_interop.fmt_out offset");
+        { ref var r = ref s.Vctx; fixed (void* p = &r) AssertEqual(Abi(352, 336), PointerOffset(ref s, p), "vlc_gl_interop.vctx offset"); }
+        AssertEqual(Abi(360, 344), Offset(ref s, ref s.HandleTexsGen), "vlc_gl_interop.handle_texs_gen offset");
+        AssertEqual(Abi(364, 348), Offset(ref s, ref s.Texs), "vlc_gl_interop.texs offset");
+        AssertEqual(Abi(504, 488), Offset(ref s, ref s.TexCount), "vlc_gl_interop.tex_count offset");
+        { ref var r = ref s.Priv; fixed (void* p = &r) AssertEqual(Abi(512, 496), PointerOffset(ref s, p), "vlc_gl_interop.priv offset"); }
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(Abi(520, 504), PointerOffset(ref s, p), "vlc_gl_interop.ops offset"); }
+        { ref var r = ref s.GetTexFormatSize; fixed (void* p = &r) AssertEqual(Abi(528, 512), PointerOffset(ref s, p), "vlc_gl_interop.get_tex_format_size offset"); }
+    }
+
+    [Fact]
+    public void GlInteropOps_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlInteropOps);
+        AssertEqual(40, global::VLCLR.Native.Interop.GlInteropOps.SizeOf, "vlc_gl_interop_ops sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlInteropOps>(), "vlc_gl_interop_ops Unsafe.SizeOf");
+        { ref var r = ref s.GetTransformMatrix; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_interop_ops.get_transform_matrix offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_interop_ops.close offset"); }
+    }
+
+    [Fact]
+    public void GlOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlOperations);
+        AssertEqual(48, global::VLCLR.Native.Interop.GlOperations.SizeOf, "vlc_gl_operations sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlOperations>(), "vlc_gl_operations Unsafe.SizeOf");
+        { ref var r = ref s.Swap; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_gl_operations.swap offset"); }
+        { ref var r = ref s.SwapOffscreen; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_gl_operations.swap_offscreen offset"); }
+        { ref var r = ref s.MakeCurrent; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_gl_operations.make_current offset"); }
+        { ref var r = ref s.ReleaseCurrent; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_gl_operations.release_current offset"); }
+        { ref var r = ref s.Resize; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_operations.resize offset"); }
+        { ref var r = ref s.GetProcAddress; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_operations.get_proc_address offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_gl_operations.close offset"); }
+    }
+
+    [Fact]
+    public void GlPicture_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlPicture);
+        AssertEqual(48, global::VLCLR.Native.Interop.GlPicture.SizeOf, "vlc_gl_picture sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlPicture>(), "vlc_gl_picture Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Textures), "vlc_gl_picture.textures offset");
+        AssertEqual(20, Offset(ref s, ref s.Mtx), "vlc_gl_picture.mtx offset");
+        AssertEqual(44, Offset(ref s, ref s.MtxHasChanged), "vlc_gl_picture.mtx_has_changed offset");
+    }
+
+    [Fact]
+    public void GlSampler_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlSampler);
+        AssertEqual(Abi(320, 312), global::VLCLR.Native.Interop.GlSampler.SizeOf, "vlc_gl_sampler sizeof");
+        AssertEqual(320, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlSampler>(), "vlc_gl_sampler Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_gl_sampler.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_sampler.module offset"); }
+        { ref var r = ref s.Gl; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_sampler.gl offset"); }
+        AssertEqual(40, PointerOffset(ref s, s.FmtIn), "vlc_gl_sampler.fmt_in offset");
+        AssertEqual(Abi(192, 184), Offset(ref s, ref s.TexCount), "vlc_gl_sampler.tex_count offset");
+        AssertEqual(Abi(196, 188), Offset(ref s, ref s.TexWidths), "vlc_gl_sampler.tex_widths offset");
+        AssertEqual(Abi(216, 208), Offset(ref s, ref s.TexHeights), "vlc_gl_sampler.tex_heights offset");
+        AssertEqual(Abi(236, 228), Offset(ref s, ref s.TexTarget), "vlc_gl_sampler.tex_target offset");
+        AssertEqual(Abi(240, 232), Offset(ref s, ref s.Formats), "vlc_gl_sampler.formats offset");
+        AssertEqual(Abi(260, 252), Offset(ref s, ref s.HalfFloat), "vlc_gl_sampler.half_float offset");
+        { ref var r = ref s.PicToTexMatrix; fixed (void* p = &r) AssertEqual(Abi(264, 256), PointerOffset(ref s, p), "vlc_gl_sampler.pic_to_tex_matrix offset"); }
+        AssertEqual(Abi(272, 264), Offset(ref s, ref s.Shader), "vlc_gl_sampler.shader offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(Abi(304, 296), PointerOffset(ref s, p), "vlc_gl_sampler.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(Abi(312, 304), PointerOffset(ref s, p), "vlc_gl_sampler.sys offset"); }
+    }
+
+    [Fact]
+    public void GlSamplerShader_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlSamplerShader);
+        AssertEqual(32, global::VLCLR.Native.Interop.GlSamplerShader.SizeOf, "vlc_gl_sampler::shader sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlSamplerShader>(), "vlc_gl_sampler::shader Unsafe.SizeOf");
+        { ref var r = ref s.Version; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_gl_sampler::shader.version offset"); }
+        { ref var r = ref s.Precision; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_gl_sampler::shader.precision offset"); }
+        { ref var r = ref s.Extensions; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_gl_sampler::shader.extensions offset"); }
+        { ref var r = ref s.Body; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_sampler::shader.body offset"); }
+    }
+
+    [Fact]
+    public void GlSamplerOps_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlSamplerOps);
+        AssertEqual(40, global::VLCLR.Native.Interop.GlSamplerOps.SizeOf, "vlc_gl_sampler_ops sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlSamplerOps>(), "vlc_gl_sampler_ops Unsafe.SizeOf");
+        { ref var r = ref s.FetchLocations; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_gl_sampler_ops.fetch_locations offset"); }
+        { ref var r = ref s.Load; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_gl_sampler_ops.load offset"); }
+        { ref var r = ref s.Update; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_gl_sampler_ops.update offset"); }
+        { ref var r = ref s.SelectPlane; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_sampler_ops.select_plane offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_sampler_ops.close offset"); }
+    }
+
+    [Fact]
+    public void Gl_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Gl);
+        AssertEqual(80, global::VLCLR.Native.Interop.Gl.SizeOf, "vlc_gl_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.Gl>(), "vlc_gl_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_gl_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_gl_t.module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_gl_t.sys offset"); }
+        { ref var r = ref s.Device; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_gl_t.device offset"); }
+        { ref var r = ref s.Surface; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_gl_t.surface offset"); }
+        AssertEqual(48, Offset(ref s, ref s.OffscreenChromaOut), "vlc_gl_t.offscreen_chroma_out offset");
+        { ref var r = ref s.OffscreenVctxOut; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_gl_t.offscreen_vctx_out offset"); }
+        AssertEqual(64, Offset(ref s, ref s.Orientation), "vlc_gl_t.orientation offset");
+        AssertEqual(68, Offset(ref s, ref s.ApiType), "vlc_gl_t.api_type offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_gl_t.ops offset"); }
+    }
+
+    [Fact]
+    public void GlTexCfg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlTexCfg);
+        AssertEqual(28, global::VLCLR.Native.Interop.GlTexCfg.SizeOf, "vlc_gl_tex_cfg sizeof");
+        AssertEqual(28, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlTexCfg>(), "vlc_gl_tex_cfg Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.W), "vlc_gl_tex_cfg.w offset");
+        AssertEqual(8, Offset(ref s, ref s.H), "vlc_gl_tex_cfg.h offset");
+        AssertEqual(16, Offset(ref s, ref s.Internal), "vlc_gl_tex_cfg.internal offset");
+        AssertEqual(20, Offset(ref s, ref s.Format), "vlc_gl_tex_cfg.format offset");
+        AssertEqual(24, Offset(ref s, ref s.Type), "vlc_gl_tex_cfg.type offset");
+    }
+
+    [Fact]
+    public void GlTexSize_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.GlTexSize);
+        AssertEqual(8, global::VLCLR.Native.Interop.GlTexSize.SizeOf, "vlc_gl_tex_size sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.GlTexSize>(), "vlc_gl_tex_size Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Width), "vlc_gl_tex_size.width offset");
+        AssertEqual(4, Offset(ref s, ref s.Height), "vlc_gl_tex_size.height offset");
+    }
+
+    [Fact]
+    public void HashMd5Ctx_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.HashMd5Ctx);
+        AssertEqual(88, global::VLCLR.Native.Interop.HashMd5Ctx.SizeOf, "vlc_hash_md5_ctx sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.HashMd5Ctx>(), "vlc_hash_md5_ctx Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Priv), "vlc_hash_md5_ctx.priv offset");
+    }
+
+    [Fact]
+    public void HttpAuth_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.HttpAuth);
+        AssertEqual(80, global::VLCLR.Native.Interop.HttpAuth.SizeOf, "vlc_http_auth_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.HttpAuth>(), "vlc_http_auth_t Unsafe.SizeOf");
+        { ref var r = ref s.Realm; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_http_auth_t.psz_realm offset"); }
+        { ref var r = ref s.Domain; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_http_auth_t.psz_domain offset"); }
+        { ref var r = ref s.Nonce; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_http_auth_t.psz_nonce offset"); }
+        { ref var r = ref s.Opaque; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_http_auth_t.psz_opaque offset"); }
+        { ref var r = ref s.Stale; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_http_auth_t.psz_stale offset"); }
+        { ref var r = ref s.Algorithm; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_http_auth_t.psz_algorithm offset"); }
+        { ref var r = ref s.Qop; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_http_auth_t.psz_qop offset"); }
+        AssertEqual(56, Offset(ref s, ref s.NonceCount), "vlc_http_auth_t.i_nonce offset");
+        { ref var r = ref s.Cnonce; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_http_auth_t.psz_cnonce offset"); }
+        { ref var r = ref s.Ha1; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_http_auth_t.psz_HA1 offset"); }
+    }
+
+    [Fact]
+    public void IccProfile_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.IccProfile);
+        AssertEqual(8, global::VLCLR.Native.Interop.IccProfile.SizeOf, "vlc_icc_profile_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.IccProfile>(), "vlc_icc_profile_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Size), "vlc_icc_profile_t.size offset");
+    }
+
+    [Fact]
+    public void Inhibit_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Inhibit);
+        AssertEqual(40, global::VLCLR.Native.Interop.Inhibit.SizeOf, "vlc_inhibit sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.Inhibit>(), "vlc_inhibit Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_inhibit.obj offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_inhibit.p_sys offset"); }
+        { ref var r = ref s.InhibitValue; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_inhibit.inhibit offset"); }
+    }
+
+    [Fact]
+    public void Keystore_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Keystore);
+        AssertEqual(64, global::VLCLR.Native.Interop.Keystore.SizeOf, "vlc_keystore sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.Keystore>(), "vlc_keystore Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_keystore.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_keystore.p_module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_keystore.p_sys offset"); }
+    }
+
+    [Fact]
+    public void KeystoreEntry_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.KeystoreEntry);
+        AssertEqual(72, global::VLCLR.Native.Interop.KeystoreEntry.SizeOf, "vlc_keystore_entry sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.KeystoreEntry>(), "vlc_keystore_entry Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Values), "vlc_keystore_entry.ppsz_values offset");
+        { ref var r = ref s.Secret; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_keystore_entry.p_secret offset"); }
+        AssertEqual(64, Offset(ref s, ref s.SecretLen), "vlc_keystore_entry.i_secret_len offset");
+    }
+
+    [Fact]
+    public void Latch_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Latch);
+        AssertEqual(16, global::VLCLR.Native.Interop.Latch.SizeOf, "vlc_latch_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Latch>(), "vlc_latch_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Value), "vlc_latch_t.value offset");
+        AssertEqual(8, Offset(ref s, ref s.Ready), "vlc_latch_t.ready offset");
+    }
+
+    [Fact]
     public void List_Layout()
     {
-        var s = default(List);
-        AssertEqual(16, List.SizeOf, "vlc_list sizeof");
-        AssertEqual(16, Unsafe.SizeOf<List>(), "vlc_list Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.List);
+        AssertEqual(16, global::VLCLR.Native.Interop.List.SizeOf, "vlc_list sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.List>(), "vlc_list Unsafe.SizeOf");
         { ref var r = ref s.Prev; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_list.prev offset"); }
         { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_list.next offset"); }
     }
 
     [Fact]
+    public void ListIt_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ListIt);
+        AssertEqual(24, global::VLCLR.Native.Interop.ListIt.SizeOf, "vlc_list_it sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ListIt>(), "vlc_list_it Unsafe.SizeOf");
+        { ref var r = ref s.Head; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_list_it.head offset"); }
+        { ref var r = ref s.Current; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_list_it.current offset"); }
+        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_list_it.next offset"); }
+    }
+
+    [Fact]
     public void Log_Layout()
     {
-        var s = default(Log);
-        AssertEqual(64, Log.SizeOf, "vlc_log_t sizeof");
-        AssertEqual(64, Unsafe.SizeOf<Log>(), "vlc_log_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Log);
+        AssertEqual(64, global::VLCLR.Native.Interop.Log.SizeOf, "vlc_log_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.Log>(), "vlc_log_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.ObjectId), "vlc_log_t.i_object_id offset");
         { ref var r = ref s.ObjectType; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_log_t.psz_object_type offset"); }
         { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_log_t.psz_module offset"); }
@@ -533,11 +2679,729 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void Logger_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Logger);
+        AssertEqual(8, global::VLCLR.Native.Interop.Logger.SizeOf, "vlc_logger sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.Logger>(), "vlc_logger Unsafe.SizeOf");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_logger.ops offset"); }
+    }
+
+    [Fact]
+    public void LoggerOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.LoggerOperations);
+        AssertEqual(16, global::VLCLR.Native.Interop.LoggerOperations.SizeOf, "vlc_logger_operations sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.LoggerOperations>(), "vlc_logger_operations Unsafe.SizeOf");
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_logger_operations.destroy offset"); }
+    }
+
+    [Fact]
+    public void MediaSourceMeta_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MediaSourceMeta);
+        AssertEqual(24, global::VLCLR.Native.Interop.MediaSourceMeta.SizeOf, "vlc_media_source_meta sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.MediaSourceMeta>(), "vlc_media_source_meta Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_media_source_meta.name offset"); }
+        { ref var r = ref s.Longname; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_media_source_meta.longname offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Category), "vlc_media_source_meta.category offset");
+    }
+
+    [Fact]
+    public void MediaSource_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MediaSource);
+        AssertEqual(16, global::VLCLR.Native.Interop.MediaSource.SizeOf, "vlc_media_source_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MediaSource>(), "vlc_media_source_t Unsafe.SizeOf");
+        { ref var r = ref s.Tree; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_media_source_t.tree offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_media_source_t.description offset"); }
+    }
+
+    [Fact]
+    public void MediaTree_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MediaTree);
+        AssertEqual(24, global::VLCLR.Native.Interop.MediaTree.SizeOf, "vlc_media_tree sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.MediaTree>(), "vlc_media_tree Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Root), "vlc_media_tree.root offset");
+    }
+
+    [Fact]
+    public void MediaTreeCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MediaTreeCallbacks);
+        AssertEqual(32, global::VLCLR.Native.Interop.MediaTreeCallbacks.SizeOf, "vlc_media_tree_callbacks sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.MediaTreeCallbacks>(), "vlc_media_tree_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.OnChildrenReset; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_media_tree_callbacks.on_children_reset offset"); }
+        { ref var r = ref s.OnPreparseEnd; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_media_tree_callbacks.on_preparse_end offset"); }
+    }
+
+    [Fact]
+    public void MedialibraryCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MedialibraryCallbacks);
+        AssertEqual(8, global::VLCLR.Native.Interop.MedialibraryCallbacks.SizeOf, "vlc_medialibrary_callbacks_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MedialibraryCallbacks>(), "vlc_medialibrary_callbacks_t Unsafe.SizeOf");
+        { ref var r = ref s.SendEvent; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_medialibrary_callbacks_t.pf_send_event offset"); }
+    }
+
+    [Fact]
+    public void MedialibraryModule_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MedialibraryModule);
+        AssertEqual(72, global::VLCLR.Native.Interop.MedialibraryModule.SizeOf, "vlc_medialibrary_module_t sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.MedialibraryModule>(), "vlc_medialibrary_module_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_medialibrary_module_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_medialibrary_module_t.p_module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_medialibrary_module_t.p_sys offset"); }
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_medialibrary_module_t.cbs offset"); }
+    }
+
+    [Fact]
+    public void Memstream_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Memstream);
+        AssertEqual(24, global::VLCLR.Native.Interop.Memstream.SizeOf, "vlc_memstream sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Memstream>(), "vlc_memstream Unsafe.SizeOf");
+        { ref var r = ref s.Ptr; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_memstream.ptr offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Length), "vlc_memstream.length offset");
+    }
+
+    [Fact]
+    public void MlAlbumList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlAlbumList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlAlbumList.SizeOf, "vlc_ml_album_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlAlbumList>(), "vlc_ml_album_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_album_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlAlbum_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlAlbum);
+        AssertEqual(104, global::VLCLR.Native.Interop.MlAlbum.SizeOf, "vlc_ml_album_t sizeof");
+        AssertEqual(104, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlAlbum>(), "vlc_ml_album_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_album_t.i_id offset");
+        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_album_t.psz_title offset"); }
+        { ref var r = ref s.Summary; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_album_t.psz_summary offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Thumbnails), "vlc_ml_album_t.thumbnails offset");
+        { ref var r = ref s.Artist; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_ml_album_t.psz_artist offset"); }
+        AssertEqual(64, Offset(ref s, ref s.ArtistId), "vlc_ml_album_t.i_artist_id offset");
+        AssertEqual(72, Offset(ref s, ref s.NbTracks), "vlc_ml_album_t.i_nb_tracks offset");
+        AssertEqual(76, Offset(ref s, ref s.NbPresentTracks), "vlc_ml_album_t.i_nb_present_tracks offset");
+        AssertEqual(80, Offset(ref s, ref s.NbDiscs), "vlc_ml_album_t.i_nb_discs offset");
+        AssertEqual(88, Offset(ref s, ref s.Duration), "vlc_ml_album_t.i_duration offset");
+        AssertEqual(96, Offset(ref s, ref s.Year), "vlc_ml_album_t.i_year offset");
+        AssertEqual(100, Offset(ref s, ref s.IsFavorite), "vlc_ml_album_t.b_is_favorite offset");
+    }
+
+    [Fact]
+    public void MlArtistList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlArtistList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlArtistList.SizeOf, "vlc_ml_artist_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlArtistList>(), "vlc_ml_artist_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_artist_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlArtist_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlArtist);
+        AssertEqual(80, global::VLCLR.Native.Interop.MlArtist.SizeOf, "vlc_ml_artist_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlArtist>(), "vlc_ml_artist_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_artist_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_artist_t.psz_name offset"); }
+        { ref var r = ref s.Shortbio; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_artist_t.psz_shortbio offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Thumbnails), "vlc_ml_artist_t.thumbnails offset");
+        { ref var r = ref s.MbId; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_ml_artist_t.psz_mb_id offset"); }
+        AssertEqual(64, Offset(ref s, ref s.NbAlbum), "vlc_ml_artist_t.i_nb_album offset");
+        AssertEqual(68, Offset(ref s, ref s.NbTracks), "vlc_ml_artist_t.i_nb_tracks offset");
+        AssertEqual(72, Offset(ref s, ref s.NbPresentTracks), "vlc_ml_artist_t.i_nb_present_tracks offset");
+        AssertEqual(76, Offset(ref s, ref s.IsFavorite), "vlc_ml_artist_t.b_is_favorite offset");
+    }
+
+    [Fact]
+    public void MlBookmark_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlBookmark);
+        AssertEqual(32, global::VLCLR.Native.Interop.MlBookmark.SizeOf, "vlc_ml_bookmark_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlBookmark>(), "vlc_ml_bookmark_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.MediaId), "vlc_ml_bookmark_t.i_media_id offset");
+        AssertEqual(8, Offset(ref s, ref s.Time), "vlc_ml_bookmark_t.i_time offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_bookmark_t.psz_name offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_ml_bookmark_t.psz_description offset"); }
+    }
+
+    [Fact]
+    public void MlBoomkmarkList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlBoomkmarkList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlBoomkmarkList.SizeOf, "vlc_ml_boomkmark_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlBoomkmarkList>(), "vlc_ml_boomkmark_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_boomkmark_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlEvent_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEvent);
+        AssertEqual(24, global::VLCLR.Native.Interop.MlEvent.SizeOf, "vlc_ml_event_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEvent>(), "vlc_ml_event_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "vlc_ml_event_t.i_type offset");
+        AssertEqual(8, Offset(ref s, ref s.DiscoveryProgress), "vlc_ml_event_t.discovery_progress offset");
+        AssertEqual(8, Offset(ref s, ref s.DiscoveryFailed), "vlc_ml_event_t.discovery_failed offset");
+        AssertEqual(8, Offset(ref s, ref s.EntryPointAdded), "vlc_ml_event_t.entry_point_added offset");
+        AssertEqual(8, Offset(ref s, ref s.EntryPointRemoved), "vlc_ml_event_t.entry_point_removed offset");
+        AssertEqual(8, Offset(ref s, ref s.EntryPointBanned), "vlc_ml_event_t.entry_point_banned offset");
+        AssertEqual(8, Offset(ref s, ref s.EntryPointUnbanned), "vlc_ml_event_t.entry_point_unbanned offset");
+        AssertEqual(8, Offset(ref s, ref s.ParsingProgress), "vlc_ml_event_t.parsing_progress offset");
+        AssertEqual(8, Offset(ref s, ref s.Creation), "vlc_ml_event_t.creation offset");
+        AssertEqual(8, Offset(ref s, ref s.Modification), "vlc_ml_event_t.modification offset");
+        AssertEqual(8, Offset(ref s, ref s.Deletion), "vlc_ml_event_t.deletion offset");
+        AssertEqual(8, Offset(ref s, ref s.BackgroundIdleChanged), "vlc_ml_event_t.background_idle_changed offset");
+        AssertEqual(8, Offset(ref s, ref s.MediaThumbnailGenerated), "vlc_ml_event_t.media_thumbnail_generated offset");
+        AssertEqual(8, Offset(ref s, ref s.HistoryChanged), "vlc_ml_event_t.history_changed offset");
+        AssertEqual(8, Offset(ref s, ref s.FavoritesChanged), "vlc_ml_event_t.favorites_changed offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0BackgroundIdleChanged_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0BackgroundIdleChanged);
+        AssertEqual(1, global::VLCLR.Native.Interop.MlEventAnon0BackgroundIdleChanged.SizeOf, "vlc_ml_event_t::@0::background_idle_changed sizeof");
+        AssertEqual(1, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0BackgroundIdleChanged>(), "vlc_ml_event_t::@0::background_idle_changed Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Idle), "vlc_ml_event_t::@0::background_idle_changed.b_idle offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0Creation_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0Creation);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlEventAnon0Creation.SizeOf, "vlc_ml_event_t::@0::creation sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0Creation>(), "vlc_ml_event_t::@0::creation Unsafe.SizeOf");
+        { ref var r = ref s.Media; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_media offset"); }
+        { ref var r = ref s.Artist; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_artist offset"); }
+        { ref var r = ref s.Album; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_album offset"); }
+        { ref var r = ref s.Group; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_group offset"); }
+        { ref var r = ref s.Playlist; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_playlist offset"); }
+        { ref var r = ref s.Genre; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_genre offset"); }
+        { ref var r = ref s.Bookmark; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_bookmark offset"); }
+        { ref var r = ref s.Folder; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::creation.p_folder offset"); }
+    }
+
+    [Fact]
+    public void MlEventAnon0Deletion_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0Deletion);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlEventAnon0Deletion.SizeOf, "vlc_ml_event_t::@0::deletion sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0Deletion>(), "vlc_ml_event_t::@0::deletion Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.EntityId), "vlc_ml_event_t::@0::deletion.i_entity_id offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0DiscoveryFailed_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0DiscoveryFailed);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlEventAnon0DiscoveryFailed.SizeOf, "vlc_ml_event_t::@0::discovery_failed sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0DiscoveryFailed>(), "vlc_ml_event_t::@0::discovery_failed Unsafe.SizeOf");
+        { ref var r = ref s.EntryPoint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::discovery_failed.psz_entry_point offset"); }
+    }
+
+    [Fact]
+    public void MlEventAnon0DiscoveryProgress_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0DiscoveryProgress);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlEventAnon0DiscoveryProgress.SizeOf, "vlc_ml_event_t::@0::discovery_progress sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0DiscoveryProgress>(), "vlc_ml_event_t::@0::discovery_progress Unsafe.SizeOf");
+        { ref var r = ref s.EntryPoint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::discovery_progress.psz_entry_point offset"); }
+    }
+
+    [Fact]
+    public void MlEventAnon0EntryPointAdded_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0EntryPointAdded);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlEventAnon0EntryPointAdded.SizeOf, "vlc_ml_event_t::@0::entry_point_added sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0EntryPointAdded>(), "vlc_ml_event_t::@0::entry_point_added Unsafe.SizeOf");
+        { ref var r = ref s.EntryPoint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::entry_point_added.psz_entry_point offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Success), "vlc_ml_event_t::@0::entry_point_added.b_success offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0EntryPointBanned_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0EntryPointBanned);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlEventAnon0EntryPointBanned.SizeOf, "vlc_ml_event_t::@0::entry_point_banned sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0EntryPointBanned>(), "vlc_ml_event_t::@0::entry_point_banned Unsafe.SizeOf");
+        { ref var r = ref s.EntryPoint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::entry_point_banned.psz_entry_point offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Success), "vlc_ml_event_t::@0::entry_point_banned.b_success offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0EntryPointRemoved_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0EntryPointRemoved);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlEventAnon0EntryPointRemoved.SizeOf, "vlc_ml_event_t::@0::entry_point_removed sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0EntryPointRemoved>(), "vlc_ml_event_t::@0::entry_point_removed Unsafe.SizeOf");
+        { ref var r = ref s.EntryPoint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::entry_point_removed.psz_entry_point offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Success), "vlc_ml_event_t::@0::entry_point_removed.b_success offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0EntryPointUnbanned_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0EntryPointUnbanned);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlEventAnon0EntryPointUnbanned.SizeOf, "vlc_ml_event_t::@0::entry_point_unbanned sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0EntryPointUnbanned>(), "vlc_ml_event_t::@0::entry_point_unbanned Unsafe.SizeOf");
+        { ref var r = ref s.EntryPoint; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::entry_point_unbanned.psz_entry_point offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Success), "vlc_ml_event_t::@0::entry_point_unbanned.b_success offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0FavoritesChanged_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0FavoritesChanged);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlEventAnon0FavoritesChanged.SizeOf, "vlc_ml_event_t::@0::favorites_changed sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0FavoritesChanged>(), "vlc_ml_event_t::@0::favorites_changed Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.EntityId), "vlc_ml_event_t::@0::favorites_changed.i_entity_id offset");
+        AssertEqual(8, Offset(ref s, ref s.EntityType), "vlc_ml_event_t::@0::favorites_changed.i_entity_type offset");
+        AssertEqual(12, Offset(ref s, ref s.Favorite), "vlc_ml_event_t::@0::favorites_changed.b_favorite offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0HistoryChanged_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0HistoryChanged);
+        AssertEqual(4, global::VLCLR.Native.Interop.MlEventAnon0HistoryChanged.SizeOf, "vlc_ml_event_t::@0::history_changed sizeof");
+        AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0HistoryChanged>(), "vlc_ml_event_t::@0::history_changed Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.HistoryType), "vlc_ml_event_t::@0::history_changed.history_type offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0MediaThumbnailGenerated_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0MediaThumbnailGenerated);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlEventAnon0MediaThumbnailGenerated.SizeOf, "vlc_ml_event_t::@0::media_thumbnail_generated sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0MediaThumbnailGenerated>(), "vlc_ml_event_t::@0::media_thumbnail_generated Unsafe.SizeOf");
+        { ref var r = ref s.Media; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_event_t::@0::media_thumbnail_generated.p_media offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_ml_event_t::@0::media_thumbnail_generated.i_size offset");
+        AssertEqual(12, Offset(ref s, ref s.Success), "vlc_ml_event_t::@0::media_thumbnail_generated.b_success offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0Modification_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0Modification);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlEventAnon0Modification.SizeOf, "vlc_ml_event_t::@0::modification sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0Modification>(), "vlc_ml_event_t::@0::modification Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.EntityId), "vlc_ml_event_t::@0::modification.i_entity_id offset");
+    }
+
+    [Fact]
+    public void MlEventAnon0ParsingProgress_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlEventAnon0ParsingProgress);
+        AssertEqual(1, global::VLCLR.Native.Interop.MlEventAnon0ParsingProgress.SizeOf, "vlc_ml_event_t::@0::parsing_progress sizeof");
+        AssertEqual(1, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlEventAnon0ParsingProgress>(), "vlc_ml_event_t::@0::parsing_progress Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Percent), "vlc_ml_event_t::@0::parsing_progress.i_percent offset");
+    }
+
+    [Fact]
+    public void MlFileList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlFileList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlFileList.SizeOf, "vlc_ml_file_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlFileList>(), "vlc_ml_file_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_file_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlFile_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlFile);
+        AssertEqual(32, global::VLCLR.Native.Interop.MlFile.SizeOf, "vlc_ml_file_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlFile>(), "vlc_ml_file_t Unsafe.SizeOf");
+        { ref var r = ref s.Mrl; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_file_t.psz_mrl offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_ml_file_t.i_size offset");
+        AssertEqual(16, Offset(ref s, ref s.LastModificationDate), "vlc_ml_file_t.i_last_modification_date offset");
+        AssertEqual(24, Offset(ref s, ref s.Type), "vlc_ml_file_t.i_type offset");
+        AssertEqual(28, Offset(ref s, ref s.External), "vlc_ml_file_t.b_external offset");
+        AssertEqual(29, Offset(ref s, ref s.Removable), "vlc_ml_file_t.b_removable offset");
+        AssertEqual(30, Offset(ref s, ref s.Present), "vlc_ml_file_t.b_present offset");
+    }
+
+    [Fact]
+    public void MlFolderList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlFolderList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlFolderList.SizeOf, "vlc_ml_folder_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlFolderList>(), "vlc_ml_folder_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_folder_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlFolder_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlFolder);
+        AssertEqual(56, global::VLCLR.Native.Interop.MlFolder.SizeOf, "vlc_ml_folder_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlFolder>(), "vlc_ml_folder_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_folder_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_folder_t.psz_name offset"); }
+        { ref var r = ref s.Mrl; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_folder_t.psz_mrl offset"); }
+        AssertEqual(24, Offset(ref s, ref s.NbMedia), "vlc_ml_folder_t.i_nb_media offset");
+        AssertEqual(28, Offset(ref s, ref s.NbVideo), "vlc_ml_folder_t.i_nb_video offset");
+        AssertEqual(32, Offset(ref s, ref s.NbAudio), "vlc_ml_folder_t.i_nb_audio offset");
+        AssertEqual(40, Offset(ref s, ref s.Duration), "vlc_ml_folder_t.i_duration offset");
+        AssertEqual(48, Offset(ref s, ref s.IsFavorite), "vlc_ml_folder_t.b_is_favorite offset");
+        AssertEqual(49, Offset(ref s, ref s.Present), "vlc_ml_folder_t.b_present offset");
+        AssertEqual(50, Offset(ref s, ref s.Banned), "vlc_ml_folder_t.b_banned offset");
+    }
+
+    [Fact]
+    public void MlGenreList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlGenreList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlGenreList.SizeOf, "vlc_ml_genre_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlGenreList>(), "vlc_ml_genre_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_genre_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlGenre_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlGenre);
+        AssertEqual(64, global::VLCLR.Native.Interop.MlGenre.SizeOf, "vlc_ml_genre_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlGenre>(), "vlc_ml_genre_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_genre_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_genre_t.psz_name offset"); }
+        AssertEqual(16, Offset(ref s, ref s.NbTracks), "vlc_ml_genre_t.i_nb_tracks offset");
+        AssertEqual(24, Offset(ref s, ref s.Thumbnails), "vlc_ml_genre_t.thumbnails offset");
+        AssertEqual(56, Offset(ref s, ref s.IsFavorite), "vlc_ml_genre_t.b_is_favorite offset");
+    }
+
+    [Fact]
+    public void MlGroupList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlGroupList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlGroupList.SizeOf, "vlc_ml_group_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlGroupList>(), "vlc_ml_group_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_group_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlGroup_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlGroup);
+        AssertEqual(80, global::VLCLR.Native.Interop.MlGroup.SizeOf, "vlc_ml_group_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlGroup>(), "vlc_ml_group_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_group_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_group_t.psz_name offset"); }
+        AssertEqual(16, Offset(ref s, ref s.NbTotalMedia), "vlc_ml_group_t.i_nb_total_media offset");
+        AssertEqual(20, Offset(ref s, ref s.NbVideo), "vlc_ml_group_t.i_nb_video offset");
+        AssertEqual(24, Offset(ref s, ref s.NbAudio), "vlc_ml_group_t.i_nb_audio offset");
+        AssertEqual(28, Offset(ref s, ref s.NbUnknown), "vlc_ml_group_t.i_nb_unknown offset");
+        AssertEqual(32, Offset(ref s, ref s.NbPresentMedia), "vlc_ml_group_t.i_nb_present_media offset");
+        AssertEqual(36, Offset(ref s, ref s.NbPresentVideo), "vlc_ml_group_t.i_nb_present_video offset");
+        AssertEqual(40, Offset(ref s, ref s.NbPresentAudio), "vlc_ml_group_t.i_nb_present_audio offset");
+        AssertEqual(44, Offset(ref s, ref s.NbPresentUnknown), "vlc_ml_group_t.i_nb_present_unknown offset");
+        AssertEqual(48, Offset(ref s, ref s.NbSeen), "vlc_ml_group_t.i_nb_seen offset");
+        AssertEqual(52, Offset(ref s, ref s.NbPresentSeen), "vlc_ml_group_t.i_nb_present_seen offset");
+        AssertEqual(56, Offset(ref s, ref s.Duration), "vlc_ml_group_t.i_duration offset");
+        AssertEqual(64, Offset(ref s, ref s.CreationDate), "vlc_ml_group_t.i_creation_date offset");
+        AssertEqual(72, Offset(ref s, ref s.LastModificationDate), "vlc_ml_group_t.i_last_modification_date offset");
+    }
+
+    [Fact]
+    public void MlLabelList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlLabelList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlLabelList.SizeOf, "vlc_ml_label_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlLabelList>(), "vlc_ml_label_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_label_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlLabel_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlLabel);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlLabel.SizeOf, "vlc_ml_label_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlLabel>(), "vlc_ml_label_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_label_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_label_t.psz_name offset"); }
+    }
+
+    [Fact]
+    public void MlMediaList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlMediaList.SizeOf, "vlc_ml_media_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaList>(), "vlc_ml_media_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_media_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlMedia_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMedia);
+        AssertEqual(160, global::VLCLR.Native.Interop.MlMedia.SizeOf, "vlc_ml_media_t sizeof");
+        AssertEqual(160, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMedia>(), "vlc_ml_media_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_media_t.i_id offset");
+        AssertEqual(8, Offset(ref s, ref s.Type), "vlc_ml_media_t.i_type offset");
+        AssertEqual(12, Offset(ref s, ref s.Subtype), "vlc_ml_media_t.i_subtype offset");
+        { ref var r = ref s.Files; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_media_t.p_files offset"); }
+        { ref var r = ref s.Tracks; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_ml_media_t.p_tracks offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Year), "vlc_ml_media_t.i_year offset");
+        AssertEqual(40, Offset(ref s, ref s.Duration), "vlc_ml_media_t.i_duration offset");
+        AssertEqual(48, Offset(ref s, ref s.Playcount), "vlc_ml_media_t.i_playcount offset");
+        AssertEqual(56, Offset(ref s, ref s.Progress), "vlc_ml_media_t.f_progress offset");
+        AssertEqual(64, Offset(ref s, ref s.LastPlayedDate), "vlc_ml_media_t.i_last_played_date offset");
+        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_ml_media_t.psz_title offset"); }
+        { ref var r = ref s.Filename; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_ml_media_t.psz_filename offset"); }
+        AssertEqual(88, Offset(ref s, ref s.Thumbnails), "vlc_ml_media_t.thumbnails offset");
+        AssertEqual(120, Offset(ref s, ref s.IsFavorite), "vlc_ml_media_t.b_is_favorite offset");
+        AssertEqual(121, Offset(ref s, ref s.IsPublic), "vlc_ml_media_t.b_is_public offset");
+        AssertEqual(128, Offset(ref s, ref s.ShowEpisode), "vlc_ml_media_t.show_episode offset");
+        AssertEqual(128, Offset(ref s, ref s.Movie), "vlc_ml_media_t.movie offset");
+        AssertEqual(128, Offset(ref s, ref s.AlbumTrack), "vlc_ml_media_t.album_track offset");
+    }
+
+    [Fact]
+    public void MlMediaAnon0AlbumTrack_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaAnon0AlbumTrack);
+        AssertEqual(32, global::VLCLR.Native.Interop.MlMediaAnon0AlbumTrack.SizeOf, "vlc_ml_media_t::@0::album_track sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaAnon0AlbumTrack>(), "vlc_ml_media_t::@0::album_track Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.ArtistId), "vlc_ml_media_t::@0::album_track.i_artist_id offset");
+        AssertEqual(8, Offset(ref s, ref s.AlbumId), "vlc_ml_media_t::@0::album_track.i_album_id offset");
+        AssertEqual(16, Offset(ref s, ref s.GenreId), "vlc_ml_media_t::@0::album_track.i_genre_id offset");
+        AssertEqual(24, Offset(ref s, ref s.TrackNb), "vlc_ml_media_t::@0::album_track.i_track_nb offset");
+        AssertEqual(28, Offset(ref s, ref s.DiscNb), "vlc_ml_media_t::@0::album_track.i_disc_nb offset");
+    }
+
+    [Fact]
+    public void MlMediaTrackList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaTrackList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlMediaTrackList.SizeOf, "vlc_ml_media_track_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaTrackList>(), "vlc_ml_media_track_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_media_track_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlMediaTrack_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaTrack);
+        AssertEqual(56, global::VLCLR.Native.Interop.MlMediaTrack.SizeOf, "vlc_ml_media_track_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaTrack>(), "vlc_ml_media_track_t Unsafe.SizeOf");
+        { ref var r = ref s.Codec; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_media_track_t.psz_codec offset"); }
+        { ref var r = ref s.Language; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_media_track_t.psz_language offset"); }
+        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_media_track_t.psz_description offset"); }
+        AssertEqual(24, Offset(ref s, ref s.Type), "vlc_ml_media_track_t.i_type offset");
+        AssertEqual(28, Offset(ref s, ref s.Bitrate), "vlc_ml_media_track_t.i_bitrate offset");
+        AssertEqual(32, Offset(ref s, ref s.A), "vlc_ml_media_track_t.a offset");
+        AssertEqual(32, Offset(ref s, ref s.V), "vlc_ml_media_track_t.v offset");
+        AssertEqual(32, Offset(ref s, ref s.S), "vlc_ml_media_track_t.s offset");
+    }
+
+    [Fact]
+    public void MlMediaTrackAnon0A_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaTrackAnon0A);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlMediaTrackAnon0A.SizeOf, "vlc_ml_media_track_t::@0::a sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaTrackAnon0A>(), "vlc_ml_media_track_t::@0::a Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbChannels), "vlc_ml_media_track_t::@0::a.i_nbChannels offset");
+        AssertEqual(4, Offset(ref s, ref s.SampleRate), "vlc_ml_media_track_t::@0::a.i_sampleRate offset");
+    }
+
+    [Fact]
+    public void MlMediaTrackAnon0S_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaTrackAnon0S);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlMediaTrackAnon0S.SizeOf, "vlc_ml_media_track_t::@0::s sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaTrackAnon0S>(), "vlc_ml_media_track_t::@0::s Unsafe.SizeOf");
+        { ref var r = ref s.Encoding; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_media_track_t::@0::s.psz_encoding offset"); }
+    }
+
+    [Fact]
+    public void MlMediaTrackAnon0V_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMediaTrackAnon0V);
+        AssertEqual(24, global::VLCLR.Native.Interop.MlMediaTrackAnon0V.SizeOf, "vlc_ml_media_track_t::@0::v sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMediaTrackAnon0V>(), "vlc_ml_media_track_t::@0::v Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Height), "vlc_ml_media_track_t::@0::v.i_height offset");
+        AssertEqual(4, Offset(ref s, ref s.Width), "vlc_ml_media_track_t::@0::v.i_width offset");
+        AssertEqual(8, Offset(ref s, ref s.SarNum), "vlc_ml_media_track_t::@0::v.i_sarNum offset");
+        AssertEqual(12, Offset(ref s, ref s.SarDen), "vlc_ml_media_track_t::@0::v.i_sarDen offset");
+        AssertEqual(16, Offset(ref s, ref s.FpsNum), "vlc_ml_media_track_t::@0::v.i_fpsNum offset");
+        AssertEqual(20, Offset(ref s, ref s.FpsDen), "vlc_ml_media_track_t::@0::v.i_fpsDen offset");
+    }
+
+    [Fact]
+    public void MlMovie_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlMovie);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlMovie.SizeOf, "vlc_ml_movie_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlMovie>(), "vlc_ml_movie_t Unsafe.SizeOf");
+        { ref var r = ref s.Summary; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_movie_t.psz_summary offset"); }
+        { ref var r = ref s.ImdbId; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_movie_t.psz_imdb_id offset"); }
+    }
+
+    [Fact]
+    public void MlPlaybackStatesAll_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlPlaybackStatesAll);
+        AssertEqual(72, global::VLCLR.Native.Interop.MlPlaybackStatesAll.SizeOf, "vlc_ml_playback_states_all sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlPlaybackStatesAll>(), "vlc_ml_playback_states_all Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Rate), "vlc_ml_playback_states_all.rate offset");
+        AssertEqual(4, Offset(ref s, ref s.Zoom), "vlc_ml_playback_states_all.zoom offset");
+        AssertEqual(8, Offset(ref s, ref s.CurrentTitle), "vlc_ml_playback_states_all.current_title offset");
+        { ref var r = ref s.CurrentVideoTrack; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_playback_states_all.current_video_track offset"); }
+        { ref var r = ref s.CurrentAudioTrack; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_ml_playback_states_all.current_audio_track offset"); }
+        { ref var r = ref s.CurrentSubtitleTrack; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_ml_playback_states_all.current_subtitle_track offset"); }
+        { ref var r = ref s.AspectRatio; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_ml_playback_states_all.aspect_ratio offset"); }
+        { ref var r = ref s.Crop; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_ml_playback_states_all.crop offset"); }
+        { ref var r = ref s.Deinterlace; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_ml_playback_states_all.deinterlace offset"); }
+        { ref var r = ref s.VideoFilter; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_ml_playback_states_all.video_filter offset"); }
+    }
+
+    [Fact]
+    public void MlPlaylistList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlPlaylistList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlPlaylistList.SizeOf, "vlc_ml_playlist_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlPlaylistList>(), "vlc_ml_playlist_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_playlist_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlPlaylist_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlPlaylist);
+        AssertEqual(88, global::VLCLR.Native.Interop.MlPlaylist.SizeOf, "vlc_ml_playlist_t sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlPlaylist>(), "vlc_ml_playlist_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_playlist_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_playlist_t.psz_name offset"); }
+        { ref var r = ref s.Mrl; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_playlist_t.psz_mrl offset"); }
+        { ref var r = ref s.ArtworkMrl; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_ml_playlist_t.psz_artwork_mrl offset"); }
+        AssertEqual(32, Offset(ref s, ref s.NbMedia), "vlc_ml_playlist_t.i_nb_media offset");
+        AssertEqual(36, Offset(ref s, ref s.NbVideo), "vlc_ml_playlist_t.i_nb_video offset");
+        AssertEqual(40, Offset(ref s, ref s.NbAudio), "vlc_ml_playlist_t.i_nb_audio offset");
+        AssertEqual(44, Offset(ref s, ref s.NbUnknown), "vlc_ml_playlist_t.i_nb_unknown offset");
+        AssertEqual(48, Offset(ref s, ref s.NbPresentMedia), "vlc_ml_playlist_t.i_nb_present_media offset");
+        AssertEqual(52, Offset(ref s, ref s.NbPresentVideo), "vlc_ml_playlist_t.i_nb_present_video offset");
+        AssertEqual(56, Offset(ref s, ref s.NbPresentAudio), "vlc_ml_playlist_t.i_nb_present_audio offset");
+        AssertEqual(60, Offset(ref s, ref s.NbPresentUnknown), "vlc_ml_playlist_t.i_nb_present_unknown offset");
+        AssertEqual(64, Offset(ref s, ref s.CreationDate), "vlc_ml_playlist_t.i_creation_date offset");
+        AssertEqual(72, Offset(ref s, ref s.Duration), "vlc_ml_playlist_t.i_duration offset");
+        AssertEqual(80, Offset(ref s, ref s.NbDurationUnknown), "vlc_ml_playlist_t.i_nb_duration_unknown offset");
+        AssertEqual(84, Offset(ref s, ref s.IsReadOnly), "vlc_ml_playlist_t.b_is_read_only offset");
+        AssertEqual(85, Offset(ref s, ref s.IsFavorite), "vlc_ml_playlist_t.b_is_favorite offset");
+    }
+
+    [Fact]
+    public void MlQueryParams_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlQueryParams);
+        AssertEqual(24, global::VLCLR.Native.Interop.MlQueryParams.SizeOf, "vlc_ml_query_params_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlQueryParams>(), "vlc_ml_query_params_t Unsafe.SizeOf");
+        { ref var r = ref s.Pattern; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_query_params_t.psz_pattern offset"); }
+        AssertEqual(8, Offset(ref s, ref s.NbResults), "vlc_ml_query_params_t.i_nbResults offset");
+        AssertEqual(12, Offset(ref s, ref s.Offset), "vlc_ml_query_params_t.i_offset offset");
+        AssertEqual(16, Offset(ref s, ref s.Sort), "vlc_ml_query_params_t.i_sort offset");
+        AssertEqual(20, Offset(ref s, ref s.Desc), "vlc_ml_query_params_t.b_desc offset");
+        AssertEqual(21, Offset(ref s, ref s.FavoriteOnly), "vlc_ml_query_params_t.b_favorite_only offset");
+        AssertEqual(22, Offset(ref s, ref s.PublicOnly), "vlc_ml_query_params_t.b_public_only offset");
+    }
+
+    [Fact]
+    public void MlShowEpisode_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlShowEpisode);
+        AssertEqual(24, global::VLCLR.Native.Interop.MlShowEpisode.SizeOf, "vlc_ml_show_episode_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlShowEpisode>(), "vlc_ml_show_episode_t Unsafe.SizeOf");
+        { ref var r = ref s.Summary; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_show_episode_t.psz_summary offset"); }
+        { ref var r = ref s.TvdbId; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_show_episode_t.psz_tvdb_id offset"); }
+        AssertEqual(16, Offset(ref s, ref s.EpisodeNb), "vlc_ml_show_episode_t.i_episode_nb offset");
+        AssertEqual(20, Offset(ref s, ref s.SeasonNumber), "vlc_ml_show_episode_t.i_season_number offset");
+    }
+
+    [Fact]
+    public void MlShowList_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlShowList);
+        AssertEqual(8, global::VLCLR.Native.Interop.MlShowList.SizeOf, "vlc_ml_show_list_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlShowList>(), "vlc_ml_show_list_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.NbItems), "vlc_ml_show_list_t.i_nb_items offset");
+    }
+
+    [Fact]
+    public void MlShow_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlShow);
+        AssertEqual(56, global::VLCLR.Native.Interop.MlShow.SizeOf, "vlc_ml_show_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlShow>(), "vlc_ml_show_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlc_ml_show_t.i_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_ml_show_t.psz_name offset"); }
+        { ref var r = ref s.Summary; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_ml_show_t.psz_summary offset"); }
+        { ref var r = ref s.ArtworkMrl; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_ml_show_t.psz_artwork_mrl offset"); }
+        { ref var r = ref s.TvdbId; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_ml_show_t.psz_tvdb_id offset"); }
+        AssertEqual(40, Offset(ref s, ref s.ReleaseYear), "vlc_ml_show_t.i_release_year offset");
+        AssertEqual(44, Offset(ref s, ref s.NbEpisodes), "vlc_ml_show_t.i_nb_episodes offset");
+        AssertEqual(48, Offset(ref s, ref s.NbSeasons), "vlc_ml_show_t.i_nb_seasons offset");
+    }
+
+    [Fact]
+    public void MlThumbnail_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MlThumbnail);
+        AssertEqual(16, global::VLCLR.Native.Interop.MlThumbnail.SizeOf, "vlc_ml_thumbnail_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MlThumbnail>(), "vlc_ml_thumbnail_t Unsafe.SizeOf");
+        { ref var r = ref s.Mrl; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_ml_thumbnail_t.psz_mrl offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Status), "vlc_ml_thumbnail_t.i_status offset");
+    }
+
+    [Fact]
+    public void Mouse_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Mouse);
+        AssertEqual(16, global::VLCLR.Native.Interop.Mouse.SizeOf, "vlc_mouse_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Mouse>(), "vlc_mouse_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.X), "vlc_mouse_t.i_x offset");
+        AssertEqual(4, Offset(ref s, ref s.Y), "vlc_mouse_t.i_y offset");
+        AssertEqual(8, Offset(ref s, ref s.Pressed), "vlc_mouse_t.i_pressed offset");
+        AssertEqual(12, Offset(ref s, ref s.DoubleClick), "vlc_mouse_t.b_double_click offset");
+    }
+
+    [Fact]
+    public void Mutex_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Mutex);
+        AssertEqual(Abi(12, 16), global::VLCLR.Native.Interop.Mutex.SizeOf, "vlc_mutex_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Mutex>(), "vlc_mutex_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Value), "vlc_mutex_t.value offset");
+        AssertEqual(4, Offset(ref s, ref s.Recursion), "vlc_mutex_t.recursion offset");
+        AssertEqual(8, Offset(ref s, ref s.Owner), "vlc_mutex_t.owner offset");
+        AssertEqual(0, PointerOffset(ref s, s.Dummy), "vlc_mutex_t.dummy offset");
+    }
+
+    [Fact]
+    public void MutexAnon0Dummy_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.MutexAnon0Dummy);
+        AssertEqual(Abi(12, 16), global::VLCLR.Native.Interop.MutexAnon0Dummy.SizeOf, "vlc_mutex_t::@0::dummy sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.MutexAnon0Dummy>(), "vlc_mutex_t::@0::dummy Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Value), "vlc_mutex_t::@0::dummy.value offset");
+        AssertEqual(4, Offset(ref s, ref s.Recursion), "vlc_mutex_t::@0::dummy.recursion offset");
+        AssertEqual(8, Offset(ref s, ref s.Owner), "vlc_mutex_t::@0::dummy.owner offset");
+    }
+
+    [Fact]
     public void ObjectHeader_Layout()
     {
-        var s = default(ObjectHeader);
-        AssertEqual(24, ObjectHeader.SizeOf, "vlc_object_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<ObjectHeader>(), "vlc_object_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.ObjectHeader);
+        AssertEqual(24, global::VLCLR.Native.Interop.ObjectHeader.SizeOf, "vlc_object_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ObjectHeader>(), "vlc_object_t Unsafe.SizeOf");
         { ref var r = ref s.Logger; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_object_t.logger offset"); }
         { ref var r = ref s.Priv; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_object_t.priv offset"); }
         { ref var r = ref s.Obj; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_object_t.obj offset"); }
@@ -546,11 +3410,41 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void Once_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Once);
+        AssertEqual(4, global::VLCLR.Native.Interop.Once.SizeOf, "vlc_once_t sizeof");
+        AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.Once>(), "vlc_once_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Value), "vlc_once_t.value offset");
+    }
+
+    [Fact]
+    public void PicChain_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PicChain);
+        AssertEqual(16, global::VLCLR.Native.Interop.PicChain.SizeOf, "vlc_pic_chain sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.PicChain>(), "vlc_pic_chain Unsafe.SizeOf");
+        { ref var r = ref s.Front; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_pic_chain.front offset"); }
+        { ref var r = ref s.Tail; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_pic_chain.tail offset"); }
+    }
+
+    [Fact]
+    public void PlayerAoutCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerAoutCbs);
+        AssertEqual(24, global::VLCLR.Native.Interop.PlayerAoutCbs.SizeOf, "vlc_player_aout_cbs sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerAoutCbs>(), "vlc_player_aout_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnVolumeChanged; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_aout_cbs.on_volume_changed offset"); }
+        { ref var r = ref s.OnMuteChanged; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_aout_cbs.on_mute_changed offset"); }
+        { ref var r = ref s.OnDeviceChanged; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_player_aout_cbs.on_device_changed offset"); }
+    }
+
+    [Fact]
     public void PlayerCbs_Layout()
     {
-        var s = default(PlayerCbs);
-        AssertEqual(296, PlayerCbs.SizeOf, "vlc_player_cbs sizeof");
-        AssertEqual(296, Unsafe.SizeOf<PlayerCbs>(), "vlc_player_cbs Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.PlayerCbs);
+        AssertEqual(296, global::VLCLR.Native.Interop.PlayerCbs.SizeOf, "vlc_player_cbs sizeof");
+        AssertEqual(296, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerCbs>(), "vlc_player_cbs Unsafe.SizeOf");
         { ref var r = ref s.OnCurrentMediaChanged; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_cbs.on_current_media_changed offset"); }
         { ref var r = ref s.OnStateChanged; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_cbs.on_state_changed offset"); }
         { ref var r = ref s.OnErrorChanged; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_player_cbs.on_error_changed offset"); }
@@ -591,31 +3485,756 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
+    public void PlayerChapter_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerChapter);
+        AssertEqual(16, global::VLCLR.Native.Interop.PlayerChapter.SizeOf, "vlc_player_chapter sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerChapter>(), "vlc_player_chapter Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_chapter.name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Time), "vlc_player_chapter.time offset");
+    }
+
+    [Fact]
+    public void PlayerMetadataCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerMetadataCbs);
+        AssertEqual(8, global::VLCLR.Native.Interop.PlayerMetadataCbs.SizeOf, "vlc_player_metadata_cbs sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerMetadataCbs>(), "vlc_player_metadata_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnMomentaryLoudnessChanged; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_metadata_cbs.on_momentary_loudness_changed offset"); }
+        { ref var r = ref s.OnLoudnessChanged; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_metadata_cbs.on_loudness_changed offset"); }
+    }
+
+    [Fact]
+    public void PlayerProgram_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerProgram);
+        AssertEqual(24, global::VLCLR.Native.Interop.PlayerProgram.SizeOf, "vlc_player_program sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerProgram>(), "vlc_player_program Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.GroupId), "vlc_player_program.group_id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_program.name offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Selected), "vlc_player_program.selected offset");
+        AssertEqual(17, Offset(ref s, ref s.Scrambled), "vlc_player_program.scrambled offset");
+    }
+
+    [Fact]
+    public void PlayerTimerCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerTimerCbs);
+        AssertEqual(24, global::VLCLR.Native.Interop.PlayerTimerCbs.SizeOf, "vlc_player_timer_cbs sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerTimerCbs>(), "vlc_player_timer_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnUpdate; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_timer_cbs.on_update offset"); }
+        { ref var r = ref s.OnPaused; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_timer_cbs.on_paused offset"); }
+        { ref var r = ref s.OnSeek; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_player_timer_cbs.on_seek offset"); }
+    }
+
+    [Fact]
+    public void PlayerTimerPoint_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerTimerPoint);
+        AssertEqual(48, global::VLCLR.Native.Interop.PlayerTimerPoint.SizeOf, "vlc_player_timer_point sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerTimerPoint>(), "vlc_player_timer_point Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Position), "vlc_player_timer_point.position offset");
+        AssertEqual(8, Offset(ref s, ref s.Rate), "vlc_player_timer_point.rate offset");
+        AssertEqual(16, Offset(ref s, ref s.Ts), "vlc_player_timer_point.ts offset");
+        AssertEqual(24, Offset(ref s, ref s.Length), "vlc_player_timer_point.length offset");
+        AssertEqual(32, Offset(ref s, ref s.Live), "vlc_player_timer_point.live offset");
+        AssertEqual(40, Offset(ref s, ref s.SystemDate), "vlc_player_timer_point.system_date offset");
+    }
+
+    [Fact]
+    public void PlayerTimerSmpteCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerTimerSmpteCbs);
+        AssertEqual(24, global::VLCLR.Native.Interop.PlayerTimerSmpteCbs.SizeOf, "vlc_player_timer_smpte_cbs sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerTimerSmpteCbs>(), "vlc_player_timer_smpte_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnUpdate; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_timer_smpte_cbs.on_update offset"); }
+        { ref var r = ref s.OnPaused; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_timer_smpte_cbs.on_paused offset"); }
+        { ref var r = ref s.OnSeek; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_player_timer_smpte_cbs.on_seek offset"); }
+    }
+
+    [Fact]
+    public void PlayerTimerSmpteTimecode_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerTimerSmpteTimecode);
+        AssertEqual(24, global::VLCLR.Native.Interop.PlayerTimerSmpteTimecode.SizeOf, "vlc_player_timer_smpte_timecode sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerTimerSmpteTimecode>(), "vlc_player_timer_smpte_timecode Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Hours), "vlc_player_timer_smpte_timecode.hours offset");
+        AssertEqual(4, Offset(ref s, ref s.Minutes), "vlc_player_timer_smpte_timecode.minutes offset");
+        AssertEqual(8, Offset(ref s, ref s.Seconds), "vlc_player_timer_smpte_timecode.seconds offset");
+        AssertEqual(12, Offset(ref s, ref s.Frames), "vlc_player_timer_smpte_timecode.frames offset");
+        AssertEqual(16, Offset(ref s, ref s.FrameResolution), "vlc_player_timer_smpte_timecode.frame_resolution offset");
+        AssertEqual(20, Offset(ref s, ref s.DropFrame), "vlc_player_timer_smpte_timecode.drop_frame offset");
+    }
+
+    [Fact]
+    public void PlayerTitle_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerTitle);
+        AssertEqual(40, global::VLCLR.Native.Interop.PlayerTitle.SizeOf, "vlc_player_title sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerTitle>(), "vlc_player_title Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_title.name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Length), "vlc_player_title.length offset");
+        AssertEqual(16, Offset(ref s, ref s.Flags), "vlc_player_title.flags offset");
+        AssertEqual(24, Offset(ref s, ref s.ChapterCount), "vlc_player_title.chapter_count offset");
+        { ref var r = ref s.Chapters; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_player_title.chapters offset"); }
+    }
+
+    [Fact]
+    public void PlayerTrack_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerTrack);
+        AssertEqual(Abi(264, 256), global::VLCLR.Native.Interop.PlayerTrack.SizeOf, "vlc_player_track sizeof");
+        AssertEqual(264, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerTrack>(), "vlc_player_track Unsafe.SizeOf");
+        { ref var r = ref s.EsId; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_track.es_id offset"); }
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_track.name offset"); }
+        AssertEqual(16, PointerOffset(ref s, s.Fmt), "vlc_player_track.fmt offset");
+        AssertEqual(Abi(256, 248), Offset(ref s, ref s.Selected), "vlc_player_track.selected offset");
+    }
+
+    [Fact]
+    public void PlayerVoutCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlayerVoutCbs);
+        AssertEqual(16, global::VLCLR.Native.Interop.PlayerVoutCbs.SizeOf, "vlc_player_vout_cbs sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlayerVoutCbs>(), "vlc_player_vout_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnFullscreenChanged; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_player_vout_cbs.on_fullscreen_changed offset"); }
+        { ref var r = ref s.OnWallpaperModeChanged; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_player_vout_cbs.on_wallpaper_mode_changed offset"); }
+    }
+
+    [Fact]
+    public void PlaylistCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlaylistCallbacks);
+        AssertEqual(88, global::VLCLR.Native.Interop.PlaylistCallbacks.SizeOf, "vlc_playlist_callbacks sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlaylistCallbacks>(), "vlc_playlist_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.OnItemsMoved; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_items_moved offset"); }
+        { ref var r = ref s.OnItemsRemoved; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_items_removed offset"); }
+        { ref var r = ref s.OnPlaybackRepeatChanged; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_playback_repeat_changed offset"); }
+        { ref var r = ref s.OnPlaybackOrderChanged; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_playback_order_changed offset"); }
+        { ref var r = ref s.OnCurrentIndexChanged; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_current_index_changed offset"); }
+        { ref var r = ref s.OnHasPrevChanged; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_has_prev_changed offset"); }
+        { ref var r = ref s.OnHasNextChanged; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_has_next_changed offset"); }
+        { ref var r = ref s.OnMediaStoppedActionChanged; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_playlist_callbacks.on_media_stopped_action_changed offset"); }
+    }
+
+    [Fact]
+    public void PlaylistExport_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlaylistExport);
+        AssertEqual(48, global::VLCLR.Native.Interop.PlaylistExport.SizeOf, "vlc_playlist_export sizeof");
+        AssertEqual(48, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlaylistExport>(), "vlc_playlist_export Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_playlist_export.obj offset");
+        { ref var r = ref s.BaseUrl; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_playlist_export.base_url offset"); }
+        { ref var r = ref s.PlaylistView; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_playlist_export.playlist_view offset"); }
+    }
+
+    [Fact]
+    public void PlaylistSortCriterion_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PlaylistSortCriterion);
+        AssertEqual(8, global::VLCLR.Native.Interop.PlaylistSortCriterion.SizeOf, "vlc_playlist_sort_criterion sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.PlaylistSortCriterion>(), "vlc_playlist_sort_criterion Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Key), "vlc_playlist_sort_criterion.key offset");
+        AssertEqual(4, Offset(ref s, ref s.Order), "vlc_playlist_sort_criterion.order offset");
+    }
+
+    [Fact]
+    public void PreparserCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserCbs);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserCbs.SizeOf, "vlc_preparser_cbs sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserCbs>(), "vlc_preparser_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnEnded; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_preparser_cbs.on_ended offset"); }
+        { ref var r = ref s.OnSubtreeAdded; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_preparser_cbs.on_subtree_added offset"); }
+        { ref var r = ref s.OnAttachmentsAdded; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_preparser_cbs.on_attachments_added offset"); }
+    }
+
+    [Fact]
+    public void PreparserCfg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserCfg);
+        AssertEqual(32, global::VLCLR.Native.Interop.PreparserCfg.SizeOf, "vlc_preparser_cfg sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserCfg>(), "vlc_preparser_cfg Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Types), "vlc_preparser_cfg.types offset");
+        AssertEqual(4, Offset(ref s, ref s.MaxParserThreads), "vlc_preparser_cfg.max_parser_threads offset");
+        AssertEqual(8, Offset(ref s, ref s.MaxThumbnailerThreads), "vlc_preparser_cfg.max_thumbnailer_threads offset");
+        AssertEqual(16, Offset(ref s, ref s.Timeout), "vlc_preparser_cfg.timeout offset");
+        AssertEqual(24, Offset(ref s, ref s.ExternalProcess), "vlc_preparser_cfg.external_process offset");
+    }
+
+    [Fact]
+    public void PreparserMsg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsg);
+        AssertEqual(104, global::VLCLR.Native.Interop.PreparserMsg.SizeOf, "vlc_preparser_msg sizeof");
+        AssertEqual(104, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsg>(), "vlc_preparser_msg Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "vlc_preparser_msg.type offset");
+        AssertEqual(4, Offset(ref s, ref s.ReqType), "vlc_preparser_msg.req_type offset");
+        AssertEqual(8, Offset(ref s, ref s.Req), "vlc_preparser_msg.req offset");
+        AssertEqual(8, Offset(ref s, ref s.Res), "vlc_preparser_msg.res offset");
+    }
+
+    [Fact]
+    public void PreparserMsgReq_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgReq);
+        AssertEqual(96, global::VLCLR.Native.Interop.PreparserMsgReq.SizeOf, "vlc_preparser_msg_req sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgReq>(), "vlc_preparser_msg_req Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "vlc_preparser_msg_req.type offset");
+        AssertEqual(4, Offset(ref s, ref s.Options), "vlc_preparser_msg_req.options offset");
+        AssertEqual(8, Offset(ref s, ref s.Arg), "vlc_preparser_msg_req.arg offset");
+        AssertEqual(40, Offset(ref s, ref s.OutputsPath), "vlc_preparser_msg_req.outputs_path offset");
+        AssertEqual(64, Offset(ref s, ref s.Outputs), "vlc_preparser_msg_req.outputs offset");
+        { ref var r = ref s.Uri; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "vlc_preparser_msg_req.uri offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgReqOutputs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgReqOutputs);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserMsgReqOutputs.SizeOf, "vlc_preparser_msg_req::outputs sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgReqOutputs>(), "vlc_preparser_msg_req::outputs Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_preparser_msg_req::outputs.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_preparser_msg_req::outputs.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_preparser_msg_req::outputs.data offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgReqOutputsPath_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgReqOutputsPath);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserMsgReqOutputsPath.SizeOf, "vlc_preparser_msg_req::outputs_path sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgReqOutputsPath>(), "vlc_preparser_msg_req::outputs_path Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_preparser_msg_req::outputs_path.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_preparser_msg_req::outputs_path.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_preparser_msg_req::outputs_path.data offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgRes_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgRes);
+        AssertEqual(88, global::VLCLR.Native.Interop.PreparserMsgRes.SizeOf, "vlc_preparser_msg_res sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgRes>(), "vlc_preparser_msg_res Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "vlc_preparser_msg_res.type offset");
+        AssertEqual(8, Offset(ref s, ref s.Attachments), "vlc_preparser_msg_res.attachments offset");
+        { ref var r = ref s.Subtree; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_preparser_msg_res.subtree offset"); }
+        { ref var r = ref s.Pic; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_preparser_msg_res.pic offset"); }
+        AssertEqual(48, Offset(ref s, ref s.Result), "vlc_preparser_msg_res.result offset");
+        AssertEqual(72, Offset(ref s, ref s.Status), "vlc_preparser_msg_res.status offset");
+        { ref var r = ref s.Item; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_preparser_msg_res.item offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgResAttachments_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgResAttachments);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserMsgResAttachments.SizeOf, "vlc_preparser_msg_res::attachments sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgResAttachments>(), "vlc_preparser_msg_res::attachments Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_preparser_msg_res::attachments.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_preparser_msg_res::attachments.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_preparser_msg_res::attachments.data offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgResResult_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgResResult);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserMsgResResult.SizeOf, "vlc_preparser_msg_res::result sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgResResult>(), "vlc_preparser_msg_res::result Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_preparser_msg_res::result.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_preparser_msg_res::result.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_preparser_msg_res::result.data offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgSerdes_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgSerdes);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserMsgSerdes.SizeOf, "vlc_preparser_msg_serdes sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgSerdes>(), "vlc_preparser_msg_serdes Unsafe.SizeOf");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_preparser_msg_serdes.ops offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Owner), "vlc_preparser_msg_serdes.owner offset");
+    }
+
+    [Fact]
+    public void PreparserMsgSerdesOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgSerdesOwner);
+        AssertEqual(16, global::VLCLR.Native.Interop.PreparserMsgSerdesOwner.SizeOf, "vlc_preparser_msg_serdes::owner sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgSerdesOwner>(), "vlc_preparser_msg_serdes::owner Unsafe.SizeOf");
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_preparser_msg_serdes::owner.cbs offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_preparser_msg_serdes::owner.sys offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgSerdesCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgSerdesCbs);
+        AssertEqual(16, global::VLCLR.Native.Interop.PreparserMsgSerdesCbs.SizeOf, "vlc_preparser_msg_serdes_cbs sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgSerdesCbs>(), "vlc_preparser_msg_serdes_cbs Unsafe.SizeOf");
+        { ref var r = ref s.Write; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_preparser_msg_serdes_cbs.write offset"); }
+        { ref var r = ref s.Read; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_preparser_msg_serdes_cbs.read offset"); }
+    }
+
+    [Fact]
+    public void PreparserMsgSerdesOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.PreparserMsgSerdesOperations);
+        AssertEqual(24, global::VLCLR.Native.Interop.PreparserMsgSerdesOperations.SizeOf, "vlc_preparser_msg_serdes_operations sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.PreparserMsgSerdesOperations>(), "vlc_preparser_msg_serdes_operations Unsafe.SizeOf");
+        { ref var r = ref s.Serialize; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_preparser_msg_serdes_operations.serialize offset"); }
+        { ref var r = ref s.Deserialize; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_preparser_msg_serdes_operations.deserialize offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_preparser_msg_serdes_operations.close offset"); }
+    }
+
+    [Fact]
+    public void Probe_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Probe);
+        AssertEqual(40, global::VLCLR.Native.Interop.Probe.SizeOf, "vlc_probe_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.Probe>(), "vlc_probe_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_probe_t.obj offset");
+        { ref var r = ref s.List; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_probe_t.list offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Count), "vlc_probe_t.count offset");
+    }
+
+    [Fact]
+    public void Queue_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Queue);
+        AssertEqual(64, global::VLCLR.Native.Interop.Queue.SizeOf, "vlc_queue sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.Queue>(), "vlc_queue Unsafe.SizeOf");
+        { ref var r = ref s.First; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_queue.first offset"); }
+        { ref var r = ref s.Lastp; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_queue.lastp offset"); }
+        AssertEqual(16, Offset(ref s, ref s.NextOffset), "vlc_queue.next_offset offset");
+        AssertEqual(24, PointerOffset(ref s, s.Lock), "vlc_queue.lock offset");
+        AssertEqual(40, Offset(ref s, ref s.Wait), "vlc_queue.wait offset");
+    }
+
+    [Fact]
     public void Rational_Layout()
     {
-        var s = default(Rational);
-        AssertEqual(8, Rational.SizeOf, "vlc_rational_t sizeof");
-        AssertEqual(8, Unsafe.SizeOf<Rational>(), "vlc_rational_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Rational);
+        AssertEqual(8, global::VLCLR.Native.Interop.Rational.SizeOf, "vlc_rational_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.Rational>(), "vlc_rational_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Num), "vlc_rational_t.num offset");
         AssertEqual(4, Offset(ref s, ref s.Den), "vlc_rational_t.den offset");
     }
 
     [Fact]
+    public void ReaddirHelper_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ReaddirHelper);
+        AssertEqual(56, global::VLCLR.Native.Interop.ReaddirHelper.SizeOf, "vlc_readdir_helper sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.ReaddirHelper>(), "vlc_readdir_helper Unsafe.SizeOf");
+        { ref var r = ref s.Node; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_readdir_helper.p_node offset"); }
+        { ref var r = ref s.Slaves; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_readdir_helper.pp_slaves offset"); }
+        AssertEqual(16, Offset(ref s, ref s.SlavesCount), "vlc_readdir_helper.i_slaves offset");
+        { ref var r = ref s.Dirs; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_readdir_helper.pp_dirs offset"); }
+        AssertEqual(32, Offset(ref s, ref s.DirsCount), "vlc_readdir_helper.i_dirs offset");
+        AssertEqual(40, Offset(ref s, ref s.SubAutodetectFuzzy), "vlc_readdir_helper.i_sub_autodetect_fuzzy offset");
+        AssertEqual(44, Offset(ref s, ref s.ShowHiddenfiles), "vlc_readdir_helper.b_show_hiddenfiles offset");
+        AssertEqual(45, Offset(ref s, ref s.Flatten), "vlc_readdir_helper.b_flatten offset");
+        { ref var r = ref s.IgnoredExts; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_readdir_helper.psz_ignored_exts offset"); }
+    }
+
+    [Fact]
+    public void RenderSubpicture_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.RenderSubpicture);
+        AssertEqual(32, global::VLCLR.Native.Interop.RenderSubpicture.SizeOf, "vlc_render_subpicture sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.RenderSubpicture>(), "vlc_render_subpicture Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Regions), "vlc_render_subpicture.regions offset");
+        AssertEqual(24, Offset(ref s, ref s.Order), "vlc_render_subpicture.i_order offset");
+    }
+
+    [Fact]
+    public void RenderSubpictureRegions_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.RenderSubpictureRegions);
+        AssertEqual(24, global::VLCLR.Native.Interop.RenderSubpictureRegions.SizeOf, "vlc_render_subpicture::regions sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.RenderSubpictureRegions>(), "vlc_render_subpicture::regions Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Cap), "vlc_render_subpicture::regions.cap offset");
+        AssertEqual(8, Offset(ref s, ref s.Size), "vlc_render_subpicture::regions.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_render_subpicture::regions.data offset"); }
+    }
+
+    [Fact]
+    public void RendererDiscoveryOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.RendererDiscoveryOwner);
+        AssertEqual(24, global::VLCLR.Native.Interop.RendererDiscoveryOwner.SizeOf, "vlc_renderer_discovery_owner sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.RendererDiscoveryOwner>(), "vlc_renderer_discovery_owner Unsafe.SizeOf");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_renderer_discovery_owner.sys offset"); }
+        { ref var r = ref s.ItemAdded; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_renderer_discovery_owner.item_added offset"); }
+        { ref var r = ref s.ItemRemoved; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_renderer_discovery_owner.item_removed offset"); }
+    }
+
+    [Fact]
+    public void RendererDiscovery_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.RendererDiscovery);
+        AssertEqual(80, global::VLCLR.Native.Interop.RendererDiscovery.SizeOf, "vlc_renderer_discovery_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.RendererDiscovery>(), "vlc_renderer_discovery_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_renderer_discovery_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_renderer_discovery_t.p_module offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Owner), "vlc_renderer_discovery_t.owner offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_renderer_discovery_t.psz_name offset"); }
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_renderer_discovery_t.p_cfg offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_renderer_discovery_t.p_sys offset"); }
+    }
+
+    [Fact]
+    public void Runnable_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Runnable);
+        AssertEqual(32, global::VLCLR.Native.Interop.Runnable.SizeOf, "vlc_runnable sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.Runnable>(), "vlc_runnable Unsafe.SizeOf");
+        { ref var r = ref s.Run; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_runnable.run offset"); }
+        { ref var r = ref s.Userdata; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_runnable.userdata offset"); }
+        AssertEqual(16, Offset(ref s, ref s.Node), "vlc_runnable.node offset");
+    }
+
+    [Fact]
+    public void Sem_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Sem);
+        AssertEqual(4, global::VLCLR.Native.Interop.Sem.SizeOf, "vlc_sem_t sizeof");
+        AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.Sem>(), "vlc_sem_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Value), "vlc_sem_t.value offset");
+        AssertEqual(0, Offset(ref s, ref s.Dummy), "vlc_sem_t.dummy offset");
+    }
+
+    [Fact]
+    public void VlcSockaddr_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlcSockaddr);
+        AssertEqual(128, global::VLCLR.Native.Interop.VlcSockaddr.SizeOf, "vlc_sockaddr sizeof");
+        AssertEqual(128, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlcSockaddr>(), "vlc_sockaddr Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Sa), "vlc_sockaddr.sa offset");
+        AssertEqual(0, Offset(ref s, ref s.Sin), "vlc_sockaddr.sin offset");
+    }
+
+    [Fact]
+    public void SpuHighlight_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SpuHighlight);
+        AssertEqual(1044, global::VLCLR.Native.Interop.SpuHighlight.SizeOf, "vlc_spu_highlight_t sizeof");
+        AssertEqual(1044, Unsafe.SizeOf<global::VLCLR.Native.Interop.SpuHighlight>(), "vlc_spu_highlight_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.XStart), "vlc_spu_highlight_t.x_start offset");
+        AssertEqual(4, Offset(ref s, ref s.XEnd), "vlc_spu_highlight_t.x_end offset");
+        AssertEqual(8, Offset(ref s, ref s.YStart), "vlc_spu_highlight_t.y_start offset");
+        AssertEqual(12, Offset(ref s, ref s.YEnd), "vlc_spu_highlight_t.y_end offset");
+        AssertEqual(16, Offset(ref s, ref s.Palette), "vlc_spu_highlight_t.palette offset");
+    }
+
+    [Fact]
+    public void SpuUpdaterConfiguration_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SpuUpdaterConfiguration);
+        AssertEqual(56, global::VLCLR.Native.Interop.SpuUpdaterConfiguration.SizeOf, "vlc_spu_updater_configuration sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.SpuUpdaterConfiguration>(), "vlc_spu_updater_configuration Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Current), "vlc_spu_updater_configuration.current offset");
+        AssertEqual(24, Offset(ref s, ref s.Previous), "vlc_spu_updater_configuration.previous offset");
+        AssertEqual(48, Offset(ref s, ref s.Pts), "vlc_spu_updater_configuration.pts offset");
+    }
+
+    [Fact]
+    public void SpuUpdaterConfigurationCurrent_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.SpuUpdaterConfigurationCurrent);
+        AssertEqual(24, global::VLCLR.Native.Interop.SpuUpdaterConfigurationCurrent.SizeOf, "vlc_spu_updater_configuration::current sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.SpuUpdaterConfigurationCurrent>(), "vlc_spu_updater_configuration::current Unsafe.SizeOf");
+        { ref var r = ref s.VideoSrc; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_spu_updater_configuration::current.video_src offset"); }
+        { ref var r = ref s.VideoDst; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_spu_updater_configuration::current.video_dst offset"); }
+        AssertEqual(16, Offset(ref s, ref s.DisplayWidth), "vlc_spu_updater_configuration::current.display_width offset");
+        AssertEqual(20, Offset(ref s, ref s.DisplayHeight), "vlc_spu_updater_configuration::current.display_height offset");
+    }
+
+    [Fact]
     public void SpuUpdaterOps_Layout()
     {
-        var s = default(SpuUpdaterOps);
-        AssertEqual(16, SpuUpdaterOps.SizeOf, "vlc_spu_updater_ops sizeof");
-        AssertEqual(16, Unsafe.SizeOf<SpuUpdaterOps>(), "vlc_spu_updater_ops Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.SpuUpdaterOps);
+        AssertEqual(16, global::VLCLR.Native.Interop.SpuUpdaterOps.SizeOf, "vlc_spu_updater_ops sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.SpuUpdaterOps>(), "vlc_spu_updater_ops Unsafe.SizeOf");
         { ref var r = ref s.Update; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_spu_updater_ops.update offset"); }
         { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_spu_updater_ops.destroy offset"); }
     }
 
     [Fact]
+    public void StreamOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.StreamOperations);
+        AssertEqual(360, global::VLCLR.Native.Interop.StreamOperations.SizeOf, "vlc_stream_operations sizeof");
+        AssertEqual(360, Unsafe.SizeOf<global::VLCLR.Native.Interop.StreamOperations>(), "vlc_stream_operations Unsafe.SizeOf");
+        { ref var r = ref s.CanSeek; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_stream_operations.can_seek offset"); }
+        { ref var r = ref s.CanPause; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_stream_operations.can_pause offset"); }
+        { ref var r = ref s.CanControlPace; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_stream_operations.can_control_pace offset"); }
+        { ref var r = ref s.GetSignal; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_stream_operations.get_signal offset"); }
+        { ref var r = ref s.GetMeta; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_stream_operations.get_meta offset"); }
+        { ref var r = ref s.GetType; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_stream_operations.get_type offset"); }
+        { ref var r = ref s.SetPauseState; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_stream_operations.set_pause_state offset"); }
+        { ref var r = ref s.SetSeekPoint; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_stream_operations.set_seek_point offset"); }
+        { ref var r = ref s.SetTitle; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_stream_operations.set_title offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_stream_operations.close offset"); }
+        AssertEqual(80, Offset(ref s, ref s.Stream), "vlc_stream_operations.stream offset");
+        AssertEqual(80, Offset(ref s, ref s.Demux), "vlc_stream_operations.demux offset");
+    }
+
+    [Fact]
+    public void StreamOperationsAnon0Demux_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.StreamOperationsAnon0Demux);
+        AssertEqual(280, global::VLCLR.Native.Interop.StreamOperationsAnon0Demux.SizeOf, "vlc_stream_operations::@0::demux sizeof");
+        AssertEqual(280, Unsafe.SizeOf<global::VLCLR.Native.Interop.StreamOperationsAnon0Demux>(), "vlc_stream_operations::@0::demux Unsafe.SizeOf");
+        { ref var r = ref s.CanRecord; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.can_record offset"); }
+        { ref var r = ref s.CanControlRate; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.can_control_rate offset"); }
+        { ref var r = ref s.Demux; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.demux offset"); }
+        { ref var r = ref s.Readdir; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.readdir offset"); }
+        { ref var r = ref s.HasUnsupportedMeta; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.has_unsupported_meta offset"); }
+        { ref var r = ref s.GetTitle; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_title offset"); }
+        { ref var r = ref s.GetSeekpoint; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_seekpoint offset"); }
+        { ref var r = ref s.GetPosition; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_position offset"); }
+        { ref var r = ref s.GetLength; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_length offset"); }
+        { ref var r = ref s.GetTime; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_time offset"); }
+        { ref var r = ref s.GetNormalTime; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_normal_time offset"); }
+        { ref var r = ref s.GetTitleInfo; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_title_info offset"); }
+        { ref var r = ref s.GetFps; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_fps offset"); }
+        { ref var r = ref s.GetAttachments; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_attachments offset"); }
+        { ref var r = ref s.GetPtsDelay; fixed (void* p = &r) AssertEqual(112, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.get_pts_delay offset"); }
+        { ref var r = ref s.SetPosition; fixed (void* p = &r) AssertEqual(120, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_position offset"); }
+        { ref var r = ref s.SetTime; fixed (void* p = &r) AssertEqual(128, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_time offset"); }
+        { ref var r = ref s.SetNextDemuxTime; fixed (void* p = &r) AssertEqual(136, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_next_demux_time offset"); }
+        { ref var r = ref s.SetRecordState; fixed (void* p = &r) AssertEqual(144, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_record_state offset"); }
+        { ref var r = ref s.SetRate; fixed (void* p = &r) AssertEqual(152, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_rate offset"); }
+        { ref var r = ref s.SetGroupDefault; fixed (void* p = &r) AssertEqual(160, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_group_default offset"); }
+        { ref var r = ref s.SetGroupAll; fixed (void* p = &r) AssertEqual(168, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_group_all offset"); }
+        { ref var r = ref s.SetGroupList; fixed (void* p = &r) AssertEqual(176, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_group_list offset"); }
+        { ref var r = ref s.SetEs; fixed (void* p = &r) AssertEqual(184, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_es offset"); }
+        { ref var r = ref s.SetEsList; fixed (void* p = &r) AssertEqual(192, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.set_es_list offset"); }
+        { ref var r = ref s.NavActivate; fixed (void* p = &r) AssertEqual(200, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_activate offset"); }
+        { ref var r = ref s.NavUp; fixed (void* p = &r) AssertEqual(208, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_up offset"); }
+        { ref var r = ref s.NavDown; fixed (void* p = &r) AssertEqual(216, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_down offset"); }
+        { ref var r = ref s.NavLeft; fixed (void* p = &r) AssertEqual(224, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_left offset"); }
+        { ref var r = ref s.NavRight; fixed (void* p = &r) AssertEqual(232, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_right offset"); }
+        { ref var r = ref s.NavPopup; fixed (void* p = &r) AssertEqual(240, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_popup offset"); }
+        { ref var r = ref s.NavMenu; fixed (void* p = &r) AssertEqual(248, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.nav_menu offset"); }
+        { ref var r = ref s.FilterEnable; fixed (void* p = &r) AssertEqual(256, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.filter_enable offset"); }
+        { ref var r = ref s.FilterDisable; fixed (void* p = &r) AssertEqual(264, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.filter_disable offset"); }
+        { ref var r = ref s.TestAndClearFlags; fixed (void* p = &r) AssertEqual(272, PointerOffset(ref s, p), "vlc_stream_operations::@0::demux.test_and_clear_flags offset"); }
+    }
+
+    [Fact]
+    public void StreamOperationsAnon0Stream_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.StreamOperationsAnon0Stream);
+        AssertEqual(136, global::VLCLR.Native.Interop.StreamOperationsAnon0Stream.SizeOf, "vlc_stream_operations::@0::stream sizeof");
+        AssertEqual(136, Unsafe.SizeOf<global::VLCLR.Native.Interop.StreamOperationsAnon0Stream>(), "vlc_stream_operations::@0::stream Unsafe.SizeOf");
+        { ref var r = ref s.CanFastseek; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.can_fastseek offset"); }
+        { ref var r = ref s.Read; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.read offset"); }
+        { ref var r = ref s.Block; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.block offset"); }
+        { ref var r = ref s.Readdir; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.readdir offset"); }
+        { ref var r = ref s.Seek; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.seek offset"); }
+        { ref var r = ref s.GetTitle; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_title offset"); }
+        { ref var r = ref s.GetSeekpoint; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_seekpoint offset"); }
+        { ref var r = ref s.GetSize; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_size offset"); }
+        { ref var r = ref s.GetMtime; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_mtime offset"); }
+        { ref var r = ref s.GetTitleInfo; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_title_info offset"); }
+        { ref var r = ref s.GetContentType; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_content_type offset"); }
+        { ref var r = ref s.GetTags; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_tags offset"); }
+        { ref var r = ref s.GetPrivateIdState; fixed (void* p = &r) AssertEqual(96, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_private_id_state offset"); }
+        { ref var r = ref s.GetPtsDelay; fixed (void* p = &r) AssertEqual(104, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.get_pts_delay offset"); }
+        { ref var r = ref s.SetRecordState; fixed (void* p = &r) AssertEqual(112, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.set_record_state offset"); }
+        { ref var r = ref s.SetPrivateIdState; fixed (void* p = &r) AssertEqual(120, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.set_private_id_state offset"); }
+        { ref var r = ref s.SetPrivateIdCa; fixed (void* p = &r) AssertEqual(128, PointerOffset(ref s, p), "vlc_stream_operations::@0::stream.set_private_id_ca offset"); }
+    }
+
+    [Fact]
+    [UnsupportedOSPlatform("windows")]
+    public void ThreadHandle_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ThreadHandle);
+        AssertEqual(8, global::VLCLR.Native.Interop.ThreadHandle.SizeOf, "vlc_thread_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThreadHandle>(), "vlc_thread_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Handle), "vlc_thread_t.handle offset");
+    }
+
+    [Fact]
+    public void ThumbnailerArg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ThumbnailerArg);
+        AssertEqual(32, global::VLCLR.Native.Interop.ThumbnailerArg.SizeOf, "vlc_thumbnailer_arg sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThumbnailerArg>(), "vlc_thumbnailer_arg Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Seek), "vlc_thumbnailer_arg.seek offset");
+        AssertEqual(24, Offset(ref s, ref s.HwDec), "vlc_thumbnailer_arg.hw_dec offset");
+    }
+
+    [Fact]
+    public void ThumbnailerCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ThumbnailerCbs);
+        AssertEqual(8, global::VLCLR.Native.Interop.ThumbnailerCbs.SizeOf, "vlc_thumbnailer_cbs sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThumbnailerCbs>(), "vlc_thumbnailer_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnEnded; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_thumbnailer_cbs.on_ended offset"); }
+    }
+
+    [Fact]
+    public void ThumbnailerOutput_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ThumbnailerOutput);
+        AssertEqual(32, global::VLCLR.Native.Interop.ThumbnailerOutput.SizeOf, "vlc_thumbnailer_output sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThumbnailerOutput>(), "vlc_thumbnailer_output Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Format), "vlc_thumbnailer_output.format offset");
+        AssertEqual(4, Offset(ref s, ref s.Width), "vlc_thumbnailer_output.width offset");
+        AssertEqual(8, Offset(ref s, ref s.Height), "vlc_thumbnailer_output.height offset");
+        AssertEqual(12, Offset(ref s, ref s.Crop), "vlc_thumbnailer_output.crop offset");
+        { ref var r = ref s.FilePath; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_thumbnailer_output.file_path offset"); }
+        AssertEqual(24, Offset(ref s, ref s.CreatMode), "vlc_thumbnailer_output.creat_mode offset");
+    }
+
+    [Fact]
+    public void ThumbnailerToFilesCbs_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.ThumbnailerToFilesCbs);
+        AssertEqual(8, global::VLCLR.Native.Interop.ThumbnailerToFilesCbs.SizeOf, "vlc_thumbnailer_to_files_cbs sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThumbnailerToFilesCbs>(), "vlc_thumbnailer_to_files_cbs Unsafe.SizeOf");
+        { ref var r = ref s.OnEnded; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_thumbnailer_to_files_cbs.on_ended offset"); }
+    }
+
+    [Fact]
+    public void Tls_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Tls);
+        AssertEqual(16, global::VLCLR.Native.Interop.Tls.SizeOf, "vlc_tls sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Tls>(), "vlc_tls Unsafe.SizeOf");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tls.ops offset"); }
+        { ref var r = ref s.P; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_tls.p offset"); }
+    }
+
+    [Fact]
+    public void TlsClient_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TlsClient);
+        AssertEqual(40, global::VLCLR.Native.Interop.TlsClient.SizeOf, "vlc_tls_client sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.TlsClient>(), "vlc_tls_client Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_tls_client.obj offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_tls_client.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_tls_client.sys offset"); }
+    }
+
+    [Fact]
+    public void TlsClientOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TlsClientOperations);
+        AssertEqual(24, global::VLCLR.Native.Interop.TlsClientOperations.SizeOf, "vlc_tls_client_operations sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.TlsClientOperations>(), "vlc_tls_client_operations Unsafe.SizeOf");
+        { ref var r = ref s.Open; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tls_client_operations.open offset"); }
+        { ref var r = ref s.Handshake; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_tls_client_operations.handshake offset"); }
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_tls_client_operations.destroy offset"); }
+    }
+
+    [Fact]
+    public void TlsOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TlsOperations);
+        AssertEqual(40, global::VLCLR.Native.Interop.TlsOperations.SizeOf, "vlc_tls_operations sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.TlsOperations>(), "vlc_tls_operations Unsafe.SizeOf");
+        { ref var r = ref s.GetFd; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tls_operations.get_fd offset"); }
+        { ref var r = ref s.Readv; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_tls_operations.readv offset"); }
+        { ref var r = ref s.Writev; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_tls_operations.writev offset"); }
+        { ref var r = ref s.Shutdown; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_tls_operations.shutdown offset"); }
+        { ref var r = ref s.Close; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_tls_operations.close offset"); }
+    }
+
+    [Fact]
+    public void TlsServer_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TlsServer);
+        AssertEqual(40, global::VLCLR.Native.Interop.TlsServer.SizeOf, "vlc_tls_server sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.TlsServer>(), "vlc_tls_server Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_tls_server.obj offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_tls_server.ops offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_tls_server.sys offset"); }
+    }
+
+    [Fact]
+    public void TlsServerOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TlsServerOperations);
+        AssertEqual(24, global::VLCLR.Native.Interop.TlsServerOperations.SizeOf, "vlc_tls_server_operations sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.TlsServerOperations>(), "vlc_tls_server_operations Unsafe.SizeOf");
+        { ref var r = ref s.Open; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tls_server_operations.open offset"); }
+        { ref var r = ref s.Handshake; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_tls_server_operations.handshake offset"); }
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_tls_server_operations.destroy offset"); }
+    }
+
+    [Fact]
+    public void TracerEntry_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TracerEntry);
+        AssertEqual(24, global::VLCLR.Native.Interop.TracerEntry.SizeOf, "vlc_tracer_entry sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.TracerEntry>(), "vlc_tracer_entry Unsafe.SizeOf");
+        { ref var r = ref s.Key; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tracer_entry.key offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Value), "vlc_tracer_entry.value offset");
+        AssertEqual(16, Offset(ref s, ref s.Type), "vlc_tracer_entry.type offset");
+    }
+
+    [Fact]
+    public void TracerOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TracerOperations);
+        AssertEqual(16, global::VLCLR.Native.Interop.TracerOperations.SizeOf, "vlc_tracer_operations sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.TracerOperations>(), "vlc_tracer_operations Unsafe.SizeOf");
+        { ref var r = ref s.Trace; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tracer_operations.trace offset"); }
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_tracer_operations.destroy offset"); }
+    }
+
+    [Fact]
+    public void TracerTrace_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TracerTrace);
+        AssertEqual(8, global::VLCLR.Native.Interop.TracerTrace.SizeOf, "vlc_tracer_trace sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.TracerTrace>(), "vlc_tracer_trace Unsafe.SizeOf");
+        { ref var r = ref s.Entries; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tracer_trace.entries offset"); }
+    }
+
+    [Fact]
+    public void TracerValue_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.TracerValue);
+        AssertEqual(8, global::VLCLR.Native.Interop.TracerValue.SizeOf, "vlc_tracer_value_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.TracerValue>(), "vlc_tracer_value_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Integer), "vlc_tracer_value_t.integer offset");
+        AssertEqual(0, Offset(ref s, ref s.Double), "vlc_tracer_value_t.double_ offset");
+        { ref var r = ref s.String; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_tracer_value_t.string offset"); }
+        AssertEqual(0, Offset(ref s, ref s.Uinteger), "vlc_tracer_value_t.uinteger offset");
+    }
+
+    [Fact]
+    public void Url_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Url);
+        AssertEqual(80, global::VLCLR.Native.Interop.Url.SizeOf, "vlc_url_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.Url>(), "vlc_url_t Unsafe.SizeOf");
+        { ref var r = ref s.Protocol; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_url_t.psz_protocol offset"); }
+        { ref var r = ref s.Username; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_url_t.psz_username offset"); }
+        { ref var r = ref s.Password; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_url_t.psz_password offset"); }
+        { ref var r = ref s.Host; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_url_t.psz_host offset"); }
+        AssertEqual(32, Offset(ref s, ref s.Port), "vlc_url_t.i_port offset");
+        { ref var r = ref s.Path; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_url_t.psz_path offset"); }
+        { ref var r = ref s.Option; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_url_t.psz_option offset"); }
+        { ref var r = ref s.Fragment; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_url_t.psz_fragment offset"); }
+        { ref var r = ref s.Buffer; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_url_t.psz_buffer offset"); }
+        { ref var r = ref s.Pathbuffer; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_url_t.psz_pathbuffer offset"); }
+    }
+
+    [Fact]
     public void Value_Layout()
     {
-        var s = default(Value);
-        AssertEqual(8, Value.SizeOf, "vlc_value_t sizeof");
-        AssertEqual(8, Unsafe.SizeOf<Value>(), "vlc_value_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Value);
+        AssertEqual(8, global::VLCLR.Native.Interop.Value.SizeOf, "vlc_value_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.Value>(), "vlc_value_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Int), "vlc_value_t.i_int offset");
         AssertEqual(0, Offset(ref s, ref s.Bool), "vlc_value_t.b_bool offset");
         AssertEqual(0, Offset(ref s, ref s.Float), "vlc_value_t.f_float offset");
@@ -627,23 +4246,390 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void ValueCoords_Layout()
     {
-        var s = default(ValueCoords);
-        AssertEqual(8, ValueCoords.SizeOf, "vlc_value_t::coords sizeof");
-        AssertEqual(8, Unsafe.SizeOf<ValueCoords>(), "vlc_value_t::coords Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.ValueCoords);
+        AssertEqual(8, global::VLCLR.Native.Interop.ValueCoords.SizeOf, "vlc_value_t::coords sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ValueCoords>(), "vlc_value_t::coords Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.X), "vlc_value_t::coords.x offset");
         AssertEqual(4, Offset(ref s, ref s.Y), "vlc_value_t::coords.y offset");
     }
 
     [Fact]
+    public void VideoAlign_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoAlign);
+        AssertEqual(2, global::VLCLR.Native.Interop.VideoAlign.SizeOf, "vlc_video_align sizeof");
+        AssertEqual(2, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoAlign>(), "vlc_video_align Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Horizontal), "vlc_video_align.horizontal offset");
+        AssertEqual(1, Offset(ref s, ref s.Vertical), "vlc_video_align.vertical offset");
+    }
+
+    [Fact]
+    public void VideoContextOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoContextOperations);
+        AssertEqual(8, global::VLCLR.Native.Interop.VideoContextOperations.SizeOf, "vlc_video_context_operations sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoContextOperations>(), "vlc_video_context_operations Unsafe.SizeOf");
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_video_context_operations.destroy offset"); }
+    }
+
+    [Fact]
+    public void VideoDoviMetadata_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoDoviMetadata);
+        AssertEqual(5208, global::VLCLR.Native.Interop.VideoDoviMetadata.SizeOf, "vlc_video_dovi_metadata_t sizeof");
+        AssertEqual(5208, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoDoviMetadata>(), "vlc_video_dovi_metadata_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.CoefLog2Denom), "vlc_video_dovi_metadata_t.coef_log2_denom offset");
+        AssertEqual(1, Offset(ref s, ref s.BlBitDepth), "vlc_video_dovi_metadata_t.bl_bit_depth offset");
+        AssertEqual(2, Offset(ref s, ref s.ElBitDepth), "vlc_video_dovi_metadata_t.el_bit_depth offset");
+        AssertEqual(4, Offset(ref s, ref s.NlqMethodIdc), "vlc_video_dovi_metadata_t.nlq_method_idc offset");
+        AssertEqual(8, Offset(ref s, ref s.NonlinearOffset), "vlc_video_dovi_metadata_t.nonlinear_offset offset");
+        AssertEqual(20, Offset(ref s, ref s.NonlinearMatrix), "vlc_video_dovi_metadata_t.nonlinear_matrix offset");
+        AssertEqual(56, Offset(ref s, ref s.LinearMatrix), "vlc_video_dovi_metadata_t.linear_matrix offset");
+        AssertEqual(92, Offset(ref s, ref s.SourceMinPq), "vlc_video_dovi_metadata_t.source_min_pq offset");
+        AssertEqual(94, Offset(ref s, ref s.SourceMaxPq), "vlc_video_dovi_metadata_t.source_max_pq offset");
+        AssertEqual(96, Offset(ref s, ref s.Curves), "vlc_video_dovi_metadata_t.curves offset");
+        AssertEqual(5112, Offset(ref s, ref s.Nlq), "vlc_video_dovi_metadata_t.nlq offset");
+    }
+
+    [Fact]
+    public void VideoHdrDynamicMetadata_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoHdrDynamicMetadata);
+        AssertEqual(228, global::VLCLR.Native.Interop.VideoHdrDynamicMetadata.SizeOf, "vlc_video_hdr_dynamic_metadata_t sizeof");
+        AssertEqual(228, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoHdrDynamicMetadata>(), "vlc_video_hdr_dynamic_metadata_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.CountryCode), "vlc_video_hdr_dynamic_metadata_t.country_code offset");
+        AssertEqual(1, Offset(ref s, ref s.ApplicationVersion), "vlc_video_hdr_dynamic_metadata_t.application_version offset");
+        AssertEqual(4, Offset(ref s, ref s.TargetedLuminance), "vlc_video_hdr_dynamic_metadata_t.targeted_luminance offset");
+        AssertEqual(8, Offset(ref s, ref s.Maxscl), "vlc_video_hdr_dynamic_metadata_t.maxscl offset");
+        AssertEqual(20, Offset(ref s, ref s.AverageMaxrgb), "vlc_video_hdr_dynamic_metadata_t.average_maxrgb offset");
+        AssertEqual(24, Offset(ref s, ref s.NumHistogram), "vlc_video_hdr_dynamic_metadata_t.num_histogram offset");
+        AssertEqual(28, Offset(ref s, ref s.Histogram), "vlc_video_hdr_dynamic_metadata_t.histogram offset");
+        AssertEqual(148, Offset(ref s, ref s.FractionBrightPixels), "vlc_video_hdr_dynamic_metadata_t.fraction_bright_pixels offset");
+        AssertEqual(152, Offset(ref s, ref s.ToneMappingFlag), "vlc_video_hdr_dynamic_metadata_t.tone_mapping_flag offset");
+        AssertEqual(156, Offset(ref s, ref s.KneePointX), "vlc_video_hdr_dynamic_metadata_t.knee_point_x offset");
+        AssertEqual(160, Offset(ref s, ref s.KneePointY), "vlc_video_hdr_dynamic_metadata_t.knee_point_y offset");
+        AssertEqual(164, Offset(ref s, ref s.NumBezierAnchors), "vlc_video_hdr_dynamic_metadata_t.num_bezier_anchors offset");
+        AssertEqual(168, Offset(ref s, ref s.BezierCurveAnchors), "vlc_video_hdr_dynamic_metadata_t.bezier_curve_anchors offset");
+    }
+
+    [Fact]
+    public void VideoHdrDynamicMetadataHistogram_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VideoHdrDynamicMetadataHistogram);
+        AssertEqual(8, global::VLCLR.Native.Interop.VideoHdrDynamicMetadataHistogram.SizeOf, "vlc_video_hdr_dynamic_metadata_t::histogram sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.VideoHdrDynamicMetadataHistogram>(), "vlc_video_hdr_dynamic_metadata_t::histogram Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Percentage), "vlc_video_hdr_dynamic_metadata_t::histogram.percentage offset");
+        AssertEqual(4, Offset(ref s, ref s.Percentile), "vlc_video_hdr_dynamic_metadata_t::histogram.percentile offset");
+    }
+
+    [Fact]
     public void Viewpoint_Layout()
     {
-        var s = default(Viewpoint);
-        AssertEqual(16, Viewpoint.SizeOf, "vlc_viewpoint_t sizeof");
-        AssertEqual(16, Unsafe.SizeOf<Viewpoint>(), "vlc_viewpoint_t Unsafe.SizeOf");
+        var s = default(global::VLCLR.Native.Interop.Viewpoint);
+        AssertEqual(16, global::VLCLR.Native.Interop.Viewpoint.SizeOf, "vlc_viewpoint_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Viewpoint>(), "vlc_viewpoint_t Unsafe.SizeOf");
         AssertEqual(0, Offset(ref s, ref s.Yaw), "vlc_viewpoint_t.yaw offset");
         AssertEqual(4, Offset(ref s, ref s.Pitch), "vlc_viewpoint_t.pitch offset");
         AssertEqual(8, Offset(ref s, ref s.Roll), "vlc_viewpoint_t.roll offset");
         AssertEqual(12, Offset(ref s, ref s.Fov), "vlc_viewpoint_t.fov offset");
+    }
+
+    [Fact]
+    public void VpxAlpha_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VpxAlpha);
+        AssertEqual(16, global::VLCLR.Native.Interop.VpxAlpha.SizeOf, "vlc_vpx_alpha_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.VpxAlpha>(), "vlc_vpx_alpha_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Size), "vlc_vpx_alpha_t.size offset");
+        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_vpx_alpha_t.data offset"); }
+    }
+
+    [Fact]
+    public void Window_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Window);
+        AssertEqual(88, global::VLCLR.Native.Interop.Window.SizeOf, "vlc_window sizeof");
+        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.Window>(), "vlc_window Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vlc_window.obj offset");
+        AssertEqual(24, Offset(ref s, ref s.Type), "vlc_window.type offset");
+        AssertEqual(32, Offset(ref s, ref s.Handle), "vlc_window.handle offset");
+        AssertEqual(40, Offset(ref s, ref s.Display), "vlc_window.display offset");
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_window.ops offset"); }
+        AssertEqual(56, Offset(ref s, ref s.Info), "vlc_window.info offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_window.sys offset"); }
+        AssertEqual(72, Offset(ref s, ref s.Owner), "vlc_window.owner offset");
+    }
+
+    [Fact]
+    public void WindowDisplay_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowDisplay);
+        AssertEqual(8, global::VLCLR.Native.Interop.WindowDisplay.SizeOf, "vlc_window::display sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowDisplay>(), "vlc_window::display Unsafe.SizeOf");
+        { ref var r = ref s.X11; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::display.x11 offset"); }
+        { ref var r = ref s.Wl; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::display.wl offset"); }
+        { ref var r = ref s.DcompDevice; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::display.dcomp_device offset"); }
+        AssertEqual(0, Offset(ref s, ref s.DrmFd), "vlc_window::display.drm_fd offset");
+        { ref var r = ref s.Anativewindow; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::display.anativewindow offset"); }
+    }
+
+    [Fact]
+    public void WindowHandle_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowHandle);
+        AssertEqual(8, global::VLCLR.Native.Interop.WindowHandle.SizeOf, "vlc_window::handle sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowHandle>(), "vlc_window::handle Unsafe.SizeOf");
+        { ref var r = ref s.Hwnd; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::handle.hwnd offset"); }
+        AssertEqual(0, Offset(ref s, ref s.Xid), "vlc_window::handle.xid offset");
+        { ref var r = ref s.Nsobject; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::handle.nsobject offset"); }
+        AssertEqual(0, Offset(ref s, ref s.AndroidId), "vlc_window::handle.android_id offset");
+        { ref var r = ref s.Wl; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::handle.wl offset"); }
+        { ref var r = ref s.DcompVisual; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window::handle.dcomp_visual offset"); }
+        AssertEqual(0, Offset(ref s, ref s.Crtc), "vlc_window::handle.crtc offset");
+        AssertEqual(0, Offset(ref s, ref s.DisplayId), "vlc_window::handle.display_id offset");
+    }
+
+    [Fact]
+    public void WindowInfo_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowInfo);
+        AssertEqual(1, global::VLCLR.Native.Interop.WindowInfo.SizeOf, "vlc_window::info sizeof");
+        AssertEqual(1, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowInfo>(), "vlc_window::info Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.HasDoubleClick), "vlc_window::info.has_double_click offset");
+    }
+
+    [Fact]
+    public void WindowCallbacks_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowCallbacks);
+        AssertEqual(72, global::VLCLR.Native.Interop.WindowCallbacks.SizeOf, "vlc_window_callbacks sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowCallbacks>(), "vlc_window_callbacks Unsafe.SizeOf");
+        { ref var r = ref s.Resized; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window_callbacks.resized offset"); }
+        { ref var r = ref s.Closed; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_window_callbacks.closed offset"); }
+        { ref var r = ref s.StateChanged; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_window_callbacks.state_changed offset"); }
+        { ref var r = ref s.Windowed; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_window_callbacks.windowed offset"); }
+        { ref var r = ref s.Fullscreened; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_window_callbacks.fullscreened offset"); }
+        { ref var r = ref s.MouseEvent; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_window_callbacks.mouse_event offset"); }
+        { ref var r = ref s.KeyboardEvent; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_window_callbacks.keyboard_event offset"); }
+        { ref var r = ref s.OutputEvent; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_window_callbacks.output_event offset"); }
+        { ref var r = ref s.IccEvent; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_window_callbacks.icc_event offset"); }
+    }
+
+    [Fact]
+    public void WindowMouseEvent_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowMouseEvent);
+        AssertEqual(16, global::VLCLR.Native.Interop.WindowMouseEvent.SizeOf, "vlc_window_mouse_event sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowMouseEvent>(), "vlc_window_mouse_event Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "vlc_window_mouse_event.type offset");
+        AssertEqual(4, Offset(ref s, ref s.X), "vlc_window_mouse_event.x offset");
+        AssertEqual(8, Offset(ref s, ref s.Y), "vlc_window_mouse_event.y offset");
+        AssertEqual(12, Offset(ref s, ref s.ButtonMask), "vlc_window_mouse_event.button_mask offset");
+    }
+
+    [Fact]
+    public void WindowOperations_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowOperations);
+        AssertEqual(64, global::VLCLR.Native.Interop.WindowOperations.SizeOf, "vlc_window_operations sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowOperations>(), "vlc_window_operations Unsafe.SizeOf");
+        { ref var r = ref s.Disable; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_window_operations.disable offset"); }
+        { ref var r = ref s.Resize; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_window_operations.resize offset"); }
+        { ref var r = ref s.Destroy; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_window_operations.destroy offset"); }
+        { ref var r = ref s.SetState; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_window_operations.set_state offset"); }
+        { ref var r = ref s.UnsetFullscreen; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_window_operations.unset_fullscreen offset"); }
+        { ref var r = ref s.SetFullscreen; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_window_operations.set_fullscreen offset"); }
+        { ref var r = ref s.SetTitle; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_window_operations.set_title offset"); }
+    }
+
+    [Fact]
+    public void WindowOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.WindowOwner);
+        AssertEqual(16, global::VLCLR.Native.Interop.WindowOwner.SizeOf, "vlc_window_owner sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.WindowOwner>(), "vlc_window_owner Unsafe.SizeOf");
+        { ref var r = ref s.Cbs; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_window_owner.cbs offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_window_owner.sys offset"); }
+    }
+
+    [Fact]
+    public void VlmEvent_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlmEvent);
+        AssertEqual(40, global::VLCLR.Native.Interop.VlmEvent.SizeOf, "vlm_event_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlmEvent>(), "vlm_event_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Type), "vlm_event_t.i_type offset");
+        AssertEqual(8, Offset(ref s, ref s.Id), "vlm_event_t.id offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlm_event_t.psz_name offset"); }
+        { ref var r = ref s.InstanceName; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlm_event_t.psz_instance_name offset"); }
+        AssertEqual(32, Offset(ref s, ref s.InputState), "vlm_event_t.input_state offset");
+    }
+
+    [Fact]
+    public void VlmMediaInstance_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlmMediaInstance);
+        AssertEqual(40, global::VLCLR.Native.Interop.VlmMediaInstance.SizeOf, "vlm_media_instance_t sizeof");
+        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlmMediaInstance>(), "vlm_media_instance_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlm_media_instance_t.psz_name offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Time), "vlm_media_instance_t.i_time offset");
+        AssertEqual(16, Offset(ref s, ref s.Length), "vlm_media_instance_t.i_length offset");
+        AssertEqual(24, Offset(ref s, ref s.DPosition), "vlm_media_instance_t.d_position offset");
+        AssertEqual(32, Offset(ref s, ref s.Paused), "vlm_media_instance_t.b_paused offset");
+        AssertEqual(36, Offset(ref s, ref s.Rate), "vlm_media_instance_t.f_rate offset");
+    }
+
+    [Fact]
+    public void VlmMedia_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlmMedia);
+        AssertEqual(72, global::VLCLR.Native.Interop.VlmMedia.SizeOf, "vlm_media_t sizeof");
+        AssertEqual(72, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlmMedia>(), "vlm_media_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Id), "vlm_media_t.id offset");
+        AssertEqual(8, Offset(ref s, ref s.Enabled), "vlm_media_t.b_enabled offset");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlm_media_t.psz_name offset"); }
+        AssertEqual(24, Offset(ref s, ref s.InputCount), "vlm_media_t.i_input offset");
+        { ref var r = ref s.Input; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlm_media_t.ppsz_input offset"); }
+        AssertEqual(40, Offset(ref s, ref s.OptionCount), "vlm_media_t.i_option offset");
+        { ref var r = ref s.Option; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlm_media_t.ppsz_option offset"); }
+        { ref var r = ref s.Output; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlm_media_t.psz_output offset"); }
+        AssertEqual(64, Offset(ref s, ref s.Broadcast), "vlm_media_t.broadcast offset");
+    }
+
+    [Fact]
+    public void VlmMediaBroadcast_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlmMediaBroadcast);
+        AssertEqual(1, global::VLCLR.Native.Interop.VlmMediaBroadcast.SizeOf, "vlm_media_t::broadcast sizeof");
+        AssertEqual(1, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlmMediaBroadcast>(), "vlm_media_t::broadcast Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Loop), "vlm_media_t::broadcast.b_loop offset");
+    }
+
+    [Fact]
+    public void VlmMessage_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VlmMessage);
+        AssertEqual(32, global::VLCLR.Native.Interop.VlmMessage.SizeOf, "vlm_message_t sizeof");
+        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlmMessage>(), "vlm_message_t Unsafe.SizeOf");
+        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlm_message_t.psz_name offset"); }
+        { ref var r = ref s.Value; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlm_message_t.psz_value offset"); }
+        AssertEqual(16, Offset(ref s, ref s.ChildCount), "vlm_message_t.i_child offset");
+        { ref var r = ref s.Child; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlm_message_t.child offset"); }
+    }
+
+    [Fact]
+    public void VoutDisplayCfg_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutDisplayCfg);
+        AssertEqual(80, global::VLCLR.Native.Interop.VoutDisplayCfg.SizeOf, "vout_display_cfg sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutDisplayCfg>(), "vout_display_cfg Unsafe.SizeOf");
+        { ref var r = ref s.Window; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vout_display_cfg.window offset"); }
+        AssertEqual(8, Offset(ref s, ref s.Display), "vout_display_cfg.display offset");
+        { ref var r = ref s.IccProfile; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vout_display_cfg.icc_profile offset"); }
+        AssertEqual(56, Offset(ref s, ref s.Projection), "vout_display_cfg.projection offset");
+        AssertEqual(60, Offset(ref s, ref s.Viewpoint), "vout_display_cfg.viewpoint offset");
+        AssertEqual(76, Offset(ref s, ref s.StereoMode), "vout_display_cfg.stereo_mode offset");
+    }
+
+    [Fact]
+    public void VoutDisplayInfo_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutDisplayInfo);
+        AssertEqual(8, global::VLCLR.Native.Interop.VoutDisplayInfo.SizeOf, "vout_display_info_t sizeof");
+        AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutDisplayInfo>(), "vout_display_info_t Unsafe.SizeOf");
+        { ref var r = ref s.SubpictureChromas; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vout_display_info_t.subpicture_chromas offset"); }
+    }
+
+    [Fact]
+    public void VoutDisplayOwner_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutDisplayOwner);
+        AssertEqual(16, global::VLCLR.Native.Interop.VoutDisplayOwner.SizeOf, "vout_display_owner_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutDisplayOwner>(), "vout_display_owner_t Unsafe.SizeOf");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vout_display_owner_t.sys offset"); }
+        { ref var r = ref s.ViewpointMoved; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vout_display_owner_t.viewpoint_moved offset"); }
+    }
+
+    [Fact]
+    public void VoutDisplayPlace_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutDisplayPlace);
+        AssertEqual(16, global::VLCLR.Native.Interop.VoutDisplayPlace.SizeOf, "vout_display_place_t sizeof");
+        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutDisplayPlace>(), "vout_display_place_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.X), "vout_display_place_t.x offset");
+        AssertEqual(4, Offset(ref s, ref s.Y), "vout_display_place_t.y offset");
+        AssertEqual(8, Offset(ref s, ref s.Width), "vout_display_place_t.width offset");
+        AssertEqual(12, Offset(ref s, ref s.Height), "vout_display_place_t.height offset");
+    }
+
+    [Fact]
+    public void VoutDisplayPlacement_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutDisplayPlacement);
+        AssertEqual(36, global::VLCLR.Native.Interop.VoutDisplayPlacement.SizeOf, "vout_display_placement sizeof");
+        AssertEqual(36, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutDisplayPlacement>(), "vout_display_placement Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Width), "vout_display_placement.width offset");
+        AssertEqual(4, Offset(ref s, ref s.Height), "vout_display_placement.height offset");
+        AssertEqual(8, Offset(ref s, ref s.Sar), "vout_display_placement.sar offset");
+        AssertEqual(16, Offset(ref s, ref s.Align), "vout_display_placement.align offset");
+        AssertEqual(20, Offset(ref s, ref s.Fitting), "vout_display_placement.fitting offset");
+        AssertEqual(24, Offset(ref s, ref s.Zoom), "vout_display_placement.zoom offset");
+        AssertEqual(32, Offset(ref s, ref s.FullFill), "vout_display_placement.full_fill offset");
+    }
+
+    [Fact]
+    public void VoutDisplay_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutDisplay);
+        AssertEqual(96, global::VLCLR.Native.Interop.VoutDisplay.SizeOf, "vout_display_t sizeof");
+        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutDisplay>(), "vout_display_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vout_display_t.obj offset");
+        { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vout_display_t.cfg offset"); }
+        { ref var r = ref s.Source; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vout_display_t.source offset"); }
+        { ref var r = ref s.Place; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vout_display_t.place offset"); }
+        { ref var r = ref s.Fmt; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vout_display_t.fmt offset"); }
+        AssertEqual(56, Offset(ref s, ref s.Info), "vout_display_t.info offset");
+        AssertEqual(64, Offset(ref s, ref s.Owner), "vout_display_t.owner offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vout_display_t.sys offset"); }
+        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "vout_display_t.ops offset"); }
+    }
+
+    [Fact]
+    public void VoutThread_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.VoutThread);
+        AssertEqual(24, global::VLCLR.Native.Interop.VoutThread.SizeOf, "vout_thread_t sizeof");
+        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.VoutThread>(), "vout_thread_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "vout_thread_t.obj offset");
+    }
+
+    [Fact]
+    public void XmlReader_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.XmlReader);
+        AssertEqual(80, global::VLCLR.Native.Interop.XmlReader.SizeOf, "xml_reader_t sizeof");
+        AssertEqual(80, Unsafe.SizeOf<global::VLCLR.Native.Interop.XmlReader>(), "xml_reader_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "xml_reader_t.obj offset");
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "xml_reader_t.p_sys offset"); }
+        { ref var r = ref s.Stream; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "xml_reader_t.p_stream offset"); }
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "xml_reader_t.p_module offset"); }
+        { ref var r = ref s.NextNode; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "xml_reader_t.pf_next_node offset"); }
+        { ref var r = ref s.NextAttr; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "xml_reader_t.pf_next_attr offset"); }
+        { ref var r = ref s.UseDtd; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "xml_reader_t.pf_use_dtd offset"); }
+        { ref var r = ref s.IsEmpty; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "xml_reader_t.pf_is_empty offset"); }
+    }
+
+    [Fact]
+    public void Xml_Layout()
+    {
+        var s = default(global::VLCLR.Native.Interop.Xml);
+        AssertEqual(56, global::VLCLR.Native.Interop.Xml.SizeOf, "xml_t sizeof");
+        AssertEqual(56, Unsafe.SizeOf<global::VLCLR.Native.Interop.Xml>(), "xml_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Obj), "xml_t.obj offset");
+        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "xml_t.p_module offset"); }
+        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "xml_t.p_sys offset"); }
+        { ref var r = ref s.CatalogLoad; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "xml_t.pf_catalog_load offset"); }
+        { ref var r = ref s.CatalogAdd; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "xml_t.pf_catalog_add offset"); }
     }
 
     // Windows value, then SysV value, for the ABI the tests run on.

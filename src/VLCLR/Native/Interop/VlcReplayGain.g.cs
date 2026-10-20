@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -81,4 +82,22 @@ public unsafe partial struct AudioReplayGain
         /// <summary>offsetof(audio_replay_gain_t, pf_peak)</summary>
         public const int Peak = 24;
     }
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcReplayGain
+{
+    /// <summary>AUDIO_REPLAY_GAIN_ALBUM</summary>
+    public const int AudioReplayGainAlbum = 1;
+
+    /// <summary>AUDIO_REPLAY_GAIN_MAX</summary>
+    public const int AudioReplayGainMax = 2;
+
+    /// <summary>AUDIO_REPLAY_GAIN_TRACK</summary>
+    public const int AudioReplayGainTrack = 0;
+
+    /// <summary>vlc_replay_gain_CopyFromMeta</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_replay_gain_CopyFromMeta")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int CopyFromMeta(AudioReplayGain* p_dst, Meta* p_meta);
 }

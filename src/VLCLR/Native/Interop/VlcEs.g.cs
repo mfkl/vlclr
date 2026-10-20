@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -202,7 +203,33 @@ public unsafe partial struct EsFormat
 }
 
 /// <summary>extra_languages_t</summary>
-public partial struct ExtraLanguages { }
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct ExtraLanguages
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>psz_language</summary>
+    [FieldOffset(0)] public byte* Language;
+
+    /// <summary>psz_description</summary>
+    [FieldOffset(8)] public byte* Description;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(extra_languages_t, psz_language)</summary>
+        public const int Language = 0;
+        /// <summary>offsetof(extra_languages_t, psz_description)</summary>
+        public const int Description = 8;
+    }
+}
 
 /// <summary>subs_format_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 112)]
@@ -689,10 +716,50 @@ public unsafe partial struct VideoFormatMastering
 }
 
 /// <summary>video_palette_t</summary>
-public partial struct VideoPalette { }
+[StructLayout(LayoutKind.Explicit, Size = 1028)]
+public unsafe partial struct VideoPalette
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 1028;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 1028;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 1028;
+
+    /// <summary>i_entries</summary>
+    [FieldOffset(0)] public int Entries;
+
+    /// <summary>palette</summary>
+    [FieldOffset(4)] public PaletteArray Palette;
+
+    /// <summary>Inline array of 256 elements of <c>palette</c>.</summary>
+    [InlineArray(256)]
+    public struct PaletteArray
+    {
+        private PaletteArray2 _e0;
+    }
+
+    /// <summary>Inline array of 4 elements of <c>palette</c>.</summary>
+    [InlineArray(4)]
+    public struct PaletteArray2
+    {
+        private byte _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(video_palette_t, i_entries)</summary>
+        public const int Entries = 0;
+        /// <summary>offsetof(video_palette_t, palette)</summary>
+        public const int Palette = 4;
+    }
+}
 
 /// <summary>audio_channel_type_t</summary>
-public enum AudioChannelType : int
+public enum AudioChannelType : uint
 {
     /// <summary>AUDIO_CHANNEL_TYPE_BITMAP</summary>
     Bitmap = 0,
@@ -702,7 +769,7 @@ public enum AudioChannelType : int
 }
 
 /// <summary>es_format_category_e</summary>
-public enum EsFormatCategory : int
+public enum EsFormatCategory : uint
 {
     /// <summary>UNKNOWN_ES</summary>
     UnknownEs = 0,
@@ -721,7 +788,7 @@ public enum EsFormatCategory : int
 }
 
 /// <summary>video_chroma_location_t</summary>
-public enum VideoChromaLocation : int
+public enum VideoChromaLocation : uint
 {
     /// <summary>CHROMA_LOCATION_UNDEF</summary>
     Undef = 0,
@@ -746,7 +813,7 @@ public enum VideoChromaLocation : int
 }
 
 /// <summary>video_color_primaries_t</summary>
-public enum VideoColorPrimaries : int
+public enum VideoColorPrimaries : uint
 {
     /// <summary>COLOR_PRIMARIES_UNDEF</summary>
     Undef = 0,
@@ -771,7 +838,7 @@ public enum VideoColorPrimaries : int
 }
 
 /// <summary>video_color_range_t</summary>
-public enum VideoColorRange : int
+public enum VideoColorRange : uint
 {
     /// <summary>COLOR_RANGE_UNDEF</summary>
     Undef = 0,
@@ -784,7 +851,7 @@ public enum VideoColorRange : int
 }
 
 /// <summary>video_color_space_t</summary>
-public enum VideoColorSpace : int
+public enum VideoColorSpace : uint
 {
     /// <summary>COLOR_SPACE_UNDEF</summary>
     Undef = 0,
@@ -800,7 +867,7 @@ public enum VideoColorSpace : int
 }
 
 /// <summary>video_multiview_mode_t</summary>
-public enum VideoMultiviewMode : int
+public enum VideoMultiviewMode : uint
 {
     /// <summary>MULTIVIEW_2D</summary>
     Multiview2d = 0,
@@ -825,7 +892,7 @@ public enum VideoMultiviewMode : int
 }
 
 /// <summary>video_orientation_t</summary>
-public enum VideoOrientation : int
+public enum VideoOrientation : uint
 {
     /// <summary>ORIENT_TOP_LEFT</summary>
     TopLeft = 0,
@@ -877,7 +944,7 @@ public enum VideoOrientation : int
 }
 
 /// <summary>video_projection_mode_t</summary>
-public enum VideoProjectionMode : int
+public enum VideoProjectionMode : uint
 {
     /// <summary>PROJECTION_MODE_RECTANGULAR</summary>
     Rectangular = 0,
@@ -890,7 +957,7 @@ public enum VideoProjectionMode : int
 }
 
 /// <summary>video_transfer_func_t</summary>
-public enum VideoTransferFunc : int
+public enum VideoTransferFunc : uint
 {
     /// <summary>TRANSFER_FUNC_UNDEF</summary>
     Undef = 0,
@@ -920,6 +987,34 @@ public enum VideoTransferFunc : int
     Hlg = 8,
 }
 
+/// <summary>video_transform_t</summary>
+public enum VideoTransform : uint
+{
+    /// <summary>TRANSFORM_IDENTITY</summary>
+    Identity = 0,
+
+    /// <summary>TRANSFORM_HFLIP</summary>
+    Hflip = 1,
+
+    /// <summary>TRANSFORM_VFLIP</summary>
+    Vflip = 2,
+
+    /// <summary>TRANSFORM_R180</summary>
+    R180 = 3,
+
+    /// <summary>TRANSFORM_R270</summary>
+    R270 = 5,
+
+    /// <summary>TRANSFORM_R90</summary>
+    R90 = 6,
+
+    /// <summary>TRANSFORM_TRANSPOSE</summary>
+    Transpose = 4,
+
+    /// <summary>TRANSFORM_ANTI_TRANSPOSE</summary>
+    AntiTranspose = 7,
+}
+
 public unsafe partial struct EsFormat
 {
     /// <summary>es_format_Clean</summary>
@@ -936,12 +1031,313 @@ public unsafe partial struct EsFormat
     [LibraryImport("libvlccore", EntryPoint = "es_format_Init")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Init(EsFormat* arg0, int i_cat, uint i_codec);
+
+    /// <summary>es_format_InitFromVideo</summary>
+    [LibraryImport("libvlccore", EntryPoint = "es_format_InitFromVideo")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void InitFromVideo(EsFormat* arg0, VideoFormat* arg1);
+
+    /// <summary>es_format_IsSimilar</summary>
+    [LibraryImport("libvlccore", EntryPoint = "es_format_IsSimilar")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsSimilar(EsFormat* arg0, EsFormat* arg1);
+
+    /// <summary>es_format_LogDifferences</summary>
+    [LibraryImport("libvlccore", EntryPoint = "es_format_LogDifferences")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void LogDifferences(Logger* arg0, byte* name_a, EsFormat* a, byte* name_b, EsFormat* b);
 }
 
 public unsafe partial struct VideoFormat
 {
+    /// <summary>video_format_ApplyRotation</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_ApplyRotation")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ApplyRotation(VideoFormat* @out, VideoFormat* @in);
+
+    /// <summary>video_format_CopyCrop</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_CopyCrop")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CopyCrop(VideoFormat* arg0, VideoFormat* arg1);
+
+    /// <summary>video_format_GetTransform</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_GetTransform")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VideoTransform GetTransform(VideoOrientation src, VideoOrientation dst);
+
+    /// <summary>video_format_IsSimilar</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_IsSimilar")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsSimilar(VideoFormat* arg0, VideoFormat* arg1);
+
+    /// <summary>video_format_LogDifferences</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_LogDifferences")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void LogDifferences(Logger* log, byte* name_a, VideoFormat* a, byte* name_b, VideoFormat* b);
+
+    /// <summary>video_format_Print</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_Print")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Print(ObjectHeader* arg0, byte* arg1, VideoFormat* arg2);
+
+    /// <summary>video_format_ScaleCropAr</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_ScaleCropAr")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ScaleCropAr(VideoFormat* arg0, VideoFormat* arg1);
+
     /// <summary>video_format_Setup</summary>
     [LibraryImport("libvlccore", EntryPoint = "video_format_Setup")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Setup(VideoFormat* arg0, uint i_chroma, int i_width, int i_height, int i_visible_width, int i_visible_height, int i_sar_num, int i_sar_den);
+
+    /// <summary>video_format_TransformBy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_TransformBy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void TransformBy(VideoFormat* fmt, VideoTransform transform);
+
+    /// <summary>video_format_TransformTo</summary>
+    [LibraryImport("libvlccore", EntryPoint = "video_format_TransformTo")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void TransformTo(VideoFormat* fmt, VideoOrientation dst_orientation);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcEs
+{
+    /// <summary>AOUT_CHANMODE_BINAURAL</summary>
+    public const int AoutChanmodeBinaural = 4;
+
+    /// <summary>AOUT_CHANMODE_DOLBYSTEREO</summary>
+    public const int AoutChanmodeDolbystereo = 2;
+
+    /// <summary>AOUT_CHANMODE_DUALMONO</summary>
+    public const int AoutChanmodeDualmono = 1;
+
+    /// <summary>AOUT_CHANS_2_0</summary>
+    public const int AoutChans20 = 6;
+
+    /// <summary>AOUT_CHANS_2_1</summary>
+    public const int AoutChans21 = 4102;
+
+    /// <summary>AOUT_CHANS_3_0</summary>
+    public const int AoutChans30 = 7;
+
+    /// <summary>AOUT_CHANS_3_1</summary>
+    public const int AoutChans31 = 4103;
+
+    /// <summary>AOUT_CHANS_4_0</summary>
+    public const int AoutChans40 = 102;
+
+    /// <summary>AOUT_CHANS_4_0_MIDDLE</summary>
+    public const int AoutChans40Middle = 774;
+
+    /// <summary>AOUT_CHANS_4_1</summary>
+    public const int AoutChans41 = 4198;
+
+    /// <summary>AOUT_CHANS_4_CENTER_REAR</summary>
+    public const int AoutChans4CenterRear = 23;
+
+    /// <summary>AOUT_CHANS_5_0</summary>
+    public const int AoutChans50 = 103;
+
+    /// <summary>AOUT_CHANS_5_0_MIDDLE</summary>
+    public const int AoutChans50Middle = 775;
+
+    /// <summary>AOUT_CHANS_5_1</summary>
+    public const int AoutChans51 = 4199;
+
+    /// <summary>AOUT_CHANS_6_0</summary>
+    public const int AoutChans60 = 870;
+
+    /// <summary>AOUT_CHANS_6_1_MIDDLE</summary>
+    public const int AoutChans61Middle = 4887;
+
+    /// <summary>AOUT_CHANS_7_0</summary>
+    public const int AoutChans70 = 871;
+
+    /// <summary>AOUT_CHANS_7_1</summary>
+    public const int AoutChans71 = 4967;
+
+    /// <summary>AOUT_CHANS_8_1</summary>
+    public const int AoutChans81 = 4983;
+
+    /// <summary>AOUT_CHANS_CENTER</summary>
+    public const int AoutChansCenter = 17;
+
+    /// <summary>AOUT_CHANS_FRONT</summary>
+    public const int AoutChansFront = 6;
+
+    /// <summary>AOUT_CHANS_MIDDLE</summary>
+    public const int AoutChansMiddle = 768;
+
+    /// <summary>AOUT_CHANS_REAR</summary>
+    public const int AoutChansRear = 96;
+
+    /// <summary>AOUT_CHANS_STEREO</summary>
+    public const int AoutChansStereo = 6;
+
+    /// <summary>AOUT_CHAN_CENTER</summary>
+    public const int AoutChanCenter = 1;
+
+    /// <summary>AOUT_CHAN_LEFT</summary>
+    public const int AoutChanLeft = 2;
+
+    /// <summary>AOUT_CHAN_LFE</summary>
+    public const int AoutChanLfe = 4096;
+
+    /// <summary>AOUT_CHAN_MAX</summary>
+    public const int AoutChanMax = 9;
+
+    /// <summary>AOUT_CHAN_MIDDLELEFT</summary>
+    public const int AoutChanMiddleleft = 256;
+
+    /// <summary>AOUT_CHAN_MIDDLERIGHT</summary>
+    public const int AoutChanMiddleright = 512;
+
+    /// <summary>AOUT_CHAN_REARCENTER</summary>
+    public const int AoutChanRearcenter = 16;
+
+    /// <summary>AOUT_CHAN_REARLEFT</summary>
+    public const int AoutChanRearleft = 32;
+
+    /// <summary>AOUT_CHAN_REARRIGHT</summary>
+    public const int AoutChanRearright = 64;
+
+    /// <summary>AOUT_CHAN_RIGHT</summary>
+    public const int AoutChanRight = 4;
+
+    /// <summary>CHROMA_LOCATION_MAX</summary>
+    public const int ChromaLocationMax = 6;
+
+    /// <summary>COLOR_PRIMARIES_BT470_BG</summary>
+    public const int ColorPrimariesBt470Bg = 2;
+
+    /// <summary>COLOR_PRIMARIES_BT470_M</summary>
+    public const int ColorPrimariesBt470M = 6;
+
+    /// <summary>COLOR_PRIMARIES_EBU_3213</summary>
+    public const int ColorPrimariesEbu3213 = 2;
+
+    /// <summary>COLOR_PRIMARIES_MAX</summary>
+    public const int ColorPrimariesMax = 6;
+
+    /// <summary>COLOR_PRIMARIES_SMTPE_170</summary>
+    public const int ColorPrimariesSmtpe170 = 1;
+
+    /// <summary>COLOR_PRIMARIES_SMTPE_240</summary>
+    public const int ColorPrimariesSmtpe240 = 1;
+
+    /// <summary>COLOR_PRIMARIES_SMTPE_RP145</summary>
+    public const int ColorPrimariesSmtpeRp145 = 1;
+
+    /// <summary>COLOR_PRIMARIES_SRGB</summary>
+    public const int ColorPrimariesSrgb = 3;
+
+    /// <summary>COLOR_RANGE_MAX</summary>
+    public const int ColorRangeMax = 2;
+
+    /// <summary>COLOR_RANGE_STUDIO</summary>
+    public const int ColorRangeStudio = 2;
+
+    /// <summary>COLOR_SPACE_MAX</summary>
+    public const int ColorSpaceMax = 3;
+
+    /// <summary>COLOR_SPACE_SMPTE_170</summary>
+    public const int ColorSpaceSmpte170 = 1;
+
+    /// <summary>COLOR_SPACE_SMPTE_240</summary>
+    public const int ColorSpaceSmpte240 = 1;
+
+    /// <summary>COLOR_SPACE_SRGB</summary>
+    public const int ColorSpaceSrgb = 2;
+
+    /// <summary>ES_CATEGORY_COUNT</summary>
+    public const int EsCategoryCount = 5;
+
+    /// <summary>ES_PRIORITY_MIN</summary>
+    public const int EsPriorityMin = -2;
+
+    /// <summary>ES_PRIORITY_NOT_DEFAULTABLE</summary>
+    public const int EsPriorityNotDefaultable = -1;
+
+    /// <summary>ES_PRIORITY_NOT_SELECTABLE</summary>
+    public const int EsPriorityNotSelectable = -2;
+
+    /// <summary>ES_PRIORITY_SELECTABLE_MIN</summary>
+    public const int EsPrioritySelectableMin = 0;
+
+    /// <summary>INPUT_CHAN_MAX</summary>
+    public const int InputChanMax = 64;
+
+    /// <summary>MULTIVIEW_STEREO_MAX</summary>
+    public const int MultiviewStereoMax = 6;
+
+    /// <summary>ORIENT_MAX</summary>
+    public const ulong OrientMax = 7;
+
+    /// <summary>TRANSFER_FUNC_ARIB_B67</summary>
+    public const int TransferFuncAribB67 = 8;
+
+    /// <summary>TRANSFER_FUNC_BT2020</summary>
+    public const int TransferFuncBt2020 = 5;
+
+    /// <summary>TRANSFER_FUNC_MAX</summary>
+    public const int TransferFuncMax = 8;
+
+    /// <summary>TRANSFER_FUNC_SMPTE_170</summary>
+    public const int TransferFuncSmpte170 = 5;
+
+    /// <summary>TRANSFER_FUNC_SMPTE_274</summary>
+    public const int TransferFuncSmpte274 = 5;
+
+    /// <summary>TRANSFER_FUNC_SMPTE_293</summary>
+    public const int TransferFuncSmpte293 = 5;
+
+    /// <summary>TRANSFER_FUNC_SMPTE_296</summary>
+    public const int TransferFuncSmpte296 = 5;
+
+    /// <summary>VIDEO_PALETTE_CLUT_COUNT</summary>
+    public const int VideoPaletteClutCount = 16;
+
+    /// <summary>VIDEO_PALETTE_COLORS_MAX</summary>
+    public const int VideoPaletteColorsMax = 256;
+
+    /// <summary>vlc_viewpoint_from_orientation</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_from_orientation")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcViewpointFromOrientation(Viewpoint* vp, VideoOrientation orient);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcEsId
+{
+    /// <summary>vlc_es_id_GetCat</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_GetCat")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial EsFormatCategory GetCat(EsId* id);
+
+    /// <summary>vlc_es_id_GetInputId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_GetInputId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int GetInputId(EsId* id);
+
+    /// <summary>vlc_es_id_GetStrId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_GetStrId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetStrId(EsId* id);
+
+    /// <summary>vlc_es_id_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial EsId* Hold(EsId* es);
+
+    /// <summary>vlc_es_id_IsStrIdStable</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_IsStrIdStable")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsStrIdStable(EsId* id);
+
+    /// <summary>vlc_es_id_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(EsId* id);
 }

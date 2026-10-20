@@ -3,15 +3,650 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
+
+/// <summary>aout_filters</summary>
+public partial struct AoutFilters { }
+
+/// <summary>aout_filters_cfg_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 40)]
+public unsafe partial struct AoutFiltersCfg
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 40;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 40;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
+
+    /// <summary>remap</summary>
+    [FieldOffset(0)] public RemapArray Remap;
+
+    /// <summary>headphones</summary>
+    [FieldOffset(36)] public byte Headphones;
+
+    /// <summary>Inline array of 9 elements of <c>remap</c>.</summary>
+    [InlineArray(9)]
+    public struct RemapArray
+    {
+        private int _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(aout_filters_cfg_t, remap)</summary>
+        public const int Remap = 0;
+        /// <summary>offsetof(aout_filters_cfg_t, headphones)</summary>
+        public const int Headphones = 36;
+    }
+}
+
+/// <summary>audio_output</summary>
+[StructLayout(LayoutKind.Explicit, Size = 120)]
+public unsafe partial struct AudioOutput
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 120;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 120;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 120;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>sys</summary>
+    [FieldOffset(24)] public void* Sys;
+
+    /// <summary>start</summary>
+    [FieldOffset(32)] public delegate* unmanaged[Cdecl]<AudioOutput*, AudioFormat*, int> Start;
+
+    /// <summary>stop</summary>
+    [FieldOffset(40)] public delegate* unmanaged[Cdecl]<AudioOutput*, void> Stop;
+
+    /// <summary>play</summary>
+    [FieldOffset(48)] public delegate* unmanaged[Cdecl]<AudioOutput*, Frame*, long, void> Play;
+
+    /// <summary>pause</summary>
+    [FieldOffset(56)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte, long, void> Pause;
+
+    /// <summary>flush</summary>
+    [FieldOffset(64)] public delegate* unmanaged[Cdecl]<AudioOutput*, void> Flush;
+
+    /// <summary>drain</summary>
+    [FieldOffset(72)] public delegate* unmanaged[Cdecl]<AudioOutput*, void> Drain;
+
+    /// <summary>volume_set</summary>
+    [FieldOffset(80)] public delegate* unmanaged[Cdecl]<AudioOutput*, float, int> VolumeSet;
+
+    /// <summary>mute_set</summary>
+    [FieldOffset(88)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte, int> MuteSet;
+
+    /// <summary>device_select</summary>
+    [FieldOffset(96)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte*, int> DeviceSelect;
+
+    /// <summary>current_sink_info</summary>
+    [FieldOffset(104)] public AudioOutputCurrentSinkInfo CurrentSinkInfo;
+
+    /// <summary>events</summary>
+    [FieldOffset(112)] public AudioOutputEvents* Events;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(audio_output, obj)</summary>
+        public const int Obj = 0;
+        /// <summary>offsetof(audio_output, sys)</summary>
+        public const int Sys = 24;
+        /// <summary>offsetof(audio_output, start)</summary>
+        public const int Start = 32;
+        /// <summary>offsetof(audio_output, stop)</summary>
+        public const int Stop = 40;
+        /// <summary>offsetof(audio_output, play)</summary>
+        public const int Play = 48;
+        /// <summary>offsetof(audio_output, pause)</summary>
+        public const int Pause = 56;
+        /// <summary>offsetof(audio_output, flush)</summary>
+        public const int Flush = 64;
+        /// <summary>offsetof(audio_output, drain)</summary>
+        public const int Drain = 72;
+        /// <summary>offsetof(audio_output, volume_set)</summary>
+        public const int VolumeSet = 80;
+        /// <summary>offsetof(audio_output, mute_set)</summary>
+        public const int MuteSet = 88;
+        /// <summary>offsetof(audio_output, device_select)</summary>
+        public const int DeviceSelect = 96;
+        /// <summary>offsetof(audio_output, current_sink_info)</summary>
+        public const int CurrentSinkInfo = 104;
+        /// <summary>offsetof(audio_output, events)</summary>
+        public const int Events = 112;
+    }
+}
+
+/// <summary>audio_output::current_sink_info</summary>
+[StructLayout(LayoutKind.Explicit, Size = 1)]
+public unsafe partial struct AudioOutputCurrentSinkInfo
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 1;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 1;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 1;
+
+    /// <summary>headphones</summary>
+    [FieldOffset(0)] public byte Headphones;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(audio_output::current_sink_info, headphones)</summary>
+        public const int Headphones = 0;
+    }
+}
+
+/// <summary>vlc_audio_loudness</summary>
+[StructLayout(LayoutKind.Explicit, Size = 40)]
+public unsafe partial struct AudioLoudness
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 40;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 40;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
+
+    /// <summary>loudness_momentary</summary>
+    [FieldOffset(0)] public double LoudnessMomentary;
+
+    /// <summary>loudness_shortterm</summary>
+    [FieldOffset(8)] public double LoudnessShortterm;
+
+    /// <summary>loudness_integrated</summary>
+    [FieldOffset(16)] public double LoudnessIntegrated;
+
+    /// <summary>loudness_range</summary>
+    [FieldOffset(24)] public double LoudnessRange;
+
+    /// <summary>truepeak</summary>
+    [FieldOffset(32)] public double Truepeak;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_audio_loudness, loudness_momentary)</summary>
+        public const int LoudnessMomentary = 0;
+        /// <summary>offsetof(vlc_audio_loudness, loudness_shortterm)</summary>
+        public const int LoudnessShortterm = 8;
+        /// <summary>offsetof(vlc_audio_loudness, loudness_integrated)</summary>
+        public const int LoudnessIntegrated = 16;
+        /// <summary>offsetof(vlc_audio_loudness, loudness_range)</summary>
+        public const int LoudnessRange = 24;
+        /// <summary>offsetof(vlc_audio_loudness, truepeak)</summary>
+        public const int Truepeak = 32;
+    }
+}
+
+/// <summary>vlc_audio_meter</summary>
+[StructLayout(LayoutKind.Explicit, Size = 48)]
+public unsafe partial struct AudioMeter
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 48;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 48;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 48;
+
+    /// <summary>lock</summary>
+    /// <remarks>A pointer because <see cref="Mutex"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public Mutex* Lock => (Mutex*)((byte*)Unsafe.AsPointer(ref this) + 0);
+
+    /// <summary>parent</summary>
+    [FieldOffset(16)] public ObjectHeader* Parent;
+
+    /// <summary>fmt</summary>
+    [FieldOffset(24)] public AudioFormat* Fmt;
+
+    /// <summary>plugins</summary>
+    [FieldOffset(32)] public List Plugins;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_audio_meter, lock)</summary>
+        public const int Lock = 0;
+        /// <summary>offsetof(vlc_audio_meter, parent)</summary>
+        public const int Parent = 16;
+        /// <summary>offsetof(vlc_audio_meter, fmt)</summary>
+        public const int Fmt = 24;
+        /// <summary>offsetof(vlc_audio_meter, plugins)</summary>
+        public const int Plugins = 32;
+    }
+}
+
+/// <summary>vlc_audio_meter_cbs</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct AudioMeterCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>on_loudness</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<long, AudioLoudness*, void*, void> OnLoudness;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_audio_meter_cbs, on_loudness)</summary>
+        public const int OnLoudness = 0;
+    }
+}
+
+/// <summary>vlc_audio_meter_plugin</summary>
+public partial struct AudioMeterPlugin { }
+
+/// <summary>vlc_audio_meter_plugin_owner</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct AudioMeterPluginOwner
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>cbs</summary>
+    [FieldOffset(0)] public AudioMeterCbs* Cbs;
+
+    /// <summary>sys</summary>
+    [FieldOffset(8)] public void* Sys;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_audio_meter_plugin_owner, cbs)</summary>
+        public const int Cbs = 0;
+        /// <summary>offsetof(vlc_audio_meter_plugin_owner, sys)</summary>
+        public const int Sys = 8;
+    }
+}
+
+/// <summary>vlc_audio_output_events</summary>
+[StructLayout(LayoutKind.Explicit, Size = 72)]
+public unsafe partial struct AudioOutputEvents
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 72;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 72;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 72;
+
+    /// <summary>timing_report</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<AudioOutput*, long, long, void> TimingReport;
+
+    /// <summary>drained_report</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<AudioOutput*, void> DrainedReport;
+
+    /// <summary>volume_report</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<AudioOutput*, float, void> VolumeReport;
+
+    /// <summary>mute_report</summary>
+    [FieldOffset(24)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte, void> MuteReport;
+
+    /// <summary>policy_report</summary>
+    [FieldOffset(32)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte, void> PolicyReport;
+
+    /// <summary>device_report</summary>
+    [FieldOffset(40)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte*, void> DeviceReport;
+
+    /// <summary>hotplug_report</summary>
+    [FieldOffset(48)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte*, byte*, void> HotplugReport;
+
+    /// <summary>restart_request</summary>
+    [FieldOffset(56)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte, void> RestartRequest;
+
+    /// <summary>gain_request</summary>
+    [FieldOffset(64)] public delegate* unmanaged[Cdecl]<AudioOutput*, float, int> GainRequest;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_audio_output_events, timing_report)</summary>
+        public const int TimingReport = 0;
+        /// <summary>offsetof(vlc_audio_output_events, drained_report)</summary>
+        public const int DrainedReport = 8;
+        /// <summary>offsetof(vlc_audio_output_events, volume_report)</summary>
+        public const int VolumeReport = 16;
+        /// <summary>offsetof(vlc_audio_output_events, mute_report)</summary>
+        public const int MuteReport = 24;
+        /// <summary>offsetof(vlc_audio_output_events, policy_report)</summary>
+        public const int PolicyReport = 32;
+        /// <summary>offsetof(vlc_audio_output_events, device_report)</summary>
+        public const int DeviceReport = 40;
+        /// <summary>offsetof(vlc_audio_output_events, hotplug_report)</summary>
+        public const int HotplugReport = 48;
+        /// <summary>offsetof(vlc_audio_output_events, restart_request)</summary>
+        public const int RestartRequest = 56;
+        /// <summary>offsetof(vlc_audio_output_events, gain_request)</summary>
+        public const int GainRequest = 64;
+    }
+}
+
+/// <summary>vlc_chan_order_idx_t</summary>
+public enum ChanOrderIdx : int
+{
+    /// <summary>AOUT_CHANIDX_DISABLE</summary>
+    Disable = -1,
+
+    /// <summary>AOUT_CHANIDX_LEFT</summary>
+    Left = 0,
+
+    /// <summary>AOUT_CHANIDX_RIGHT</summary>
+    Right = 1,
+
+    /// <summary>AOUT_CHANIDX_MIDDLELEFT</summary>
+    Middleleft = 2,
+
+    /// <summary>AOUT_CHANIDX_MIDDLERIGHT</summary>
+    Middleright = 3,
+
+    /// <summary>AOUT_CHANIDX_REARLEFT</summary>
+    Rearleft = 4,
+
+    /// <summary>AOUT_CHANIDX_REARRIGHT</summary>
+    Rearright = 5,
+
+    /// <summary>AOUT_CHANIDX_REARCENTER</summary>
+    Rearcenter = 6,
+
+    /// <summary>AOUT_CHANIDX_CENTER</summary>
+    Center = 7,
+
+    /// <summary>AOUT_CHANIDX_LFE</summary>
+    Lfe = 8,
+
+    /// <summary>AOUT_CHANIDX_MAX</summary>
+    Max = 9,
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Aout
+{
+    /// <summary>aout_BitsPerSample</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_BitsPerSample")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint BitsPerSample(uint i_format);
+
+    /// <summary>aout_ChannelExtract</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_ChannelExtract")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ChannelExtract(void* p_dst, int i_dst_channels, void* p_src, int i_src_channels, int i_sample_count, int* pi_selection, int i_bits_per_sample);
+
+    /// <summary>aout_ChannelReorder</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_ChannelReorder")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ChannelReorder(void* ptr, nuint bytes, byte channels, byte* chans_table, uint fourcc);
+
+    /// <summary>aout_CheckChannelReorder</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_CheckChannelReorder")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint CheckChannelReorder(uint* arg0, uint* arg1, uint mask, byte* table);
+
+    /// <summary>aout_Deinterleave</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_Deinterleave")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Deinterleave(void* dst, void* src, uint samples, uint channels, uint fourcc);
+
+    /// <summary>aout_DeviceGet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_DeviceGet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* DeviceGet(AudioOutput* arg0);
+
+    /// <summary>aout_DeviceSet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_DeviceSet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int DeviceSet(AudioOutput* aout, byte* id);
+
+    /// <summary>aout_DevicesList</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_DevicesList")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int DevicesList(AudioOutput* aout, byte*** ids, byte*** names);
+
+    /// <summary>aout_EnableFilter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_EnableFilter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int EnableFilter(AudioOutput* aout, byte* name, byte add);
+
+    /// <summary>aout_FiltersAdjustResampling</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersAdjustResampling")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte FiltersAdjustResampling(AoutFilters* arg0, int arg1);
+
+    /// <summary>aout_FiltersChangeViewpoint</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersChangeViewpoint")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FiltersChangeViewpoint(AoutFilters* arg0, Viewpoint* vp);
+
+    /// <summary>aout_FiltersDelete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersDelete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FiltersDelete(ObjectHeader* arg0, AoutFilters* arg1);
+
+    /// <summary>aout_FiltersDrain</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersDrain")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* FiltersDrain(AoutFilters* arg0);
+
+    /// <summary>aout_FiltersFlush</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersFlush")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FiltersFlush(AoutFilters* arg0);
+
+    /// <summary>aout_FiltersNew</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersNew")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial AoutFilters* FiltersNew(ObjectHeader* arg0, AudioFormat* arg1, AudioFormat* arg2, AoutFiltersCfg* cfg);
+
+    /// <summary>aout_FiltersPlay</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersPlay")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* FiltersPlay(AoutFilters* arg0, Frame* arg1, float rate);
+
+    /// <summary>aout_FormatPrepare</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FormatPrepare")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FormatPrepare(AudioFormat* p_format);
+
+    /// <summary>aout_FormatPrint</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FormatPrint")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FormatPrint(ObjectHeader* arg0, byte* arg1, AudioFormat* arg2);
+
+    /// <summary>aout_FormatPrintChannels</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_FormatPrintChannels")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* FormatPrintChannels(AudioFormat* arg0);
+
+    /// <summary>aout_Interleave</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_Interleave")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Interleave(void* dst, void** planes, uint samples, uint channels, uint fourcc);
+
+    /// <summary>aout_MuteGet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_MuteGet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int MuteGet(AudioOutput* arg0);
+
+    /// <summary>aout_MuteSet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_MuteSet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int MuteSet(AudioOutput* arg0, byte arg1);
+
+    /// <summary>aout_VolumeGet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_VolumeGet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial float VolumeGet(AudioOutput* arg0);
+
+    /// <summary>aout_VolumeSet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_VolumeSet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VolumeSet(AudioOutput* arg0, float arg1);
+
+    /// <summary>aout_VolumeUpdate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_VolumeUpdate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VolumeUpdate(AudioOutput* aout, int value, float* volp);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class AoutFilter
+{
+    /// <summary>aout_filter_GetVout</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_filter_GetVout")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VoutThread* GetVout(Filter* arg0, VideoFormat* arg1);
+}
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static partial class VlcAout
 {
+    /// <summary>A52_FRAME_NB</summary>
+    public const int A52FrameNb = 1536;
+
+    /// <summary>AOUT_MAX_ADVANCE_TIME</summary>
+    public const long AoutMaxAdvanceTime = 3000000;
+
+    /// <summary>AOUT_MAX_PREPARE_TIME</summary>
+    public const long AoutMaxPrepareTime = 2000000;
+
+    /// <summary>AOUT_MAX_PTS_ADVANCE</summary>
+    public const long AoutMaxPtsAdvance = 40000;
+
+    /// <summary>AOUT_MAX_PTS_DELAY</summary>
+    public const long AoutMaxPtsDelay = 60000;
+
+    /// <summary>AOUT_MAX_RESAMPLING</summary>
+    public const int AoutMaxResampling = 10;
+
+    /// <summary>AOUT_MIN_PREPARE_TIME</summary>
+    public const long AoutMinPrepareTime = 40000;
+
+    /// <summary>AOUT_MIX_MODE_4_0</summary>
+    public const int AoutMixMode40 = 3;
+
+    /// <summary>AOUT_MIX_MODE_5_1</summary>
+    public const int AoutMixMode51 = 4;
+
+    /// <summary>AOUT_MIX_MODE_7_1</summary>
+    public const int AoutMixMode71 = 5;
+
+    /// <summary>AOUT_MIX_MODE_BINAURAL</summary>
+    public const int AoutMixModeBinaural = 2;
+
+    /// <summary>AOUT_MIX_MODE_STEREO</summary>
+    public const int AoutMixModeStereo = 1;
+
+    /// <summary>AOUT_MIX_MODE_UNSET</summary>
+    public const int AoutMixModeUnset = 0;
+
+    /// <summary>AOUT_SPDIF_SIZE</summary>
+    public const int AoutSpdifSize = 6144;
+
+    /// <summary>AOUT_VAR_CHAN_DOLBYS</summary>
+    public const int AoutVarChanDolbys = 5;
+
+    /// <summary>AOUT_VAR_CHAN_LEFT</summary>
+    public const int AoutVarChanLeft = 3;
+
+    /// <summary>AOUT_VAR_CHAN_MONO</summary>
+    public const int AoutVarChanMono = 7;
+
+    /// <summary>AOUT_VAR_CHAN_RIGHT</summary>
+    public const int AoutVarChanRight = 4;
+
+    /// <summary>AOUT_VAR_CHAN_RSTEREO</summary>
+    public const int AoutVarChanRstereo = 2;
+
+    /// <summary>AOUT_VAR_CHAN_STEREO</summary>
+    public const int AoutVarChanStereo = 1;
+
+    /// <summary>AOUT_VAR_CHAN_UNSET</summary>
+    public const int AoutVarChanUnset = 0;
+
+    /// <summary>AOUT_VOLUME_DEFAULT</summary>
+    public const int AoutVolumeDefault = 256;
+
+    /// <summary>AOUT_VOLUME_MAX</summary>
+    public const int AoutVolumeMax = 512;
+
     /// <summary>VLC_CODEC_SPDIFB</summary>
     public const uint CodecSpdifb = 1650749555;
 
     /// <summary>VLC_CODEC_SPDIFL</summary>
     public const uint CodecSpdifl = 1768190067;
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcAudioMeter
+{
+    /// <summary>vlc_audio_meter_AddPlugin</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_AddPlugin")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial AudioMeterPlugin* AddPlugin(AudioMeter* meter, byte* chain, AudioMeterPluginOwner* owner);
+
+    /// <summary>vlc_audio_meter_Destroy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Destroy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Destroy(AudioMeter* meter);
+
+    /// <summary>vlc_audio_meter_Flush</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Flush")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Flush(AudioMeter* meter);
+
+    /// <summary>vlc_audio_meter_Init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Init(AudioMeter* meter, ObjectHeader* parent);
+
+    /// <summary>vlc_audio_meter_Process</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Process")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Process(AudioMeter* meter, Frame* block, long date);
+
+    /// <summary>vlc_audio_meter_RemovePlugin</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_RemovePlugin")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemovePlugin(AudioMeter* meter, AudioMeterPlugin* plugin);
+
+    /// <summary>vlc_audio_meter_Reset</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Reset")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Reset(AudioMeter* meter, AudioFormat* fmt);
 }

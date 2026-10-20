@@ -3,14 +3,119 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
-/// <summary>vlc_player_t</summary>
-public partial struct Player { }
+/// <summary>vlc_playlist_callbacks</summary>
+[StructLayout(LayoutKind.Explicit, Size = 88)]
+public unsafe partial struct PlaylistCallbacks
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 88;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 88;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 88;
+
+    /// <summary>on_items_moved</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<Playlist*, nuint, nuint, nuint, void*, void> OnItemsMoved;
+
+    /// <summary>on_items_removed</summary>
+    [FieldOffset(24)] public delegate* unmanaged[Cdecl]<Playlist*, nuint, nuint, void*, void> OnItemsRemoved;
+
+    /// <summary>on_playback_repeat_changed</summary>
+    [FieldOffset(40)] public delegate* unmanaged[Cdecl]<Playlist*, PlaylistPlaybackRepeat, void*, void> OnPlaybackRepeatChanged;
+
+    /// <summary>on_playback_order_changed</summary>
+    [FieldOffset(48)] public delegate* unmanaged[Cdecl]<Playlist*, PlaylistPlaybackOrder, void*, void> OnPlaybackOrderChanged;
+
+    /// <summary>on_current_index_changed</summary>
+    [FieldOffset(56)] public delegate* unmanaged[Cdecl]<Playlist*, nint, void*, void> OnCurrentIndexChanged;
+
+    /// <summary>on_has_prev_changed</summary>
+    [FieldOffset(64)] public delegate* unmanaged[Cdecl]<Playlist*, byte, void*, void> OnHasPrevChanged;
+
+    /// <summary>on_has_next_changed</summary>
+    [FieldOffset(72)] public delegate* unmanaged[Cdecl]<Playlist*, byte, void*, void> OnHasNextChanged;
+
+    /// <summary>on_media_stopped_action_changed</summary>
+    [FieldOffset(80)] public delegate* unmanaged[Cdecl]<Playlist*, PlaylistMediaStoppedAction, void*, void> OnMediaStoppedActionChanged;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_playlist_callbacks, on_items_moved)</summary>
+        public const int OnItemsMoved = 16;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_items_removed)</summary>
+        public const int OnItemsRemoved = 24;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_playback_repeat_changed)</summary>
+        public const int OnPlaybackRepeatChanged = 40;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_playback_order_changed)</summary>
+        public const int OnPlaybackOrderChanged = 48;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_current_index_changed)</summary>
+        public const int OnCurrentIndexChanged = 56;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_has_prev_changed)</summary>
+        public const int OnHasPrevChanged = 64;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_has_next_changed)</summary>
+        public const int OnHasNextChanged = 72;
+        /// <summary>offsetof(vlc_playlist_callbacks, on_media_stopped_action_changed)</summary>
+        public const int OnMediaStoppedActionChanged = 80;
+    }
+}
+
+/// <summary>vlc_playlist_item</summary>
+public partial struct PlaylistItem { }
+
+/// <summary>vlc_playlist_listener_id</summary>
+public partial struct PlaylistListenerId { }
+
+/// <summary>vlc_playlist_sort_criterion</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct PlaylistSortCriterion
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>key</summary>
+    [FieldOffset(0)] public PlaylistSortKey Key;
+
+    /// <summary>order</summary>
+    [FieldOffset(4)] public PlaylistSortOrder Order;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_playlist_sort_criterion, key)</summary>
+        public const int Key = 0;
+        /// <summary>offsetof(vlc_playlist_sort_criterion, order)</summary>
+        public const int Order = 4;
+    }
+}
+
+/// <summary>vlc_playlist_media_stopped_action</summary>
+public enum PlaylistMediaStoppedAction : uint
+{
+    /// <summary>VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE</summary>
+    Continue = 0,
+
+    /// <summary>VLC_PLAYLIST_MEDIA_STOPPED_STOP</summary>
+    Stop = 1,
+
+    /// <summary>VLC_PLAYLIST_MEDIA_STOPPED_EXIT</summary>
+    Exit = 2,
+}
 
 /// <summary>vlc_playlist_playback_order</summary>
-public enum PlaylistPlaybackOrder : int
+public enum PlaylistPlaybackOrder : uint
 {
     /// <summary>VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL</summary>
     Normal = 0,
@@ -20,7 +125,7 @@ public enum PlaylistPlaybackOrder : int
 }
 
 /// <summary>vlc_playlist_playback_repeat</summary>
-public enum PlaylistPlaybackRepeat : int
+public enum PlaylistPlaybackRepeat : uint
 {
     /// <summary>VLC_PLAYLIST_PLAYBACK_REPEAT_NONE</summary>
     None = 0,
@@ -32,18 +137,122 @@ public enum PlaylistPlaybackRepeat : int
     All = 2,
 }
 
+/// <summary>vlc_playlist_preparsing</summary>
+public enum PlaylistPreparsing : uint
+{
+    /// <summary>VLC_PLAYLIST_PREPARSING_DISABLED</summary>
+    Disabled = 0,
+
+    /// <summary>VLC_PLAYLIST_PREPARSING_ENABLED</summary>
+    Enabled = 1,
+
+    /// <summary>VLC_PLAYLIST_PREPARSING_COLLAPSE</summary>
+    Collapse = 2,
+
+    /// <summary>VLC_PLAYLIST_PREPARSING_RECURSIVE</summary>
+    Recursive = 3,
+}
+
+/// <summary>vlc_playlist_sort_key</summary>
+public enum PlaylistSortKey : uint
+{
+    /// <summary>VLC_PLAYLIST_SORT_KEY_TITLE</summary>
+    Title = 0,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_DURATION</summary>
+    Duration = 1,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_ARTIST</summary>
+    Artist = 2,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_ALBUM</summary>
+    Album = 3,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_ALBUM_ARTIST</summary>
+    AlbumArtist = 4,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_GENRE</summary>
+    Genre = 5,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_DATE</summary>
+    Date = 6,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_TRACK_NUMBER</summary>
+    TrackNumber = 7,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_DISC_NUMBER</summary>
+    DiscNumber = 8,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_URL</summary>
+    Url = 9,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_RATING</summary>
+    Rating = 10,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_FILE_SIZE</summary>
+    FileSize = 11,
+
+    /// <summary>VLC_PLAYLIST_SORT_KEY_FILE_MODIFIED</summary>
+    FileModified = 12,
+}
+
+/// <summary>vlc_playlist_sort_order</summary>
+public enum PlaylistSortOrder : uint
+{
+    /// <summary>VLC_PLAYLIST_SORT_ORDER_ASCENDING</summary>
+    Ascending = 0,
+
+    /// <summary>VLC_PLAYLIST_SORT_ORDER_DESCENDING</summary>
+    Descending = 1,
+}
+
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcPlaylist
 {
+    /// <summary>vlc_playlist_AddListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_AddListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlaylistListenerId* AddListener(Playlist* playlist, PlaylistCallbacks* cbs, void* userdata, byte notify_current_state);
+
+    /// <summary>vlc_playlist_Clear</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Clear")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Clear(Playlist* playlist);
+
     /// <summary>vlc_playlist_Count</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Count")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial nuint Count(Playlist* playlist);
 
+    /// <summary>vlc_playlist_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(Playlist* arg0);
+
+    /// <summary>vlc_playlist_Export</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Export")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Export(Playlist* playlist, byte* filename, byte* type);
+
+    /// <summary>vlc_playlist_Get</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Get")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlaylistItem* Get(Playlist* playlist, nuint index);
+
     /// <summary>vlc_playlist_GetCurrentIndex</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetCurrentIndex")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial nint GetCurrentIndex(Playlist* playlist);
+
+    /// <summary>vlc_playlist_GetPlaybackOrder</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetPlaybackOrder")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlaylistPlaybackOrder GetPlaybackOrder(Playlist* playlist);
+
+    /// <summary>vlc_playlist_GetPlaybackRepeat</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetPlaybackRepeat")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlaylistPlaybackRepeat GetPlaybackRepeat(Playlist* playlist);
 
     /// <summary>vlc_playlist_GetPlayer</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetPlayer")]
@@ -65,10 +274,35 @@ public static unsafe partial class VlcPlaylist
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial byte HasPrev(Playlist* playlist);
 
+    /// <summary>vlc_playlist_IndexOf</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_IndexOf")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nint IndexOf(Playlist* playlist, PlaylistItem* item);
+
+    /// <summary>vlc_playlist_IndexOfId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_IndexOfId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nint IndexOfId(Playlist* playlist, ulong id);
+
+    /// <summary>vlc_playlist_IndexOfMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_IndexOfMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nint IndexOfMedia(Playlist* playlist, InputItem* media);
+
     /// <summary>vlc_playlist_Lock</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Lock")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Lock(Playlist* arg0);
+
+    /// <summary>vlc_playlist_Move</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Move")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Move(Playlist* playlist, nuint index, nuint count, nuint target);
+
+    /// <summary>vlc_playlist_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Playlist* New(ObjectHeader* parent, PlaylistPreparsing rec, uint preparse_max_threads, long preparse_timeout);
 
     /// <summary>vlc_playlist_Next</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Next")]
@@ -85,10 +319,45 @@ public static unsafe partial class VlcPlaylist
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial int Prev(Playlist* playlist);
 
+    /// <summary>vlc_playlist_Remove</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Remove")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Remove(Playlist* playlist, nuint index, nuint count);
+
+    /// <summary>vlc_playlist_RemoveListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_RemoveListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemoveListener(Playlist* playlist, PlaylistListenerId* id);
+
+    /// <summary>vlc_playlist_RequestGoTo</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_RequestGoTo")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int RequestGoTo(Playlist* playlist, PlaylistItem* item, nint index_hint);
+
     /// <summary>vlc_playlist_Resume</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Resume")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Resume(Playlist* playlist);
+
+    /// <summary>vlc_playlist_SetMediaStoppedAction</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_SetMediaStoppedAction")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetMediaStoppedAction(Playlist* playlist, PlaylistMediaStoppedAction action);
+
+    /// <summary>vlc_playlist_SetPlaybackOrder</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_SetPlaybackOrder")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetPlaybackOrder(Playlist* playlist, PlaylistPlaybackOrder order);
+
+    /// <summary>vlc_playlist_SetPlaybackRepeat</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_SetPlaybackRepeat")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetPlaybackRepeat(Playlist* playlist, PlaylistPlaybackRepeat repeat);
+
+    /// <summary>vlc_playlist_Shuffle</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Shuffle")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Shuffle(Playlist* playlist);
 
     /// <summary>vlc_playlist_Start</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Start")]
@@ -104,4 +373,28 @@ public static unsafe partial class VlcPlaylist
     [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Unlock")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Unlock(Playlist* arg0);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcPlaylistItem
+{
+    /// <summary>vlc_playlist_item_GetId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_GetId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial ulong GetId(PlaylistItem* arg0);
+
+    /// <summary>vlc_playlist_item_GetMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_GetMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItem* GetMedia(PlaylistItem* arg0);
+
+    /// <summary>vlc_playlist_item_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Hold(PlaylistItem* arg0);
+
+    /// <summary>vlc_playlist_item_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(PlaylistItem* arg0);
 }

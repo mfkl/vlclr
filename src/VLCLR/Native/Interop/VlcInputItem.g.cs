@@ -3,14 +3,923 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
+/// <summary>info_category_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 40)]
+public unsafe partial struct InfoCategory
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 40;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 40;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
+
+    /// <summary>psz_name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>infos</summary>
+    [FieldOffset(8)] public List Infos;
+
+    /// <summary>node</summary>
+    [FieldOffset(24)] public List Node;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(info_category_t, psz_name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(info_category_t, infos)</summary>
+        public const int Infos = 8;
+        /// <summary>offsetof(info_category_t, node)</summary>
+        public const int Node = 24;
+    }
+}
+
+/// <summary>info_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 32)]
+public unsafe partial struct Info
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
+    /// <summary>psz_name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>psz_value</summary>
+    [FieldOffset(8)] public byte* Value;
+
+    /// <summary>node</summary>
+    [FieldOffset(16)] public List Node;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(info_t, psz_name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(info_t, psz_value)</summary>
+        public const int Value = 8;
+        /// <summary>offsetof(info_t, node)</summary>
+        public const int Node = 16;
+    }
+}
+
+/// <summary>input_item_es</summary>
+[StructLayout(LayoutKind.Explicit, Size = 256)]
+public unsafe partial struct InputItemEs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 256 : 248; }
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 248;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 256;
+
+    /// <summary>es</summary>
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* Es => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + 0);
+
+    /// <summary>id</summary>
+    [UnscopedRef]
+    public ref byte* Id { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(byte**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 240 : 232)); }
+
+    /// <summary>id_stable</summary>
+    [UnscopedRef]
+    public ref byte IdStable { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<InputItemEs, byte>(ref this, OperatingSystem.IsWindows() ? 248 : 240); }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_es, es)</summary>
+        public const int Es = 0;
+        /// <summary>offsetof(input_item_es, id)</summary>
+        public static int Id { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 240 : 232; }
+        /// <summary>offsetof(input_item_es, id_stable)</summary>
+        public static int IdStable { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 248 : 240; }
+    }
+}
+
+/// <summary>input_item_es_vector</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct InputItemEsVector
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>cap</summary>
+    [FieldOffset(0)] public nuint Cap;
+
+    /// <summary>size</summary>
+    [FieldOffset(8)] public nuint Size;
+
+    /// <summary>data</summary>
+    [FieldOffset(16)] public InputItemEs* Data;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_es_vector, cap)</summary>
+        public const int Cap = 0;
+        /// <summary>offsetof(input_item_es_vector, size)</summary>
+        public const int Size = 8;
+        /// <summary>offsetof(input_item_es_vector, data)</summary>
+        public const int Data = 16;
+    }
+}
+
 /// <summary>input_item_node_t</summary>
-public partial struct InputItemNode { }
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct InputItemNode
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>p_item</summary>
+    [FieldOffset(0)] public InputItem* Item;
+
+    /// <summary>i_children</summary>
+    [FieldOffset(8)] public int ChildrenCount;
+
+    /// <summary>pp_children</summary>
+    [FieldOffset(16)] public InputItemNode** Children;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_node_t, p_item)</summary>
+        public const int Item = 0;
+        /// <summary>offsetof(input_item_node_t, i_children)</summary>
+        public const int ChildrenCount = 8;
+        /// <summary>offsetof(input_item_node_t, pp_children)</summary>
+        public const int Children = 16;
+    }
+}
+
+/// <summary>input_item_opaque</summary>
+public partial struct InputItemOpaque { }
+
+/// <summary>input_item_parser_cbs_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct InputItemParserCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>on_ended</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<InputItem*, int, void*, void> OnEnded;
+
+    /// <summary>on_subtree_added</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<InputItem*, InputItemNode*, void*, void> OnSubtreeAdded;
+
+    /// <summary>on_attachments_added</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<InputItem*, InputAttachment**, nuint, void*, void> OnAttachmentsAdded;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_parser_cbs_t, on_ended)</summary>
+        public const int OnEnded = 0;
+        /// <summary>offsetof(input_item_parser_cbs_t, on_subtree_added)</summary>
+        public const int OnSubtreeAdded = 8;
+        /// <summary>offsetof(input_item_parser_cbs_t, on_attachments_added)</summary>
+        public const int OnAttachmentsAdded = 16;
+    }
+}
+
+/// <summary>input_item_parser_cfg</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct InputItemParserCfg
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>cbs</summary>
+    [FieldOffset(0)] public InputItemParserCbs* Cbs;
+
+    /// <summary>cbs_data</summary>
+    [FieldOffset(8)] public void* CbsData;
+
+    /// <summary>subitems</summary>
+    [FieldOffset(16)] public byte Subitems;
+
+    /// <summary>interact</summary>
+    [FieldOffset(17)] public byte Interact;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_parser_cfg, cbs)</summary>
+        public const int Cbs = 0;
+        /// <summary>offsetof(input_item_parser_cfg, cbs_data)</summary>
+        public const int CbsData = 8;
+        /// <summary>offsetof(input_item_parser_cfg, subitems)</summary>
+        public const int Subitems = 16;
+        /// <summary>offsetof(input_item_parser_cfg, interact)</summary>
+        public const int Interact = 17;
+    }
+}
+
+/// <summary>input_item_parser_id_t</summary>
+public partial struct InputItemParserId { }
+
+/// <summary>input_item_slave</summary>
+[StructLayout(LayoutKind.Explicit, Size = 12)]
+public unsafe partial struct InputItemSlave
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 12;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 12;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 12;
+
+    /// <summary>i_type</summary>
+    [FieldOffset(0)] public SlaveType Type;
+
+    /// <summary>i_priority</summary>
+    [FieldOffset(4)] public SlavePriority Priority;
+
+    /// <summary>b_forced</summary>
+    [FieldOffset(8)] public byte Forced;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_slave, i_type)</summary>
+        public const int Type = 0;
+        /// <summary>offsetof(input_item_slave, i_priority)</summary>
+        public const int Priority = 4;
+        /// <summary>offsetof(input_item_slave, b_forced)</summary>
+        public const int Forced = 8;
+    }
+}
 
 /// <summary>input_item_t</summary>
-public partial struct InputItem { }
+[StructLayout(LayoutKind.Explicit, Size = 192)]
+public unsafe partial struct InputItem
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 192;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 192;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 192;
+
+    /// <summary>psz_name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>psz_uri</summary>
+    [FieldOffset(8)] public byte* Uri;
+
+    /// <summary>i_options</summary>
+    [FieldOffset(16)] public int OptionsCount;
+
+    /// <summary>ppsz_options</summary>
+    [FieldOffset(24)] public byte** Options;
+
+    /// <summary>optflagv</summary>
+    [FieldOffset(32)] public byte* Optflagv;
+
+    /// <summary>optflagc</summary>
+    [FieldOffset(40)] public uint Optflagc;
+
+    /// <summary>opaques</summary>
+    [FieldOffset(48)] public InputItemOpaque* Opaques;
+
+    /// <summary>i_duration</summary>
+    [FieldOffset(56)] public long Duration;
+
+    /// <summary>categories</summary>
+    [FieldOffset(64)] public List Categories;
+
+    /// <summary>es_vec</summary>
+    [FieldOffset(80)] public InputItemEsVector EsVec;
+
+    /// <summary>p_stats</summary>
+    [FieldOffset(104)] public InputStats* Stats;
+
+    /// <summary>p_meta</summary>
+    [FieldOffset(112)] public Meta* Meta;
+
+    /// <summary>i_epg</summary>
+    [FieldOffset(120)] public int EpgCount;
+
+    /// <summary>pp_epg</summary>
+    [FieldOffset(128)] public Epg** Epg;
+
+    /// <summary>i_epg_time</summary>
+    [FieldOffset(136)] public long EpgTime;
+
+    /// <summary>p_epg_table</summary>
+    [FieldOffset(144)] public Epg* EpgTable;
+
+    /// <summary>i_slaves</summary>
+    [FieldOffset(152)] public int SlavesCount;
+
+    /// <summary>pp_slaves</summary>
+    [FieldOffset(160)] public InputItemSlave** Slaves;
+
+    /// <summary>lock</summary>
+    /// <remarks>A pointer because <see cref="Mutex"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public Mutex* Lock => (Mutex*)((byte*)Unsafe.AsPointer(ref this) + 168);
+
+    /// <summary>i_type</summary>
+    [UnscopedRef]
+    public ref InputItemType Type { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<InputItem, InputItemType>(ref this, OperatingSystem.IsWindows() ? 180 : 184); }
+
+    /// <summary>b_net</summary>
+    [UnscopedRef]
+    public ref byte Net { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<InputItem, byte>(ref this, OperatingSystem.IsWindows() ? 184 : 188); }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_item_t, psz_name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(input_item_t, psz_uri)</summary>
+        public const int Uri = 8;
+        /// <summary>offsetof(input_item_t, i_options)</summary>
+        public const int OptionsCount = 16;
+        /// <summary>offsetof(input_item_t, ppsz_options)</summary>
+        public const int Options = 24;
+        /// <summary>offsetof(input_item_t, optflagv)</summary>
+        public const int Optflagv = 32;
+        /// <summary>offsetof(input_item_t, optflagc)</summary>
+        public const int Optflagc = 40;
+        /// <summary>offsetof(input_item_t, opaques)</summary>
+        public const int Opaques = 48;
+        /// <summary>offsetof(input_item_t, i_duration)</summary>
+        public const int Duration = 56;
+        /// <summary>offsetof(input_item_t, categories)</summary>
+        public const int Categories = 64;
+        /// <summary>offsetof(input_item_t, es_vec)</summary>
+        public const int EsVec = 80;
+        /// <summary>offsetof(input_item_t, p_stats)</summary>
+        public const int Stats = 104;
+        /// <summary>offsetof(input_item_t, p_meta)</summary>
+        public const int Meta = 112;
+        /// <summary>offsetof(input_item_t, i_epg)</summary>
+        public const int EpgCount = 120;
+        /// <summary>offsetof(input_item_t, pp_epg)</summary>
+        public const int Epg = 128;
+        /// <summary>offsetof(input_item_t, i_epg_time)</summary>
+        public const int EpgTime = 136;
+        /// <summary>offsetof(input_item_t, p_epg_table)</summary>
+        public const int EpgTable = 144;
+        /// <summary>offsetof(input_item_t, i_slaves)</summary>
+        public const int SlavesCount = 152;
+        /// <summary>offsetof(input_item_t, pp_slaves)</summary>
+        public const int Slaves = 160;
+        /// <summary>offsetof(input_item_t, lock)</summary>
+        public const int Lock = 168;
+        /// <summary>offsetof(input_item_t, i_type)</summary>
+        public static int Type { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 180 : 184; }
+        /// <summary>offsetof(input_item_t, b_net)</summary>
+        public static int Net { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 184 : 188; }
+    }
+}
 
 /// <summary>input_stats_t</summary>
-public partial struct InputStats { }
+[StructLayout(LayoutKind.Explicit, Size = 120)]
+public unsafe partial struct InputStats
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 120;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 120;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 120;
+
+    /// <summary>i_read_packets</summary>
+    [FieldOffset(0)] public ulong ReadPackets;
+
+    /// <summary>i_read_bytes</summary>
+    [FieldOffset(8)] public ulong ReadBytes;
+
+    /// <summary>f_input_bitrate</summary>
+    [FieldOffset(16)] public float InputBitrate;
+
+    /// <summary>i_demux_read_packets</summary>
+    [FieldOffset(24)] public ulong DemuxReadPackets;
+
+    /// <summary>i_demux_read_bytes</summary>
+    [FieldOffset(32)] public ulong DemuxReadBytes;
+
+    /// <summary>f_demux_bitrate</summary>
+    [FieldOffset(40)] public float DemuxBitrate;
+
+    /// <summary>i_demux_corrupted</summary>
+    [FieldOffset(48)] public ulong DemuxCorrupted;
+
+    /// <summary>i_demux_discontinuity</summary>
+    [FieldOffset(56)] public ulong DemuxDiscontinuity;
+
+    /// <summary>i_decoded_audio</summary>
+    [FieldOffset(64)] public ulong DecodedAudio;
+
+    /// <summary>i_decoded_video</summary>
+    [FieldOffset(72)] public ulong DecodedVideo;
+
+    /// <summary>i_displayed_pictures</summary>
+    [FieldOffset(80)] public ulong DisplayedPictures;
+
+    /// <summary>i_late_pictures</summary>
+    [FieldOffset(88)] public ulong LatePictures;
+
+    /// <summary>i_lost_pictures</summary>
+    [FieldOffset(96)] public ulong LostPictures;
+
+    /// <summary>i_played_abuffers</summary>
+    [FieldOffset(104)] public ulong PlayedAbuffers;
+
+    /// <summary>i_lost_abuffers</summary>
+    [FieldOffset(112)] public ulong LostAbuffers;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_stats_t, i_read_packets)</summary>
+        public const int ReadPackets = 0;
+        /// <summary>offsetof(input_stats_t, i_read_bytes)</summary>
+        public const int ReadBytes = 8;
+        /// <summary>offsetof(input_stats_t, f_input_bitrate)</summary>
+        public const int InputBitrate = 16;
+        /// <summary>offsetof(input_stats_t, i_demux_read_packets)</summary>
+        public const int DemuxReadPackets = 24;
+        /// <summary>offsetof(input_stats_t, i_demux_read_bytes)</summary>
+        public const int DemuxReadBytes = 32;
+        /// <summary>offsetof(input_stats_t, f_demux_bitrate)</summary>
+        public const int DemuxBitrate = 40;
+        /// <summary>offsetof(input_stats_t, i_demux_corrupted)</summary>
+        public const int DemuxCorrupted = 48;
+        /// <summary>offsetof(input_stats_t, i_demux_discontinuity)</summary>
+        public const int DemuxDiscontinuity = 56;
+        /// <summary>offsetof(input_stats_t, i_decoded_audio)</summary>
+        public const int DecodedAudio = 64;
+        /// <summary>offsetof(input_stats_t, i_decoded_video)</summary>
+        public const int DecodedVideo = 72;
+        /// <summary>offsetof(input_stats_t, i_displayed_pictures)</summary>
+        public const int DisplayedPictures = 80;
+        /// <summary>offsetof(input_stats_t, i_late_pictures)</summary>
+        public const int LatePictures = 88;
+        /// <summary>offsetof(input_stats_t, i_lost_pictures)</summary>
+        public const int LostPictures = 96;
+        /// <summary>offsetof(input_stats_t, i_played_abuffers)</summary>
+        public const int PlayedAbuffers = 104;
+        /// <summary>offsetof(input_stats_t, i_lost_abuffers)</summary>
+        public const int LostAbuffers = 112;
+    }
+}
+
+/// <summary>vlc_readdir_helper</summary>
+[StructLayout(LayoutKind.Explicit, Size = 56)]
+public unsafe partial struct ReaddirHelper
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 56;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 56;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 56;
+
+    /// <summary>p_node</summary>
+    [FieldOffset(0)] public InputItemNode* Node;
+
+    /// <summary>pp_slaves</summary>
+    [FieldOffset(8)] public void** Slaves;
+
+    /// <summary>i_slaves</summary>
+    [FieldOffset(16)] public nuint SlavesCount;
+
+    /// <summary>pp_dirs</summary>
+    [FieldOffset(24)] public void** Dirs;
+
+    /// <summary>i_dirs</summary>
+    [FieldOffset(32)] public nuint DirsCount;
+
+    /// <summary>i_sub_autodetect_fuzzy</summary>
+    [FieldOffset(40)] public int SubAutodetectFuzzy;
+
+    /// <summary>b_show_hiddenfiles</summary>
+    [FieldOffset(44)] public byte ShowHiddenfiles;
+
+    /// <summary>b_flatten</summary>
+    [FieldOffset(45)] public byte Flatten;
+
+    /// <summary>psz_ignored_exts</summary>
+    [FieldOffset(48)] public byte* IgnoredExts;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_readdir_helper, p_node)</summary>
+        public const int Node = 0;
+        /// <summary>offsetof(vlc_readdir_helper, pp_slaves)</summary>
+        public const int Slaves = 8;
+        /// <summary>offsetof(vlc_readdir_helper, i_slaves)</summary>
+        public const int SlavesCount = 16;
+        /// <summary>offsetof(vlc_readdir_helper, pp_dirs)</summary>
+        public const int Dirs = 24;
+        /// <summary>offsetof(vlc_readdir_helper, i_dirs)</summary>
+        public const int DirsCount = 32;
+        /// <summary>offsetof(vlc_readdir_helper, i_sub_autodetect_fuzzy)</summary>
+        public const int SubAutodetectFuzzy = 40;
+        /// <summary>offsetof(vlc_readdir_helper, b_show_hiddenfiles)</summary>
+        public const int ShowHiddenfiles = 44;
+        /// <summary>offsetof(vlc_readdir_helper, b_flatten)</summary>
+        public const int Flatten = 45;
+        /// <summary>offsetof(vlc_readdir_helper, psz_ignored_exts)</summary>
+        public const int IgnoredExts = 48;
+    }
+}
+
+/// <summary>input_item_net_type</summary>
+public enum InputItemNetType : uint
+{
+    /// <summary>ITEM_NET_UNKNOWN</summary>
+    NetUnknown = 0,
+
+    /// <summary>ITEM_NET</summary>
+    Net = 1,
+
+    /// <summary>ITEM_LOCAL</summary>
+    Local = 2,
+}
+
+/// <summary>input_item_option_e</summary>
+public enum InputItemOption : uint
+{
+    /// <summary>VLC_INPUT_OPTION_TRUSTED</summary>
+    Trusted = 2,
+
+    /// <summary>VLC_INPUT_OPTION_UNIQUE</summary>
+    Unique = 256,
+}
+
+/// <summary>input_item_type_e</summary>
+public enum InputItemType : uint
+{
+    /// <summary>ITEM_TYPE_UNKNOWN</summary>
+    Unknown = 0,
+
+    /// <summary>ITEM_TYPE_FILE</summary>
+    File = 1,
+
+    /// <summary>ITEM_TYPE_DIRECTORY</summary>
+    Directory = 2,
+
+    /// <summary>ITEM_TYPE_DISC</summary>
+    Disc = 3,
+
+    /// <summary>ITEM_TYPE_CARD</summary>
+    Card = 4,
+
+    /// <summary>ITEM_TYPE_STREAM</summary>
+    Stream = 5,
+
+    /// <summary>ITEM_TYPE_PLAYLIST</summary>
+    Playlist = 6,
+
+    /// <summary>ITEM_TYPE_NODE</summary>
+    Node = 7,
+
+    /// <summary>ITEM_TYPE_NUMBER</summary>
+    Number = 8,
+}
+
+/// <summary>slave_priority</summary>
+public enum SlavePriority : uint
+{
+    /// <summary>SLAVE_PRIORITY_MATCH_NONE</summary>
+    MatchNone = 1,
+
+    /// <summary>SLAVE_PRIORITY_MATCH_RIGHT</summary>
+    MatchRight = 2,
+
+    /// <summary>SLAVE_PRIORITY_MATCH_LEFT</summary>
+    MatchLeft = 3,
+
+    /// <summary>SLAVE_PRIORITY_MATCH_ALL</summary>
+    MatchAll = 4,
+
+    /// <summary>SLAVE_PRIORITY_USER</summary>
+    User = 5,
+}
+
+/// <summary>slave_type</summary>
+public enum SlaveType : uint
+{
+    /// <summary>SLAVE_TYPE_SPU</summary>
+    Spu = 0,
+
+    /// <summary>SLAVE_TYPE_GENERIC</summary>
+    Generic = 1,
+}
+
+public unsafe partial struct InputItem
+{
+    /// <summary>input_item_AddOpaque</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_AddOpaque")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AddOpaque(InputItem* arg0, byte* arg1, void* arg2);
+
+    /// <summary>input_item_AddOption</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_AddOption")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AddOption(InputItem* arg0, byte* arg1, uint i_flags);
+
+    /// <summary>input_item_AddOptions</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_AddOptions")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AddOptions(InputItem* arg0, int i_options, byte** ppsz_options, uint i_flags);
+
+    /// <summary>input_item_AddSlave</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_AddSlave")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AddSlave(InputItem* arg0, InputItemSlave* arg1);
+
+    /// <summary>input_item_Copy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_Copy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItem* Copy(InputItem* arg0);
+
+    /// <summary>input_item_CopyOptions</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_CopyOptions")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CopyOptions(InputItem* p_child, InputItem* p_parent);
+
+    /// <summary>input_item_CreateFilename</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_CreateFilename")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* CreateFilename(InputItem* arg0, byte* psz_path, byte* psz_prefix, byte* psz_extension);
+
+    /// <summary>input_item_DelInfo</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_DelInfo")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int DelInfo(InputItem* p_i, byte* psz_cat, byte* psz_name);
+
+    /// <summary>input_item_GetDuration</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetDuration")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial long GetDuration(InputItem* p_i);
+
+    /// <summary>input_item_GetInfo</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetInfo")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetInfo(InputItem* p_i, byte* psz_cat, byte* psz_name);
+
+    /// <summary>input_item_GetInfoLocked</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetInfoLocked")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetInfoLocked(InputItem* p_i, byte* psz_cat, byte* psz_name);
+
+    /// <summary>input_item_GetMeta</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMeta")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetMeta(InputItem* p_i, MetaType meta_type);
+
+    /// <summary>input_item_GetMetaExtra</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMetaExtra")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetMetaExtra(InputItem* p_i, byte* psz_name);
+
+    /// <summary>input_item_GetMetaExtraNames</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMetaExtraNames")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetMetaExtraNames(InputItem* p_i, byte*** pppsz_names);
+
+    /// <summary>input_item_GetMetaLocked</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMetaLocked")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetMetaLocked(InputItem* arg0, MetaType meta_type);
+
+    /// <summary>input_item_GetName</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetName")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetName(InputItem* p_i);
+
+    /// <summary>input_item_GetNowPlayingFb</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetNowPlayingFb")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetNowPlayingFb(InputItem* p_item);
+
+    /// <summary>input_item_GetTitleFbName</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetTitleFbName")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetTitleFbName(InputItem* p_i);
+
+    /// <summary>input_item_GetURI</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_GetURI")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetURI(InputItem* p_i);
+
+    /// <summary>input_item_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItem* Hold(InputItem* arg0);
+
+    /// <summary>input_item_IsArtFetched</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_IsArtFetched")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsArtFetched(InputItem* p_i);
+
+    /// <summary>input_item_IsPreparsed</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_IsPreparsed")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsPreparsed(InputItem* p_i);
+
+    /// <summary>input_item_MergeInfos</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_MergeInfos")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void MergeInfos(InputItem* arg0, InfoCategory* arg1);
+
+    /// <summary>input_item_MetaMatch</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_MetaMatch")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte MetaMatch(InputItem* p_i, MetaType meta_type, byte* psz);
+
+    /// <summary>input_item_NewExt</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_NewExt")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItem* NewExt(byte* psz_uri, byte* psz_name, long i_duration, InputItemType i_type, InputItemNetType i_net);
+
+    /// <summary>input_item_Parse</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_Parse")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItemParserId* Parse(ObjectHeader* parent, InputItem* item, InputItemParserCfg* cfg);
+
+    /// <summary>input_item_Playable</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_Playable")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte Playable(byte* arg0);
+
+    /// <summary>input_item_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(InputItem* arg0);
+
+    /// <summary>input_item_ReplaceInfos</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_ReplaceInfos")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ReplaceInfos(InputItem* arg0, InfoCategory* arg1);
+
+    /// <summary>input_item_SetDuration</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_SetDuration")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetDuration(InputItem* p_i, long i_duration);
+
+    /// <summary>input_item_SetMeta</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_SetMeta")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetMeta(InputItem* arg0, MetaType meta_type, byte* psz_val);
+
+    /// <summary>input_item_SetMetaExtra</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_SetMetaExtra")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetMetaExtra(InputItem* p_i, byte* psz_name, byte* psz_value);
+
+    /// <summary>input_item_SetName</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_SetName")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetName(InputItem* p_item, byte* psz_name);
+
+    /// <summary>input_item_SetURI</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_SetURI")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetURI(InputItem* p_i, byte* psz_uri);
+
+    /// <summary>input_item_Update</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_Update")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Update(InputItem* dst, InputItem* src);
+}
+
+public unsafe partial struct InputItemNode
+{
+    /// <summary>input_item_node_AppendItem</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_node_AppendItem")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItemNode* AppendItem(InputItemNode* p_node, InputItem* p_item);
+
+    /// <summary>input_item_node_AppendNode</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_node_AppendNode")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void AppendNode(InputItemNode* p_parent, InputItemNode* p_child);
+
+    /// <summary>input_item_node_Create</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_node_Create")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItemNode* Create(InputItem* p_input);
+
+    /// <summary>input_item_node_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_node_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(InputItemNode* p_node);
+
+    /// <summary>input_item_node_RemoveNode</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_node_RemoveNode")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemoveNode(InputItemNode* parent, InputItemNode* child);
+}
+
+public unsafe partial struct InputItemParserId
+{
+    /// <summary>input_item_parser_id_Interrupt</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_parser_id_Interrupt")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Interrupt(InputItemParserId* parser);
+
+    /// <summary>input_item_parser_id_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_parser_id_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(InputItemParserId* parser);
+}
+
+public unsafe partial struct InputItemSlave
+{
+    /// <summary>input_item_slave_GetType</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_slave_GetType")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte GetType(byte* arg0, SlaveType* arg1);
+
+    /// <summary>input_item_slave_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "input_item_slave_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItemSlave* New(byte* arg0, SlaveType arg1, SlavePriority arg2);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcInputItem
+{
+    /// <summary>INPUT_DURATION_INDEFINITE</summary>
+    public const int InputDurationIndefinite = -1;
+
+    /// <summary>INPUT_DURATION_UNSET</summary>
+    public const long InputDurationUnset = 0;
+
+    /// <summary>INPUT_ITEM_URI_NOP</summary>
+    public const string InputItemUriNop = "vlc://nop";
+
+    /// <summary>INPUT_RECORD_PREFIX</summary>
+    public const string InputRecordPrefix = "vlc-record-%Y-%m-%d-%Hh%Mm%Ss-$ N-$ p";
+
+    /// <summary>vlc_readdir_helper_additem</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_readdir_helper_additem")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcReaddirHelperAdditem(ReaddirHelper* p_rdh, byte* psz_uri, byte* psz_flatpath, byte* psz_filename, int i_type, int i_net, InputItem** created_item);
+
+    /// <summary>vlc_readdir_helper_finish</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_readdir_helper_finish")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcReaddirHelperFinish(ReaddirHelper* p_rdh, byte b_success);
+
+    /// <summary>vlc_readdir_helper_init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_readdir_helper_init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcReaddirHelperInit(ReaddirHelper* p_rdh, ObjectHeader* p_obj, InputItemNode* p_node);
+}

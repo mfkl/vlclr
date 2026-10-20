@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -66,10 +67,55 @@ public unsafe partial struct Log
 }
 
 /// <summary>vlc_logger</summary>
-public partial struct Logger { }
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct Logger
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>ops</summary>
+    [FieldOffset(0)] public LoggerOperations* Ops;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_logger, ops)</summary>
+        public const int Ops = 0;
+    }
+}
+
+/// <summary>vlc_logger_operations</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct LoggerOperations
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>destroy</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<void*, void> Destroy;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_logger_operations, destroy)</summary>
+        public const int Destroy = 8;
+    }
+}
 
 /// <summary>vlc_log_type</summary>
-public enum LogType : int
+public enum LogType : uint
 {
     /// <summary>VLC_MSG_INFO</summary>
     Info = 0,
@@ -82,4 +128,32 @@ public enum LogType : int
 
     /// <summary>VLC_MSG_DBG</summary>
     Dbg = 3,
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Vlc
+{
+    /// <summary>vlc_LogDestroy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_LogDestroy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void LogDestroy(Logger* arg0);
+
+    /// <summary>vlc_LogHeaderCreate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_LogHeaderCreate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Logger* LogHeaderCreate(Logger* parent, byte* str);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcMessages
+{
+    /// <summary>vlc_strerror</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_strerror")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* VlcStrerror(int arg0);
+
+    /// <summary>vlc_strerror_c</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_strerror_c")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* VlcStrerrorC(int arg0);
 }

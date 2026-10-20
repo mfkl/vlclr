@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -97,7 +98,7 @@ public unsafe partial struct ChromaDescriptionP
 }
 
 /// <summary>vlc_chroma_subtype</summary>
-public enum ChromaSubtype : int
+public enum ChromaSubtype : uint
 {
     /// <summary>VLC_CHROMA_SUBTYPE_OTHER</summary>
     Other = 0,
@@ -1706,4 +1707,39 @@ public static unsafe partial class VlcFourcc
     [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetChromaDescription")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial ChromaDescription* GetChromaDescription(uint fourcc);
+
+    /// <summary>vlc_fourcc_GetCodec</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodec")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetCodec(int i_cat, uint i_fourcc);
+
+    /// <summary>vlc_fourcc_GetCodecAudio</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodecAudio")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetCodecAudio(uint i_fourcc, int i_bits);
+
+    /// <summary>vlc_fourcc_GetCodecFromString</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodecFromString")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetCodecFromString(int i_cat, byte* arg1);
+
+    /// <summary>vlc_fourcc_GetDescription</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetDescription")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetDescription(int i_cat, uint i_fourcc);
+
+    /// <summary>vlc_fourcc_GetFallback</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetFallback")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint* GetFallback(uint arg0);
+
+    /// <summary>vlc_fourcc_GetRGBFallback</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetRGBFallback")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint* GetRGBFallback(uint arg0);
+
+    /// <summary>vlc_fourcc_GetYUVFallback</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetYUVFallback")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint* GetYUVFallback(uint arg0);
 }

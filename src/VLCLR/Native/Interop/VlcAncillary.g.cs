@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -41,4 +42,558 @@ public unsafe partial struct AncillaryArray
         /// <summary>offsetof(vlc_ancillary_array, data)</summary>
         public const int Data = 16;
     }
+}
+
+/// <summary>vlc_dovi_nlq_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 32)]
+public unsafe partial struct DoviNlq
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
+    /// <summary>offset_depth</summary>
+    [FieldOffset(0)] public byte OffsetDepth;
+
+    /// <summary>offset</summary>
+    [FieldOffset(2)] public ushort Offset;
+
+    /// <summary>hdr_in_max</summary>
+    [FieldOffset(8)] public ulong HdrInMax;
+
+    /// <summary>dz_slope</summary>
+    [FieldOffset(16)] public ulong DzSlope;
+
+    /// <summary>dz_threshold</summary>
+    [FieldOffset(24)] public ulong DzThreshold;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_dovi_nlq_t, offset_depth)</summary>
+        public const int OffsetDepth = 0;
+        /// <summary>offsetof(vlc_dovi_nlq_t, offset)</summary>
+        public const int Offset = 2;
+        /// <summary>offsetof(vlc_dovi_nlq_t, hdr_in_max)</summary>
+        public const int HdrInMax = 8;
+        /// <summary>offsetof(vlc_dovi_nlq_t, dz_slope)</summary>
+        public const int DzSlope = 16;
+        /// <summary>offsetof(vlc_dovi_nlq_t, dz_threshold)</summary>
+        public const int DzThreshold = 24;
+    }
+}
+
+/// <summary>vlc_dovi_reshape_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 1672)]
+public unsafe partial struct DoviReshape
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 1672;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 1672;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 1672;
+
+    /// <summary>num_pivots</summary>
+    [FieldOffset(0)] public byte NumPivots;
+
+    /// <summary>pivots</summary>
+    [FieldOffset(2)] public PivotsArray Pivots;
+
+    /// <summary>mapping_idc</summary>
+    [FieldOffset(20)] public MappingIdcArray MappingIdc;
+
+    /// <summary>poly_order</summary>
+    [FieldOffset(52)] public PolyOrderArray PolyOrder;
+
+    /// <summary>poly_coef</summary>
+    [FieldOffset(64)] public PolyCoefArray PolyCoef;
+
+    /// <summary>mmr_order</summary>
+    [FieldOffset(256)] public MmrOrderArray MmrOrder;
+
+    /// <summary>mmr_constant</summary>
+    [FieldOffset(264)] public MmrConstantArray MmrConstant;
+
+    /// <summary>mmr_coef</summary>
+    [FieldOffset(328)] public MmrCoefArray MmrCoef;
+
+    /// <summary>Inline array of 9 elements of <c>pivots</c>.</summary>
+    [InlineArray(9)]
+    public struct PivotsArray
+    {
+        private ushort _e0;
+    }
+
+    /// <summary>Inline array of 8 elements of <c>mapping_idc</c>.</summary>
+    [InlineArray(8)]
+    public struct MappingIdcArray
+    {
+        private DoviReshapeMethod _e0;
+    }
+
+    /// <summary>Inline array of 8 elements of <c>poly_order</c>.</summary>
+    [InlineArray(8)]
+    public struct PolyOrderArray
+    {
+        private byte _e0;
+    }
+
+    /// <summary>Inline array of 8 elements of <c>poly_coef</c>.</summary>
+    [InlineArray(8)]
+    public struct PolyCoefArray
+    {
+        private PolyCoefArray2 _e0;
+    }
+
+    /// <summary>Inline array of 3 elements of <c>poly_coef</c>.</summary>
+    [InlineArray(3)]
+    public struct PolyCoefArray2
+    {
+        private long _e0;
+    }
+
+    /// <summary>Inline array of 8 elements of <c>mmr_order</c>.</summary>
+    [InlineArray(8)]
+    public struct MmrOrderArray
+    {
+        private byte _e0;
+    }
+
+    /// <summary>Inline array of 8 elements of <c>mmr_constant</c>.</summary>
+    [InlineArray(8)]
+    public struct MmrConstantArray
+    {
+        private long _e0;
+    }
+
+    /// <summary>Inline array of 8 elements of <c>mmr_coef</c>.</summary>
+    [InlineArray(8)]
+    public struct MmrCoefArray
+    {
+        private MmrCoefArray2 _e0;
+    }
+
+    /// <summary>Inline array of 3 elements of <c>mmr_coef</c>.</summary>
+    [InlineArray(3)]
+    public struct MmrCoefArray2
+    {
+        private MmrCoefArray3 _e0;
+    }
+
+    /// <summary>Inline array of 7 elements of <c>mmr_coef</c>.</summary>
+    [InlineArray(7)]
+    public struct MmrCoefArray3
+    {
+        private long _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_dovi_reshape_t, num_pivots)</summary>
+        public const int NumPivots = 0;
+        /// <summary>offsetof(vlc_dovi_reshape_t, pivots)</summary>
+        public const int Pivots = 2;
+        /// <summary>offsetof(vlc_dovi_reshape_t, mapping_idc)</summary>
+        public const int MappingIdc = 20;
+        /// <summary>offsetof(vlc_dovi_reshape_t, poly_order)</summary>
+        public const int PolyOrder = 52;
+        /// <summary>offsetof(vlc_dovi_reshape_t, poly_coef)</summary>
+        public const int PolyCoef = 64;
+        /// <summary>offsetof(vlc_dovi_reshape_t, mmr_order)</summary>
+        public const int MmrOrder = 256;
+        /// <summary>offsetof(vlc_dovi_reshape_t, mmr_constant)</summary>
+        public const int MmrConstant = 264;
+        /// <summary>offsetof(vlc_dovi_reshape_t, mmr_coef)</summary>
+        public const int MmrCoef = 328;
+    }
+}
+
+/// <summary>vlc_icc_profile_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct IccProfile
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>size</summary>
+    [FieldOffset(0)] public nuint Size;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_icc_profile_t, size)</summary>
+        public const int Size = 0;
+    }
+}
+
+/// <summary>vlc_video_dovi_metadata_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 5208)]
+public unsafe partial struct VideoDoviMetadata
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 5208;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 5208;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 5208;
+
+    /// <summary>coef_log2_denom</summary>
+    [FieldOffset(0)] public byte CoefLog2Denom;
+
+    /// <summary>bl_bit_depth</summary>
+    [FieldOffset(1)] public byte BlBitDepth;
+
+    /// <summary>el_bit_depth</summary>
+    [FieldOffset(2)] public byte ElBitDepth;
+
+    /// <summary>nlq_method_idc</summary>
+    [FieldOffset(4)] public DoviNlqMethod NlqMethodIdc;
+
+    /// <summary>nonlinear_offset</summary>
+    [FieldOffset(8)] public NonlinearOffsetArray NonlinearOffset;
+
+    /// <summary>nonlinear_matrix</summary>
+    [FieldOffset(20)] public NonlinearMatrixArray NonlinearMatrix;
+
+    /// <summary>linear_matrix</summary>
+    [FieldOffset(56)] public LinearMatrixArray LinearMatrix;
+
+    /// <summary>source_min_pq</summary>
+    [FieldOffset(92)] public ushort SourceMinPq;
+
+    /// <summary>source_max_pq</summary>
+    [FieldOffset(94)] public ushort SourceMaxPq;
+
+    /// <summary>curves</summary>
+    [FieldOffset(96)] public CurvesArray Curves;
+
+    /// <summary>nlq</summary>
+    [FieldOffset(5112)] public NlqArray Nlq;
+
+    /// <summary>Inline array of 3 elements of <c>nonlinear_offset</c>.</summary>
+    [InlineArray(3)]
+    public struct NonlinearOffsetArray
+    {
+        private float _e0;
+    }
+
+    /// <summary>Inline array of 9 elements of <c>nonlinear_matrix</c>.</summary>
+    [InlineArray(9)]
+    public struct NonlinearMatrixArray
+    {
+        private float _e0;
+    }
+
+    /// <summary>Inline array of 9 elements of <c>linear_matrix</c>.</summary>
+    [InlineArray(9)]
+    public struct LinearMatrixArray
+    {
+        private float _e0;
+    }
+
+    /// <summary>Inline array of 3 elements of <c>curves</c>.</summary>
+    [InlineArray(3)]
+    public struct CurvesArray
+    {
+        private DoviReshape _e0;
+    }
+
+    /// <summary>Inline array of 3 elements of <c>nlq</c>.</summary>
+    [InlineArray(3)]
+    public struct NlqArray
+    {
+        private DoviNlq _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, coef_log2_denom)</summary>
+        public const int CoefLog2Denom = 0;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, bl_bit_depth)</summary>
+        public const int BlBitDepth = 1;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, el_bit_depth)</summary>
+        public const int ElBitDepth = 2;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, nlq_method_idc)</summary>
+        public const int NlqMethodIdc = 4;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, nonlinear_offset)</summary>
+        public const int NonlinearOffset = 8;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, nonlinear_matrix)</summary>
+        public const int NonlinearMatrix = 20;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, linear_matrix)</summary>
+        public const int LinearMatrix = 56;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, source_min_pq)</summary>
+        public const int SourceMinPq = 92;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, source_max_pq)</summary>
+        public const int SourceMaxPq = 94;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, curves)</summary>
+        public const int Curves = 96;
+        /// <summary>offsetof(vlc_video_dovi_metadata_t, nlq)</summary>
+        public const int Nlq = 5112;
+    }
+}
+
+/// <summary>vlc_video_hdr_dynamic_metadata_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 228)]
+public unsafe partial struct VideoHdrDynamicMetadata
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 228;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 228;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 228;
+
+    /// <summary>country_code</summary>
+    [FieldOffset(0)] public byte CountryCode;
+
+    /// <summary>application_version</summary>
+    [FieldOffset(1)] public byte ApplicationVersion;
+
+    /// <summary>targeted_luminance</summary>
+    [FieldOffset(4)] public float TargetedLuminance;
+
+    /// <summary>maxscl</summary>
+    [FieldOffset(8)] public MaxsclArray Maxscl;
+
+    /// <summary>average_maxrgb</summary>
+    [FieldOffset(20)] public float AverageMaxrgb;
+
+    /// <summary>num_histogram</summary>
+    [FieldOffset(24)] public byte NumHistogram;
+
+    /// <summary>histogram</summary>
+    [FieldOffset(28)] public HistogramArray Histogram;
+
+    /// <summary>fraction_bright_pixels</summary>
+    [FieldOffset(148)] public float FractionBrightPixels;
+
+    /// <summary>tone_mapping_flag</summary>
+    [FieldOffset(152)] public byte ToneMappingFlag;
+
+    /// <summary>knee_point_x</summary>
+    [FieldOffset(156)] public float KneePointX;
+
+    /// <summary>knee_point_y</summary>
+    [FieldOffset(160)] public float KneePointY;
+
+    /// <summary>num_bezier_anchors</summary>
+    [FieldOffset(164)] public byte NumBezierAnchors;
+
+    /// <summary>bezier_curve_anchors</summary>
+    [FieldOffset(168)] public BezierCurveAnchorsArray BezierCurveAnchors;
+
+    /// <summary>Inline array of 3 elements of <c>maxscl</c>.</summary>
+    [InlineArray(3)]
+    public struct MaxsclArray
+    {
+        private float _e0;
+    }
+
+    /// <summary>Inline array of 15 elements of <c>histogram</c>.</summary>
+    [InlineArray(15)]
+    public struct HistogramArray
+    {
+        private VideoHdrDynamicMetadataHistogram _e0;
+    }
+
+    /// <summary>Inline array of 15 elements of <c>bezier_curve_anchors</c>.</summary>
+    [InlineArray(15)]
+    public struct BezierCurveAnchorsArray
+    {
+        private float _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, country_code)</summary>
+        public const int CountryCode = 0;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, application_version)</summary>
+        public const int ApplicationVersion = 1;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, targeted_luminance)</summary>
+        public const int TargetedLuminance = 4;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, maxscl)</summary>
+        public const int Maxscl = 8;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, average_maxrgb)</summary>
+        public const int AverageMaxrgb = 20;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, num_histogram)</summary>
+        public const int NumHistogram = 24;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, histogram)</summary>
+        public const int Histogram = 28;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, fraction_bright_pixels)</summary>
+        public const int FractionBrightPixels = 148;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, tone_mapping_flag)</summary>
+        public const int ToneMappingFlag = 152;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, knee_point_x)</summary>
+        public const int KneePointX = 156;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, knee_point_y)</summary>
+        public const int KneePointY = 160;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, num_bezier_anchors)</summary>
+        public const int NumBezierAnchors = 164;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t, bezier_curve_anchors)</summary>
+        public const int BezierCurveAnchors = 168;
+    }
+}
+
+/// <summary>vlc_video_hdr_dynamic_metadata_t::histogram</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct VideoHdrDynamicMetadataHistogram
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>percentage</summary>
+    [FieldOffset(0)] public byte Percentage;
+
+    /// <summary>percentile</summary>
+    [FieldOffset(4)] public float Percentile;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t::histogram, percentage)</summary>
+        public const int Percentage = 0;
+        /// <summary>offsetof(vlc_video_hdr_dynamic_metadata_t::histogram, percentile)</summary>
+        public const int Percentile = 4;
+    }
+}
+
+/// <summary>vlc_vpx_alpha_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct VpxAlpha
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>size</summary>
+    [FieldOffset(0)] public nuint Size;
+
+    /// <summary>data</summary>
+    [FieldOffset(8)] public byte* Data;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_vpx_alpha_t, size)</summary>
+        public const int Size = 0;
+        /// <summary>offsetof(vlc_vpx_alpha_t, data)</summary>
+        public const int Data = 8;
+    }
+}
+
+/// <summary>vlc_dovi_nlq_method_t</summary>
+public enum DoviNlqMethod : int
+{
+    /// <summary>VLC_DOVI_NLQ_NONE</summary>
+    None = -1,
+
+    /// <summary>VLC_DOVI_NLQ_LINEAR_DZ</summary>
+    LinearDz = 0,
+}
+
+/// <summary>vlc_dovi_reshape_method_t</summary>
+public enum DoviReshapeMethod : uint
+{
+    /// <summary>VLC_DOVI_RESHAPE_POLYNOMIAL</summary>
+    Polynomial = 0,
+
+    /// <summary>VLC_DOVI_RESHAPE_MMR</summary>
+    Mmr = 1,
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcAncillary
+{
+    /// <summary>VLC_ANCILLARY_ID_DOVI</summary>
+    public const uint AncillaryIdDovi = 1767272260;
+
+    /// <summary>VLC_ANCILLARY_ID_HDR10PLUS</summary>
+    public const uint AncillaryIdHdr10plus = 726811720;
+
+    /// <summary>VLC_ANCILLARY_ID_ICC</summary>
+    public const uint AncillaryIdIcc = 1346585449;
+
+    /// <summary>VLC_ANCILLARY_ID_VPX_ALPHA</summary>
+    public const uint AncillaryIdVpxAlpha = 1098412150;
+
+    /// <summary>vlc_ancillary_CreateWithFreeCb</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_CreateWithFreeCb")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Ancillary* CreateWithFreeCb(void* data, uint id, delegate* unmanaged[Cdecl]<void*, void> free_cb);
+
+    /// <summary>vlc_ancillary_GetData</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_GetData")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void* GetData(Ancillary* ancillary);
+
+    /// <summary>vlc_ancillary_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Ancillary* Hold(Ancillary* ancillary);
+
+    /// <summary>vlc_ancillary_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(Ancillary* ancillary);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcAncillaryArray
+{
+    /// <summary>vlc_ancillary_array_Clear</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Clear")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Clear(AncillaryArray* array);
+
+    /// <summary>vlc_ancillary_array_Get</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Get")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Ancillary* Get(AncillaryArray* array, uint id);
+
+    /// <summary>vlc_ancillary_array_Insert</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Insert")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Insert(AncillaryArray* array, Ancillary* ancillary);
+
+    /// <summary>vlc_ancillary_array_Merge</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Merge")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Merge(AncillaryArray* dst_array, AncillaryArray* src_array);
+
+    /// <summary>vlc_ancillary_array_MergeAndClear</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_MergeAndClear")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int MergeAndClear(AncillaryArray* dst_array, AncillaryArray* src_array);
 }

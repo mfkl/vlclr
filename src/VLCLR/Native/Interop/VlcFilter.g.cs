@@ -3,11 +3,60 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
 /// <summary>filter_audio_callbacks</summary>
-public partial struct FilterAudioCallbacks { }
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct FilterAudioCallbacks
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>meter_loudness</summary>
+    [FieldOffset(0)] public FilterAudioCallbacksMeterLoudness MeterLoudness;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_audio_callbacks, meter_loudness)</summary>
+        public const int MeterLoudness = 0;
+    }
+}
+
+/// <summary>filter_audio_callbacks::meter_loudness</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct FilterAudioCallbacksMeterLoudness
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>on_changed</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Filter*, AudioLoudness*, void> OnChanged;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_audio_callbacks::meter_loudness, on_changed)</summary>
+        public const int OnChanged = 0;
+    }
+}
+
+/// <summary>filter_chain_t</summary>
+public partial struct FilterChain { }
 
 /// <summary>filter_owner_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 24)]
@@ -54,7 +103,28 @@ public unsafe partial struct FilterOwner
 }
 
 /// <summary>filter_subpicture_callbacks</summary>
-public partial struct FilterSubpictureCallbacks { }
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct FilterSubpictureCallbacks
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>buffer_new</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Filter*, Subpicture*> BufferNew;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(filter_subpicture_callbacks, buffer_new)</summary>
+        public const int BufferNew = 0;
+    }
+}
 
 /// <summary>filter_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 592)]
@@ -245,4 +315,129 @@ public unsafe partial struct FilterOperations
         /// <summary>offsetof(vlc_filter_operations, close)</summary>
         public const int Close = 40;
     }
+}
+
+public unsafe partial struct Filter
+{
+    /// <summary>filter_AddProxyCallbacks</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_AddProxyCallbacks")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void AddProxyCallbacks(ObjectHeader* obj, Filter* filter, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, Value, Value, void*, int> restart_cb);
+
+    /// <summary>filter_Blend</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_Blend")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Blend(Filter* arg0, Picture* p_dst, int i_dst_x, int i_dst_y, Picture* p_src, int i_alpha);
+
+    /// <summary>filter_ConfigureBlend</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_ConfigureBlend")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int ConfigureBlend(Filter* arg0, int i_dst_width, int i_dst_height, VideoFormat* p_src);
+
+    /// <summary>filter_DelProxyCallbacks</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_DelProxyCallbacks")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void DelProxyCallbacks(ObjectHeader* obj, Filter* filter, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, Value, Value, void*, int> restart_cb);
+
+    /// <summary>filter_DeleteBlend</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_DeleteBlend")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void DeleteBlend(Filter* arg0);
+
+    /// <summary>filter_NewBlend</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_NewBlend")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Filter* NewBlend(ObjectHeader* arg0, VideoFormat* p_dst_chroma);
+}
+
+public unsafe partial struct FilterChain
+{
+    /// <summary>filter_chain_AppendConverter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_AppendConverter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AppendConverter(FilterChain* chain, EsFormat* fmt_out);
+
+    /// <summary>filter_chain_AppendFilter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_AppendFilter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Filter* AppendFilter(FilterChain* chain, byte* name, ConfigChain* cfg, EsFormat* fmt_out);
+
+    /// <summary>filter_chain_AppendFromString</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_AppendFromString")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AppendFromString(FilterChain* chain, byte* str);
+
+    /// <summary>filter_chain_Clear</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_Clear")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Clear(FilterChain* arg0);
+
+    /// <summary>filter_chain_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(FilterChain* chain);
+
+    /// <summary>filter_chain_DeleteFilter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_DeleteFilter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void DeleteFilter(FilterChain* chain, Filter* filter);
+
+    /// <summary>filter_chain_ForEach</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_ForEach")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int ForEach(FilterChain* chain, delegate* unmanaged[Cdecl]<Filter*, void*, int> cb, void* opaque);
+
+    /// <summary>filter_chain_GetFmtOut</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_GetFmtOut")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial EsFormat* GetFmtOut(FilterChain* chain);
+
+    /// <summary>filter_chain_GetVideoCtxOut</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_GetVideoCtxOut")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VideoContext* GetVideoCtxOut(FilterChain* chain);
+
+    /// <summary>filter_chain_IsEmpty</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_IsEmpty")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsEmpty(FilterChain* chain);
+
+    /// <summary>filter_chain_MouseFilter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_MouseFilter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int MouseFilter(FilterChain* arg0, Mouse* arg1, Mouse* arg2);
+
+    /// <summary>filter_chain_NewVideo</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_NewVideo")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial FilterChain* NewVideo(ObjectHeader* obj, byte change, FilterOwner* owner);
+
+    /// <summary>filter_chain_Reset</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_Reset")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Reset(FilterChain* p_chain, EsFormat* p_fmt_in, VideoContext* vctx_in, EsFormat* p_fmt_out);
+
+    /// <summary>filter_chain_VideoFilter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_VideoFilter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Picture* VideoFilter(FilterChain* chain, Picture* pic);
+
+    /// <summary>filter_chain_VideoFlush</summary>
+    [LibraryImport("libvlccore", EntryPoint = "filter_chain_VideoFlush")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VideoFlush(FilterChain* arg0);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcFilter
+{
+    /// <summary>vlc_filter_LoadModule</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_filter_LoadModule")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Module* LoadModule(Filter* arg0, byte* cap, byte* name, byte strict);
+
+    /// <summary>vlc_filter_UnloadModule</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_filter_UnloadModule")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void UnloadModule(Filter* arg0);
 }

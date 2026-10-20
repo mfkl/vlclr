@@ -3,8 +3,12 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
+
+/// <summary>vlc_param</summary>
+public partial struct Param { }
 
 /// <summary>vlc_config_cat</summary>
 public enum ConfigCat : int
@@ -147,7 +151,7 @@ public enum ConfigSubcat : int
 }
 
 /// <summary>vlc_module_properties</summary>
-public enum ModuleProperties : int
+public enum ModuleProperties : uint
 {
     /// <summary>VLC_MODULE_CREATE</summary>
     ModuleCreate = 0,

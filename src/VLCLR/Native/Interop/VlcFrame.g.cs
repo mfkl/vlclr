@@ -3,11 +3,33 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
 /// <summary>vlc_frame_callbacks</summary>
-public partial struct FrameCallbacks { }
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct FrameCallbacks
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>free</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Frame*, void> Free;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_frame_callbacks, free)</summary>
+        public const int Free = 0;
+    }
+}
 
 /// <summary>vlc_frame_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 104)]
@@ -89,7 +111,61 @@ public unsafe partial struct Frame
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
-public static partial class VlcFrame
+public static unsafe partial class VlcFifo
+{
+    /// <summary>vlc_fifo_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(Fifo* arg0);
+
+    /// <summary>vlc_fifo_DequeueAllUnlocked</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_DequeueAllUnlocked")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* DequeueAllUnlocked(Fifo* arg0);
+
+    /// <summary>vlc_fifo_DequeueUnlocked</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_DequeueUnlocked")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* DequeueUnlocked(Fifo* arg0);
+
+    /// <summary>vlc_fifo_Get</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Get")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Get(Fifo* arg0);
+
+    /// <summary>vlc_fifo_GetBytes</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_GetBytes")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nuint GetBytes(Fifo* arg0);
+
+    /// <summary>vlc_fifo_GetCount</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_GetCount")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nuint GetCount(Fifo* arg0);
+
+    /// <summary>vlc_fifo_Held</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Held")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte Held(Fifo* fifo);
+
+    /// <summary>vlc_fifo_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Fifo* New();
+
+    /// <summary>vlc_fifo_QueueUnlocked</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_QueueUnlocked")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void QueueUnlocked(Fifo* fifo, Frame* block);
+
+    /// <summary>vlc_fifo_Show</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Show")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Show(Fifo* arg0);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcFrame
 {
     /// <summary>VLC_FRAME_FLAG_AU_END</summary>
     public const int FrameFlagAuEnd = 2048;
@@ -150,4 +226,76 @@ public static partial class VlcFrame
 
     /// <summary>VLC_FRAME_FLAG_TYPE_PB</summary>
     public const int FrameFlagTypePb = 16;
+
+    /// <summary>vlc_frame_Alloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Alloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Alloc(nuint size);
+
+    /// <summary>vlc_frame_CopyProperties</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_CopyProperties")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CopyProperties(Frame* dst, Frame* src);
+
+    /// <summary>vlc_frame_File</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_File")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* File(int fd, byte write);
+
+    /// <summary>vlc_frame_FilePath</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_FilePath")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* FilePath(byte* path, byte write);
+
+    /// <summary>vlc_frame_Init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Init(Frame* frame, FrameCallbacks* cbs, void* @base, nuint length);
+
+    /// <summary>vlc_frame_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* New(FrameCallbacks* cbs, void* @base, nuint length);
+
+    /// <summary>vlc_frame_Realloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Realloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Realloc(Frame* frame, nint pre, nuint body);
+
+    /// <summary>vlc_frame_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(Frame* frame);
+
+    /// <summary>vlc_frame_TryRealloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_TryRealloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* TryRealloc(Frame* arg0, nint pre, nuint body);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcFrameHeap
+{
+    /// <summary>vlc_frame_heap_Alloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_heap_Alloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Alloc(void* addr, nuint length);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcFrameMmap
+{
+    /// <summary>vlc_frame_mmap_Alloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_mmap_Alloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Alloc(void* addr, nuint length);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcFrameShm
+{
+    /// <summary>vlc_frame_shm_Alloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_shm_Alloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* Alloc(void* addr, nuint length);
 }
