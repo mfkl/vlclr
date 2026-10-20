@@ -77,13 +77,17 @@ jobs:
         run: dotnet test tests/InlineParity -c Release --no-build
 
       # A failure here, with the pinned step above green, means VLC changed a
-      # layout since the pinned commit: a real drift signal.
+      # layout since the pinned commit: a real drift signal. It does not block
+      # PRs, except the bump PR from cimport-bump.yml, so VLC moving upstream
+      # does not turn unrelated PRs red.
       - name: VLC nightly drift, interop layouts against the nightly headers
         if: ${{ !cancelled() && runner.os != 'Windows' }}
+        continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
         run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc/include
 
       - name: VLC nightly drift, interop layouts against the nightly headers (MSVC)
         if: ${{ !cancelled() && runner.os == 'Windows' }}
+        continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
         shell: cmd
         run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc\include
 
