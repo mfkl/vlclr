@@ -7,10 +7,11 @@ that differ between its two runs (a filter that reads uninitialized padding
 past the visible width) are skipped and counted, and the check fails when more
 than --max-unstable of the values are skipped. Any value of ACTUAL that
 differs between its two runs fails the check: the filter under test must not
-read uninitialized memory. --skip-edges N leaves out the N columns at each
-side of every plane, for filters that read past the ends of each line, as
-VLC's do there: those values depend on the picture padding, which VLC leaves
-uninitialized, so they differ from process to process.
+read uninitialized memory. --skip-edges N leaves the N columns at each side
+of every plane out of every check, for filters that read past the ends of
+each line, as VLC's do there: those values depend on the picture padding,
+which VLC leaves uninitialized, so they differ from run to run, on both
+sides; the values left out that differ in any way are counted.
 
 Usage: framediff.py WIDTH HEIGHT EXPECTED ACTUAL [--again EXPECTED2 ACTUAL2]
                     [--tolerance N] [--max-unstable FRACTION] [--skip-edges N]
@@ -72,6 +73,10 @@ def main():
                 if e == a and e == e2 and a == a2:
                     continue
                 for x in range(width):
+                    if x < args.skip_edges or x >= width - args.skip_edges:
+                        if not (e[x] == a[x] == e2[x] == a2[x]):
+                            edges += 1
+                        continue
                     if a[x] != a2[x]:
                         actual_unstable += 1
                         if first_actual_unstable is None:
@@ -79,9 +84,6 @@ def main():
                         continue
                     if e[x] != e2[x]:
                         unstable += 1
-                        continue
-                    if e[x] != a[x] and (x < args.skip_edges or x >= width - args.skip_edges):
-                        edges += 1
                         continue
                     delta = abs(e[x] - a[x])
                     if delta > args.tolerance:
