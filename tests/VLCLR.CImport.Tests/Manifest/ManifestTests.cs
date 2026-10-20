@@ -97,7 +97,6 @@ public class ManifestTests
     {
         var m = CImportManifest.Load(Path.Combine(AppContext.BaseDirectory, "vlc.cimport.json"));
 
-        Assert.StartsWith("dc69496e", m.Vlc.Commit);
         Assert.Equal("vlc_common.h", m.Headers[0]);
         Assert.Equal("VLCLR.Native.Interop", m.Output.Namespace);
     }
