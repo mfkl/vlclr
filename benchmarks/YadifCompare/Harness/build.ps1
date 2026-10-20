@@ -2,7 +2,8 @@
 # yadif next to it:
 #   cyadif.dll      yadif.h and yadif_x86.asm as VLC's release builds compile
 #                   them: clang -O3 -funroll-loops -fomit-frame-pointer for
-#                   baseline x86-64, NASM -f win64
+#                   baseline x86-64, NASM -f win64; and algo_x.c, which
+#                   renders yadif's first picture
 #   cyadif-isa.dll  the same C for the harness's instruction set, to see what
 #                   clang makes of it with AVX2 / AVX-512
 # and decodes the test frames (frames-8bit.yuv, frames-10bit.yuv) once.
@@ -23,6 +24,7 @@ $nasm = @((Get-Command nasm -ErrorAction Ignore).Source, "$env:LOCALAPPDATA\bin\
 if (-not $nasm) { throw 'NASM not found: winget install NASM.NASM' }
 $deinterlace = Join-Path (Resolve-Path $VlcSource) 'modules\video_filter\deinterlace'
 $x86inc = Join-Path (Resolve-Path $VlcSource) 'extras\include\x86'
+$vlcInclude = Join-Path (Resolve-Path $VlcSource) 'include'
 
 $obj = Join-Path $PSScriptRoot 'obj\native'
 New-Item -ItemType Directory -Force $obj | Out-Null
@@ -31,8 +33,16 @@ $asmObj = Join-Path $obj 'yadif_x86.obj'
 if ($LASTEXITCODE) { throw 'nasm failed' }
 
 function Build-C([string] $march, [string] $dll) {
+    # algo_x.c and its caller need VLC's headers, and a config.h for them.
+    $xObjs = foreach ($source in @((Join-Path $PSScriptRoot 'c\x.c'), (Join-Path $deinterlace 'algo_x.c'))) {
+        $o = Join-Path $obj "$([IO.Path]::GetFileNameWithoutExtension($source))-$march.o"
+        & "$llvm\clang.exe" -c -O3 -funroll-loops -fomit-frame-pointer "-march=$march" -Wno-deprecated-declarations `
+            -include (Join-Path $PSScriptRoot 'c\config.h') "-I$vlcInclude" "-I$deinterlace" '-DMODULE_STRING="deinterlace"' $source -o $o
+        if ($LASTEXITCODE) { throw "clang failed for $source, $march" }
+        $o
+    }
     & "$llvm\clang.exe" -O3 -funroll-loops -fomit-frame-pointer "-march=$march" -shared -fuse-ld=lld `
-        "-I$deinterlace" (Join-Path $PSScriptRoot 'c\yadif.c') $asmObj -o $dll
+        "-I$deinterlace" (Join-Path $PSScriptRoot 'c\yadif.c') $asmObj @xObjs -o $dll
     if ($LASTEXITCODE) { throw "clang failed for $march" }
 }
 

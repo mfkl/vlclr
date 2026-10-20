@@ -104,6 +104,47 @@ foreach (int bits in new[] { 8, 10 })
 Console.WriteLine(mismatches == 0
     ? "Random pictures (8 and 10 bits, 5 sizes, both fields, parities 0/1/2): every variant matches VLC's C."
     : $"Random pictures: {mismatches} mismatches.");
+
+// The first picture: RenderX, on the same kinds of pictures and on the real
+// frames (it works on bytes, whatever the bit depth).
+int xMismatches = 0;
+foreach (int bits in new[] { 8, 10 })
+{
+    foreach ((int w, int h) in new[] { (64, 48), (97, 61), (33, 9), (7, 5), (720, 576), (1920, 1080) })
+    {
+        foreach (bool combed in new[] { false, true })
+        {
+            using var src = new Picture(w, h, bits, seed: 5);
+            if (combed)
+            {
+                src.Comb(seed: 6);
+            }
+            using var vlcOut = new Picture(w, h, bits, seed: 4);
+            using var csOut = new Picture(w, h, bits, seed: 4);
+            vlc.RenderX(vlcOut.Planes, src.Planes);
+            XDeinterlace.Render(src.Planes, csOut.Planes);
+            if (!vlcOut.Visible().AsSpan().SequenceEqual(csOut.Visible()))
+            {
+                Console.WriteLine($"MISMATCH: C# XDeinterlace, {bits}-bit {w}x{h}{(combed ? ", combed" : "")}");
+                xMismatches++;
+            }
+        }
+    }
+    using var frames = Picture.LoadFrames(Path.Combine(dir, "..", bits == 8 ? "frames-8bit.yuv" : "frames-10bit.yuv"), 1920, 1080, bits, 3);
+    using var vlcFrame = new Picture(1920, 1080, bits, seed: 4);
+    using var csFrame = new Picture(1920, 1080, bits, seed: 4);
+    vlc.RenderX(vlcFrame.Planes, frames.Pictures[0].Planes);
+    XDeinterlace.Render(frames.Pictures[0].Planes, csFrame.Planes);
+    if (!vlcFrame.Visible().AsSpan().SequenceEqual(csFrame.Visible()))
+    {
+        Console.WriteLine($"MISMATCH: C# XDeinterlace, {bits}-bit 1080i frame");
+        xMismatches++;
+    }
+}
+Console.WriteLine(xMismatches == 0
+    ? "X, yadif's first picture (8 and 10 bits, 6 sizes random and combed, a 1080i frame): C# matches VLC's C."
+    : $"X: {xMismatches} mismatches.");
+mismatches += xMismatches;
 Console.WriteLine();
 
 foreach (int bits in new[] { 8, 10 })
@@ -191,11 +232,14 @@ internal sealed unsafe class NativeYadif
 
     private readonly delegate* unmanaged<int, int, VLCPlane*, VLCPlane*, VLCPlane*, VLCPlane*, int, int, void> _render;
 
+    private readonly delegate* unmanaged<int, VLCPlane*, VLCPlane*, void> _renderX;
+
     public NativeYadif(string path)
     {
         nint library = NativeLibrary.Load(path);
         _render = (delegate* unmanaged<int, int, VLCPlane*, VLCPlane*, VLCPlane*, VLCPlane*, int, int, void>)
             NativeLibrary.GetExport(library, "yadif_render");
+        _renderX = (delegate* unmanaged<int, VLCPlane*, VLCPlane*, void>)NativeLibrary.GetExport(library, "x_render");
     }
 
     public void Render(int impl, VLCPlane[] dst, VLCPlane[] prev, VLCPlane[] cur, VLCPlane[] next, int field, int parity)
@@ -203,6 +247,15 @@ internal sealed unsafe class NativeYadif
         fixed (VLCPlane* d = dst, p = prev, c = cur, n = next)
         {
             _render(impl, dst.Length, d, p, c, n, field, parity);
+        }
+    }
+
+    /// <summary>RenderX of algo_x.c, yadif's first picture.</summary>
+    public void RenderX(VLCPlane[] dst, VLCPlane[] src)
+    {
+        fixed (VLCPlane* d = dst, s = src)
+        {
+            _renderX(dst.Length, d, s);
         }
     }
 }
@@ -256,6 +309,27 @@ internal sealed unsafe class Picture : IDisposable
     }
 
     public VLCPlane[] Planes { get; }
+
+    /// <summary>
+    /// Makes every line, spare ones included, a combed field: bytes around 60
+    /// on even lines and 180 on odd ones, with a little noise, so that X sees
+    /// interlacing in every block.
+    /// </summary>
+    public void Comb(int seed)
+    {
+        var random = new Random(seed);
+        foreach (VLCPlane plane in Planes)
+        {
+            for (int line = 0; line < plane.Lines; line++)
+            {
+                var bytes = new Span<byte>((byte*)plane.Pixels + line * plane.Pitch, plane.Pitch);
+                foreach (ref byte b in bytes)
+                {
+                    b = (byte)((line % 2 == 0 ? 60 : 180) + random.Next(16));
+                }
+            }
+        }
+    }
 
     public byte[] Visible()
     {
