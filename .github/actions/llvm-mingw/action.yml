@@ -1,0 +1,55 @@
+name: llvm-mingw
+description: >
+  Downloads a pinned llvm-mingw (msvcrt, x86_64, the toolchain VLC's Windows
+  builds use), checks its SHA256, caches it, puts its bin directory on PATH
+  and sets CIMPORT_MINGW_SYSROOT for VLCLR.CImport's windows extraction.
+  Windows runners only.
+
+inputs:
+  version:
+    description: llvm-mingw release tag
+    default: "20261006"
+  sha256:
+    description: SHA256 of llvm-mingw-<version>-msvcrt-x86_64.zip
+    default: 24847b37a951c8583c3f7ec061de2eb87f6394215c8ef3fdc4565ed0835396e1
+
+runs:
+  using: composite
+  steps:
+    - name: Cache llvm-mingw
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}/llvm-mingw
+        key: llvm-mingw-${{ inputs.version }}-${{ inputs.sha256 }}
+
+    - name: Download llvm-mingw
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      env:
+        VERSION: ${{ inputs.version }}
+        SHA256: ${{ inputs.sha256 }}
+      run: |
+        $ErrorActionPreference = "Stop"
+        $name = "llvm-mingw-$env:VERSION-msvcrt-x86_64"
+        $zip = Join-Path $env:RUNNER_TEMP "$name.zip"
+        Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/$env:VERSION/$name.zip" -OutFile $zip
+        $hash = (Get-FileHash $zip -Algorithm SHA256).Hash
+        if ($hash -ne $env:SHA256) {
+          throw "llvm-mingw archive SHA256 mismatch: expected $env:SHA256, got $hash"
+        }
+        # 7-Zip, not Expand-Archive: the libc++ headers nest deep enough to
+        # need long paths, which 7-Zip handles.
+        7z x -bso0 -bsp0 "-o$env:RUNNER_TEMP" $zip
+        if ($LASTEXITCODE) { throw "7z failed to extract $zip" }
+        Move-Item (Join-Path $env:RUNNER_TEMP $name) (Join-Path $env:RUNNER_TEMP "llvm-mingw")
+
+    - name: Use llvm-mingw
+      shell: pwsh
+      run: |
+        $root = Join-Path $env:RUNNER_TEMP "llvm-mingw"
+        if (-not (Test-Path (Join-Path $root "include/_mingw.h"))) {
+          throw "llvm-mingw was not found in $root"
+        }
+        echo (Join-Path $root "bin") | Out-File -FilePath $env:GITHUB_PATH -Append
+        echo "CIMPORT_MINGW_SYSROOT=$root" | Out-File -FilePath $env:GITHUB_ENV -Append
