@@ -3,8 +3,48 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
+
+/// <summary>picture_buffer_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 32)]
+public unsafe partial struct PictureBuffer
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
+    /// <summary>fd</summary>
+    [FieldOffset(0)] public int Fd;
+
+    /// <summary>base</summary>
+    [FieldOffset(8)] public void* Base;
+
+    /// <summary>size</summary>
+    [FieldOffset(16)] public nuint Size;
+
+    /// <summary>offset</summary>
+    [FieldOffset(24)] public long Offset;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(picture_buffer_t, fd)</summary>
+        public const int Fd = 0;
+        /// <summary>offsetof(picture_buffer_t, base)</summary>
+        public const int Base = 8;
+        /// <summary>offsetof(picture_buffer_t, size)</summary>
+        public const int Size = 16;
+        /// <summary>offsetof(picture_buffer_t, offset)</summary>
+        public const int Offset = 24;
+    }
+}
 
 /// <summary>picture_context_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 24)]
@@ -37,6 +77,81 @@ public unsafe partial struct PictureContext
         public const int Copy = 8;
         /// <summary>offsetof(picture_context_t, vctx)</summary>
         public const int Vctx = 16;
+    }
+}
+
+/// <summary>picture_resource_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 96)]
+public unsafe partial struct PictureResource
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 96;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 96;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 96;
+
+    /// <summary>p_sys</summary>
+    [FieldOffset(0)] public void* Sys;
+
+    /// <summary>pf_destroy</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Picture*, void> Destroy;
+
+    /// <summary>p</summary>
+    [FieldOffset(16)] public PArray P;
+
+    /// <summary>Inline array of 5 elements of <c>p</c>.</summary>
+    [InlineArray(5)]
+    public struct PArray
+    {
+        private PictureResourceP _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(picture_resource_t, p_sys)</summary>
+        public const int Sys = 0;
+        /// <summary>offsetof(picture_resource_t, pf_destroy)</summary>
+        public const int Destroy = 8;
+        /// <summary>offsetof(picture_resource_t, p)</summary>
+        public const int P = 16;
+    }
+}
+
+/// <summary>picture_resource_t::p</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct PictureResourceP
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>p_pixels</summary>
+    [FieldOffset(0)] public byte* Pixels;
+
+    /// <summary>i_lines</summary>
+    [FieldOffset(8)] public int Lines;
+
+    /// <summary>i_pitch</summary>
+    [FieldOffset(12)] public int Pitch;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(picture_resource_t::p, p_pixels)</summary>
+        public const int Pixels = 0;
+        /// <summary>offsetof(picture_resource_t::p, i_lines)</summary>
+        public const int Lines = 8;
+        /// <summary>offsetof(picture_resource_t::p, i_pitch)</summary>
+        public const int Pitch = 12;
     }
 }
 
@@ -199,15 +314,119 @@ public unsafe partial struct Plane
     }
 }
 
+/// <summary>vlc_pic_chain</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct PicChain
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>front</summary>
+    [FieldOffset(0)] public Picture* Front;
+
+    /// <summary>tail</summary>
+    [FieldOffset(8)] public Picture* Tail;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_pic_chain, front)</summary>
+        public const int Front = 0;
+        /// <summary>offsetof(vlc_pic_chain, tail)</summary>
+        public const int Tail = 8;
+    }
+}
+
 /// <summary>vlc_video_context</summary>
 public partial struct VideoContext { }
 
+/// <summary>vlc_video_context_operations</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct VideoContextOperations
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>destroy</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<void*, void> Destroy;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_video_context_operations, destroy)</summary>
+        public const int Destroy = 0;
+    }
+}
+
+/// <summary>vlc_video_context_type</summary>
+public enum VideoContextType : uint
+{
+    /// <summary>VLC_VIDEO_CONTEXT_VAAPI</summary>
+    Vaapi = 1,
+
+    /// <summary>VLC_VIDEO_CONTEXT_VDPAU</summary>
+    Vdpau = 2,
+
+    /// <summary>VLC_VIDEO_CONTEXT_DXVA2</summary>
+    Dxva2 = 3,
+
+    /// <summary>VLC_VIDEO_CONTEXT_D3D11VA</summary>
+    D3d11va = 4,
+
+    /// <summary>VLC_VIDEO_CONTEXT_AWINDOW</summary>
+    Awindow = 5,
+
+    /// <summary>VLC_VIDEO_CONTEXT_NVDEC</summary>
+    Nvdec = 6,
+
+    /// <summary>VLC_VIDEO_CONTEXT_CVPX</summary>
+    Cvpx = 7,
+
+    /// <summary>VLC_VIDEO_CONTEXT_MMAL</summary>
+    Mmal = 8,
+
+    /// <summary>VLC_VIDEO_CONTEXT_GSTDECODE</summary>
+    Gstdecode = 9,
+}
+
 public unsafe partial struct Picture
 {
+    /// <summary>picture_AttachAncillary</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_AttachAncillary")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AttachAncillary(Picture* pic, Ancillary* ancillary);
+
+    /// <summary>picture_AttachNewAncillary</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_AttachNewAncillary")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void* AttachNewAncillary(Picture* pic, uint id, nuint size);
+
+    /// <summary>picture_Clone</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_Clone")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Picture* Clone(Picture* pic);
+
     /// <summary>picture_Copy</summary>
     [LibraryImport("libvlccore", EntryPoint = "picture_Copy")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Copy(Picture* p_dst, Picture* p_src);
+
+    /// <summary>picture_CopyPixels</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_CopyPixels")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CopyPixels(Picture* p_dst, Picture* p_src);
 
     /// <summary>picture_CopyProperties</summary>
     [LibraryImport("libvlccore", EntryPoint = "picture_CopyProperties")]
@@ -219,26 +438,106 @@ public unsafe partial struct Picture
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Destroy(Picture* picture);
 
+    /// <summary>picture_Export</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_Export")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Export(ObjectHeader* p_obj, Frame** pp_image, VideoFormat* p_fmt, Picture* p_picture, uint i_codec, int i_override_width, int i_override_height, byte b_crop);
+
+    /// <summary>picture_GetAncillary</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_GetAncillary")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Ancillary* GetAncillary(Picture* pic, uint id);
+
+    /// <summary>picture_MergeAncillaries</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_MergeAncillaries")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int MergeAncillaries(Picture* pic, AncillaryArray* src_array);
+
+    /// <summary>picture_MergeAndClearAncillaries</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_MergeAndClearAncillaries")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int MergeAndClearAncillaries(Picture* pic, AncillaryArray* src_array);
+
+    /// <summary>picture_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Picture* New(uint i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den);
+
     /// <summary>picture_NewFromFormat</summary>
     [LibraryImport("libvlccore", EntryPoint = "picture_NewFromFormat")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial Picture* NewFromFormat(VideoFormat* p_fmt);
+
+    /// <summary>picture_NewFromResource</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_NewFromResource")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Picture* NewFromResource(VideoFormat* arg0, PictureResource* arg1);
+
+    /// <summary>picture_Reset</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_Reset")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Reset(Picture* arg0);
+
+    /// <summary>picture_Setup</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_Setup")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Setup(Picture* arg0, VideoFormat* arg1);
+}
+
+public unsafe partial struct Plane
+{
+    /// <summary>plane_CopyPixels</summary>
+    [LibraryImport("libvlccore", EntryPoint = "plane_CopyPixels")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CopyPixels(Plane* p_dst, Plane* p_src);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static partial class VlcPicture
 {
+    /// <summary>A_PLANE</summary>
+    public const uint APlane = 3;
+
     /// <summary>PICTURE_PLANE_MAX</summary>
     public const int PicturePlaneMax = 5;
+
+    /// <summary>U_PLANE</summary>
+    public const uint UPlane = 1;
+
+    /// <summary>V_PLANE</summary>
+    public const uint VPlane = 2;
+
+    /// <summary>Y_PLANE</summary>
+    public const uint YPlane = 0;
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcVideoContext
 {
+    /// <summary>vlc_video_context_Create</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_Create")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VideoContext* Create(DecoderDevice* arg0, VideoContextType private_type, nuint private_size, VideoContextOperations* arg3);
+
+    /// <summary>vlc_video_context_GetPrivate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_GetPrivate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void* GetPrivate(VideoContext* arg0, VideoContextType arg1);
+
+    /// <summary>vlc_video_context_GetType</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_GetType")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VideoContextType GetType(VideoContext* arg0);
+
     /// <summary>vlc_video_context_Hold</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_Hold")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial VideoContext* Hold(VideoContext* arg0);
+
+    /// <summary>vlc_video_context_HoldDevice</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_HoldDevice")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial DecoderDevice* HoldDevice(VideoContext* arg0);
 
     /// <summary>vlc_video_context_Release</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_Release")]

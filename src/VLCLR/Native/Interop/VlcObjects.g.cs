@@ -3,8 +3,33 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
+
+/// <summary>libvlc_int_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct LibvlcInt
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(libvlc_int_t, obj)</summary>
+        public const int Obj = 0;
+    }
+}
 
 /// <summary>vlc_object_internals</summary>
 public partial struct ObjectInternals { }
@@ -56,6 +81,23 @@ public unsafe partial struct ObjectHeader
     }
 }
 
+/// <summary>vlc_tracer</summary>
+public partial struct Tracer { }
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Aout
+{
+    /// <summary>aout_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial AudioOutput* Hold(AudioOutput* aout);
+
+    /// <summary>aout_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "aout_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(AudioOutput* aout);
+}
+
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcObject
 {
@@ -68,4 +110,62 @@ public static unsafe partial class VlcObject
     [LibraryImport("libvlccore", EntryPoint = "vlc_object_typename")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial byte* Typename(ObjectHeader* obj);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcObjects
+{
+    /// <summary>vlc_list_children</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_list_children")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nuint VlcListChildren(ObjectHeader* arg0, ObjectHeader** arg1, nuint arg2);
+
+    /// <summary>vlc_obj_calloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_obj_calloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void* VlcObjCalloc(ObjectHeader* obj, nuint nmemb, nuint size);
+
+    /// <summary>vlc_obj_free</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_obj_free")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcObjFree(ObjectHeader* obj, void* ptr);
+
+    /// <summary>vlc_obj_malloc</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_obj_malloc")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void* VlcObjMalloc(ObjectHeader* obj, nuint size);
+
+    /// <summary>vlc_obj_strdup</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_obj_strdup")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* VlcObjStrdup(ObjectHeader* obj, byte* str);
+
+    /// <summary>vlc_object_create</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_object_create")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void* VlcObjectCreate(ObjectHeader* parent, nuint i_size);
+
+    /// <summary>vlc_object_delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_object_delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcObjectDelete(ObjectHeader* obj);
+
+    /// <summary>vlc_object_get_tracer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_object_get_tracer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Tracer* VlcObjectGetTracer(ObjectHeader* obj);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Vout
+{
+    /// <summary>vout_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VoutThread* Hold(VoutThread* vout);
+
+    /// <summary>vout_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(VoutThread* vout);
 }

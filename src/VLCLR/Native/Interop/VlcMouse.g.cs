@@ -3,8 +3,73 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
 /// <summary>vlc_mouse_t</summary>
-public partial struct Mouse { }
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct Mouse
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>i_x</summary>
+    [FieldOffset(0)] public int X;
+
+    /// <summary>i_y</summary>
+    [FieldOffset(4)] public int Y;
+
+    /// <summary>i_pressed</summary>
+    [FieldOffset(8)] public int Pressed;
+
+    /// <summary>b_double_click</summary>
+    [FieldOffset(12)] public byte DoubleClick;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_mouse_t, i_x)</summary>
+        public const int X = 0;
+        /// <summary>offsetof(vlc_mouse_t, i_y)</summary>
+        public const int Y = 4;
+        /// <summary>offsetof(vlc_mouse_t, i_pressed)</summary>
+        public const int Pressed = 8;
+        /// <summary>offsetof(vlc_mouse_t, b_double_click)</summary>
+        public const int DoubleClick = 12;
+    }
+}
+
+/// <summary>vlc_mouse_button</summary>
+public enum MouseButton : uint
+{
+    /// <summary>MOUSE_BUTTON_LEFT</summary>
+    Left = 0,
+
+    /// <summary>MOUSE_BUTTON_CENTER</summary>
+    Center = 1,
+
+    /// <summary>MOUSE_BUTTON_RIGHT</summary>
+    Right = 2,
+
+    /// <summary>MOUSE_BUTTON_WHEEL_UP</summary>
+    WheelUp = 3,
+
+    /// <summary>MOUSE_BUTTON_WHEEL_DOWN</summary>
+    WheelDown = 4,
+
+    /// <summary>MOUSE_BUTTON_WHEEL_LEFT</summary>
+    WheelLeft = 5,
+
+    /// <summary>MOUSE_BUTTON_WHEEL_RIGHT</summary>
+    WheelRight = 6,
+
+    /// <summary>MOUSE_BUTTON_MAX</summary>
+    Max = 7,
+}

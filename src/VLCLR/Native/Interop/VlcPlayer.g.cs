@@ -3,8 +3,46 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
+
+/// <summary>vlc_player_aout_cbs</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct PlayerAoutCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>on_volume_changed</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<AudioOutput*, float, void*, void> OnVolumeChanged;
+
+    /// <summary>on_mute_changed</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte, void*, void> OnMuteChanged;
+
+    /// <summary>on_device_changed</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<AudioOutput*, byte*, void*, void> OnDeviceChanged;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_aout_cbs, on_volume_changed)</summary>
+        public const int OnVolumeChanged = 0;
+        /// <summary>offsetof(vlc_player_aout_cbs, on_mute_changed)</summary>
+        public const int OnMuteChanged = 8;
+        /// <summary>offsetof(vlc_player_aout_cbs, on_device_changed)</summary>
+        public const int OnDeviceChanged = 16;
+    }
+}
+
+/// <summary>vlc_player_aout_listener_id</summary>
+public partial struct PlayerAoutListenerId { }
 
 /// <summary>vlc_player_cbs</summary>
 [StructLayout(LayoutKind.Explicit, Size = 296)]
@@ -211,25 +249,399 @@ public unsafe partial struct PlayerCbs
 }
 
 /// <summary>vlc_player_chapter</summary>
-public partial struct PlayerChapter { }
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct PlayerChapter
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>time</summary>
+    [FieldOffset(8)] public long Time;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_chapter, name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(vlc_player_chapter, time)</summary>
+        public const int Time = 8;
+    }
+}
 
 /// <summary>vlc_player_listener_id</summary>
 public partial struct PlayerListenerId { }
 
+/// <summary>vlc_player_metadata_cbs</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct PlayerMetadataCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>on_momentary_loudness_changed</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<long, double, void*, void> OnMomentaryLoudnessChanged;
+
+    /// <summary>on_loudness_changed</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<long, AudioLoudness*, void*, void> OnLoudnessChanged;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_metadata_cbs, on_momentary_loudness_changed)</summary>
+        public const int OnMomentaryLoudnessChanged = 0;
+        /// <summary>offsetof(vlc_player_metadata_cbs, on_loudness_changed)</summary>
+        public const int OnLoudnessChanged = 0;
+    }
+}
+
+/// <summary>vlc_player_metadata_listener_id</summary>
+public partial struct PlayerMetadataListenerId { }
+
 /// <summary>vlc_player_program</summary>
-public partial struct PlayerProgram { }
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct PlayerProgram
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>group_id</summary>
+    [FieldOffset(0)] public int GroupId;
+
+    /// <summary>name</summary>
+    [FieldOffset(8)] public byte* Name;
+
+    /// <summary>selected</summary>
+    [FieldOffset(16)] public byte Selected;
+
+    /// <summary>scrambled</summary>
+    [FieldOffset(17)] public byte Scrambled;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_program, group_id)</summary>
+        public const int GroupId = 0;
+        /// <summary>offsetof(vlc_player_program, name)</summary>
+        public const int Name = 8;
+        /// <summary>offsetof(vlc_player_program, selected)</summary>
+        public const int Selected = 16;
+        /// <summary>offsetof(vlc_player_program, scrambled)</summary>
+        public const int Scrambled = 17;
+    }
+}
+
+/// <summary>vlc_player_timer_cbs</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct PlayerTimerCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>on_update</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<PlayerTimerPoint*, void*, void> OnUpdate;
+
+    /// <summary>on_paused</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<long, void*, void> OnPaused;
+
+    /// <summary>on_seek</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<PlayerTimerPoint*, void*, void> OnSeek;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_timer_cbs, on_update)</summary>
+        public const int OnUpdate = 0;
+        /// <summary>offsetof(vlc_player_timer_cbs, on_paused)</summary>
+        public const int OnPaused = 8;
+        /// <summary>offsetof(vlc_player_timer_cbs, on_seek)</summary>
+        public const int OnSeek = 16;
+    }
+}
+
+/// <summary>vlc_player_timer_id</summary>
+public partial struct PlayerTimerId { }
+
+/// <summary>vlc_player_timer_point</summary>
+[StructLayout(LayoutKind.Explicit, Size = 48)]
+public unsafe partial struct PlayerTimerPoint
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 48;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 48;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 48;
+
+    /// <summary>position</summary>
+    [FieldOffset(0)] public double Position;
+
+    /// <summary>rate</summary>
+    [FieldOffset(8)] public double Rate;
+
+    /// <summary>ts</summary>
+    [FieldOffset(16)] public long Ts;
+
+    /// <summary>length</summary>
+    [FieldOffset(24)] public long Length;
+
+    /// <summary>live</summary>
+    [FieldOffset(32)] public byte Live;
+
+    /// <summary>system_date</summary>
+    [FieldOffset(40)] public long SystemDate;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_timer_point, position)</summary>
+        public const int Position = 0;
+        /// <summary>offsetof(vlc_player_timer_point, rate)</summary>
+        public const int Rate = 8;
+        /// <summary>offsetof(vlc_player_timer_point, ts)</summary>
+        public const int Ts = 16;
+        /// <summary>offsetof(vlc_player_timer_point, length)</summary>
+        public const int Length = 24;
+        /// <summary>offsetof(vlc_player_timer_point, live)</summary>
+        public const int Live = 32;
+        /// <summary>offsetof(vlc_player_timer_point, system_date)</summary>
+        public const int SystemDate = 40;
+    }
+}
+
+/// <summary>vlc_player_timer_smpte_cbs</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct PlayerTimerSmpteCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>on_update</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<PlayerTimerSmpteTimecode*, void*, void> OnUpdate;
+
+    /// <summary>on_paused</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<long, void*, void> OnPaused;
+
+    /// <summary>on_seek</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<PlayerTimerPoint*, void*, void> OnSeek;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_timer_smpte_cbs, on_update)</summary>
+        public const int OnUpdate = 0;
+        /// <summary>offsetof(vlc_player_timer_smpte_cbs, on_paused)</summary>
+        public const int OnPaused = 8;
+        /// <summary>offsetof(vlc_player_timer_smpte_cbs, on_seek)</summary>
+        public const int OnSeek = 16;
+    }
+}
+
+/// <summary>vlc_player_timer_smpte_timecode</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct PlayerTimerSmpteTimecode
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>hours</summary>
+    [FieldOffset(0)] public uint Hours;
+
+    /// <summary>minutes</summary>
+    [FieldOffset(4)] public uint Minutes;
+
+    /// <summary>seconds</summary>
+    [FieldOffset(8)] public uint Seconds;
+
+    /// <summary>frames</summary>
+    [FieldOffset(12)] public uint Frames;
+
+    /// <summary>frame_resolution</summary>
+    [FieldOffset(16)] public uint FrameResolution;
+
+    /// <summary>drop_frame</summary>
+    [FieldOffset(20)] public byte DropFrame;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_timer_smpte_timecode, hours)</summary>
+        public const int Hours = 0;
+        /// <summary>offsetof(vlc_player_timer_smpte_timecode, minutes)</summary>
+        public const int Minutes = 4;
+        /// <summary>offsetof(vlc_player_timer_smpte_timecode, seconds)</summary>
+        public const int Seconds = 8;
+        /// <summary>offsetof(vlc_player_timer_smpte_timecode, frames)</summary>
+        public const int Frames = 12;
+        /// <summary>offsetof(vlc_player_timer_smpte_timecode, frame_resolution)</summary>
+        public const int FrameResolution = 16;
+        /// <summary>offsetof(vlc_player_timer_smpte_timecode, drop_frame)</summary>
+        public const int DropFrame = 20;
+    }
+}
 
 /// <summary>vlc_player_title</summary>
-public partial struct PlayerTitle { }
+[StructLayout(LayoutKind.Explicit, Size = 40)]
+public unsafe partial struct PlayerTitle
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 40;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 40;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
+
+    /// <summary>name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>length</summary>
+    [FieldOffset(8)] public long Length;
+
+    /// <summary>flags</summary>
+    [FieldOffset(16)] public uint Flags;
+
+    /// <summary>chapter_count</summary>
+    [FieldOffset(24)] public nuint ChapterCount;
+
+    /// <summary>chapters</summary>
+    [FieldOffset(32)] public PlayerChapter* Chapters;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_title, name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(vlc_player_title, length)</summary>
+        public const int Length = 8;
+        /// <summary>offsetof(vlc_player_title, flags)</summary>
+        public const int Flags = 16;
+        /// <summary>offsetof(vlc_player_title, chapter_count)</summary>
+        public const int ChapterCount = 24;
+        /// <summary>offsetof(vlc_player_title, chapters)</summary>
+        public const int Chapters = 32;
+    }
+}
 
 /// <summary>vlc_player_title_list</summary>
 public partial struct PlayerTitleList { }
 
 /// <summary>vlc_player_track</summary>
-public partial struct PlayerTrack { }
+[StructLayout(LayoutKind.Explicit, Size = 264)]
+public unsafe partial struct PlayerTrack
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 264 : 256; }
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 256;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 264;
+
+    /// <summary>es_id</summary>
+    [FieldOffset(0)] public EsId* EsId;
+
+    /// <summary>name</summary>
+    [FieldOffset(8)] public byte* Name;
+
+    /// <summary>fmt</summary>
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* Fmt => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + 16);
+
+    /// <summary>selected</summary>
+    [UnscopedRef]
+    public ref byte Selected { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<PlayerTrack, byte>(ref this, OperatingSystem.IsWindows() ? 256 : 248); }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_track, es_id)</summary>
+        public const int EsId = 0;
+        /// <summary>offsetof(vlc_player_track, name)</summary>
+        public const int Name = 8;
+        /// <summary>offsetof(vlc_player_track, fmt)</summary>
+        public const int Fmt = 16;
+        /// <summary>offsetof(vlc_player_track, selected)</summary>
+        public static int Selected { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 256 : 248; }
+    }
+}
+
+/// <summary>vlc_player_vout_cbs</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct PlayerVoutCbs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>on_fullscreen_changed</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<VoutThread*, byte, void*, void> OnFullscreenChanged;
+
+    /// <summary>on_wallpaper_mode_changed</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<VoutThread*, byte, void*, void> OnWallpaperModeChanged;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_player_vout_cbs, on_fullscreen_changed)</summary>
+        public const int OnFullscreenChanged = 0;
+        /// <summary>offsetof(vlc_player_vout_cbs, on_wallpaper_mode_changed)</summary>
+        public const int OnWallpaperModeChanged = 8;
+    }
+}
+
+/// <summary>vlc_player_vout_listener_id</summary>
+public partial struct PlayerVoutListenerId { }
 
 /// <summary>vlc_player_abloop</summary>
-public enum PlayerAbloop : int
+public enum PlayerAbloop : uint
 {
     /// <summary>VLC_PLAYER_ABLOOP_NONE</summary>
     None = 0,
@@ -242,7 +654,7 @@ public enum PlayerAbloop : int
 }
 
 /// <summary>vlc_player_error</summary>
-public enum PlayerError : int
+public enum PlayerError : uint
 {
     /// <summary>VLC_PLAYER_ERROR_NONE</summary>
     None = 0,
@@ -252,7 +664,7 @@ public enum PlayerError : int
 }
 
 /// <summary>vlc_player_list_action</summary>
-public enum PlayerListAction : int
+public enum PlayerListAction : uint
 {
     /// <summary>VLC_PLAYER_LIST_ADDED</summary>
     Added = 0,
@@ -264,8 +676,18 @@ public enum PlayerListAction : int
     Updated = 2,
 }
 
+/// <summary>vlc_player_lock_type</summary>
+public enum PlayerLockType : uint
+{
+    /// <summary>VLC_PLAYER_LOCK_NORMAL</summary>
+    Normal = 0,
+
+    /// <summary>VLC_PLAYER_LOCK_REENTRANT</summary>
+    Reentrant = 1,
+}
+
 /// <summary>vlc_player_media_stopping_reason</summary>
-public enum PlayerMediaStoppingReason : int
+public enum PlayerMediaStoppingReason : uint
 {
     /// <summary>VLC_PLAYER_MEDIA_STOPPING_ERROR</summary>
     Error = 0,
@@ -277,8 +699,56 @@ public enum PlayerMediaStoppingReason : int
     User = 2,
 }
 
+/// <summary>vlc_player_metadata_option</summary>
+public enum PlayerMetadataOption : uint
+{
+    /// <summary>VLC_PLAYER_METADATA_LOUDNESS_MOMENTARY</summary>
+    Momentary = 0,
+
+    /// <summary>VLC_PLAYER_METADATA_LOUDNESS_FULL</summary>
+    Full = 1,
+}
+
+/// <summary>vlc_player_nav</summary>
+public enum PlayerNav : uint
+{
+    /// <summary>VLC_PLAYER_NAV_ACTIVATE</summary>
+    Activate = 0,
+
+    /// <summary>VLC_PLAYER_NAV_UP</summary>
+    Up = 1,
+
+    /// <summary>VLC_PLAYER_NAV_DOWN</summary>
+    Down = 2,
+
+    /// <summary>VLC_PLAYER_NAV_LEFT</summary>
+    Left = 3,
+
+    /// <summary>VLC_PLAYER_NAV_RIGHT</summary>
+    Right = 4,
+
+    /// <summary>VLC_PLAYER_NAV_POPUP</summary>
+    Popup = 5,
+
+    /// <summary>VLC_PLAYER_NAV_MENU</summary>
+    Menu = 6,
+}
+
+/// <summary>vlc_player_restore_playback_pos</summary>
+public enum PlayerRestorePlaybackPos : uint
+{
+    /// <summary>VLC_PLAYER_RESTORE_PLAYBACK_POS_NEVER</summary>
+    Never = 0,
+
+    /// <summary>VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK</summary>
+    Ask = 1,
+
+    /// <summary>VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS</summary>
+    Always = 2,
+}
+
 /// <summary>vlc_player_seek_speed</summary>
-public enum PlayerSeekSpeed : int
+public enum PlayerSeekSpeed : uint
 {
     /// <summary>VLC_PLAYER_SEEK_PRECISE</summary>
     Precise = 0,
@@ -287,8 +757,18 @@ public enum PlayerSeekSpeed : int
     Fast = 1,
 }
 
+/// <summary>vlc_player_select_policy</summary>
+public enum PlayerSelectPolicy : uint
+{
+    /// <summary>VLC_PLAYER_SELECT_EXCLUSIVE</summary>
+    Exclusive = 0,
+
+    /// <summary>VLC_PLAYER_SELECT_SIMULTANEOUS</summary>
+    Simultaneous = 1,
+}
+
 /// <summary>vlc_player_state</summary>
-public enum PlayerState : int
+public enum PlayerState : uint
 {
     /// <summary>VLC_PLAYER_STATE_STOPPED</summary>
     Stopped = 0,
@@ -307,7 +787,7 @@ public enum PlayerState : int
 }
 
 /// <summary>vlc_player_vout_action</summary>
-public enum PlayerVoutAction : int
+public enum PlayerVoutAction : uint
 {
     /// <summary>VLC_PLAYER_VOUT_STARTED</summary>
     Started = 0,
@@ -317,7 +797,7 @@ public enum PlayerVoutAction : int
 }
 
 /// <summary>vlc_player_whence</summary>
-public enum PlayerWhence : int
+public enum PlayerWhence : uint
 {
     /// <summary>VLC_PLAYER_WHENCE_ABSOLUTE</summary>
     Absolute = 0,
@@ -341,50 +821,324 @@ public static unsafe partial class VlcPlayer
     /// <summary>VLC_PLAYER_CAP_SEEK</summary>
     public const int PlayerCapSeek = 1;
 
+    /// <summary>VLC_PLAYER_TELETEXT_KEY_BLUE</summary>
+    public const int PlayerTeletextKeyBlue = 6422528;
+
+    /// <summary>VLC_PLAYER_TELETEXT_KEY_GREEN</summary>
+    public const int PlayerTeletextKeyGreen = 6750208;
+
+    /// <summary>VLC_PLAYER_TELETEXT_KEY_INDEX</summary>
+    public const int PlayerTeletextKeyIndex = 6881280;
+
+    /// <summary>VLC_PLAYER_TELETEXT_KEY_RED</summary>
+    public const int PlayerTeletextKeyRed = 7471104;
+
+    /// <summary>VLC_PLAYER_TELETEXT_KEY_YELLOW</summary>
+    public const int PlayerTeletextKeyYellow = 7929856;
+
+    /// <summary>VLC_PLAYER_TITLE_INTERACTIVE</summary>
+    public const int PlayerTitleInteractive = 2;
+
+    /// <summary>VLC_PLAYER_TITLE_MAIN</summary>
+    public const int PlayerTitleMain = 4;
+
+    /// <summary>VLC_PLAYER_TITLE_MENU</summary>
+    public const int PlayerTitleMenu = 1;
+
+    /// <summary>vlc_player_AddAssociatedMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_AddAssociatedMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int AddAssociatedMedia(Player* player, EsFormatCategory cat, byte* uri, byte select, byte notify, byte check_ext);
+
     /// <summary>vlc_player_AddListener</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_AddListener")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial PlayerListenerId* AddListener(Player* player, PlayerCbs* cbs, void* cbs_data);
+
+    /// <summary>vlc_player_AddMetadataListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_AddMetadataListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerMetadataListenerId* AddMetadataListener(Player* player, PlayerMetadataOption option, PlayerMetadataCbs* cbs, void* cbs_data);
+
+    /// <summary>vlc_player_AddSmpteTimer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_AddSmpteTimer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTimerId* AddSmpteTimer(Player* player, PlayerTimerSmpteCbs* cbs, void* cbs_data);
+
+    /// <summary>vlc_player_AddTimer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_AddTimer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTimerId* AddTimer(Player* player, long min_period, PlayerTimerCbs* cbs, void* cbs_data);
+
+    /// <summary>vlc_player_ChangeRate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_ChangeRate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ChangeRate(Player* player, float rate);
+
+    /// <summary>vlc_player_CondWait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_CondWait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CondWait(Player* player, Cond* cond);
+
+    /// <summary>vlc_player_CycleTrack</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_CycleTrack")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void CycleTrack(Player* player, EsFormatCategory cat, VoutOrder vout_order, byte next);
+
+    /// <summary>vlc_player_DecrementRate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_DecrementRate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void DecrementRate(Player* player);
+
+    /// <summary>vlc_player_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(Player* player);
+
+    /// <summary>vlc_player_DisplayPosition</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_DisplayPosition")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void DisplayPosition(Player* player);
+
+    /// <summary>vlc_player_GetAtoBLoop</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetAtoBLoop")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerAbloop GetAtoBLoop(Player* player, long* a_time, double* a_pos, long* b_time, double* b_pos);
 
     /// <summary>vlc_player_GetCapabilities</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetCapabilities")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial int GetCapabilities(Player* player);
 
+    /// <summary>vlc_player_GetCategoryDelay</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetCategoryDelay")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial long GetCategoryDelay(Player* player, EsFormatCategory cat);
+
+    /// <summary>vlc_player_GetCategoryLanguage</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetCategoryLanguage")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* GetCategoryLanguage(Player* player, EsFormatCategory cat);
+
+    /// <summary>vlc_player_GetCurrentMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetCurrentMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItem* GetCurrentMedia(Player* player);
+
+    /// <summary>vlc_player_GetError</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetError")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerError GetError(Player* player);
+
+    /// <summary>vlc_player_GetEsIdDelay</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetEsIdDelay")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial long GetEsIdDelay(Player* player, EsId* es_id);
+
+    /// <summary>vlc_player_GetEsIdFromVout</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetEsIdFromVout")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial EsId* GetEsIdFromVout(Player* player, VoutThread* vout);
+
+    /// <summary>vlc_player_GetEsIdVout</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetEsIdVout")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VoutThread* GetEsIdVout(Player* player, EsId* es_id, VoutOrder* order);
+
     /// <summary>vlc_player_GetLength</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetLength")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial long GetLength(Player* player);
+
+    /// <summary>vlc_player_GetNextMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetNextMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputItem* GetNextMedia(Player* player);
 
     /// <summary>vlc_player_GetPosition</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetPosition")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial double GetPosition(Player* player);
 
+    /// <summary>vlc_player_GetProgram</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetProgram")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerProgram* GetProgram(Player* player, int group_id);
+
+    /// <summary>vlc_player_GetProgramAt</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetProgramAt")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerProgram* GetProgramAt(Player* player, nuint index);
+
+    /// <summary>vlc_player_GetProgramCount</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetProgramCount")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nuint GetProgramCount(Player* player);
+
+    /// <summary>vlc_player_GetRate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetRate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial float GetRate(Player* player);
+
+    /// <summary>vlc_player_GetRenderer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetRenderer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial RendererItem* GetRenderer(Player* player);
+
+    /// <summary>vlc_player_GetSelectedChapterIdx</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetSelectedChapterIdx")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nint GetSelectedChapterIdx(Player* player);
+
+    /// <summary>vlc_player_GetSelectedTitleIdx</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetSelectedTitleIdx")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nint GetSelectedTitleIdx(Player* player);
+
+    /// <summary>vlc_player_GetSignal</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetSignal")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int GetSignal(Player* player, float* quality, float* strength);
+
     /// <summary>vlc_player_GetState</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetState")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial PlayerState GetState(Player* player);
+
+    /// <summary>vlc_player_GetStatistics</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetStatistics")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputStats* GetStatistics(Player* player);
+
+    /// <summary>vlc_player_GetSubtitleTextScale</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetSubtitleTextScale")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetSubtitleTextScale(Player* player);
+
+    /// <summary>vlc_player_GetTeletextPage</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetTeletextPage")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetTeletextPage(Player* player);
 
     /// <summary>vlc_player_GetTime</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetTime")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial long GetTime(Player* player);
 
+    /// <summary>vlc_player_GetTitleList</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetTitleList")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTitleList* GetTitleList(Player* player);
+
+    /// <summary>vlc_player_GetTrack</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetTrack")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTrack* GetTrack(Player* player, EsId* es_id);
+
+    /// <summary>vlc_player_GetTrackAt</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetTrackAt")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTrack* GetTrackAt(Player* player, EsFormatCategory cat, nuint index);
+
+    /// <summary>vlc_player_GetTrackCount</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetTrackCount")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nuint GetTrackCount(Player* player, EsFormatCategory cat);
+
+    /// <summary>vlc_player_GetV4l2Object</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_GetV4l2Object")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial ObjectHeader* GetV4l2Object(Player* player);
+
+    /// <summary>vlc_player_HasTeletextMenu</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_HasTeletextMenu")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte HasTeletextMenu(Player* player);
+
+    /// <summary>vlc_player_IncrementRate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_IncrementRate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void IncrementRate(Player* player);
+
+    /// <summary>vlc_player_IsRecording</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_IsRecording")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsRecording(Player* player);
+
+    /// <summary>vlc_player_IsTeletextEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_IsTeletextEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsTeletextEnabled(Player* player);
+
+    /// <summary>vlc_player_IsTeletextTransparent</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_IsTeletextTransparent")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsTeletextTransparent(Player* player);
+
+    /// <summary>vlc_player_IsTrackCategoryEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_IsTrackCategoryEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsTrackCategoryEnabled(Player* player, EsFormatCategory cat);
+
     /// <summary>vlc_player_Lock</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_Lock")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Lock(Player* player);
+
+    /// <summary>vlc_player_Navigate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_Navigate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Navigate(Player* player, PlayerNav nav);
+
+    /// <summary>vlc_player_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Player* New(ObjectHeader* parent, PlayerLockType lock_type);
+
+    /// <summary>vlc_player_NextVideoFrame</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_NextVideoFrame")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void NextVideoFrame(Player* player);
 
     /// <summary>vlc_player_Pause</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_Pause")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Pause(Player* player);
 
+    /// <summary>vlc_player_PreviousVideoFrame</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_PreviousVideoFrame")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void PreviousVideoFrame(Player* player);
+
     /// <summary>vlc_player_RemoveListener</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_RemoveListener")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void RemoveListener(Player* player, PlayerListenerId* listener_id);
+
+    /// <summary>vlc_player_RemoveMetadataListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_RemoveMetadataListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemoveMetadataListener(Player* player, PlayerMetadataListenerId* listener_id);
+
+    /// <summary>vlc_player_RemoveTimer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_RemoveTimer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemoveTimer(Player* player, PlayerTimerId* timer);
+
+    /// <summary>vlc_player_ResetAtoBLoop</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_ResetAtoBLoop")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int ResetAtoBLoop(Player* player);
+
+    /// <summary>vlc_player_RestartEsId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_RestartEsId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RestartEsId(Player* player, EsId* es_id);
+
+    /// <summary>vlc_player_RestorePlaybackPos</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_RestorePlaybackPos")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RestorePlaybackPos(Player* player);
 
     /// <summary>vlc_player_Resume</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_Resume")]
@@ -401,19 +1155,219 @@ public static unsafe partial class VlcPlayer
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void SeekByTime(Player* player, long time, PlayerSeekSpeed speed, PlayerWhence whence);
 
+    /// <summary>vlc_player_SelectCategoryLanguage</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectCategoryLanguage")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectCategoryLanguage(Player* player, EsFormatCategory cat, byte* lang);
+
+    /// <summary>vlc_player_SelectChapter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectChapter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectChapter(Player* player, PlayerTitle* title, nuint chapter_idx);
+
+    /// <summary>vlc_player_SelectChapterIdx</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectChapterIdx")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectChapterIdx(Player* player, nuint index);
+
+    /// <summary>vlc_player_SelectEsId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectEsId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint SelectEsId(Player* player, EsId* es_id, PlayerSelectPolicy policy);
+
+    /// <summary>vlc_player_SelectNextChapter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectNextChapter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectNextChapter(Player* player);
+
+    /// <summary>vlc_player_SelectNextProgram</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectNextProgram")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectNextProgram(Player* player);
+
+    /// <summary>vlc_player_SelectNextTitle</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectNextTitle")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectNextTitle(Player* player);
+
+    /// <summary>vlc_player_SelectPrevChapter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectPrevChapter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectPrevChapter(Player* player);
+
+    /// <summary>vlc_player_SelectPrevProgram</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectPrevProgram")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectPrevProgram(Player* player);
+
+    /// <summary>vlc_player_SelectPrevTitle</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectPrevTitle")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectPrevTitle(Player* player);
+
+    /// <summary>vlc_player_SelectProgram</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectProgram")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectProgram(Player* player, int group_id);
+
+    /// <summary>vlc_player_SelectTeletextPage</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectTeletextPage")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectTeletextPage(Player* player, uint page);
+
+    /// <summary>vlc_player_SelectTitle</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectTitle")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectTitle(Player* player, PlayerTitle* title);
+
+    /// <summary>vlc_player_SelectTitleIdx</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectTitleIdx")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectTitleIdx(Player* player, nuint index);
+
+    /// <summary>vlc_player_SelectTracksByStringIds</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SelectTracksByStringIds")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SelectTracksByStringIds(Player* player, EsFormatCategory cat, byte* str_ids);
+
+    /// <summary>vlc_player_SetAssociatedSubsFPS</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetAssociatedSubsFPS")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetAssociatedSubsFPS(Player* player, float fps);
+
+    /// <summary>vlc_player_SetAtoBLoop</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetAtoBLoop")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int SetAtoBLoop(Player* player, PlayerAbloop abloop);
+
+    /// <summary>vlc_player_SetAtoBLoopPosition</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetAtoBLoopPosition")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int SetAtoBLoopPosition(Player* player, double a_pos, double b_pos);
+
+    /// <summary>vlc_player_SetAtoBLoopTime</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetAtoBLoopTime")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int SetAtoBLoopTime(Player* player, long a_time, long b_time);
+
+    /// <summary>vlc_player_SetCategoryDelay</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetCategoryDelay")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int SetCategoryDelay(Player* player, EsFormatCategory cat, long delay, PlayerWhence whence);
+
+    /// <summary>vlc_player_SetCurrentMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetCurrentMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int SetCurrentMedia(Player* player, InputItem* media);
+
+    /// <summary>vlc_player_SetEsIdDelay</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetEsIdDelay")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int SetEsIdDelay(Player* player, EsId* es_id, long delay, PlayerWhence whence);
+
+    /// <summary>vlc_player_SetNextMedia</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetNextMedia")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetNextMedia(Player* player, InputItem* media);
+
+    /// <summary>vlc_player_SetPlayAndPause</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetPlayAndPause")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetPlayAndPause(Player* player, byte play_and_pause);
+
+    /// <summary>vlc_player_SetRecordingEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetRecordingEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetRecordingEnabled(Player* player, byte enabled, byte* dir_path);
+
+    /// <summary>vlc_player_SetRenderer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetRenderer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetRenderer(Player* player, RendererItem* renderer);
+
+    /// <summary>vlc_player_SetRepeatCount</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetRepeatCount")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetRepeatCount(Player* player, uint repeat_count);
+
+    /// <summary>vlc_player_SetStartPaused</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetStartPaused")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetStartPaused(Player* player, byte start_paused);
+
+    /// <summary>vlc_player_SetSubtitleTextScale</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetSubtitleTextScale")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetSubtitleTextScale(Player* player, uint scale);
+
+    /// <summary>vlc_player_SetTeletextEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetTeletextEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetTeletextEnabled(Player* player, byte enabled);
+
+    /// <summary>vlc_player_SetTeletextTransparency</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetTeletextTransparency")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetTeletextTransparency(Player* player, byte enabled);
+
+    /// <summary>vlc_player_SetTrackCategoryEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_SetTrackCategoryEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetTrackCategoryEnabled(Player* player, EsFormatCategory cat, byte enabled);
+
+    /// <summary>vlc_player_Start</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_Start")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Start(Player* player);
+
+    /// <summary>vlc_player_Stop</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_Stop")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Stop(Player* player);
+
     /// <summary>vlc_player_Unlock</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_Unlock")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Unlock(Player* player);
+
+    /// <summary>vlc_player_UnselectEsId</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_UnselectEsId")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void UnselectEsId(Player* player, EsId* es_id);
+
+    /// <summary>vlc_player_UpdateViewpoint</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_UpdateViewpoint")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void UpdateViewpoint(Player* player, Viewpoint* viewpoint, PlayerWhence whence);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcPlayerAout
 {
+    /// <summary>vlc_player_aout_AddListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_AddListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerAoutListenerId* AddListener(Player* player, PlayerAoutCbs* cbs, void* cbs_data);
+
+    /// <summary>vlc_player_aout_EnableFilter</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_EnableFilter")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int EnableFilter(Player* player, byte* name, byte add);
+
     /// <summary>vlc_player_aout_GetVolume</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_GetVolume")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial float GetVolume(Player* player);
+
+    /// <summary>vlc_player_aout_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial AudioOutput* Hold(Player* player);
+
+    /// <summary>vlc_player_aout_IncrementVolume</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_IncrementVolume")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int IncrementVolume(Player* player, int steps, float* result);
 
     /// <summary>vlc_player_aout_IsMuted</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_IsMuted")]
@@ -425,8 +1379,133 @@ public static unsafe partial class VlcPlayerAout
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial int Mute(Player* player, byte mute);
 
+    /// <summary>vlc_player_aout_RemoveListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_RemoveListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemoveListener(Player* player, PlayerAoutListenerId* listener_id);
+
+    /// <summary>vlc_player_aout_Reset</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_Reset")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Reset(Player* player);
+
     /// <summary>vlc_player_aout_SetVolume</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_player_aout_SetVolume")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial int SetVolume(Player* player, float volume);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcPlayerProgram
+{
+    /// <summary>vlc_player_program_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_program_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(PlayerProgram* prgm);
+
+    /// <summary>vlc_player_program_Dup</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_program_Dup")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerProgram* Dup(PlayerProgram* prgm);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcPlayerTimerPoint
+{
+    /// <summary>vlc_player_timer_point_GetNextIntervalDate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_timer_point_GetNextIntervalDate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial long GetNextIntervalDate(PlayerTimerPoint* point, long system_now, long interpolated_ts, long next_interval);
+
+    /// <summary>vlc_player_timer_point_Interpolate</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_timer_point_Interpolate")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Interpolate(PlayerTimerPoint* point, long system_now, long* out_ts, double* out_pos);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcPlayerTitleList
+{
+    /// <summary>vlc_player_title_list_GetAt</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_title_list_GetAt")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTitle* GetAt(PlayerTitleList* titles, nuint idx);
+
+    /// <summary>vlc_player_title_list_GetCount</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_title_list_GetCount")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nuint GetCount(PlayerTitleList* titles);
+
+    /// <summary>vlc_player_title_list_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_title_list_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTitleList* Hold(PlayerTitleList* titles);
+
+    /// <summary>vlc_player_title_list_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_title_list_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(PlayerTitleList* titles);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcPlayerTrack
+{
+    /// <summary>vlc_player_track_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_track_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(PlayerTrack* track);
+
+    /// <summary>vlc_player_track_Dup</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_track_Dup")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerTrack* Dup(PlayerTrack* track);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcPlayerVout
+{
+    /// <summary>vlc_player_vout_AddListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_AddListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial PlayerVoutListenerId* AddListener(Player* player, PlayerVoutCbs* cbs, void* cbs_data);
+
+    /// <summary>vlc_player_vout_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VoutThread* Hold(Player* player);
+
+    /// <summary>vlc_player_vout_HoldAll</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_HoldAll")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial VoutThread** HoldAll(Player* player, nuint* count);
+
+    /// <summary>vlc_player_vout_IsFullscreen</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_IsFullscreen")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsFullscreen(Player* player);
+
+    /// <summary>vlc_player_vout_IsWallpaperModeEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_IsWallpaperModeEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte IsWallpaperModeEnabled(Player* player);
+
+    /// <summary>vlc_player_vout_RemoveListener</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_RemoveListener")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void RemoveListener(Player* player, PlayerVoutListenerId* listener_id);
+
+    /// <summary>vlc_player_vout_SetFullscreen</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_SetFullscreen")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetFullscreen(Player* player, byte enabled);
+
+    /// <summary>vlc_player_vout_SetWallpaperModeEnabled</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_SetWallpaperModeEnabled")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void SetWallpaperModeEnabled(Player* player, byte enabled);
+
+    /// <summary>vlc_player_vout_Snapshot</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_player_vout_Snapshot")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Snapshot(Player* player);
 }

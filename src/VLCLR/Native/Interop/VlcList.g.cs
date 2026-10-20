@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -32,5 +33,39 @@ public unsafe partial struct List
         public const int Prev = 0;
         /// <summary>offsetof(vlc_list, next)</summary>
         public const int Next = 8;
+    }
+}
+
+/// <summary>vlc_list_it</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct ListIt
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>head</summary>
+    [FieldOffset(0)] public List* Head;
+
+    /// <summary>current</summary>
+    [FieldOffset(8)] public List* Current;
+
+    /// <summary>next</summary>
+    [FieldOffset(16)] public List* Next;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_list_it, head)</summary>
+        public const int Head = 0;
+        /// <summary>offsetof(vlc_list_it, current)</summary>
+        public const int Current = 8;
+        /// <summary>offsetof(vlc_list_it, next)</summary>
+        public const int Next = 16;
     }
 }

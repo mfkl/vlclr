@@ -3,11 +3,46 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
 /// <summary>subpicture_private_t</summary>
 public partial struct SubpicturePrivate { }
+
+/// <summary>subpicture_region_rendered</summary>
+[StructLayout(LayoutKind.Explicit, Size = 32)]
+public unsafe partial struct SubpictureRegionRendered
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
+    /// <summary>p_picture</summary>
+    [FieldOffset(0)] public Picture* Picture;
+
+    /// <summary>place</summary>
+    [FieldOffset(8)] public VoutDisplayPlace Place;
+
+    /// <summary>i_alpha</summary>
+    [FieldOffset(24)] public int Alpha;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(subpicture_region_rendered, p_picture)</summary>
+        public const int Picture = 0;
+        /// <summary>offsetof(subpicture_region_rendered, place)</summary>
+        public const int Place = 8;
+        /// <summary>offsetof(subpicture_region_rendered, i_alpha)</summary>
+        public const int Alpha = 24;
+    }
+}
 
 /// <summary>subpicture_region_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 224)]
@@ -224,8 +259,185 @@ public unsafe partial struct SubpictureUpdater
     }
 }
 
+/// <summary>vlc_render_subpicture</summary>
+[StructLayout(LayoutKind.Explicit, Size = 32)]
+public unsafe partial struct RenderSubpicture
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
+    /// <summary>regions</summary>
+    [FieldOffset(0)] public RenderSubpictureRegions Regions;
+
+    /// <summary>i_order</summary>
+    [FieldOffset(24)] public long Order;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_render_subpicture, regions)</summary>
+        public const int Regions = 0;
+        /// <summary>offsetof(vlc_render_subpicture, i_order)</summary>
+        public const int Order = 24;
+    }
+}
+
+/// <summary>vlc_render_subpicture::regions</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct RenderSubpictureRegions
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>cap</summary>
+    [FieldOffset(0)] public nuint Cap;
+
+    /// <summary>size</summary>
+    [FieldOffset(8)] public nuint Size;
+
+    /// <summary>data</summary>
+    [FieldOffset(16)] public SubpictureRegionRendered** Data;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_render_subpicture::regions, cap)</summary>
+        public const int Cap = 0;
+        /// <summary>offsetof(vlc_render_subpicture::regions, size)</summary>
+        public const int Size = 8;
+        /// <summary>offsetof(vlc_render_subpicture::regions, data)</summary>
+        public const int Data = 16;
+    }
+}
+
+/// <summary>vlc_spu_highlight_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 1044)]
+public unsafe partial struct SpuHighlight
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 1044;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 1044;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 1044;
+
+    /// <summary>x_start</summary>
+    [FieldOffset(0)] public int XStart;
+
+    /// <summary>x_end</summary>
+    [FieldOffset(4)] public int XEnd;
+
+    /// <summary>y_start</summary>
+    [FieldOffset(8)] public int YStart;
+
+    /// <summary>y_end</summary>
+    [FieldOffset(12)] public int YEnd;
+
+    /// <summary>palette</summary>
+    [FieldOffset(16)] public VideoPalette Palette;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_spu_highlight_t, x_start)</summary>
+        public const int XStart = 0;
+        /// <summary>offsetof(vlc_spu_highlight_t, x_end)</summary>
+        public const int XEnd = 4;
+        /// <summary>offsetof(vlc_spu_highlight_t, y_start)</summary>
+        public const int YStart = 8;
+        /// <summary>offsetof(vlc_spu_highlight_t, y_end)</summary>
+        public const int YEnd = 12;
+        /// <summary>offsetof(vlc_spu_highlight_t, palette)</summary>
+        public const int Palette = 16;
+    }
+}
+
 /// <summary>vlc_spu_updater_configuration</summary>
-public partial struct SpuUpdaterConfiguration { }
+[StructLayout(LayoutKind.Explicit, Size = 56)]
+public unsafe partial struct SpuUpdaterConfiguration
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 56;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 56;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 56;
+
+    /// <summary>current</summary>
+    [FieldOffset(0)] public SpuUpdaterConfigurationCurrent Current;
+
+    /// <summary>previous</summary>
+    [FieldOffset(24)] public SpuUpdaterConfigurationCurrent Previous;
+
+    /// <summary>pts</summary>
+    [FieldOffset(48)] public long Pts;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_spu_updater_configuration, current)</summary>
+        public const int Current = 0;
+        /// <summary>offsetof(vlc_spu_updater_configuration, previous)</summary>
+        public const int Previous = 24;
+        /// <summary>offsetof(vlc_spu_updater_configuration, pts)</summary>
+        public const int Pts = 48;
+    }
+}
+
+/// <summary>vlc_spu_updater_configuration::current</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct SpuUpdaterConfigurationCurrent
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>video_src</summary>
+    [FieldOffset(0)] public VideoFormat* VideoSrc;
+
+    /// <summary>video_dst</summary>
+    [FieldOffset(8)] public VideoFormat* VideoDst;
+
+    /// <summary>display_width</summary>
+    [FieldOffset(16)] public uint DisplayWidth;
+
+    /// <summary>display_height</summary>
+    [FieldOffset(20)] public uint DisplayHeight;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_spu_updater_configuration::current, video_src)</summary>
+        public const int VideoSrc = 0;
+        /// <summary>offsetof(vlc_spu_updater_configuration::current, video_dst)</summary>
+        public const int VideoDst = 8;
+        /// <summary>offsetof(vlc_spu_updater_configuration::current, display_width)</summary>
+        public const int DisplayWidth = 16;
+        /// <summary>offsetof(vlc_spu_updater_configuration::current, display_height)</summary>
+        public const int DisplayHeight = 20;
+    }
+}
 
 /// <summary>vlc_spu_updater_ops</summary>
 [StructLayout(LayoutKind.Explicit, Size = 16)]
@@ -256,12 +468,35 @@ public unsafe partial struct SpuUpdaterOps
     }
 }
 
+public unsafe partial struct Picture
+{
+    /// <summary>picture_BlendSubpicture</summary>
+    [LibraryImport("libvlccore", EntryPoint = "picture_BlendSubpicture")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint BlendSubpicture(Picture* arg0, Filter* arg1, RenderSubpicture* arg2);
+}
+
 public unsafe partial struct Subpicture
 {
     /// <summary>subpicture_Delete</summary>
     [LibraryImport("libvlccore", EntryPoint = "subpicture_Delete")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Delete(Subpicture* p_subpic);
+
+    /// <summary>subpicture_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "subpicture_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Subpicture* New(SubpictureUpdater* arg0);
+
+    /// <summary>subpicture_NewFromPicture</summary>
+    [LibraryImport("libvlccore", EntryPoint = "subpicture_NewFromPicture")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Subpicture* NewFromPicture(ObjectHeader* arg0, Picture* arg1, uint i_chroma);
+
+    /// <summary>subpicture_Update</summary>
+    [LibraryImport("libvlccore", EntryPoint = "subpicture_Update")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Update(Subpicture* arg0, VideoFormat* src, VideoFormat* arg2, uint display_width, uint display_height, long arg5);
 }
 
 public unsafe partial struct SubpictureRegion
@@ -285,6 +520,29 @@ public unsafe partial struct SubpictureRegion
     [LibraryImport("libvlccore", EntryPoint = "subpicture_region_NewText")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial SubpictureRegion* NewText();
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcRenderSubpicture
+{
+    /// <summary>vlc_render_subpicture_Delete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_render_subpicture_Delete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Delete(RenderSubpicture* arg0);
+
+    /// <summary>vlc_render_subpicture_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_render_subpicture_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial RenderSubpicture* New();
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcSpuRegions
+{
+    /// <summary>vlc_spu_regions_Clear</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_spu_regions_Clear")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Clear(List* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

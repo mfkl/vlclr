@@ -3,8 +3,164 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
 /// <summary>input_attachment_t</summary>
-public partial struct InputAttachment { }
+[StructLayout(LayoutKind.Explicit, Size = 40)]
+public unsafe partial struct InputAttachment
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 40;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 40;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 40;
+
+    /// <summary>psz_name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>psz_mime</summary>
+    [FieldOffset(8)] public byte* Mime;
+
+    /// <summary>psz_description</summary>
+    [FieldOffset(16)] public byte* Description;
+
+    /// <summary>i_data</summary>
+    [FieldOffset(24)] public nuint DataCount;
+
+    /// <summary>p_data</summary>
+    [FieldOffset(32)] public void* Data;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_attachment_t, psz_name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(input_attachment_t, psz_mime)</summary>
+        public const int Mime = 8;
+        /// <summary>offsetof(input_attachment_t, psz_description)</summary>
+        public const int Description = 16;
+        /// <summary>offsetof(input_attachment_t, i_data)</summary>
+        public const int DataCount = 24;
+        /// <summary>offsetof(input_attachment_t, p_data)</summary>
+        public const int Data = 32;
+    }
+}
+
+/// <summary>input_resource_t</summary>
+public partial struct InputResource { }
+
+/// <summary>input_title_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 32)]
+public unsafe partial struct InputTitle
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 32;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 32;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 32;
+
+    /// <summary>psz_name</summary>
+    [FieldOffset(0)] public byte* Name;
+
+    /// <summary>i_length</summary>
+    [FieldOffset(8)] public long Length;
+
+    /// <summary>i_flags</summary>
+    [FieldOffset(16)] public uint Flags;
+
+    /// <summary>i_seekpoint</summary>
+    [FieldOffset(20)] public int SeekpointCount;
+
+    /// <summary>seekpoint</summary>
+    [FieldOffset(24)] public Seekpoint** Seekpoint;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(input_title_t, psz_name)</summary>
+        public const int Name = 0;
+        /// <summary>offsetof(input_title_t, i_length)</summary>
+        public const int Length = 8;
+        /// <summary>offsetof(input_title_t, i_flags)</summary>
+        public const int Flags = 16;
+        /// <summary>offsetof(input_title_t, i_seekpoint)</summary>
+        public const int SeekpointCount = 20;
+        /// <summary>offsetof(input_title_t, seekpoint)</summary>
+        public const int Seekpoint = 24;
+    }
+}
+
+/// <summary>seekpoint_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct Seekpoint
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>i_time_offset</summary>
+    [FieldOffset(0)] public long TimeOffset;
+
+    /// <summary>psz_name</summary>
+    [FieldOffset(8)] public byte* Name;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(seekpoint_t, i_time_offset)</summary>
+        public const int TimeOffset = 0;
+        /// <summary>offsetof(seekpoint_t, psz_name)</summary>
+        public const int Name = 8;
+    }
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static partial class VlcInput
+{
+    /// <summary>INPUT_RATE_MAX</summary>
+    public const float InputRateMax = 31.25f;
+
+    /// <summary>INPUT_RATE_MIN</summary>
+    public const float InputRateMin = 0.03125f;
+
+    /// <summary>INPUT_TITLE_INTERACTIVE</summary>
+    public const int InputTitleInteractive = 2;
+
+    /// <summary>INPUT_TITLE_MAIN</summary>
+    public const int InputTitleMain = 4;
+
+    /// <summary>INPUT_TITLE_MENU</summary>
+    public const int InputTitleMenu = 1;
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcInputAttachment
+{
+    /// <summary>vlc_input_attachment_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_input_attachment_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputAttachment* Hold(InputAttachment* a);
+
+    /// <summary>vlc_input_attachment_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_input_attachment_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial InputAttachment* New(byte* psz_name, byte* psz_mime, byte* psz_description, void* p_data, nuint i_data);
+
+    /// <summary>vlc_input_attachment_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_input_attachment_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(InputAttachment* a);
+}

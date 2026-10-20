@@ -3,8 +3,442 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
+
+/// <summary>vlc_cond_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct Cond
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>head</summary>
+    [FieldOffset(0)] public CondWaiter* Head;
+
+    /// <summary>lock</summary>
+    /// <remarks>A pointer because <see cref="Mutex"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public Mutex* Lock => (Mutex*)((byte*)Unsafe.AsPointer(ref this) + 8);
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_cond_t, head)</summary>
+        public const int Head = 0;
+        /// <summary>offsetof(vlc_cond_t, lock)</summary>
+        public const int Lock = 8;
+    }
+}
+
+/// <summary>vlc_cond_waiter</summary>
+public partial struct CondWaiter { }
+
+/// <summary>vlc_latch_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct Latch
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>value</summary>
+    [FieldOffset(0)] public nuint Value;
+
+    /// <summary>ready</summary>
+    [FieldOffset(8)] public uint Ready;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_latch_t, value)</summary>
+        public const int Value = 0;
+        /// <summary>offsetof(vlc_latch_t, ready)</summary>
+        public const int Ready = 8;
+    }
+}
+
+/// <summary>vlc_mutex_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct Mutex
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 12 : 16; }
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 12;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>value</summary>
+    [FieldOffset(0)] public uint Value;
+
+    /// <summary>recursion</summary>
+    [FieldOffset(4)] public uint Recursion;
+
+    /// <summary>owner</summary>
+    [FieldOffset(8)] public CULong Owner;
+
+    /// <summary>dummy</summary>
+    /// <remarks>A pointer because <see cref="MutexAnon0Dummy"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public MutexAnon0Dummy* Dummy => (MutexAnon0Dummy*)((byte*)Unsafe.AsPointer(ref this) + 0);
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_mutex_t, value)</summary>
+        public const int Value = 0;
+        /// <summary>offsetof(vlc_mutex_t, recursion)</summary>
+        public const int Recursion = 4;
+        /// <summary>offsetof(vlc_mutex_t, owner)</summary>
+        public const int Owner = 8;
+        /// <summary>offsetof(vlc_mutex_t, dummy)</summary>
+        public const int Dummy = 0;
+    }
+}
+
+/// <summary>vlc_mutex_t::@0::dummy</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct MutexAnon0Dummy
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 12 : 16; }
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 12;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>value</summary>
+    [FieldOffset(0)] public uint Value;
+
+    /// <summary>recursion</summary>
+    [FieldOffset(4)] public uint Recursion;
+
+    /// <summary>owner</summary>
+    [FieldOffset(8)] public CULong Owner;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_mutex_t::@0::dummy, value)</summary>
+        public const int Value = 0;
+        /// <summary>offsetof(vlc_mutex_t::@0::dummy, recursion)</summary>
+        public const int Recursion = 4;
+        /// <summary>offsetof(vlc_mutex_t::@0::dummy, owner)</summary>
+        public const int Owner = 8;
+    }
+}
+
+/// <summary>vlc_once_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 4)]
+public unsafe partial struct Once
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 4;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 4;
+
+    /// <summary>value</summary>
+    [FieldOffset(0)] public uint Value;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_once_t, value)</summary>
+        public const int Value = 0;
+    }
+}
+
+/// <summary>vlc_sem_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 4)]
+public unsafe partial struct Sem
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 4;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 4;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 4;
+
+    /// <summary>value</summary>
+    [FieldOffset(0)] public uint Value;
+
+    /// <summary>dummy</summary>
+    [FieldOffset(0)] public int Dummy;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_sem_t, value)</summary>
+        public const int Value = 0;
+        /// <summary>offsetof(vlc_sem_t, dummy)</summary>
+        public const int Dummy = 0;
+    }
+}
+
+/// <summary>vlc_thread</summary>
+[SupportedOSPlatform("windows")]
+public partial struct Thread { }
+
+/// <summary>vlc_thread_t</summary>
+[UnsupportedOSPlatform("windows")]
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct ThreadHandle
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>handle</summary>
+    [FieldOffset(0)] public CULong Handle;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_thread_t, handle)</summary>
+        public const int Handle = 0;
+    }
+}
+
+/// <summary>vlc_threadvar</summary>
+[SupportedOSPlatform("windows")]
+public partial struct Threadvar { }
+
+/// <summary>vlc_timer</summary>
+public partial struct Timer { }
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Vlc
+{
+    /// <summary>vlc_GetCPUCount</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_GetCPUCount")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint GetCPUCount();
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcThreads
+{
+    /// <summary>LIBVLC_USE_PTHREAD</summary>
+    [UnsupportedOSPlatform("windows")]
+    public const int LibvlcUsePthread = 1;
+
+    /// <summary>LIBVLC_USE_PTHREAD_CLEANUP</summary>
+    [UnsupportedOSPlatform("windows")]
+    public const int LibvlcUsePthreadCleanup = 1;
+
+    /// <summary>VLC_HARD_MIN_SLEEP</summary>
+    public const long HardMinSleep = 10000;
+
+    /// <summary>VLC_SOFT_MIN_SLEEP</summary>
+    public const long SoftMinSleep = 9000000;
+
+    /// <summary>VLC_TIMER_DISARM</summary>
+    public const int TimerDisarm = 0;
+
+    /// <summary>VLC_TIMER_FIRE_ONCE</summary>
+    public const int TimerFireOnce = 0;
+
+    /// <summary>vlc_cond_broadcast</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_cond_broadcast")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcCondBroadcast(Cond* arg0);
+
+    /// <summary>vlc_cond_init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_cond_init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcCondInit(Cond* arg0);
+
+    /// <summary>vlc_cond_signal</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_cond_signal")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcCondSignal(Cond* arg0);
+
+    /// <summary>vlc_cond_timedwait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_cond_timedwait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcCondTimedwait(Cond* cond, Mutex* mutex, long deadline);
+
+    /// <summary>vlc_cond_wait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_cond_wait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcCondWait(Cond* cond, Mutex* mutex);
+
+    /// <summary>vlc_global_mutex</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_global_mutex")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcGlobalMutex(uint arg0, byte arg1);
+
+    /// <summary>vlc_latch_count_down</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_latch_count_down")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcLatchCountDown(Latch* latch, nuint n);
+
+    /// <summary>vlc_latch_count_down_and_wait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_latch_count_down_and_wait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcLatchCountDownAndWait(Latch* latch, nuint n);
+
+    /// <summary>vlc_latch_init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_latch_init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcLatchInit(Latch* latch, nuint value);
+
+    /// <summary>vlc_latch_is_ready</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_latch_is_ready")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte VlcLatchIsReady(Latch* latch);
+
+    /// <summary>vlc_latch_wait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_latch_wait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcLatchWait(Latch* arg0);
+
+    /// <summary>vlc_mutex_held</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_mutex_held")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte VlcMutexHeld(Mutex* arg0);
+
+    /// <summary>vlc_mutex_init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_mutex_init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcMutexInit(Mutex* arg0);
+
+    /// <summary>vlc_mutex_init_recursive</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_mutex_init_recursive")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcMutexInitRecursive(Mutex* arg0);
+
+    /// <summary>vlc_mutex_lock</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_mutex_lock")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcMutexLock(Mutex* arg0);
+
+    /// <summary>vlc_mutex_trylock</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_mutex_trylock")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcMutexTrylock(Mutex* arg0);
+
+    /// <summary>vlc_mutex_unlock</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_mutex_unlock")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcMutexUnlock(Mutex* arg0);
+
+    /// <summary>vlc_once_begin</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_once_begin")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte VlcOnceBegin(Once* once);
+
+    /// <summary>vlc_once_complete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_once_complete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcOnceComplete(Once* once);
+
+    /// <summary>vlc_restorecancel</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_restorecancel")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcRestorecancel(int state);
+
+    /// <summary>vlc_savecancel</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_savecancel")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcSavecancel();
+
+    /// <summary>vlc_sem_init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_sem_init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcSemInit(Sem* sem, uint count);
+
+    /// <summary>vlc_sem_post</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_sem_post")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcSemPost(Sem* arg0);
+
+    /// <summary>vlc_sem_timedwait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_sem_timedwait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcSemTimedwait(Sem* sem, long deadline);
+
+    /// <summary>vlc_sem_trywait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_sem_trywait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcSemTrywait(Sem* sem);
+
+    /// <summary>vlc_sem_wait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_sem_wait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcSemWait(Sem* arg0);
+
+    /// <summary>vlc_testcancel</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_testcancel")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcTestcancel();
+
+    /// <summary>vlc_thread_id</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_thread_id")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial CULong VlcThreadId();
+
+    /// <summary>vlc_thread_set_name</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_thread_set_name")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcThreadSetName(byte* name);
+
+    /// <summary>vlc_tick_sleep</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_tick_sleep")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcTickSleep(long delay);
+
+    /// <summary>vlc_tick_wait</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_tick_wait")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcTickWait(long deadline);
+
+    /// <summary>vlc_timer_create</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_timer_create")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int VlcTimerCreate(Timer** id, delegate* unmanaged[Cdecl]<void*, void> func, void* data);
+
+    /// <summary>vlc_timer_destroy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_timer_destroy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcTimerDestroy(Timer* timer);
+
+    /// <summary>vlc_timer_getoverrun</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_timer_getoverrun")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint VlcTimerGetoverrun(Timer* timer);
+
+    /// <summary>vlc_timer_schedule</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_timer_schedule")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void VlcTimerSchedule(Timer* timer, byte absolute, long value, long interval);
+}
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcTick
