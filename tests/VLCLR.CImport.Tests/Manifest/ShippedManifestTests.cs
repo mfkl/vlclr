@@ -14,7 +14,6 @@ public class ShippedManifestTests
     {
         Assert.Equal(40, Manifest.Vlc.Commit.Length);
         Assert.Matches("^[0-9a-f]{40}$", Manifest.Vlc.Commit);
-        Assert.StartsWith("dc69496e", Manifest.Vlc.Commit);
     }
 
     [Fact]

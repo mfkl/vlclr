@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "abi": "windows",
   "target": "x86_64-pc-windows-msvc",
-  "vlcCommit": "dc69496e8a7d273a29b095b94bea403cfac7c1f5",
+  "vlcCommit": "942cdaea17fc2daa9cb2b8098a3c9b8560aef1fb",
   "pointerSize": 8,
   "types": [
     {
@@ -1626,6 +1626,14 @@
             "name": "subs_format_t::cc"
           },
           "offset": 100
+        },
+        {
+          "name": "b_forced",
+          "type": {
+            "kind": "builtin",
+            "builtin": "bool"
+          },
+          "offset": 108
         }
       ]
     },
@@ -2072,6 +2080,14 @@
             "name": "@STYLE_WRAP_DEFAULT"
           },
           "offset": 72
+        },
+        {
+          "name": "e_blending_mode",
+          "type": {
+            "kind": "enum",
+            "name": "@STYLE_BLENDING_DEFAULT"
+          },
+          "offset": 76
         }
       ]
     },
@@ -6325,6 +6341,25 @@
   ],
   "enums": [
     {
+      "name": "@STYLE_BLENDING_DEFAULT",
+      "header": "vlc_text_style.h",
+      "isAnonymous": true,
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "members": [
+        {
+          "name": "STYLE_BLENDING_DEFAULT",
+          "value": 0
+        },
+        {
+          "name": "STYLE_BLENDING_TRANSPARENT",
+          "value": 1
+        }
+      ]
+    },
+    {
       "name": "@STYLE_WRAP_DEFAULT",
       "header": "vlc_text_style.h",
       "isAnonymous": true,
@@ -10530,6 +10565,17 @@
       "expression": "( 1 \u003C\u003C 7 )"
     },
     {
+      "name": "STYLE_HAS_BLENDING_MODE",
+      "header": "vlc_text_style.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "integer": 1024,
+      "expression": "( 1 \u003C\u003C 10 )"
+    },
+    {
       "name": "STYLE_HAS_FLAGS",
       "header": "vlc_text_style.h",
       "kind": "integer",
@@ -11326,6 +11372,17 @@
       "expression": "VLC_FOURCC ( \u0027a\u0027 , \u0027t\u0027 , \u0027r\u0027 , \u0027c\u0027 )"
     },
     {
+      "name": "VLC_CODEC_ATRAC3AL",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 1819440225,
+      "expression": "VLC_FOURCC ( \u0027a\u0027 , \u0027t\u0027 , \u0027r\u0027 , \u0027l\u0027 )"
+    },
+    {
       "name": "VLC_CODEC_ATRAC3P",
       "header": "vlc_fourcc.h",
       "kind": "integer",
@@ -11335,6 +11392,28 @@
       },
       "integer": 1886549089,
       "expression": "VLC_FOURCC ( \u0027a\u0027 , \u0027t\u0027 , \u0027r\u0027 , \u0027p\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_ATRAC3PAL",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 1819309153,
+      "expression": "VLC_FOURCC ( \u0027a\u0027 , \u0027t\u0027 , \u0027p\u0027 , \u0027l\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_ATRAC9",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 963802209,
+      "expression": "VLC_FOURCC ( \u0027a\u0027 , \u0027t\u0027 , \u0027r\u0027 , \u00279\u0027 )"
     },
     {
       "name": "VLC_CODEC_AURA",
@@ -11984,6 +12063,17 @@
       },
       "integer": 1095321156,
       "expression": "VLC_FOURCC ( \u0027D\u0027 , \u0027F\u0027 , \u0027I\u0027 , \u0027A\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_DFPWM",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 1464878660,
+      "expression": "VLC_FOURCC ( \u0027D\u0027 , \u0027F\u0027 , \u0027P\u0027 , \u0027W\u0027 )"
     },
     {
       "name": "VLC_CODEC_DIRAC",
@@ -15649,6 +15739,61 @@
       "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027A\u0027 , \u0027O\u0027 , \u00272\u0027 )"
     },
     {
+      "name": "VLC_CODEC_VAAPI_422_10BPP",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 808599894,
+      "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027A\u0027 , \u00272\u0027 , \u00270\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_VAAPI_422_12BPP",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 842154326,
+      "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027A\u0027 , \u00272\u0027 , \u00272\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_VAAPI_444",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 1345601878,
+      "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027A\u0027 , \u00274\u0027 , \u0027P\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_VAAPI_444_10BPP",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 808730966,
+      "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027A\u0027 , \u00274\u0027 , \u00270\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_VAAPI_444_12BPP",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 842285398,
+      "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027A\u0027 , \u00274\u0027 , \u00272\u0027 )"
+    },
+    {
       "name": "VLC_CODEC_VB",
       "header": "vlc_fourcc.h",
       "kind": "integer",
@@ -15911,6 +16056,17 @@
       },
       "integer": 1096373590,
       "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027U\u0027 , \u0027Y\u0027 , \u0027A\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_VUYX",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 1482249558,
+      "expression": "VLC_FOURCC ( \u0027V\u0027 , \u0027U\u0027 , \u0027Y\u0027 , \u0027X\u0027 )"
     },
     {
       "name": "VLC_CODEC_VVC",
@@ -16232,6 +16388,17 @@
       "expression": "VLC_FOURCC ( \u0027Y\u0027 , \u00272\u0027 , \u00271\u0027 , \u00271\u0027 )"
     },
     {
+      "name": "VLC_CODEC_Y212",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 842084953,
+      "expression": "VLC_FOURCC ( \u0027Y\u0027 , \u00272\u0027 , \u00271\u0027 , \u00272\u0027 )"
+    },
+    {
       "name": "VLC_CODEC_Y410",
       "header": "vlc_fourcc.h",
       "kind": "integer",
@@ -16241,6 +16408,17 @@
       },
       "integer": 808531033,
       "expression": "VLC_FOURCC ( \u0027Y\u0027 , \u00274\u0027 , \u00271\u0027 , \u00270\u0027 )"
+    },
+    {
+      "name": "VLC_CODEC_Y412",
+      "header": "vlc_fourcc.h",
+      "kind": "integer",
+      "type": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "integer": 842085465,
+      "expression": "VLC_FOURCC ( \u0027Y\u0027 , \u00274\u0027 , \u00271\u0027 , \u00272\u0027 )"
     },
     {
       "name": "VLC_CODEC_YOP",
