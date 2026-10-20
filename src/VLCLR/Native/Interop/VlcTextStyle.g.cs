@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -144,10 +145,10 @@ public unsafe partial struct TextStyle
     [FieldOffset(68)] public byte BackgroundAlpha;
 
     /// <summary>e_wrapinfo</summary>
-    [FieldOffset(72)] public int Wrapinfo;
+    [FieldOffset(72)] public uint Wrapinfo;
 
     /// <summary>e_blending_mode</summary>
-    [FieldOffset(76)] public int BlendingMode;
+    [FieldOffset(76)] public uint BlendingMode;
 
     /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
     public static class Offsets
@@ -210,6 +211,11 @@ public unsafe partial struct TextSegment
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void Delete(TextSegment* arg0);
 
+    /// <summary>text_segment_FromRuby</summary>
+    [LibraryImport("libvlccore", EntryPoint = "text_segment_FromRuby")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial TextSegment* FromRuby(TextSegmentRuby* p_ruby);
+
     /// <summary>text_segment_New</summary>
     [LibraryImport("libvlccore", EntryPoint = "text_segment_New")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -219,6 +225,19 @@ public unsafe partial struct TextSegment
     [LibraryImport("libvlccore", EntryPoint = "text_segment_NewInheritStyle")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial TextSegment* NewInheritStyle(TextStyle* p_style);
+}
+
+public unsafe partial struct TextSegmentRuby
+{
+    /// <summary>text_segment_ruby_ChainDelete</summary>
+    [LibraryImport("libvlccore", EntryPoint = "text_segment_ruby_ChainDelete")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void ChainDelete(TextSegmentRuby* p_ruby);
+
+    /// <summary>text_segment_ruby_New</summary>
+    [LibraryImport("libvlccore", EntryPoint = "text_segment_ruby_New")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial TextSegmentRuby* New(byte* psz_base, byte* psz_rt);
 }
 
 public unsafe partial struct TextStyle
@@ -255,7 +274,7 @@ public unsafe partial struct TextStyle
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
-public static partial class VlcTextStyle
+public static unsafe partial class VlcTextStyle
 {
     /// <summary>STYLE_ALPHA_OPAQUE</summary>
     public const int StyleAlphaOpaque = 255;
@@ -267,10 +286,10 @@ public static partial class VlcTextStyle
     public const int StyleBackground = 16;
 
     /// <summary>STYLE_BLENDING_DEFAULT</summary>
-    public const int StyleBlendingDefault = 0;
+    public const uint StyleBlendingDefault = 0;
 
     /// <summary>STYLE_BLENDING_TRANSPARENT</summary>
-    public const int StyleBlendingTransparent = 1;
+    public const uint StyleBlendingTransparent = 1;
 
     /// <summary>STYLE_BLINK_BACKGROUND</summary>
     public const int StyleBlinkBackground = 2048;
@@ -351,11 +370,16 @@ public static partial class VlcTextStyle
     public const int StyleUnderline = 32;
 
     /// <summary>STYLE_WRAP_CHAR</summary>
-    public const int StyleWrapChar = 1;
+    public const uint StyleWrapChar = 1;
 
     /// <summary>STYLE_WRAP_DEFAULT</summary>
-    public const int StyleWrapDefault = 0;
+    public const uint StyleWrapDefault = 0;
 
     /// <summary>STYLE_WRAP_NONE</summary>
-    public const int StyleWrapNone = 2;
+    public const uint StyleWrapNone = 2;
+
+    /// <summary>vlc_html_color</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_html_color")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial uint VlcHtmlColor(byte* psz_value, byte* ok);
 }

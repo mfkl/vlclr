@@ -3,8 +3,648 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
+/// <summary>decoder_cc_desc_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct DecoderCcDesc
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>i_608_channels</summary>
+    [FieldOffset(0)] public byte I608Channels;
+
+    /// <summary>i_708_channels</summary>
+    [FieldOffset(8)] public ulong I708Channels;
+
+    /// <summary>i_reorder_depth</summary>
+    [FieldOffset(16)] public int ReorderDepth;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(decoder_cc_desc_t, i_608_channels)</summary>
+        public const int I608Channels = 0;
+        /// <summary>offsetof(decoder_cc_desc_t, i_708_channels)</summary>
+        public const int I708Channels = 8;
+        /// <summary>offsetof(decoder_cc_desc_t, i_reorder_depth)</summary>
+        public const int ReorderDepth = 16;
+    }
+}
+
+/// <summary>decoder_owner_callbacks</summary>
+[StructLayout(LayoutKind.Explicit, Size = 64)]
+public unsafe partial struct DecoderOwnerCallbacks
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 64;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 64;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 64;
+
+    /// <summary>video</summary>
+    [FieldOffset(0)] public DecoderOwnerCallbacksAnon0Video Video;
+
+    /// <summary>audio</summary>
+    [FieldOffset(0)] public DecoderOwnerCallbacksAnon0Audio Audio;
+
+    /// <summary>spu</summary>
+    [FieldOffset(0)] public DecoderOwnerCallbacksAnon0Spu Spu;
+
+    /// <summary>get_attachments</summary>
+    [FieldOffset(56)] public delegate* unmanaged[Cdecl]<Decoder*, InputAttachment***, int*, int> GetAttachments;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(decoder_owner_callbacks, video)</summary>
+        public const int Video = 0;
+        /// <summary>offsetof(decoder_owner_callbacks, audio)</summary>
+        public const int Audio = 0;
+        /// <summary>offsetof(decoder_owner_callbacks, spu)</summary>
+        public const int Spu = 0;
+        /// <summary>offsetof(decoder_owner_callbacks, get_attachments)</summary>
+        public const int GetAttachments = 56;
+    }
+}
+
+/// <summary>decoder_owner_callbacks::@0::audio</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct DecoderOwnerCallbacksAnon0Audio
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>format_update</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Decoder*, int> FormatUpdate;
+
+    /// <summary>queue</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Decoder*, Frame*, void> Queue;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(decoder_owner_callbacks::@0::audio, format_update)</summary>
+        public const int FormatUpdate = 0;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::audio, queue)</summary>
+        public const int Queue = 8;
+    }
+}
+
+/// <summary>decoder_owner_callbacks::@0::spu</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct DecoderOwnerCallbacksAnon0Spu
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>buffer_new</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Decoder*, SubpictureUpdater*, Subpicture*> BufferNew;
+
+    /// <summary>queue</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Decoder*, Subpicture*, void> Queue;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(decoder_owner_callbacks::@0::spu, buffer_new)</summary>
+        public const int BufferNew = 0;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::spu, queue)</summary>
+        public const int Queue = 8;
+    }
+}
+
+/// <summary>decoder_owner_callbacks::@0::video</summary>
+[StructLayout(LayoutKind.Explicit, Size = 56)]
+public unsafe partial struct DecoderOwnerCallbacksAnon0Video
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 56;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 56;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 56;
+
+    /// <summary>get_device</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Decoder*, DecoderDevice*> GetDevice;
+
+    /// <summary>format_update</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Decoder*, VideoContext*, int> FormatUpdate;
+
+    /// <summary>buffer_new</summary>
+    [FieldOffset(16)] public delegate* unmanaged[Cdecl]<Decoder*, Picture*> BufferNew;
+
+    /// <summary>queue</summary>
+    [FieldOffset(24)] public delegate* unmanaged[Cdecl]<Decoder*, Picture*, void> Queue;
+
+    /// <summary>queue_cc</summary>
+    [FieldOffset(32)] public delegate* unmanaged[Cdecl]<Decoder*, Frame*, DecoderCcDesc*, void> QueueCc;
+
+    /// <summary>get_display_date</summary>
+    [FieldOffset(40)] public delegate* unmanaged[Cdecl]<Decoder*, long, long, long> GetDisplayDate;
+
+    /// <summary>get_display_rate</summary>
+    [FieldOffset(48)] public delegate* unmanaged[Cdecl]<Decoder*, float> GetDisplayRate;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, get_device)</summary>
+        public const int GetDevice = 0;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, format_update)</summary>
+        public const int FormatUpdate = 8;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, buffer_new)</summary>
+        public const int BufferNew = 16;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, queue)</summary>
+        public const int Queue = 24;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, queue_cc)</summary>
+        public const int QueueCc = 32;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, get_display_date)</summary>
+        public const int GetDisplayDate = 40;
+        /// <summary>offsetof(decoder_owner_callbacks::@0::video, get_display_rate)</summary>
+        public const int GetDisplayRate = 48;
+    }
+}
+
+/// <summary>decoder_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 336)]
+public unsafe partial struct Decoder
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 336 : 328; }
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 328;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 336;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>p_module</summary>
+    [FieldOffset(24)] public Module* Module;
+
+    /// <summary>p_sys</summary>
+    [FieldOffset(32)] public void* Sys;
+
+    /// <summary>fmt_in</summary>
+    [FieldOffset(40)] public EsFormat* FmtIn;
+
+    /// <summary>fmt_out</summary>
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* FmtOut => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + 48);
+
+    /// <summary>b_frame_drop_allowed</summary>
+    [UnscopedRef]
+    public ref byte FrameDropAllowed { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Decoder, byte>(ref this, OperatingSystem.IsWindows() ? 288 : 280); }
+
+    /// <summary>i_extra_picture_buffers</summary>
+    [UnscopedRef]
+    public ref int ExtraPictureBuffers { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Decoder, int>(ref this, OperatingSystem.IsWindows() ? 292 : 284); }
+
+    /// <summary>pf_decode</summary>
+    [UnscopedRef]
+    public ref delegate* unmanaged[Cdecl]<Decoder*, Frame*, int> Decode { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(delegate* unmanaged[Cdecl]<Decoder*, Frame*, int>*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 296 : 288)); }
+
+    /// <summary>pf_packetize</summary>
+    [UnscopedRef]
+    public ref delegate* unmanaged[Cdecl]<Decoder*, Frame**, Frame*> Packetize { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(delegate* unmanaged[Cdecl]<Decoder*, Frame**, Frame*>*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 296 : 288)); }
+
+    /// <summary>pf_flush</summary>
+    [UnscopedRef]
+    public ref delegate* unmanaged[Cdecl]<Decoder*, void> Flush { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(delegate* unmanaged[Cdecl]<Decoder*, void>*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 304 : 296)); }
+
+    /// <summary>pf_get_cc</summary>
+    [UnscopedRef]
+    public ref delegate* unmanaged[Cdecl]<Decoder*, DecoderCcDesc*, Frame*> GetCc { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(delegate* unmanaged[Cdecl]<Decoder*, DecoderCcDesc*, Frame*>*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 312 : 304)); }
+
+    /// <summary>p_description</summary>
+    [UnscopedRef]
+    public ref Meta* Description { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(Meta**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 320 : 312)); }
+
+    /// <summary>cbs</summary>
+    [UnscopedRef]
+    public ref DecoderOwnerCallbacks* Cbs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(DecoderOwnerCallbacks**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 328 : 320)); }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(decoder_t, obj)</summary>
+        public const int Obj = 0;
+        /// <summary>offsetof(decoder_t, p_module)</summary>
+        public const int Module = 24;
+        /// <summary>offsetof(decoder_t, p_sys)</summary>
+        public const int Sys = 32;
+        /// <summary>offsetof(decoder_t, fmt_in)</summary>
+        public const int FmtIn = 40;
+        /// <summary>offsetof(decoder_t, fmt_out)</summary>
+        public const int FmtOut = 48;
+        /// <summary>offsetof(decoder_t, b_frame_drop_allowed)</summary>
+        public static int FrameDropAllowed { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 288 : 280; }
+        /// <summary>offsetof(decoder_t, i_extra_picture_buffers)</summary>
+        public static int ExtraPictureBuffers { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 292 : 284; }
+        /// <summary>offsetof(decoder_t, pf_decode)</summary>
+        public static int Decode { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 296 : 288; }
+        /// <summary>offsetof(decoder_t, pf_packetize)</summary>
+        public static int Packetize { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 296 : 288; }
+        /// <summary>offsetof(decoder_t, pf_flush)</summary>
+        public static int Flush { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 304 : 296; }
+        /// <summary>offsetof(decoder_t, pf_get_cc)</summary>
+        public static int GetCc { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 312 : 304; }
+        /// <summary>offsetof(decoder_t, p_description)</summary>
+        public static int Description { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 320 : 312; }
+        /// <summary>offsetof(decoder_t, cbs)</summary>
+        public static int Cbs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 328 : 320; }
+    }
+}
+
+/// <summary>encoder_owner_callbacks</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct EncoderOwnerCallbacks
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>video</summary>
+    [FieldOffset(0)] public EncoderOwnerCallbacksVideo Video;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(encoder_owner_callbacks, video)</summary>
+        public const int Video = 0;
+    }
+}
+
+/// <summary>encoder_owner_callbacks::video</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct EncoderOwnerCallbacksVideo
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>get_device</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Encoder*, DecoderDevice*> GetDevice;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(encoder_owner_callbacks::video, get_device)</summary>
+        public const int GetDevice = 0;
+    }
+}
+
+/// <summary>encoder_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 568)]
+public unsafe partial struct Encoder
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 568 : 552; }
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 552;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 568;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>p_module</summary>
+    [FieldOffset(24)] public Module* Module;
+
+    /// <summary>p_sys</summary>
+    [FieldOffset(32)] public void* Sys;
+
+    /// <summary>fmt_in</summary>
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* FmtIn => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + 40);
+
+    /// <summary>vctx_in</summary>
+    [UnscopedRef]
+    public ref VideoContext* VctxIn { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(VideoContext**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 280 : 272)); }
+
+    /// <summary>fmt_out</summary>
+    /// <remarks>A pointer because <see cref="EsFormat"/> has a different size on each ABI: assign its members, not a whole value.</remarks>
+    public EsFormat* FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => (EsFormat*)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 288 : 280)); }
+
+    /// <summary>i_threads</summary>
+    [UnscopedRef]
+    public ref int Threads { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Encoder, int>(ref this, OperatingSystem.IsWindows() ? 528 : 512); }
+
+    /// <summary>i_iframes</summary>
+    [UnscopedRef]
+    public ref int Iframes { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Encoder, int>(ref this, OperatingSystem.IsWindows() ? 532 : 516); }
+
+    /// <summary>i_bframes</summary>
+    [UnscopedRef]
+    public ref int Bframes { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Encoder, int>(ref this, OperatingSystem.IsWindows() ? 536 : 520); }
+
+    /// <summary>i_tolerance</summary>
+    [UnscopedRef]
+    public ref int Tolerance { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref CImportHelpers.FieldAt<Encoder, int>(ref this, OperatingSystem.IsWindows() ? 540 : 524); }
+
+    /// <summary>p_cfg</summary>
+    [UnscopedRef]
+    public ref ConfigChain* Cfg { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(ConfigChain**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 544 : 528)); }
+
+    /// <summary>ops</summary>
+    [UnscopedRef]
+    public ref EncoderOperations* Ops { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(EncoderOperations**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 552 : 536)); }
+
+    /// <summary>cbs</summary>
+    [UnscopedRef]
+    public ref EncoderOwnerCallbacks* Cbs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => ref *(EncoderOwnerCallbacks**)((byte*)Unsafe.AsPointer(ref this) + (OperatingSystem.IsWindows() ? 560 : 544)); }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(encoder_t, obj)</summary>
+        public const int Obj = 0;
+        /// <summary>offsetof(encoder_t, p_module)</summary>
+        public const int Module = 24;
+        /// <summary>offsetof(encoder_t, p_sys)</summary>
+        public const int Sys = 32;
+        /// <summary>offsetof(encoder_t, fmt_in)</summary>
+        public const int FmtIn = 40;
+        /// <summary>offsetof(encoder_t, vctx_in)</summary>
+        public static int VctxIn { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 280 : 272; }
+        /// <summary>offsetof(encoder_t, fmt_out)</summary>
+        public static int FmtOut { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 288 : 280; }
+        /// <summary>offsetof(encoder_t, i_threads)</summary>
+        public static int Threads { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 528 : 512; }
+        /// <summary>offsetof(encoder_t, i_iframes)</summary>
+        public static int Iframes { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 532 : 516; }
+        /// <summary>offsetof(encoder_t, i_bframes)</summary>
+        public static int Bframes { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 536 : 520; }
+        /// <summary>offsetof(encoder_t, i_tolerance)</summary>
+        public static int Tolerance { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 540 : 524; }
+        /// <summary>offsetof(encoder_t, p_cfg)</summary>
+        public static int Cfg { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 544 : 528; }
+        /// <summary>offsetof(encoder_t, ops)</summary>
+        public static int Ops { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 552 : 536; }
+        /// <summary>offsetof(encoder_t, cbs)</summary>
+        public static int Cbs { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 560 : 544; }
+    }
+}
+
 /// <summary>vlc_decoder_device</summary>
-public partial struct DecoderDevice { }
+[StructLayout(LayoutKind.Explicit, Size = 56)]
+public unsafe partial struct DecoderDevice
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 56;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 56;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 56;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>ops</summary>
+    [FieldOffset(24)] public DecoderDeviceOperations* Ops;
+
+    /// <summary>sys</summary>
+    [FieldOffset(32)] public void* Sys;
+
+    /// <summary>type</summary>
+    [FieldOffset(40)] public DecoderDeviceType Type;
+
+    /// <summary>opaque</summary>
+    [FieldOffset(48)] public void* Opaque;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_decoder_device, obj)</summary>
+        public const int Obj = 0;
+        /// <summary>offsetof(vlc_decoder_device, ops)</summary>
+        public const int Ops = 24;
+        /// <summary>offsetof(vlc_decoder_device, sys)</summary>
+        public const int Sys = 32;
+        /// <summary>offsetof(vlc_decoder_device, type)</summary>
+        public const int Type = 40;
+        /// <summary>offsetof(vlc_decoder_device, opaque)</summary>
+        public const int Opaque = 48;
+    }
+}
+
+/// <summary>vlc_decoder_device_operations</summary>
+[StructLayout(LayoutKind.Explicit, Size = 8)]
+public unsafe partial struct DecoderDeviceOperations
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 8;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 8;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 8;
+
+    /// <summary>close</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<DecoderDevice*, void> Close;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_decoder_device_operations, close)</summary>
+        public const int Close = 0;
+    }
+}
+
+/// <summary>vlc_encoder_operations</summary>
+[StructLayout(LayoutKind.Explicit, Size = 16)]
+public unsafe partial struct EncoderOperations
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 16;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 16;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 16;
+
+    /// <summary>close</summary>
+    [FieldOffset(0)] public delegate* unmanaged[Cdecl]<Encoder*, void> Close;
+
+    /// <summary>encode_video</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Encoder*, Picture*, Frame*> EncodeVideo;
+
+    /// <summary>encode_audio</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Encoder*, Frame*, Frame*> EncodeAudio;
+
+    /// <summary>encode_sub</summary>
+    [FieldOffset(8)] public delegate* unmanaged[Cdecl]<Encoder*, Subpicture*, Frame*> EncodeSub;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vlc_encoder_operations, close)</summary>
+        public const int Close = 0;
+        /// <summary>offsetof(vlc_encoder_operations, encode_video)</summary>
+        public const int EncodeVideo = 8;
+        /// <summary>offsetof(vlc_encoder_operations, encode_audio)</summary>
+        public const int EncodeAudio = 8;
+        /// <summary>offsetof(vlc_encoder_operations, encode_sub)</summary>
+        public const int EncodeSub = 8;
+    }
+}
+
+/// <summary>vlc_decoder_device_type</summary>
+public enum DecoderDeviceType : uint
+{
+    /// <summary>VLC_DECODER_DEVICE_VAAPI</summary>
+    Vaapi = 0,
+
+    /// <summary>VLC_DECODER_DEVICE_VDPAU</summary>
+    Vdpau = 1,
+
+    /// <summary>VLC_DECODER_DEVICE_DXVA2</summary>
+    Dxva2 = 2,
+
+    /// <summary>VLC_DECODER_DEVICE_D3D11VA</summary>
+    D3d11va = 3,
+
+    /// <summary>VLC_DECODER_DEVICE_VIDEOTOOLBOX</summary>
+    Videotoolbox = 4,
+
+    /// <summary>VLC_DECODER_DEVICE_AWINDOW</summary>
+    Awindow = 5,
+
+    /// <summary>VLC_DECODER_DEVICE_NVDEC</summary>
+    Nvdec = 6,
+
+    /// <summary>VLC_DECODER_DEVICE_MMAL</summary>
+    Mmal = 7,
+
+    /// <summary>VLC_DECODER_DEVICE_GSTDECODE</summary>
+    Gstdecode = 8,
+}
+
+public unsafe partial struct Decoder
+{
+    /// <summary>decoder_Clean</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_Clean")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Clean(Decoder* p_dec);
+
+    /// <summary>decoder_Init</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_Init")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Init(Decoder* dec, EsFormat* fmt_in, EsFormat* fmt);
+
+    /// <summary>decoder_LoadModule</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_LoadModule")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int LoadModule(Decoder* dec, byte packetizer, byte use_varoption);
+
+    /// <summary>decoder_NewAudioBuffer</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_NewAudioBuffer")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Frame* NewAudioBuffer(Decoder* arg0, int i_nb_samples);
+
+    /// <summary>decoder_NewPicture</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_NewPicture")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial Picture* NewPicture(Decoder* dec);
+
+    /// <summary>decoder_UpdateVideoFormat</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_UpdateVideoFormat")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int UpdateVideoFormat(Decoder* dec);
+
+    /// <summary>decoder_UpdateVideoOutput</summary>
+    [LibraryImport("libvlccore", EntryPoint = "decoder_UpdateVideoOutput")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int UpdateVideoOutput(Decoder* dec, VideoContext* vctx_out);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static partial class VlcCodec
+{
+    /// <summary>VLCDEC_ECRITICAL</summary>
+    public const int VlcdecEcritical = -2147483648;
+
+    /// <summary>VLCDEC_RELOAD</summary>
+    public const int VlcdecReload = -100;
+
+    /// <summary>VLCDEC_SUCCESS</summary>
+    public const int VlcdecSuccess = 0;
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcDecoderDevice
+{
+    /// <summary>vlc_decoder_device_Create</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_decoder_device_Create")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial DecoderDevice* Create(ObjectHeader* arg0, Window* window);
+
+    /// <summary>vlc_decoder_device_Hold</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_decoder_device_Hold")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial DecoderDevice* Hold(DecoderDevice* device);
+
+    /// <summary>vlc_decoder_device_Release</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_decoder_device_Release")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Release(DecoderDevice* device);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcEncoder
+{
+    /// <summary>vlc_encoder_Destroy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_encoder_Destroy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Destroy(Encoder* encoder);
+
+    /// <summary>vlc_encoder_GetDecoderDevice</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_encoder_GetDecoderDevice")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial DecoderDevice* GetDecoderDevice(Encoder* arg0);
+}

@@ -3,17 +3,36 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
-/// <summary>config_chain_t</summary>
-public partial struct ConfigChain { }
+/// <summary>es_out_id_t</summary>
+public partial struct EsOutId { }
+
+/// <summary>input_source_t</summary>
+public partial struct InputSource { }
 
 /// <summary>module_t</summary>
 public partial struct Module { }
 
+/// <summary>session_descriptor_t</summary>
+public partial struct SessionDescriptor { }
+
+/// <summary>sout_packetizer_input_t</summary>
+public partial struct SoutPacketizerInput { }
+
+/// <summary>update_t</summary>
+public partial struct Update { }
+
 /// <summary>vlc_es_id_t</summary>
 public partial struct EsId { }
+
+/// <summary>vlc_fifo_t</summary>
+public partial struct Fifo { }
+
+/// <summary>vlc_meta_t</summary>
+public partial struct Meta { }
 
 /// <summary>vlc_rational_t</summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
@@ -47,12 +66,89 @@ public unsafe partial struct Rational
 /// <summary>vlc_renderer_item_t</summary>
 public partial struct RendererItem { }
 
+/// <summary>vlm_t</summary>
+public partial struct Vlm { }
+
+/// <summary>vod_media_t</summary>
+public partial struct VodMedia { }
+
+/// <summary>vod_t</summary>
+public partial struct Vod { }
+
 /// <summary>Constants and functions from the C headers.</summary>
-public static partial class VlcCommon
+public static unsafe partial class Vlc
 {
+    /// <summary>VLC_CompileBy</summary>
+    [LibraryImport("libvlccore", EntryPoint = "VLC_CompileBy")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* CompileBy();
+
+    /// <summary>VLC_CompileHost</summary>
+    [LibraryImport("libvlccore", EntryPoint = "VLC_CompileHost")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* CompileHost();
+
+    /// <summary>VLC_Compiler</summary>
+    [LibraryImport("libvlccore", EntryPoint = "VLC_Compiler")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* Compiler();
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class VlcCommon
+{
+    /// <summary>DIR_SEP</summary>
+    public static string DirSep { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? "\\" : "/"; }
+
+    /// <summary>DIR_SEP_CHAR</summary>
+    public static int DirSepChar { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 92 : 47; }
+
+    /// <summary>O_NONBLOCK</summary>
+    [SupportedOSPlatform("windows")]
+    public const int ONonblock = 0;
+
+    /// <summary>PATH_SEP</summary>
+    public static string PathSep { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? ";" : ":"; }
+
+    /// <summary>PATH_SEP_CHAR</summary>
+    public static int PathSepChar { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? 59 : 58; }
+
+    /// <summary>VLC_EACCES</summary>
+    public const int Eacces = -13;
+
     /// <summary>VLC_EGENERIC</summary>
     public const int Egeneric = -2147483648;
 
+    /// <summary>VLC_EINVAL</summary>
+    public const int Einval = -22;
+
+    /// <summary>VLC_ENOENT</summary>
+    public const int Enoent = -2;
+
+    /// <summary>VLC_ENOMEM</summary>
+    public const int Enomem = -12;
+
+    /// <summary>VLC_ENOTSUP</summary>
+    public static int Enotsup { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -129 : -95; }
+
+    /// <summary>VLC_ETIMEOUT</summary>
+    public static int Etimeout { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -138 : -110; }
+
     /// <summary>VLC_SUCCESS</summary>
     public const int Success = 0;
+
+    /// <summary>vlc_gettext</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_gettext")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* VlcGettext(byte* msgid);
+
+    /// <summary>vlc_ngettext</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ngettext")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte* VlcNgettext(byte* s, byte* p, CULong n);
+
+    /// <summary>vlc_ureduce</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_ureduce")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial byte VlcUreduce(uint* arg0, uint* arg1, ulong arg2, ulong arg3, ulong arg4);
 }

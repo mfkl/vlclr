@@ -3,14 +3,426 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
+/// <summary>interaction_dialog_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 112)]
+public unsafe partial struct InteractionDialog
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 112;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 112;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 112;
+
+    /// <summary>i_type</summary>
+    [FieldOffset(0)] public int Type;
+
+    /// <summary>psz_title</summary>
+    [FieldOffset(8)] public byte* Title;
+
+    /// <summary>psz_description</summary>
+    [FieldOffset(16)] public byte* Description;
+
+    /// <summary>psz_default_button</summary>
+    [FieldOffset(24)] public byte* DefaultButton;
+
+    /// <summary>psz_alternate_button</summary>
+    [FieldOffset(32)] public byte* AlternateButton;
+
+    /// <summary>psz_other_button</summary>
+    [FieldOffset(40)] public byte* OtherButton;
+
+    /// <summary>psz_returned</summary>
+    [FieldOffset(48)] public ReturnedArray Returned;
+
+    /// <summary>i_timeToGo</summary>
+    [FieldOffset(56)] public int TimeToGo;
+
+    /// <summary>b_cancelled</summary>
+    [FieldOffset(60)] public byte Cancelled;
+
+    /// <summary>p_private</summary>
+    [FieldOffset(64)] public void* Private;
+
+    /// <summary>i_status</summary>
+    [FieldOffset(72)] public int Status;
+
+    /// <summary>i_action</summary>
+    [FieldOffset(76)] public int Action;
+
+    /// <summary>i_flags</summary>
+    [FieldOffset(80)] public int Flags;
+
+    /// <summary>i_return</summary>
+    [FieldOffset(84)] public int Return;
+
+    /// <summary>p_parent</summary>
+    [FieldOffset(88)] public ObjectHeader* Parent;
+
+    /// <summary>p_interface</summary>
+    [FieldOffset(96)] public IntfThread* Interface;
+
+    /// <summary>p_lock</summary>
+    [FieldOffset(104)] public Mutex* Lock;
+
+    /// <summary>Inline array of 1 elements of <c>psz_returned</c>.</summary>
+    [InlineArray(1)]
+    public struct ReturnedArray
+    {
+        private nint _e0;
+    }
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(interaction_dialog_t, i_type)</summary>
+        public const int Type = 0;
+        /// <summary>offsetof(interaction_dialog_t, psz_title)</summary>
+        public const int Title = 8;
+        /// <summary>offsetof(interaction_dialog_t, psz_description)</summary>
+        public const int Description = 16;
+        /// <summary>offsetof(interaction_dialog_t, psz_default_button)</summary>
+        public const int DefaultButton = 24;
+        /// <summary>offsetof(interaction_dialog_t, psz_alternate_button)</summary>
+        public const int AlternateButton = 32;
+        /// <summary>offsetof(interaction_dialog_t, psz_other_button)</summary>
+        public const int OtherButton = 40;
+        /// <summary>offsetof(interaction_dialog_t, psz_returned)</summary>
+        public const int Returned = 48;
+        /// <summary>offsetof(interaction_dialog_t, i_timeToGo)</summary>
+        public const int TimeToGo = 56;
+        /// <summary>offsetof(interaction_dialog_t, b_cancelled)</summary>
+        public const int Cancelled = 60;
+        /// <summary>offsetof(interaction_dialog_t, p_private)</summary>
+        public const int Private = 64;
+        /// <summary>offsetof(interaction_dialog_t, i_status)</summary>
+        public const int Status = 72;
+        /// <summary>offsetof(interaction_dialog_t, i_action)</summary>
+        public const int Action = 76;
+        /// <summary>offsetof(interaction_dialog_t, i_flags)</summary>
+        public const int Flags = 80;
+        /// <summary>offsetof(interaction_dialog_t, i_return)</summary>
+        public const int Return = 84;
+        /// <summary>offsetof(interaction_dialog_t, p_parent)</summary>
+        public const int Parent = 88;
+        /// <summary>offsetof(interaction_dialog_t, p_interface)</summary>
+        public const int Interface = 96;
+        /// <summary>offsetof(interaction_dialog_t, p_lock)</summary>
+        public const int Lock = 104;
+    }
+}
+
+/// <summary>intf_dialog_args_t</summary>
+[StructLayout(LayoutKind.Explicit, Size = 72)]
+public unsafe partial struct IntfDialogArgs
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 72;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 72;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 72;
+
+    /// <summary>p_intf</summary>
+    [FieldOffset(0)] public IntfThread* Intf;
+
+    /// <summary>psz_title</summary>
+    [FieldOffset(8)] public byte* Title;
+
+    /// <summary>psz_results</summary>
+    [FieldOffset(16)] public byte** Results;
+
+    /// <summary>i_results</summary>
+    [FieldOffset(24)] public int ResultsCount;
+
+    /// <summary>pf_callback</summary>
+    [FieldOffset(32)] public delegate* unmanaged[Cdecl]<IntfDialogArgs*, void> Callback;
+
+    /// <summary>p_arg</summary>
+    [FieldOffset(40)] public void* Arg;
+
+    /// <summary>psz_extensions</summary>
+    [FieldOffset(48)] public byte* Extensions;
+
+    /// <summary>b_save</summary>
+    [FieldOffset(56)] public byte Save;
+
+    /// <summary>b_multiple</summary>
+    [FieldOffset(57)] public byte Multiple;
+
+    /// <summary>p_dialog</summary>
+    [FieldOffset(64)] public InteractionDialog* Dialog;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(intf_dialog_args_t, p_intf)</summary>
+        public const int Intf = 0;
+        /// <summary>offsetof(intf_dialog_args_t, psz_title)</summary>
+        public const int Title = 8;
+        /// <summary>offsetof(intf_dialog_args_t, psz_results)</summary>
+        public const int Results = 16;
+        /// <summary>offsetof(intf_dialog_args_t, i_results)</summary>
+        public const int ResultsCount = 24;
+        /// <summary>offsetof(intf_dialog_args_t, pf_callback)</summary>
+        public const int Callback = 32;
+        /// <summary>offsetof(intf_dialog_args_t, p_arg)</summary>
+        public const int Arg = 40;
+        /// <summary>offsetof(intf_dialog_args_t, psz_extensions)</summary>
+        public const int Extensions = 48;
+        /// <summary>offsetof(intf_dialog_args_t, b_save)</summary>
+        public const int Save = 56;
+        /// <summary>offsetof(intf_dialog_args_t, b_multiple)</summary>
+        public const int Multiple = 57;
+        /// <summary>offsetof(intf_dialog_args_t, p_dialog)</summary>
+        public const int Dialog = 64;
+    }
+}
+
+/// <summary>intf_sys_t</summary>
+public partial struct IntfSys { }
+
 /// <summary>intf_thread_t</summary>
-public partial struct IntfThread { }
+[StructLayout(LayoutKind.Explicit, Size = 64)]
+public unsafe partial struct IntfThread
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 64;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 64;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 64;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>p_next</summary>
+    [FieldOffset(24)] public IntfThread* Next;
+
+    /// <summary>p_sys</summary>
+    [FieldOffset(32)] public IntfSys* Sys;
+
+    /// <summary>p_module</summary>
+    [FieldOffset(40)] public Module* Module;
+
+    /// <summary>pf_show_dialog</summary>
+    [FieldOffset(48)] public delegate* unmanaged[Cdecl]<IntfThread*, int, int, IntfDialogArgs*, void> ShowDialog;
+
+    /// <summary>p_cfg</summary>
+    [FieldOffset(56)] public ConfigChain* Cfg;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(intf_thread_t, obj)</summary>
+        public const int Obj = 0;
+        /// <summary>offsetof(intf_thread_t, p_next)</summary>
+        public const int Next = 24;
+        /// <summary>offsetof(intf_thread_t, p_sys)</summary>
+        public const int Sys = 32;
+        /// <summary>offsetof(intf_thread_t, p_module)</summary>
+        public const int Module = 40;
+        /// <summary>offsetof(intf_thread_t, pf_show_dialog)</summary>
+        public const int ShowDialog = 48;
+        /// <summary>offsetof(intf_thread_t, p_cfg)</summary>
+        public const int Cfg = 56;
+    }
+}
 
 /// <summary>vlc_playlist</summary>
 public partial struct Playlist { }
+
+/// <summary>vlc_intf_dialog</summary>
+public enum IntfDialog : uint
+{
+    /// <summary>INTF_DIALOG_FILE_SIMPLE</summary>
+    FileSimple = 1,
+
+    /// <summary>INTF_DIALOG_FILE</summary>
+    File = 2,
+
+    /// <summary>INTF_DIALOG_DISC</summary>
+    Disc = 3,
+
+    /// <summary>INTF_DIALOG_NET</summary>
+    Net = 4,
+
+    /// <summary>INTF_DIALOG_CAPTURE</summary>
+    Capture = 5,
+
+    /// <summary>INTF_DIALOG_SAT</summary>
+    Sat = 6,
+
+    /// <summary>INTF_DIALOG_DIRECTORY</summary>
+    Directory = 7,
+
+    /// <summary>INTF_DIALOG_STREAMWIZARD</summary>
+    Streamwizard = 8,
+
+    /// <summary>INTF_DIALOG_WIZARD</summary>
+    Wizard = 9,
+
+    /// <summary>INTF_DIALOG_PLAYLIST</summary>
+    Playlist = 10,
+
+    /// <summary>INTF_DIALOG_PLAYLISTS</summary>
+    Playlists = 11,
+
+    /// <summary>INTF_DIALOG_MESSAGES</summary>
+    Messages = 12,
+
+    /// <summary>INTF_DIALOG_FILEINFO</summary>
+    Fileinfo = 13,
+
+    /// <summary>INTF_DIALOG_PREFS</summary>
+    Prefs = 14,
+
+    /// <summary>INTF_DIALOG_BOOKMARKS</summary>
+    Bookmarks = 15,
+
+    /// <summary>INTF_DIALOG_EXTENDED</summary>
+    Extended = 16,
+
+    /// <summary>INTF_DIALOG_RENDERER</summary>
+    Renderer = 17,
+
+    /// <summary>INTF_DIALOG_POPUPMENU</summary>
+    Popupmenu = 20,
+
+    /// <summary>INTF_DIALOG_AUDIOPOPUPMENU</summary>
+    Audiopopupmenu = 21,
+
+    /// <summary>INTF_DIALOG_VIDEOPOPUPMENU</summary>
+    Videopopupmenu = 22,
+
+    /// <summary>INTF_DIALOG_MISCPOPUPMENU</summary>
+    Miscpopupmenu = 23,
+
+    /// <summary>INTF_DIALOG_FILE_GENERIC</summary>
+    FileGeneric = 30,
+
+    /// <summary>INTF_DIALOG_INTERACTION</summary>
+    Interaction = 50,
+
+    /// <summary>INTF_DIALOG_SENDKEY</summary>
+    Sendkey = 51,
+
+    /// <summary>INTF_DIALOG_UPDATEVLC</summary>
+    Updatevlc = 90,
+
+    /// <summary>INTF_DIALOG_VLM</summary>
+    Vlm = 91,
+
+    /// <summary>INTF_DIALOG_EXIT</summary>
+    Exit = 99,
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Intf
+{
+    /// <summary>intf_Create</summary>
+    [LibraryImport("libvlccore", EntryPoint = "intf_Create")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int Create(LibvlcInt* arg0, byte* arg1);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Libvlc
+{
+    /// <summary>libvlc_Quit</summary>
+    [LibraryImport("libvlccore", EntryPoint = "libvlc_Quit")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Quit(LibvlcInt* arg0);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Vlc
+{
+    /// <summary>vlc_LogSet</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vlc_LogSet")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void LogSet(LibvlcInt* arg0, LoggerOperations* arg1, void* data);
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static partial class VlcInterface
+{
+    /// <summary>ANSWERED_DIALOG</summary>
+    public const uint AnsweredDialog = 0;
+
+    /// <summary>DESTROYED_DIALOG</summary>
+    public const uint DestroyedDialog = 1;
+
+    /// <summary>DIALOG_BLOCKING_ERROR</summary>
+    public const int DialogBlockingError = 16;
+
+    /// <summary>DIALOG_CANCELLED</summary>
+    public const uint DialogCancelled = 2;
+
+    /// <summary>DIALOG_GOT_ANSWER</summary>
+    public const int DialogGotAnswer = 1;
+
+    /// <summary>DIALOG_INTF_PROGRESS</summary>
+    public const int DialogIntfProgress = 256;
+
+    /// <summary>DIALOG_LOGIN_PW_OK_CANCEL</summary>
+    public const int DialogLoginPwOkCancel = 4;
+
+    /// <summary>DIALOG_NO</summary>
+    public const uint DialogNo = 1;
+
+    /// <summary>DIALOG_NONBLOCKING_ERROR</summary>
+    public const int DialogNonblockingError = 32;
+
+    /// <summary>DIALOG_OK_YES</summary>
+    public const uint DialogOkYes = 0;
+
+    /// <summary>DIALOG_PSZ_INPUT_OK_CANCEL</summary>
+    public const int DialogPszInputOkCancel = 8;
+
+    /// <summary>DIALOG_USER_PROGRESS</summary>
+    public const int DialogUserProgress = 128;
+
+    /// <summary>DIALOG_YES_NO_CANCEL</summary>
+    public const int DialogYesNoCancel = 2;
+
+    /// <summary>EXTENSIONS_AUDIO</summary>
+    public const string ExtensionsAudio = "*.3ga;*.669;*.a52;*.aac;*.ac3;*.adt;*.adts;*.aif;*.aifc;*.aiff;*.alac;*.amb;*.amr;*.aob;*.ape;*.au;*.awb;*.caf;*.dts;*.dsf;*.dff;*.flac;*.it;*.kar;*.m4a;*.m4b;*.m4p;*.m5p;*.mid;*.mka;*.mlp;*.mod;*.mpa;*.mp1;*.mp2;*.mp3;*.mpc;*.mpga;*.mus;*.oga;*.ogg;*.oma;*.opus;*.qcp;*.ra;*.rmi;*.s3m;*.sid;*.spx;*.tak;*.thd;*.tta;*.voc;*.vqf;*.w64;*.wav;*.wma;*.wv;*.xa;*.xm";
+
+    /// <summary>EXTENSIONS_MEDIA</summary>
+    public const string ExtensionsMedia = "*.3g2;*.3gp;*.3gp2;*.3gpp;*.amrec;*.amv;*.asf;*.avi;*.bik;*.bin;*.crf;*.dav;*.divx;*.drc;*.dv;*.dvr-ms;*.evo;*.f4v;*.flv;*.gvi;*.gxf;*.iso;*.k3g;*.m1v;*.m2v;*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpe;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4;*.mpg;*.mpv2;*.mts;*.mtv;*.mxf;*.mxg;*.nsv;*.nuv;*.ogg;*.ogm;*.ogv;*.ogx;*.ps;*.qt;*.rec;*.rm;*.rmvb;*.rpl;*.skm;*.thp;*.tod;*.tp;*.ts;*.tts;*.txd;*.vob;*.vp6;*.vro;*.webm;*.wm;*.wmv;*.wtv;*.xesc;*.3ga;*.669;*.a52;*.aac;*.ac3;*.adt;*.adts;*.aif;*.aifc;*.aiff;*.alac;*.amb;*.amr;*.aob;*.ape;*.au;*.awb;*.caf;*.dts;*.dsf;*.dff;*.flac;*.it;*.kar;*.m4a;*.m4b;*.m4p;*.m5p;*.mid;*.mka;*.mlp;*.mod;*.mpa;*.mp1;*.mp2;*.mp3;*.mpc;*.mpga;*.mus;*.oga;*.ogg;*.oma;*.opus;*.qcp;*.ra;*.rmi;*.s3m;*.sid;*.spx;*.tak;*.thd;*.tta;*.voc;*.vqf;*.w64;*.wav;*.wma;*.wv;*.xa;*.xm;*.asx;*.b4s;*.cue;*.ifo;*.m3u;*.m3u8;*.pls;*.ram;*.rar;*.sdp;*.vlc;*.xspf;*.wax;*.wpl;*.wvx;*.zip;*.conf";
+
+    /// <summary>EXTENSIONS_PLAYLIST</summary>
+    public const string ExtensionsPlaylist = "*.asx;*.b4s;*.cue;*.ifo;*.m3u;*.m3u8;*.pls;*.ram;*.rar;*.sdp;*.vlc;*.xspf;*.wax;*.wpl;*.wvx;*.zip;*.conf";
+
+    /// <summary>EXTENSIONS_SUBTITLE</summary>
+    public const string ExtensionsSubtitle = "*.cdg;*.idx;*.srt;*.sub;*.utf;*.ass;*.ssa;*.aqt;*.jss;*.psb;*.rt;*.sami;*.smi;*.txt;*.smil;*.stl;*.usf;*.dks;*.pjs;*.mpl2;*.mks;*.vtt;*.tt;*.ttml;*.dfxp;*.scc";
+
+    /// <summary>EXTENSIONS_VIDEO</summary>
+    public const string ExtensionsVideo = "*.3g2;*.3gp;*.3gp2;*.3gpp;*.amrec;*.amv;*.asf;*.avi;*.bik;*.bin;*.crf;*.dav;*.divx;*.drc;*.dv;*.dvr-ms;*.evo;*.f4v;*.flv;*.gvi;*.gxf;*.iso;*.k3g;*.m1v;*.m2v;*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp2v;*.mp4;*.mp4v;*.mpe;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4;*.mpg;*.mpv2;*.mts;*.mtv;*.mxf;*.mxg;*.nsv;*.nuv;*.ogg;*.ogm;*.ogv;*.ogx;*.ps;*.qt;*.rec;*.rm;*.rmvb;*.rpl;*.skm;*.thp;*.tod;*.tp;*.ts;*.tts;*.txd;*.vob;*.vp6;*.vro;*.webm;*.wm;*.wmv;*.wtv;*.xesc";
+
+    /// <summary>INTERACT_DESTROY</summary>
+    public const uint InteractDestroy = 3;
+
+    /// <summary>INTERACT_HIDE</summary>
+    public const uint InteractHide = 2;
+
+    /// <summary>INTERACT_NEW</summary>
+    public const uint InteractNew = 0;
+
+    /// <summary>INTERACT_UPDATE</summary>
+    public const uint InteractUpdate = 1;
+}
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcIntf

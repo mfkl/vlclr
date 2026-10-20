@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
@@ -12,9 +13,33 @@ public static partial class VlcConfig
     /// <summary>CLOCK_FREQ</summary>
     public const long ClockFreq = 1000000;
 
+    /// <summary>DEFAULT_PTS_DELAY</summary>
+    public const long DefaultPtsDelay = 300000;
+
+    /// <summary>INPUT_IDLE_SLEEP</summary>
+    public const long InputIdleSleep = 100000;
+
+    /// <summary>INTF_IDLE_SLEEP</summary>
+    public const long IntfIdleSleep = 50000;
+
     /// <summary>VLC_TICK_0</summary>
     public const long Tick0 = 1;
 
     /// <summary>VLC_TICK_INVALID</summary>
     public const long TickInvalid = 0;
+
+    /// <summary>VOUT_ASPECT_FACTOR</summary>
+    public const int VoutAspectFactor = 432000;
+
+    /// <summary>VOUT_MAX_PLANES</summary>
+    public const int VoutMaxPlanes = 5;
+
+    /// <summary>VOUT_MAX_WIDTH</summary>
+    public const int VoutMaxWidth = 4096;
+
+    /// <summary>VOUT_OUTMEM_SLEEP</summary>
+    public const long VoutOutmemSleep = 20000;
+
+    /// <summary>VOUT_TITLE</summary>
+    public const string VoutTitle = "VLC";
 }

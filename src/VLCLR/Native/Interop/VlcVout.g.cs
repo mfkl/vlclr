@@ -3,14 +3,55 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
 /// <summary>vout_thread_t</summary>
-public partial struct VoutThread { }
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+public unsafe partial struct VoutThread
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 24;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 24;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 24;
+
+    /// <summary>obj</summary>
+    [FieldOffset(0)] public ObjectHeader Obj;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(vout_thread_t, obj)</summary>
+        public const int Obj = 0;
+    }
+}
+
+/// <summary>vlc_stereoscopic_mode_t</summary>
+public enum StereoscopicMode : uint
+{
+    /// <summary>VIDEO_STEREO_OUTPUT_AUTO</summary>
+    Auto = 0,
+
+    /// <summary>VIDEO_STEREO_OUTPUT_STEREO</summary>
+    Stereo = 1,
+
+    /// <summary>VIDEO_STEREO_OUTPUT_LEFT_ONLY</summary>
+    LeftOnly = 2,
+
+    /// <summary>VIDEO_STEREO_OUTPUT_RIGHT_ONLY</summary>
+    RightOnly = 3,
+
+    /// <summary>VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE</summary>
+    SideBySide = 4,
+}
 
 /// <summary>vlc_vout_order</summary>
-public enum VoutOrder : int
+public enum VoutOrder : uint
 {
     /// <summary>VLC_VOUT_ORDER_NONE</summary>
     None = 0,
@@ -20,4 +61,88 @@ public enum VoutOrder : int
 
     /// <summary>VLC_VOUT_ORDER_SECONDARY</summary>
     Secondary = 2,
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static partial class VlcVout
+{
+    /// <summary>VIDEO_STEREO_OUTPUT_MAX</summary>
+    public const int VideoStereoOutputMax = 4;
+
+    /// <summary>VOUT_ALIGN_BOTTOM</summary>
+    public const int VoutAlignBottom = 8;
+
+    /// <summary>VOUT_ALIGN_HMASK</summary>
+    public const int VoutAlignHmask = 3;
+
+    /// <summary>VOUT_ALIGN_LEFT</summary>
+    public const int VoutAlignLeft = 1;
+
+    /// <summary>VOUT_ALIGN_RIGHT</summary>
+    public const int VoutAlignRight = 2;
+
+    /// <summary>VOUT_ALIGN_TOP</summary>
+    public const int VoutAlignTop = 4;
+
+    /// <summary>VOUT_ALIGN_VMASK</summary>
+    public const int VoutAlignVmask = 12;
+
+    /// <summary>VOUT_SPU_CHANNEL_INVALID</summary>
+    public const int VoutSpuChannelInvalid = -1;
+
+    /// <summary>VOUT_SPU_CHANNEL_OSD</summary>
+    public const int VoutSpuChannelOsd = 0;
+
+    /// <summary>VOUT_SPU_CHANNEL_OSD_COUNT</summary>
+    public const int VoutSpuChannelOsdCount = 3;
+
+    /// <summary>VOUT_SPU_CHANNEL_OSD_HSLIDER</summary>
+    public const int VoutSpuChannelOsdHslider = 1;
+
+    /// <summary>VOUT_SPU_CHANNEL_OSD_VSLIDER</summary>
+    public const int VoutSpuChannelOsdVslider = 2;
+}
+
+/// <summary>Constants and functions from the C headers.</summary>
+public static unsafe partial class Vout
+{
+    /// <summary>vout_Close</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_Close")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void Close(VoutThread* vout);
+
+    /// <summary>vout_Flush</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_Flush")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial long Flush(VoutThread* p_vout, long i_date);
+
+    /// <summary>vout_FlushSubpictureChannel</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_FlushSubpictureChannel")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void FlushSubpictureChannel(VoutThread* arg0, nuint arg1);
+
+    /// <summary>vout_GetSnapshot</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_GetSnapshot")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial int GetSnapshot(VoutThread* p_vout, Frame** pp_image, Picture** pp_picture, VideoFormat* p_fmt, byte* psz_format, long i_timeout);
+
+    /// <summary>vout_PutPicture</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_PutPicture")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void PutPicture(VoutThread* arg0, Picture* arg1);
+
+    /// <summary>vout_PutSubpicture</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_PutSubpicture")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void PutSubpicture(VoutThread* arg0, Subpicture* arg1);
+
+    /// <summary>vout_RegisterSubpictureChannel</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_RegisterSubpictureChannel")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial nint RegisterSubpictureChannel(VoutThread* arg0);
+
+    /// <summary>vout_UnregisterSubpictureChannel</summary>
+    [LibraryImport("libvlccore", EntryPoint = "vout_UnregisterSubpictureChannel")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void UnregisterSubpictureChannel(VoutThread* arg0, nuint arg1);
 }
