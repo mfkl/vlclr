@@ -91,6 +91,35 @@ generated files carry the commit too (the `*.g.cs` headers, `vlcCommit` in
    then open a PR. The `Cross-platform` workflow probes the layouts against
    the new pin on every OS and runs the plugins in VLC.
 
+### Daily bump PR
+
+`.github/workflows/cimport-bump.yml` does the steps above every day at 06:00
+UTC, after the VLC nightlies are published:
+
+1. `check-vlc-nightly.sh` resolves the commit of the newest VLC 4 nightly. It
+   stops when that commit is the pin, was already checked by an earlier run,
+   or changed no libvlccore header (`include/*.h`) since then. Most runs end
+   here, in a few seconds.
+2. Otherwise extract runs on Linux and Windows and emit on Linux. When nothing
+   but the commit lines changed, it stops: the VLC change touched nothing
+   VLCLR imports.
+3. Otherwise it commits to `cimport/vlc-bump` and opens or updates one PR, with
+   the `cimport-report.md` diff in the body. The PR runs the usual CI, and
+   the VLC nightly drift steps of `Cross-platform` block it (they do not block
+   other PRs). If CI is red, push fixes to that branch: while it holds commits
+   not made by the workflow, the workflow leaves it alone and comments
+   instead. Merge with rebase; it never merges itself.
+
+The PR is pushed with the `CIMPORT_BUMP_TOKEN` secret, a fine-grained personal
+access token for this repository with Contents and Pull requests set to read
+and write. A PR opened with the default `GITHUB_TOKEN` would not start the
+other workflows. Only the last job sees the token, and it runs no project
+code. Renew the token before it expires. GitHub disables scheduled workflows
+after 60 days without repository activity; re-enable it from the Actions tab.
+
+Run it by hand from the Actions tab (`CImport bump`, optionally with a VLC
+commit instead of the newest nightly).
+
 ## Change what is generated
 
 Everything is driven by `vlc.cimport.json`:
