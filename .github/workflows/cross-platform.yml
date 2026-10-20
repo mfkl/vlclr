@@ -69,6 +69,17 @@ jobs:
         shell: cmd
         run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc-headers\include
 
+      # The toolchain VLC's Windows builds use; MSVC above checks the headers it can parse.
+      - name: Install llvm-mingw
+        if: ${{ !cancelled() && runner.os == 'Windows' }}
+        uses: ./.github/actions/llvm-mingw
+
+      - name: Check interop layouts against the pinned VLC headers (llvm-mingw)
+        if: ${{ !cancelled() && runner.os == 'Windows' }}
+        env:
+          CC: x86_64-w64-mingw32-clang
+        run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc-headers/include
+
       # Compiles tests/InlineParity/native/inline_parity.c against the pinned
       # headers (cl on Windows, cc elsewhere; the fixture finds the compiler)
       # and compares the C# reimplementations of VLC's static inlines with it.
@@ -90,6 +101,13 @@ jobs:
         continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
         shell: cmd
         run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc\include
+
+      - name: VLC nightly drift, interop layouts against the nightly headers (llvm-mingw)
+        if: ${{ !cancelled() && runner.os == 'Windows' }}
+        continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
+        env:
+          CC: x86_64-w64-mingw32-clang
+        run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc/include
 
       - name: Run the plugins in VLC
         if: ${{ !cancelled() }}

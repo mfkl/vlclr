@@ -84,6 +84,10 @@ jobs:
         shell: pwsh
         run: tools/VLCLR.CImport/fetch-headers.ps1
 
+      # The windows ABI is mingw-w64's, as VLC's Windows builds are made.
+      - name: Install llvm-mingw
+        uses: ./.github/actions/llvm-mingw
+
       - name: Extract the windows snapshot
         shell: pwsh
         run: >

@@ -1,9 +1,10 @@
 name: CImport bump
 
-# Regenerates the interop layer against the newest VLC 4 nightly and opens or
-# updates one PR (branch cimport/vlc-bump) when the generated code changes.
-# Most days it ends in the first job: the nightly is the pin or was already
-# checked, or no libvlccore header changed. Never merges.
+# Regenerates the interop layer against the newest VLC 4 nightly, once a week,
+# and opens or updates one PR (branch cimport/vlc-bump) when the generated code
+# changes. Most runs end in the first job: the nightly is the pin or was
+# already checked, or no libvlccore header changed. The PR merges itself
+# (rebase) once the checks main requires pass, unless someone pushed to it.
 #
 # Only the pull-request job sees CIMPORT_BUMP_TOKEN (fine-grained PAT, this
 # repository, Contents and Pull requests read/write). A PR opened with
@@ -12,7 +13,8 @@ name: CImport bump
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    # Mondays, after the night's VLC builds are published.
+    - cron: "0 6 * * 1"
   workflow_dispatch:
     inputs:
       vlc-commit:
@@ -118,6 +120,10 @@ jobs:
       - name: Fetch the VLC headers
         run: tools/VLCLR.CImport/fetch-headers.sh
 
+      - name: Install llvm-mingw
+        if: matrix.abi == 'windows'
+        uses: ./.github/actions/llvm-mingw
+
       - name: Extract the ${{ matrix.abi }} snapshot
         run: >
           dotnet run --project tools/VLCLR.CImport -c Release --
@@ -200,7 +206,7 @@ jobs:
             echo '```'
             echo
             echo "Opened by \`.github/workflows/cimport-bump.yml\`, see \`tools/VLCLR.CImport/README.md\`."
-            echo "If CI is red, push fixes to this branch: the workflow stops updating it once it holds other commits. Never merged automatically."
+            echo "It merges itself (rebase) once the required checks pass. If CI is red, push fixes to this branch: the workflow stops updating it, and stops merging it, once it holds other commits."
           } | head -c 60000 > "$RUNNER_TEMP/bump/body.md"
           cat "$RUNNER_TEMP/bump/body.md" >> "$GITHUB_STEP_SUMMARY"
           echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -280,6 +286,12 @@ jobs:
             gh pr edit "$pr" --title "$title" --body-file "$RUNNER_TEMP/bump/body.md"
           else
             gh pr create --base main --head "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/bump/body.md"
+            pr=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
+          fi
+          # Merged by GitHub once the checks main requires pass. Needs "Allow
+          # auto-merge" in the repository settings.
+          if ! gh pr merge "$pr" --auto --rebase; then
+            echo "::warning::Could not enable auto-merge on PR #$pr. Allow auto-merge in the repository settings."
           fi
 
   # Runs when every job above succeeded or was skipped, so a failed run checks
