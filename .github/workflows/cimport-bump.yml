@@ -1,0 +1,301 @@
+name: CImport bump
+
+# Regenerates the interop layer against the newest VLC 4 nightly and opens or
+# updates one PR (branch cimport/vlc-bump) when the generated code changes.
+# Most days it ends in the first job: the nightly is the pin or was already
+# checked, or no libvlccore header changed. Never merges.
+#
+# Only the pull-request job sees CIMPORT_BUMP_TOKEN (fine-grained PAT, this
+# repository, Contents and Pull requests read/write). A PR opened with
+# GITHUB_TOKEN would not start the other workflows. That job runs no project
+# code: it applies the patch made by the emit job, pushes and calls gh.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      vlc-commit:
+        description: VLC commit (full or short SHA) to check instead of the newest nightly
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cimport-bump
+  cancel-in-progress: false
+
+env:
+  MANIFEST: tools/VLCLR.CImport/vlc.cimport.json
+  BRANCH: cimport/vlc-bump
+  BOT_NAME: github-actions[bot]
+  BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+
+jobs:
+  check:
+    name: Check the VLC nightly
+    runs-on: ubuntu-24.04
+    outputs:
+      pin: ${{ steps.pin.outputs.pin }}
+      commit: ${{ steps.check.outputs.commit }}
+      build: ${{ steps.check.outputs.build }}
+      status: ${{ steps.check.outputs.status }}
+      headers: ${{ steps.check.outputs.headers }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/VLCLR.CImport
+          persist-credentials: false
+
+      - name: Read the pinned commit
+        id: pin
+        run: |
+          pin=$(grep -oE '"commit": *"[0-9a-f]{40}"' "$MANIFEST" | grep -oE '[0-9a-f]{40}')
+          echo "pin=$pin" >> "$GITHUB_OUTPUT"
+
+      # The newest cache under this prefix holds the last commit a run
+      # finished with, so a nightly whose header changes generated nothing is
+      # not extracted again the next day.
+      - name: Restore the last checked commit
+        if: ${{ inputs.vlc-commit == '' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: .cimport-checked
+          key: cimport-bump-checked-${{ github.run_id }}
+          restore-keys: cimport-bump-checked-
+
+      - name: Check the commit
+        id: check
+        env:
+          PIN: ${{ steps.pin.outputs.pin }}
+          WANTED: ${{ inputs.vlc-commit }}
+        run: |
+          last=$(cat .cimport-checked 2> /dev/null || true)
+          tools/VLCLR.CImport/check-vlc-nightly.sh "$PIN" "$last" "$WANTED"
+
+  extract:
+    name: Extract (${{ matrix.abi }})
+    needs: check
+    if: ${{ needs.check.outputs.status == 'headers-changed' }}
+    strategy:
+      matrix:
+        include:
+          - abi: sysv
+            os: ubuntu-24.04
+          - abi: windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      COMMIT: ${{ needs.check.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install clang (builtin headers for the extractor)
+        if: runner.os == 'Linux'
+        run: |
+          if ! ls -d /usr/lib/llvm-*/lib/clang/* >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y clang
+          fi
+
+      - name: Pin the manifest to the checked commit
+        run: |
+          sed -i -E "s/(\"commit\": *\")[0-9a-f]{40}/\1$COMMIT/" "$MANIFEST"
+          grep -q "\"$COMMIT\"" "$MANIFEST"
+
+      - name: Fetch the VLC headers
+        run: tools/VLCLR.CImport/fetch-headers.sh
+
+      - name: Extract the ${{ matrix.abi }} snapshot
+        run: >
+          dotnet run --project tools/VLCLR.CImport -c Release --
+          extract --abi ${{ matrix.abi }}
+          --manifest "$MANIFEST"
+          --out src/VLCLR/Native/Interop/abi/${{ matrix.abi }}.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cimport-bump-snapshot-${{ matrix.abi }}
+          path: src/VLCLR/Native/Interop/abi/${{ matrix.abi }}.json
+
+  emit:
+    name: Emit
+    needs: [check, extract]
+    runs-on: ubuntu-24.04
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    env:
+      PIN: ${{ needs.check.outputs.pin }}
+      COMMIT: ${{ needs.check.outputs.commit }}
+      BUILD: ${{ needs.check.outputs.build }}
+      HEADERS: ${{ needs.check.outputs.headers }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Pin the manifest to the checked commit
+        run: |
+          sed -i -E "s/(\"commit\": *\")[0-9a-f]{40}/\1$COMMIT/" "$MANIFEST"
+          grep -q "\"$COMMIT\"" "$MANIFEST"
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cimport-bump-snapshot-*
+          merge-multiple: true
+          path: src/VLCLR/Native/Interop/abi
+
+      - name: Emit the generated code
+        run: >
+          dotnet run --project tools/VLCLR.CImport -c Release --
+          emit --manifest "$MANIFEST"
+
+      # Every generated file names the commit; only other changes count.
+      - name: Diff without the lines that only carry the commit
+        id: diff
+        run: |
+          git add -A -- src tests tools
+          if git diff --cached --quiet -I "${PIN:0:8}|${COMMIT:0:8}"; then
+            echo "Nothing VLCLR imports changed between ${PIN:0:8} and ${COMMIT:0:8}."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p "$RUNNER_TEMP/bump"
+          git diff --cached --binary > "$RUNNER_TEMP/bump/bump.patch"
+          vlc=https://code.videolan.org/videolan/vlc
+          {
+            echo "Bumps the pinned VLC commit from [\`${PIN:0:8}\`]($vlc/-/commit/$PIN) to [\`${COMMIT:0:8}\`]($vlc/-/commit/$COMMIT)${BUILD:+, the VLC 4 nightly of $BUILD}."
+            echo
+            echo "VLC changes: $vlc/-/compare/$PIN...$COMMIT"
+            echo
+            echo "libvlccore headers changed: $(printf '`%s` ' $HEADERS)"
+            echo
+            echo "### Generated changes, without the lines that only carry the commit"
+            echo
+            echo '```'
+            git diff --cached --stat -I "${PIN:0:8}|${COMMIT:0:8}"
+            echo '```'
+            echo
+            echo "### cimport-report.md"
+            echo
+            echo '```diff'
+            git diff --cached -- src/VLCLR/Native/Interop/cimport-report.md
+            echo '```'
+            echo
+            echo "Opened by \`.github/workflows/cimport-bump.yml\`, see \`tools/VLCLR.CImport/README.md\`."
+            echo "If CI is red, push fixes to this branch: the workflow stops updating it once it holds other commits. Never merged automatically."
+          } | head -c 60000 > "$RUNNER_TEMP/bump/body.md"
+          cat "$RUNNER_TEMP/bump/body.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.diff.outputs.changed == 'true' }}
+        with:
+          name: cimport-bump-patch
+          path: ${{ runner.temp }}/bump
+
+  pull-request:
+    name: Open or update the bump PR
+    needs: [check, emit]
+    if: ${{ needs.emit.outputs.changed == 'true' }}
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ secrets.CIMPORT_BUMP_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      COMMIT: ${{ needs.check.outputs.commit }}
+      BUILD: ${{ needs.check.outputs.build }}
+    steps:
+      - name: The token is set
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Add the CIMPORT_BUMP_TOKEN secret, see tools/VLCLR.CImport/README.md."
+            exit 1
+          fi
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          token: ${{ secrets.CIMPORT_BUMP_TOKEN }}
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: cimport-bump-patch
+          path: ${{ runner.temp }}/bump
+
+      - name: Commit the bump
+        run: |
+          git config user.name "$BOT_NAME"
+          git config user.email "$BOT_EMAIL"
+          git switch -c "$BRANCH"
+          git apply --index "$RUNNER_TEMP/bump/bump.patch"
+          git commit -q -m "cimport: bump the pinned VLC headers to ${COMMIT:0:8}" \
+            -m "Generated by .github/workflows/cimport-bump.yml${BUILD:+ from the VLC 4 nightly of $BUILD}."
+
+      - name: Push and open or update the PR
+        run: |
+          title="cimport: bump the pinned VLC headers to ${COMMIT:0:8}"
+          pr=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$pr" ]; then
+            # Fixes pushed by hand stay: leave the branch alone, say so once.
+            others=$(gh api "repos/$GH_REPO/compare/main...$BRANCH" \
+              --jq "[.commits[] | select(.commit.author.email != \"$BOT_EMAIL\")] | length")
+            if [ "$others" != 0 ]; then
+              body="<!-- cimport-bump -->
+          VLC \`${COMMIT:0:8}\` changes the generated code again. This branch holds commits not made by the workflow, so it was left as is. Merge or close this PR and the next run starts from the newest nightly."
+              id=$(gh api --paginate "repos/$GH_REPO/issues/$pr/comments" \
+                --jq '.[] | select(.body | startswith("<!-- cimport-bump -->")) | .id' | tail -n 1)
+              if [ -n "$id" ]; then
+                gh api -X PATCH "repos/$GH_REPO/issues/comments/$id" -f body="$body" > /dev/null
+              else
+                gh pr comment "$pr" --body "$body"
+              fi
+              exit 0
+            fi
+            # Same generated code as the PR, only a newer commit: no push, no CI run.
+            git fetch -q --depth 1 origin "$BRANCH"
+            branch_pin=$(git show "FETCH_HEAD:$MANIFEST" | grep -oE '"commit": *"[0-9a-f]{40}"' | grep -oE '[0-9a-f]{40}')
+            if git diff --quiet -I "${branch_pin:0:8}|${COMMIT:0:8}" FETCH_HEAD HEAD; then
+              echo "PR #$pr already has this generated code."
+              exit 0
+            fi
+          fi
+          git push -q --force origin "$BRANCH"
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --title "$title" --body-file "$RUNNER_TEMP/bump/body.md"
+          else
+            gh pr create --base main --head "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/bump/body.md"
+          fi
+
+  # Runs when every job above succeeded or was skipped, so a failed run checks
+  # the same commit again the next day.
+  record:
+    name: Record the checked commit
+    needs: [check, extract, emit, pull-request]
+    if: >-
+      ${{ always()
+      && (needs.check.outputs.status == 'headers-changed' || needs.check.outputs.status == 'no-header-change')
+      && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "${{ needs.check.outputs.commit }}" > .cimport-checked
+
+      - uses: actions/cache/save@v4
+        with:
+          path: .cimport-checked
+          key: cimport-bump-checked-${{ needs.check.outputs.commit }}
