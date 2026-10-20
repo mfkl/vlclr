@@ -31,6 +31,48 @@ public unsafe class PictureParityTests
     }
 
     [SkippableFact]
+    public void PictureHold_increments_and_returns_the_picture_like_picture_Hold()
+    {
+        ParityLibrary.Require();
+
+        nint picture = ParityNative.parity_picture_new(1);
+        try
+        {
+            foreach (nuint refs in RefCounts())
+            {
+                ParityNative.parity_picture_set_refs(picture, refs);
+                var (cHeld, cLog) = Harness.Run(null, () => ParityNative.parity_picture_Hold(picture));
+                nuint cRefs = ParityNative.parity_picture_refs(picture);
+
+                ParityNative.parity_picture_set_refs(picture, refs);
+                var (managedHeld, managedLog) = Harness.Run(null, () => VLCCore.PictureHold(picture));
+                nuint managedRefs = ParityNative.parity_picture_refs(picture);
+
+                ParityAssert.Equal(cHeld, managedHeld, $"returned picture from {refs}");
+                ParityAssert.Equal(cRefs, managedRefs, $"refs after hold from {refs}");
+                ParityAssert.Same(cLog, managedLog, $"hold from {refs}");
+                ParityAssert.Equal(refs + 1, managedRefs, $"refs after hold from {refs}");
+            }
+        }
+        finally
+        {
+            ParityNative.parity_picture_free(picture);
+        }
+    }
+
+    [SkippableFact]
+    public void Documented_difference_PictureHold_ignores_a_null_picture()
+    {
+        ParityLibrary.Require();
+
+        // picture_Hold(NULL) dereferences NULL; the managed version returns NULL.
+        var (held, log) = Harness.Run(null, () => VLCCore.PictureHold(0));
+
+        Assert.Equal(0, held);
+        Assert.Equal(0, log.DestroyCalls);
+    }
+
+    [SkippableFact]
     public void PictureRelease_decrements_and_destroys_at_zero_like_picture_Release()
     {
         ParityLibrary.Require();
