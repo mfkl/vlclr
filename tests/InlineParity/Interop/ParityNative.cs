@@ -128,6 +128,7 @@ internal static unsafe partial class ParityNative
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern nuint parity_picture_refs(nint picture);
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern void parity_picture_set_refs(nint picture, nuint refs);
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern void parity_picture_free(nint picture);
+    [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern nint parity_picture_Hold(nint picture);
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern void parity_picture_Release(nint picture);
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern nint parity_fake_pnff_picture();
     [DllImport(Lib, CallingConvention = CallingConvention.Cdecl)] public static extern nint parity_fake_buffer_picture();

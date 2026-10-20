@@ -387,6 +387,7 @@ PARITY_API const video_format_t *parity_filter_fmt_out_video(filter_t *f) { retu
 
 PARITY_API void parity_vlc_fourcc_to_char(uint32_t fcc, char *out4) { vlc_fourcc_to_char(fcc, out4); }
 
+PARITY_API picture_t *parity_picture_Hold(picture_t *p) { return picture_Hold(p); }
 PARITY_API void parity_picture_Release(picture_t *p) { picture_Release(p); }
 PARITY_API picture_t *parity_filter_NewPicture(filter_t *f) { return filter_NewPicture(f); }
 
