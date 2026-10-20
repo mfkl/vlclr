@@ -67,7 +67,8 @@ public abstract class VLCVideoFilterBase : IDisposable
     /// <summary>
     /// Processes a frame and selects the picture returned to VLC.
     /// Override this for out-of-place GPU filters. A newly allocated output
-    /// receives the input properties and the input is released by the base.
+    /// receives the input properties (<see cref="SetOutputProperties"/>) and
+    /// the input is released by the base.
     /// </summary>
     /// <param name="frame">The input frame owned by the callback.</param>
     /// <returns>The input picture, a newly allocated output picture, or zero.</returns>
@@ -76,6 +77,18 @@ public abstract class VLCVideoFilterBase : IDisposable
         ProcessFrame(frame);
         return frame.NativePtr;
     }
+
+    /// <summary>
+    /// Sets the properties (date, field flags, ...) of the picture that
+    /// <see cref="ProcessFrameToOutput"/> returned in place of the input,
+    /// before the input is released. The base copies them all from the input
+    /// (picture_CopyProperties); override to change some of them afterwards,
+    /// for example to give a delayed picture its own date.
+    /// </summary>
+    /// <param name="output">The picture returned to VLC.</param>
+    /// <param name="input">The input picture of this call.</param>
+    protected virtual void SetOutputProperties(nint output, nint input)
+        => VLCCore.PictureCopyProperties(output, input);
 
     /// <summary>
     /// Called on first frame. Override for one-time setup that needs frame info.
@@ -174,9 +187,7 @@ public abstract class VLCVideoFilterBase : IDisposable
             {
                 if (outputPicture != 0)
                 {
-                    VLCCore.PictureCopyProperties(
-                        outputPicture,
-                        picturePtr);
+                    SetOutputProperties(outputPicture, picturePtr);
                 }
                 VLCCore.PictureRelease(picturePtr);
             }
