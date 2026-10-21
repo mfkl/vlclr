@@ -57,6 +57,7 @@
       "vlc_object_t": "ObjectHeader",
       // The rules give these the name of another type.
       "vlc_sockaddr": "VlcSockaddr",            // struct sockaddr is Sockaddr
+      "vlc_DIR": "VlcDir",                      // macOS's own DIR is Dir
       "vlc_thread_t": "ThreadHandle",           // struct vlc_thread (windows) is Thread
       "vlc_tracer_value": "TracerValueType"     // the enum; the union vlc_tracer_value_t is TracerValue
     },
