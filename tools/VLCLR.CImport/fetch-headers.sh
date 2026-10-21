@@ -113,8 +113,8 @@ case " $(g remote | tr '\n' ' ') " in
   *" origin "*) g remote set-url origin "$repository" ;;
   *) g remote add origin "$repository" ;;
 esac
-# MSYS (Git Bash) would turn the leading slashes into Windows paths.
-MSYS_NO_PATHCONV=1 g sparse-checkout set --no-cone /include/ /src/libvlccore.sym
+# On stdin: as arguments, MSYS (Git Bash) would turn the leading slashes into Windows paths.
+printf '%s\n' /include/ /src/libvlccore.sym | g sparse-checkout set --no-cone --stdin
 
 echo "fetch-headers: fetching include/ and src/libvlccore.sym of $commit from $repository"
 g fetch --quiet --depth 1 --filter=blob:none origin "$commit" \
