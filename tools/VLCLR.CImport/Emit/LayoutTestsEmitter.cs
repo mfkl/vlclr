@@ -74,11 +74,12 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
             Line($"        if (!({string.Join(" || ", platforms.Select(Abis.CSharpTest))}))");
             Line("            return;");
         }
-        Line($"        var s = default({csType});");
+        var members = type.Members.Where(m => !_skippedFields.Contains($"{type.Name}.{m.Name}")).ToList();
+        if (members.Any(m => !m.IsBitfield))
+            Line($"        var s = default({csType});");
         Line($"        AssertEqual({Abi(type.Size!)}, {csType}.SizeOf, \"{Escape(type.Name)} sizeof\");");
         Line($"        AssertEqual({type.Size!.Values.Max()}, Unsafe.SizeOf<{csType}>(), \"{Escape(type.Name)} Unsafe.SizeOf\");");
 
-        var members = type.Members.Where(m => !_skippedFields.Contains($"{type.Name}.{m.Name}")).ToList();
         foreach (var member in members.Where(m => !m.IsBitfield))
         {
             var csName = names.Field(member.DeclaringType, member.Name);
