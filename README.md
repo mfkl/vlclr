@@ -39,6 +39,67 @@ The source generator supplies `vlc_entry`, module registration, native
 callbacks, exception handling, and per-instance state. Advanced plugins can use
 `VLCLR.Module.ModuleBuilder` directly.
 
+## What libvlccore offers
+
+A VLC plugin is a module of one kind (video filter, decoder, demuxer, ...)
+that calls into libvlccore, VLC's core library. VLCLR has base classes for
+two kinds; any other kind is registered with `ModuleBuilder` and uses the
+generated bindings directly.
+
+```mermaid
+flowchart LR
+  subgraph base["With a VLCLR base class"]
+    VF["video filter<br/>VLCVideoFilterBase"]
+    TR["text renderer<br/>VLCTextRendererBase"]
+  end
+  subgraph builder["Any other kind, with ModuleBuilder"]
+    AF[audio filter]
+    DEC[decoder, encoder]
+    DMX[demuxer]
+    ACC[access, stream filter]
+    SO[stream output]
+    IF[interface]
+  end
+  VF --> VID[Video]
+  TR --> SUB[Subtitles and text]
+  AF --> AUD[Audio]
+  DEC --> COD[Codecs and formats]
+  DMX --> INP[Input]
+  DMX --> COD
+  ACC --> INP
+  ACC --> NET[Network]
+  SO --> OUT[Streaming out]
+  IF --> PLAY[Playback]
+  VID & SUB & AUD & COD & INP & NET & OUT & PLAY --> CORE[Core, threads and time]
+```
+
+`VLCLR.Native.Interop` binds the whole libvlccore C API, generated from the
+headers VLC installs for plugins: every exported function, struct, enum and
+constant, for Windows, Linux and macOS. The hand-written wrappers on top of it
+cover the areas VLCLR's samples need so far.
+
+| Area | Headers | What it offers | C# wrappers |
+|---|---|---|---|
+| Playback | `vlc_player.h`, `vlc_playlist.h`, `vlc_input_item.h`, `vlc_media_source.h`, `vlc_preparser.h`, `vlc_meta.h` | Player control, tracks, playlists, media items, metadata, preparsing | `VLCPlayer`, `VLCPlaylist` |
+| Video | `vlc_picture.h`, `vlc_filter.h`, `vlc_vout*.h`, `vlc_window.h`, `vlc_opengl*.h`, `vlc_ancillary.h`, `vlc_fourcc.h` | Pictures and pools, filters, video output and windows, OpenGL, HDR metadata, chromas | `VLCVideoFilterBase`, `VLCFrame`, `VLCFourCC` |
+| Subtitles and text | `vlc_subpicture.h`, `vlc_spu.h`, `vlc_text_style.h` | Subpictures and regions, text styles, text rendering | `VLCTextRendererBase`, `VLCSubpicture`, `VLCTextStyle` |
+| Audio | `vlc_aout.h`, `vlc_aout_volume.h`, `vlc_replay_gain.h` | Audio output, volume, replay gain | `VLCAudioFormat` (format only) |
+| Codecs and formats | `vlc_es.h`, `vlc_codec.h`, `vlc_decoder.h`, `vlc_frame.h` | Elementary stream formats, decoders and encoders, data blocks | `VLCEsFormat`, `VLCBlock` (types only) |
+| Input | `vlc_stream.h`, `vlc_demux.h`, `vlc_access.h`, `vlc_stream_extractor.h`, `vlc_es_out.h` | Byte streams, demuxers, access modules, archives | |
+| Streaming out | `vlc_sout.h`, `vlc_httpd.h`, `vlc_vlm.h` | Stream output chains, HTTP server, VLM | |
+| Network | `vlc_network.h`, `vlc_tls.h`, `vlc_http.h`, `vlc_url.h`, `vlc_keystore.h` | Sockets, TLS, HTTP client, URLs, credentials | |
+| Core | `vlc_objects.h`, `vlc_variables.h`, `vlc_configuration.h`, `vlc_modules.h`, `vlc_messages.h`, `vlc_interface.h`, `vlc_dialog.h` | Objects, variables, configuration, modules, logging, interfaces, dialogs | `VLCObject`, `VLCVariable`, `VLCConfiguration`, `VLCLogger` |
+| Threads and time | `vlc_threads.h`, `vlc_tick.h`, `vlc_interrupt.h`, `vlc_executor.h`, `vlc_queue.h` | Threads, locks, clocks, interruption, thread pools | `VLCTick` (time units only) |
+| Media library | `vlc_media_library.h`, `vlc_fingerprinter.h` | Library database, playback states | |
+| Utilities | `vlc_strings.h`, `vlc_charset.h`, `vlc_fs.h`, `vlc_xml.h`, `vlc_hash.h`, `vlc_memstream.h`, ... | Strings, character sets, files, XML, hashing, memory streams | |
+
+Without a wrapper, call the C API as it is: `vlc_player_GetTime(player)` is
+`VlcPlayer.GetTime(player)`, and structs keep their C layout with per-platform
+offsets. Static inline functions are not bound; the few VLCLR needs are
+reimplemented in C#. `src/VLCLR/Native/Interop/cimport-report.md` lists what
+is not bound, and why. See [`tools/VLCLR.CImport`](tools/VLCLR.CImport/README.md)
+for how the bindings are generated and kept in step with VLC.
+
 ## Samples
 
 | Sample | Capability | Platforms |
