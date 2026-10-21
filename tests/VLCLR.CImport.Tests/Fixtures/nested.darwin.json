@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "abi": "darwin",
+  "target": "x86_64-apple-darwin",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "headers": [
+    "nested.h"
+  ],
+  "types": [
+    {
+      "name": "inner",
+      "kind": "struct",
+      "header": "nested.h",
+      "size": 8,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "b",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 4
+        }
+      ]
+    },
+    {
+      "name": "middle",
+      "kind": "struct",
+      "header": "nested.h",
+      "size": 16,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "by_value",
+          "type": {
+            "kind": "record",
+            "name": "inner"
+          },
+          "offset": 0
+        },
+        {
+          "name": "by_pointer",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "record",
+              "name": "inner"
+            }
+          },
+          "offset": 8
+        }
+      ]
+    },
+    {
+      "name": "outer",
+      "kind": "struct",
+      "header": "nested.h",
+      "size": 32,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "tag",
+          "type": {
+            "kind": "builtin",
+            "builtin": "char"
+          },
+          "offset": 0
+        },
+        {
+          "name": "mid",
+          "type": {
+            "kind": "record",
+            "name": "middle"
+          },
+          "offset": 8
+        },
+        {
+          "name": "next",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "record",
+              "name": "middle"
+            }
+          },
+          "offset": 24
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

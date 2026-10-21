@@ -89,8 +89,9 @@ internal sealed partial class Extraction : IDisposable
         var args = new List<string> { "-x", "c", "-std=gnu11", "--target=" + _triple, "-w" };
         if (_options.ResourceDir is { } resourceDir)
             args.Add("-resource-dir=" + resourceDir);
+        // Apple's toolchain takes its SDK with -isysroot; mingw's with --sysroot.
         if (_options.Sysroot is { } sysroot)
-            args.Add("--sysroot=" + sysroot);
+            args.Add(_options.Abi == Abis.Darwin ? "-isysroot" + sysroot : "--sysroot=" + sysroot);
         args.AddRange(_includeDirs.Select(d => "-I" + d));
         args.AddRange(_options.Defines.Select(d => "-D" + d));
         args.AddRange(_options.ExtraArgs);

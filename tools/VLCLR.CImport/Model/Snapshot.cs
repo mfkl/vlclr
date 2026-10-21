@@ -54,8 +54,40 @@ public sealed record Snapshot
 public static class Abis
 {
     public const string Windows = "windows";
+
+    /// <summary>Linux (x86-64 System V).</summary>
     public const string SysV = "sysv";
 
+    /// <summary>macOS: System V too, but with its own C library (BSD sockaddr, errno values).</summary>
+    public const string Darwin = "darwin";
+
     /// <summary>Order of ABIs in <see cref="Merge.PerAbi{T}"/> and in generated code.</summary>
-    public static IReadOnlyList<string> All { get; } = [Windows, SysV];
+    public static IReadOnlyList<string> All { get; } = [Windows, SysV, Darwin];
+
+    /// <summary>The .NET platform name of an ABI, for <c>[SupportedOSPlatform]</c>.</summary>
+    public static string Platform(string abi) => abi switch
+    {
+        Windows => "windows",
+        SysV => "linux",
+        Darwin => "macos",
+        _ => throw new ArgumentException($"Unknown ABI '{abi}'.", nameof(abi)),
+    };
+
+    /// <summary>The C# test that the running platform is the ABI's.</summary>
+    public static string CSharpTest(string abi) => abi switch
+    {
+        Windows => "OperatingSystem.IsWindows()",
+        SysV => "OperatingSystem.IsLinux()",
+        Darwin => "OperatingSystem.IsMacOS()",
+        _ => throw new ArgumentException($"Unknown ABI '{abi}'.", nameof(abi)),
+    };
+
+    /// <summary>The C preprocessor test that the compiler targets the ABI.</summary>
+    public static string CTest(string abi) => abi switch
+    {
+        Windows => "defined(_WIN32)",
+        SysV => "(!defined(_WIN32) && !defined(__APPLE__))",
+        Darwin => "defined(__APPLE__)",
+        _ => throw new ArgumentException($"Unknown ABI '{abi}'.", nameof(abi)),
+    };
 }

@@ -127,7 +127,7 @@ internal sealed partial class CSharpGeneration
 
         var w = new CSharpWriter();
         w.Line($"/// <summary>{CSharpLiterals.Xml(e.Name)}</summary>");
-        if (PlatformAttribute(e.Name) is { } platform)
+        foreach (var platform in PlatformAttributes(e.Name))
             w.Line(platform);
         w.Open($"public enum {info.TypeName} : {info.Underlying}");
         var blocks = new List<IReadOnlyList<string>>();

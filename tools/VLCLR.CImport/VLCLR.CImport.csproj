@@ -26,6 +26,9 @@
     <PackageReference Include="libclang.runtime.linux-x64" Version="21.1.8" />
     <PackageReference Include="libClangSharp.runtime.win-x64" Version="21.1.8.2" />
     <PackageReference Include="libClangSharp.runtime.linux-x64" Version="21.1.8.2" />
+    <!-- The darwin snapshot is extracted on macOS (arm64 runners); no x64 build of libclang 21 exists. -->
+    <PackageReference Include="libclang.runtime.osx-arm64" Version="21.1.8" />
+    <PackageReference Include="libClangSharp.runtime.osx-arm64" Version="21.1.8.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "abi": "darwin",
+  "target": "x86_64-apple-darwin",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "headers": [
+    "flexible_array.h"
+  ],
+  "types": [
+    {
+      "name": "block_like",
+      "kind": "struct",
+      "header": "flexible_array.h",
+      "size": 16,
+      "alignment": 8,
+      "fields": [
+        {
+          "name": "p_next",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "record",
+              "name": "block_like"
+            }
+          },
+          "offset": 0
+        },
+        {
+          "name": "i_buffer",
+          "type": {
+            "kind": "typedef",
+            "name": "size_t",
+            "element": {
+              "kind": "builtin",
+              "builtin": "uLong"
+            }
+          },
+          "offset": 8
+        },
+        {
+          "name": "p_payload",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "typedef",
+              "name": "uint8_t",
+              "element": {
+                "kind": "builtin",
+                "builtin": "uChar"
+              }
+            }
+          },
+          "offset": 16
+        }
+      ]
+    },
+    {
+      "name": "counted_values",
+      "kind": "struct",
+      "header": "flexible_array.h",
+      "size": 4,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "count",
+          "type": {
+            "kind": "builtin",
+            "builtin": "int"
+          },
+          "offset": 0
+        },
+        {
+          "name": "values",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "builtin",
+              "builtin": "int"
+            }
+          },
+          "offset": 4
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typedefs": [
+    {
+      "name": "size_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uLong"
+      }
+    },
+    {
+      "name": "uint8_t",
+      "header": "fixture_types.h",
+      "target": {
+        "kind": "builtin",
+        "builtin": "uChar"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

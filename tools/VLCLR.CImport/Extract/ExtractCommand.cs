@@ -64,8 +64,17 @@ public static class ExtractCommand
                 throw new CommandException($"'{sysroot}' is not a mingw-w64 toolchain (no include/_mingw.h).");
             sysroot = Path.GetFullPath(sysroot);
         }
+        else if (abi == Abis.Darwin)
+        {
+            sysroot = commandLine.Get("sysroot") ?? MacSdk.Find()
+                ?? throw new CommandException("No macOS SDK for the darwin ABI: run on macOS with Xcode or its command line tools, "
+                                              + $"pass --sysroot <MacOSX.sdk> or set {MacSdk.EnvironmentVariable}.");
+            if (!MacSdk.IsSdk(sysroot))
+                throw new CommandException($"'{sysroot}' is not a macOS SDK (no usr/include/stdio.h).");
+            sysroot = Path.GetFullPath(sysroot);
+        }
         else if (commandLine.Get("sysroot") is not null)
-            throw new CommandException("--sysroot is for the windows ABI only.");
+            throw new CommandException("--sysroot is for the windows and darwin ABIs only.");
 
         HashSet<string>? exported = null;
         var symbolsPath = commandLine.Get("symbols") is { } givenSymbols ? Path.GetFullPath(givenSymbols)

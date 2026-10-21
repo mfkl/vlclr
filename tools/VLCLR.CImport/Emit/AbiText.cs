@@ -27,12 +27,21 @@ internal readonly struct AbiText
     /// <summary>The C# text, for the accessor writers.</summary>
     public string Text => _text ?? throw new InvalidOperationException("Default AbiText.");
 
-    /// <summary>One C# expression for a per-ABI value: the literal when the ABIs agree, else a platform conditional.</summary>
+    /// <summary>
+    /// One C# expression for a per-ABI value: the literal when the ABIs agree,
+    /// else a platform conditional. Linux and macOS share most layouts, so
+    /// macOS gets its own branch only where it differs.
+    /// </summary>
     public static AbiText Choice<T>(PerAbi<T> values, Func<T, string> format, bool parenthesize = false)
     {
         if (values.IsUniform)
             return new(format(values[0]), perAbi: false);
-        var expression = $"OperatingSystem.IsWindows() ? {format(values.Windows)} : {format(values.SysV)}";
+        var sysv = format(values.SysV);
+        var expression = EqualityComparer<T>.Default.Equals(values.SysV, values.Darwin)
+            ? $"OperatingSystem.IsWindows() ? {format(values.Windows)} : {sysv}"
+            : EqualityComparer<T>.Default.Equals(values.Windows, values.SysV)
+                ? $"OperatingSystem.IsMacOS() ? {format(values.Darwin)} : {sysv}"
+                : $"OperatingSystem.IsWindows() ? {format(values.Windows)} : OperatingSystem.IsMacOS() ? {format(values.Darwin)} : {sysv}";
         return new(parenthesize ? $"({expression})" : expression, perAbi: true);
     }
 

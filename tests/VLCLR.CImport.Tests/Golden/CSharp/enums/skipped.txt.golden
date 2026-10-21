@@ -1,3 +1,3 @@
-vlc_enums.h	enum	size_e	underlying type size differs between ABIs (int, long)
-vlc_enums.h	enum member	div_val_e.DV_DIFF	value differs between ABIs (2 | 3)
+vlc_enums.h	enum	size_e	underlying type size differs between ABIs (int, long, long)
+vlc_enums.h	enum member	div_val_e.DV_DIFF	value differs between ABIs (2 | 3 | 3)
 vlc_enums.h	field	holder_t.sz	enum 'size_e' is not emitted

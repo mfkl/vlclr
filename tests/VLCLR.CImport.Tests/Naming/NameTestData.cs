@@ -60,7 +60,8 @@ internal static class NameTestData
             Functions = [.. functions ?? []],
             Constants = [.. constants ?? []],
         };
-        var merged = AbiMerger.Merge(windows, windows with { Abi = Abis.SysV, Target = "x86_64-pc-linux-gnu" });
+        var sysv = windows with { Abi = Abis.SysV, Target = "x86_64-pc-linux-gnu" };
+        var merged = AbiMerger.Merge(windows, sysv, TestAbis.DarwinLike(sysv));
         Assert.DoesNotContain(merged.Diagnostics, d => d.Severity == DiagnosticSeverity.Error);
         return merged;
     }

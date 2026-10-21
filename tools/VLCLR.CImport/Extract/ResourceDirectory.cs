@@ -44,6 +44,14 @@ public static class ResourceDirectory
                 }
             }
         }
+        else if (OperatingSystem.IsMacOS())
+        {
+            // Homebrew's LLVM first (its version is close to the NuGet libclang's), then Apple's clang.
+            yield return "/opt/homebrew/opt/llvm/lib/clang";
+            yield return "/usr/local/opt/llvm/lib/clang";
+            yield return "/Library/Developer/CommandLineTools/usr/lib/clang";
+            yield return "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang";
+        }
         else
         {
             foreach (var llvm in SafeDirectories("/usr/lib").Where(d => Path.GetFileName(d).StartsWith("llvm-", StringComparison.Ordinal))

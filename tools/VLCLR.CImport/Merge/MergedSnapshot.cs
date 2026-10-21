@@ -4,7 +4,7 @@ namespace VLCLR.CImport.Merge;
 
 /// <summary>
 /// One value per ABI, indexed in <see cref="MergedSnapshot.Abis"/> order
-/// (windows first, then sysv).
+/// (windows, sysv, darwin).
 /// </summary>
 public sealed record PerAbi<T>(IReadOnlyList<T> Values)
 {
@@ -13,6 +13,8 @@ public sealed record PerAbi<T>(IReadOnlyList<T> Values)
     public T Windows => Values[0];
 
     public T SysV => Values[1];
+
+    public T Darwin => Values[2];
 
     public bool IsUniform => Values.All(v => EqualityComparer<T>.Default.Equals(v, Values[0]));
 

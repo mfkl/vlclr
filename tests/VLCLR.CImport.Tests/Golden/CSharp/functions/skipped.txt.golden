@@ -1,5 +1,5 @@
 vlc_fn.h	function	vlc_diff_Foo	signature differs between ABIs
-vlc_fn.h	function	vlc_dv_Pass	parameter 0: record 'dv_t' passed by value has an ABI-dependent size (4 | 8)
+vlc_fn.h	function	vlc_dv_Pass	parameter 0: record 'dv_t' passed by value has an ABI-dependent size (4 | 8 | 8)
 vlc_fn.h	function	vlc_inline_Foo	static inline (not exported)
 vlc_fn.h	function	vlc_ld_Get	return type: long double is not supported
 vlc_fn.h	function	vlc_msg_Log	variadic

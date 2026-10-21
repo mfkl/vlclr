@@ -100,42 +100,35 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
     /// The manifest's per-ABI prelude, first, as extract places it: guards such
     /// as <c>_OFF_T_DEFINED</c> must precede the system headers.
     /// </summary>
-    private void WriteAbiPrelude()
-    {
-        var windows = PreludeLines(Abis.Windows);
-        var sysv = PreludeLines(Abis.SysV);
-        if (windows.Count > 0 || sysv.Count > 0)
-        {
-            Line("#ifdef _WIN32");
-            foreach (var l in windows)
-                Line(l);
-            Line("#else");
-            foreach (var l in sysv)
-                Line(l);
-            Line("#endif");
-            Line();
-        }
-    }
+    private void WriteAbiPrelude() => WritePerAbi(abi => [.. PreludeLines(abi)]);
 
     /// <summary>The definitions extract parsed with, before any header (<c>_FILE_OFFSET_BITS</c> changes system types).</summary>
-    private void WriteDefines()
+    private void WriteDefines() => WritePerAbi(DefineLines);
+
+    /// <summary>
+    /// Lines every ABI has, then the others under <c>#if defined(_WIN32)</c> /
+    /// <c>#elif defined(__APPLE__)</c> / <c>#else</c> (sysv).
+    /// </summary>
+    private void WritePerAbi(Func<string, List<string>> linesOf)
     {
-        var windows = DefineLines(Abis.Windows);
-        var sysv = DefineLines(Abis.SysV);
-        var common = windows.Intersect(sysv).ToList();
+        var lines = Abis.All.ToDictionary(abi => abi, linesOf);
+        var common = lines.Values.Aggregate((a, b) => [.. a.Intersect(b)]);
         foreach (var l in common)
             Line(l);
-        if (windows.Count > common.Count || sysv.Count > common.Count)
+        if (lines.Values.Any(l => l.Count > common.Count))
         {
-            Line("#ifdef _WIN32");
-            foreach (var l in windows.Except(common))
+            Line($"#if {Abis.CTest(Abis.Windows)}");
+            foreach (var l in lines[Abis.Windows].Except(common))
+                Line(l);
+            Line($"#elif {Abis.CTest(Abis.Darwin)}");
+            foreach (var l in lines[Abis.Darwin].Except(common))
                 Line(l);
             Line("#else");
-            foreach (var l in sysv.Except(common))
+            foreach (var l in lines[Abis.SysV].Except(common))
                 Line(l);
             Line("#endif");
         }
-        if (windows.Count > 0 || sysv.Count > 0)
+        if (lines.Values.Any(l => l.Count > 0))
             Line();
     }
 
@@ -168,15 +161,8 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
         if (options.MsvcExcludeHeaders.Contains(header, StringComparer.Ordinal)
             || (cName is not null && !options.Headers.Contains(header, StringComparer.Ordinal)))
             conditions.Add("!defined(_MSC_VER)");
-        switch (cName is null ? null : merged.PlatformsOf(cName))
-        {
-            case [Abis.Windows]:
-                conditions.Add("defined(_WIN32)");
-                break;
-            case [Abis.SysV]:
-                conditions.Add("!defined(_WIN32)");
-                break;
-        }
+        if (cName is not null && merged.PlatformsOf(cName) is { } platforms)
+            conditions.Add(platforms.Count == 1 ? Abis.CTest(platforms[0]) : $"({string.Join(" || ", platforms.Select(Abis.CTest))})");
         return conditions.Count == 0 ? null : string.Join(" && ", conditions);
     }
 
@@ -198,10 +184,12 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
     {
         Line("_Static_assert(sizeof(void *) == 8, \"VLCLR currently targets the 64-bit VLC ABI\");");
         Line();
-        Line("#ifdef _WIN32");
-        Line("#define VLCLR_ABI(windows, sysv) windows");
+        Line($"#if {Abis.CTest(Abis.Windows)}");
+        Line("#define VLCLR_ABI(windows, sysv, darwin) windows");
+        Line($"#elif {Abis.CTest(Abis.Darwin)}");
+        Line("#define VLCLR_ABI(windows, sysv, darwin) darwin");
         Line("#else");
-        Line("#define VLCLR_ABI(windows, sysv) sysv");
+        Line("#define VLCLR_ABI(windows, sysv, darwin) sysv");
         Line("#endif");
         Line("#define VLCLR_SIZE(type, label, expected) \\");
         Line("    _Static_assert(sizeof(type) == (expected), \"VLCLR size mismatch: \" label)");
@@ -339,7 +327,7 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
     private static string Plain(PerAbi<long> value)
     {
         var text = value.Values.Select(v => v.ToString(CultureInfo.InvariantCulture)).ToList();
-        return value.IsUniform ? text[0] : $"VLCLR_ABI({text[0]}, {text[1]})";
+        return value.IsUniform ? text[0] : $"VLCLR_ABI({string.Join(", ", text)})";
     }
 
     private static string Value(IEnumerable<long> values, bool unsigned = false)
@@ -347,7 +335,7 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
         var list = values.ToList();
         if (list.Distinct().Count() == 1)
             return Literal(list[0], unsigned);
-        return $"VLCLR_ABI({Literal(list[0], unsigned)}, {Literal(list[1], unsigned)})";
+        return $"VLCLR_ABI({string.Join(", ", list.Select(v => Literal(v, unsigned)))})";
     }
 
     private static string Literal(long value, bool unsigned)
