@@ -63,10 +63,14 @@ public static class AbiTargets
     public const string WindowsTriple = "x86_64-w64-windows-gnu";
     public const string SysVTriple = "x86_64-pc-linux-gnu";
 
+    /// <summary>x86-64 like the others: arm64 macOS lays out VLC's records the same, only some constants differ.</summary>
+    public const string DarwinTriple = "x86_64-apple-darwin";
+
     public static string TripleFor(string abi) => abi switch
     {
         Abis.Windows => WindowsTriple,
         Abis.SysV => SysVTriple,
+        Abis.Darwin => DarwinTriple,
         _ => throw new CommandException($"Unknown ABI '{abi}'. Known: {string.Join(", ", Abis.All)}."),
     };
 }

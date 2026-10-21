@@ -181,8 +181,11 @@ public unsafe class InteropLayoutTests
         }
     }
 
-    // Windows value, then SysV value, for the ABI the tests run on.
+    // Windows value, then SysV value (Linux and macOS), for the ABI the tests run on.
     private static int Abi(int w, int s) => OperatingSystem.IsWindows() ? w : s;
+
+    // Windows, Linux, then macOS value.
+    private static int Abi(int w, int s, int d) => OperatingSystem.IsWindows() ? w : OperatingSystem.IsMacOS() ? d : s;
 
     private static nint Offset<TOwner, TField>(ref TOwner owner, ref TField field)
         => Unsafe.ByteOffset(ref Unsafe.As<TOwner, byte>(ref owner), ref Unsafe.As<TField, byte>(ref field));

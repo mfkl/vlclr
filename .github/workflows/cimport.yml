@@ -115,12 +115,50 @@ jobs:
           name: cimport-snapshot-windows
           path: src/VLCLR/Native/Interop/abi/windows.json
 
-  # One artifact with both fresh snapshots, so a maintainer without WSL can
-  # copy them into src/VLCLR/Native/Interop/abi/ and run emit.
+  # The macOS SDK only comes with Xcode: the darwin snapshot is extracted on a
+  # macOS runner (arm64, where libclang 21 is packaged), for x86-64.
+  macos-snapshot-fresh:
+    name: macOS snapshot is fresh
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Fetch the pinned VLC headers
+        run: tools/VLCLR.CImport/fetch-headers.sh
+
+      - name: Extract the darwin snapshot
+        run: >
+          dotnet run --project tools/VLCLR.CImport -c Release --
+          extract --abi darwin
+          --manifest tools/VLCLR.CImport/vlc.cimport.json
+          --out src/VLCLR/Native/Interop/abi/darwin.json
+
+      - name: darwin snapshot matches the commit
+        run: |
+          if [ -n "$(git status --porcelain -- src/VLCLR/Native/Interop/abi/darwin.json)" ]; then
+            echo "::error::$HINT"
+            git diff --stat -- src/VLCLR/Native/Interop/abi/darwin.json
+            exit 1
+          fi
+
+      - name: Upload the extracted snapshot
+        if: ${{ !cancelled() && (failure() || inputs.upload-snapshots) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cimport-snapshot-darwin
+          path: src/VLCLR/Native/Interop/abi/darwin.json
+
+  # One artifact with the fresh snapshots, so a maintainer without WSL or a
+  # Mac can copy them into src/VLCLR/Native/Interop/abi/ and run emit.
   upload-snapshots:
     name: Collect cimport-snapshots
-    needs: [generated-code-fresh, windows-snapshot-fresh]
-    if: ${{ !cancelled() && (inputs.upload-snapshots || needs.generated-code-fresh.result == 'failure' || needs.windows-snapshot-fresh.result == 'failure') }}
+    needs: [generated-code-fresh, windows-snapshot-fresh, macos-snapshot-fresh]
+    if: ${{ !cancelled() && (inputs.upload-snapshots || needs.generated-code-fresh.result == 'failure' || needs.windows-snapshot-fresh.result == 'failure' || needs.macos-snapshot-fresh.result == 'failure') }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v4

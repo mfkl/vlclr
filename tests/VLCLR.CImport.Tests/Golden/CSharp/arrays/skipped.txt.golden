@@ -1,2 +1,2 @@
 vlc_arrays.h	field	arrays_t.flex	flexible array member
-vlc_arrays.h	field	dv_holder_t.dvs	array of record 'dv_t' whose size differs between ABIs (4 | 8)
+vlc_arrays.h	field	dv_holder_t.dvs	array of record 'dv_t' whose size differs between ABIs (4 | 8 | 8)
