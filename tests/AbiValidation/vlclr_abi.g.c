@@ -228,18 +228,18 @@ typedef __typeof__(((vlm_media_t *)0)->broadcast) cimport_vlm_media_t_broadcast;
 
 // DIR
 #if !defined(_MSC_VER) && defined(__APPLE__)
-VLCLR_SIZE(struct DIR, "DIR", 136);
-VLCLR_ALIGN(struct DIR, "DIR", 8);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_fd, 0);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_loc, 8);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_size, 16);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_buf, 24);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_len, 32);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_seek, 40);
-VLCLR_OFFSET(struct DIR, "DIR", __padding, 48);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_flags, 56);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_lock, 64);
-VLCLR_OFFSET(struct DIR, "DIR", __dd_td, 128);
+VLCLR_SIZE(DIR, "DIR", 136);
+VLCLR_ALIGN(DIR, "DIR", 8);
+VLCLR_OFFSET(DIR, "DIR", __dd_fd, 0);
+VLCLR_OFFSET(DIR, "DIR", __dd_loc, 8);
+VLCLR_OFFSET(DIR, "DIR", __dd_size, 16);
+VLCLR_OFFSET(DIR, "DIR", __dd_buf, 24);
+VLCLR_OFFSET(DIR, "DIR", __dd_len, 32);
+VLCLR_OFFSET(DIR, "DIR", __dd_seek, 40);
+VLCLR_OFFSET(DIR, "DIR", __padding, 48);
+VLCLR_OFFSET(DIR, "DIR", __dd_flags, 56);
+VLCLR_OFFSET(DIR, "DIR", __dd_lock, 64);
+VLCLR_OFFSET(DIR, "DIR", __dd_td, 128);
 #endif
 
 // _SCOPE_ID
