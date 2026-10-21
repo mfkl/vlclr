@@ -19,21 +19,6 @@ public unsafe partial struct VlcSockaddr
 
     /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
     public const int MaxSizeOf = 128;
-
-    /// <summary>sa</summary>
-    [FieldOffset(0)] public Sockaddr Sa;
-
-    /// <summary>sin</summary>
-    [FieldOffset(0)] public SockaddrIn Sin;
-
-    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
-    public static class Offsets
-    {
-        /// <summary>offsetof(vlc_sockaddr, sa)</summary>
-        public const int Sa = 0;
-        /// <summary>offsetof(vlc_sockaddr, sin)</summary>
-        public const int Sin = 0;
-    }
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -110,11 +95,6 @@ public static unsafe partial class VlcNetwork
     [SupportedOSPlatform("windows")]
     public const int NoOldnames = 1;
 
-    /// <summary>vlc_accept</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_accept")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcAccept(int lfd, Sockaddr* addr, int* alen, byte nonblock);
-
     /// <summary>vlc_getProxyUrl</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_getProxyUrl")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -130,11 +110,6 @@ public static unsafe partial class VlcNetwork
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial int VlcGetaddrinfoI11e(byte* arg0, uint arg1, Addrinfo* arg2, Addrinfo** arg3);
 
-    /// <summary>vlc_getnameinfo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_getnameinfo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcGetnameinfo(Sockaddr* arg0, int arg1, byte* arg2, int arg3, int* arg4, int arg5);
-
     /// <summary>vlc_send</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_send")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -144,11 +119,6 @@ public static unsafe partial class VlcNetwork
     [LibraryImport("libvlccore", EntryPoint = "vlc_sendmsg")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial nint VlcSendmsg(int fd, Msghdr* msg, int flags);
-
-    /// <summary>vlc_sendto</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sendto")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcSendto(int fd, void* buf, nuint buflen, int flags, Sockaddr* dst, int dstlen);
 
     /// <summary>vlc_socket</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_socket")]

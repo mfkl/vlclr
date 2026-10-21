@@ -16,11 +16,6 @@ public partial struct Interrupt { }
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcInterrupt
 {
-    /// <summary>vlc_accept_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_accept_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcAcceptI11e(int fd, Sockaddr* arg1, int* arg2, byte arg3);
-
     /// <summary>vlc_interrupt_create</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_create")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -81,11 +76,6 @@ public static unsafe partial class VlcInterrupt
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial nint VlcReadvI11e(int fd, Iovec* arg1, int arg2);
 
-    /// <summary>vlc_recvfrom_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_recvfrom_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcRecvfromI11e(int fd, void* arg1, nuint arg2, int flags, Sockaddr* arg4, int* arg5);
-
     /// <summary>vlc_recvmsg_i11e</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_recvmsg_i11e")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -100,11 +90,6 @@ public static unsafe partial class VlcInterrupt
     [LibraryImport("libvlccore", EntryPoint = "vlc_sendmsg_i11e")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial nint VlcSendmsgI11e(int fd, Msghdr* arg1, int flags);
-
-    /// <summary>vlc_sendto_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sendto_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcSendtoI11e(int fd, void* arg1, nuint arg2, int flags, Sockaddr* arg4, int arg5);
 
     /// <summary>vlc_write_i11e</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_write_i11e")]

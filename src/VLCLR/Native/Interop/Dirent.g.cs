@@ -7,6 +7,80 @@ using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
+/// <summary>DIR</summary>
+[SupportedOSPlatform("macos")]
+[StructLayout(LayoutKind.Explicit, Size = 136)]
+public unsafe partial struct Dir
+{
+    /// <summary>Size of the C struct in bytes on the running platform.</summary>
+    public static int SizeOf => 136;
+
+    /// <summary>Smallest size of the C struct over the supported ABIs.</summary>
+    public const int MinSizeOf = 136;
+
+    /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
+    public const int MaxSizeOf = 136;
+
+    /// <summary>__dd_fd</summary>
+    [FieldOffset(0)] public int DdFd;
+
+    /// <summary>__dd_loc</summary>
+    [FieldOffset(8)] public CLong DdLoc;
+
+    /// <summary>__dd_size</summary>
+    [FieldOffset(16)] public CLong DdSize;
+
+    /// <summary>__dd_buf</summary>
+    [FieldOffset(24)] public byte* DdBuf;
+
+    /// <summary>__dd_len</summary>
+    [FieldOffset(32)] public int DdLen;
+
+    /// <summary>__dd_seek</summary>
+    [FieldOffset(40)] public CLong DdSeek;
+
+    /// <summary>__padding</summary>
+    [FieldOffset(48)] public CLong Padding;
+
+    /// <summary>__dd_flags</summary>
+    [FieldOffset(56)] public int DdFlags;
+
+    /// <summary>__dd_lock</summary>
+    [FieldOffset(64)] public OpaquePthreadMutex DdLock;
+
+    /// <summary>__dd_td</summary>
+    [FieldOffset(128)] public Telldir* DdTd;
+
+    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
+    public static class Offsets
+    {
+        /// <summary>offsetof(DIR, __dd_fd)</summary>
+        public const int DdFd = 0;
+        /// <summary>offsetof(DIR, __dd_loc)</summary>
+        public const int DdLoc = 8;
+        /// <summary>offsetof(DIR, __dd_size)</summary>
+        public const int DdSize = 16;
+        /// <summary>offsetof(DIR, __dd_buf)</summary>
+        public const int DdBuf = 24;
+        /// <summary>offsetof(DIR, __dd_len)</summary>
+        public const int DdLen = 32;
+        /// <summary>offsetof(DIR, __dd_seek)</summary>
+        public const int DdSeek = 40;
+        /// <summary>offsetof(DIR, __padding)</summary>
+        public const int Padding = 48;
+        /// <summary>offsetof(DIR, __dd_flags)</summary>
+        public const int DdFlags = 56;
+        /// <summary>offsetof(DIR, __dd_lock)</summary>
+        public const int DdLock = 64;
+        /// <summary>offsetof(DIR, __dd_td)</summary>
+        public const int DdTd = 128;
+    }
+}
+
 /// <summary>__dirstream</summary>
-[UnsupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
 public partial struct Dirstream { }
+
+/// <summary>_telldir</summary>
+[SupportedOSPlatform("macos")]
+public partial struct Telldir { }

@@ -201,7 +201,8 @@ public unsafe partial struct Sem
 public partial struct Thread { }
 
 /// <summary>vlc_thread_t</summary>
-[UnsupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 [StructLayout(LayoutKind.Explicit, Size = 8)]
 public unsafe partial struct ThreadHandle
 {
@@ -213,16 +214,6 @@ public unsafe partial struct ThreadHandle
 
     /// <summary>Largest size of the C struct over the supported ABIs (the managed size).</summary>
     public const int MaxSizeOf = 8;
-
-    /// <summary>handle</summary>
-    [FieldOffset(0)] public CULong Handle;
-
-    /// <summary>Member offsets on the running platform; constants where every ABI agrees.</summary>
-    public static class Offsets
-    {
-        /// <summary>offsetof(vlc_thread_t, handle)</summary>
-        public const int Handle = 0;
-    }
 }
 
 /// <summary>vlc_threadvar</summary>
@@ -245,11 +236,13 @@ public static unsafe partial class Vlc
 public static unsafe partial class VlcThreads
 {
     /// <summary>LIBVLC_USE_PTHREAD</summary>
-    [UnsupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
     public const int LibvlcUsePthread = 1;
 
     /// <summary>LIBVLC_USE_PTHREAD_CLEANUP</summary>
-    [UnsupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
     public const int LibvlcUsePthreadCleanup = 1;
 
     /// <summary>VLC_HARD_MIN_SLEEP</summary>

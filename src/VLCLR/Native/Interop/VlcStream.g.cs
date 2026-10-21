@@ -138,7 +138,7 @@ public unsafe partial struct StreamOperations
     [FieldOffset(32)] public delegate* unmanaged[Cdecl]<Stream*, Meta*, int> GetMeta;
 
     /// <summary>get_type</summary>
-    [FieldOffset(40)] public delegate* unmanaged[Cdecl]<Stream*, int*, int> GetType;
+    [FieldOffset(40)] public delegate* unmanaged[Cdecl]<Stream*, int*, int> GetTypeValue;
 
     /// <summary>set_pause_state</summary>
     [FieldOffset(48)] public delegate* unmanaged[Cdecl]<Stream*, byte, int> SetPauseState;
@@ -172,7 +172,7 @@ public unsafe partial struct StreamOperations
         /// <summary>offsetof(vlc_stream_operations, get_meta)</summary>
         public const int GetMeta = 32;
         /// <summary>offsetof(vlc_stream_operations, get_type)</summary>
-        public const int GetType = 40;
+        public const int GetTypeValue = 40;
         /// <summary>offsetof(vlc_stream_operations, set_pause_state)</summary>
         public const int SetPauseState = 48;
         /// <summary>offsetof(vlc_stream_operations, set_seek_point)</summary>

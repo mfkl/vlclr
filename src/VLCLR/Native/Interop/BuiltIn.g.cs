@@ -8,7 +8,8 @@ using System.Runtime.Versioning;
 namespace VLCLR.Native.Interop;
 
 /// <summary>__va_list_tag</summary>
-[UnsupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 [StructLayout(LayoutKind.Explicit, Size = 24)]
 public unsafe partial struct VaListTag
 {
