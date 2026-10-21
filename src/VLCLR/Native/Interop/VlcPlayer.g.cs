@@ -351,6 +351,9 @@ public unsafe partial struct PlayerProgram
     }
 }
 
+/// <summary>vlc_player_t</summary>
+public partial struct Player { }
+
 /// <summary>vlc_player_timer_cbs</summary>
 [StructLayout(LayoutKind.Explicit, Size = 24)]
 public unsafe partial struct PlayerTimerCbs
