@@ -13,6 +13,9 @@ public partial struct EsOutId { }
 /// <summary>input_source_t</summary>
 public partial struct InputSource { }
 
+/// <summary>iso639_lang_t</summary>
+public partial struct Iso639Lang { }
+
 /// <summary>module_t</summary>
 public partial struct Module { }
 

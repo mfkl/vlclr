@@ -7,6 +7,9 @@ using System.Runtime.Versioning;
 
 namespace VLCLR.Native.Interop;
 
+/// <summary>extension_dialog_t</summary>
+public partial struct ExtensionDialog { }
+
 /// <summary>vlc_dialog_cbs</summary>
 [StructLayout(LayoutKind.Explicit, Size = 40)]
 public unsafe partial struct DialogCbs
