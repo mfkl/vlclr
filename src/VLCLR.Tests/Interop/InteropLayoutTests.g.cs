@@ -13,36 +13,11 @@ namespace VLCLR.Tests.Interop;
 public unsafe class InteropLayoutTests
 {
     [Fact]
-    public void VlcBitmapinfoheader_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.VlcBitmapinfoheader);
-        AssertEqual(40, global::VLCLR.Native.Interop.VlcBitmapinfoheader.SizeOf, "VLC_BITMAPINFOHEADER sizeof");
-        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlcBitmapinfoheader>(), "VLC_BITMAPINFOHEADER Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.BiSize), "VLC_BITMAPINFOHEADER.biSize offset");
-        AssertEqual(4, Offset(ref s, ref s.BiWidth), "VLC_BITMAPINFOHEADER.biWidth offset");
-        AssertEqual(8, Offset(ref s, ref s.BiHeight), "VLC_BITMAPINFOHEADER.biHeight offset");
-        AssertEqual(12, Offset(ref s, ref s.BiPlanes), "VLC_BITMAPINFOHEADER.biPlanes offset");
-        AssertEqual(14, Offset(ref s, ref s.BiBitCount), "VLC_BITMAPINFOHEADER.biBitCount offset");
-        AssertEqual(16, Offset(ref s, ref s.BiCompression), "VLC_BITMAPINFOHEADER.biCompression offset");
-        AssertEqual(20, Offset(ref s, ref s.BiSizeImage), "VLC_BITMAPINFOHEADER.biSizeImage offset");
-        AssertEqual(24, Offset(ref s, ref s.BiXPelsPerMeter), "VLC_BITMAPINFOHEADER.biXPelsPerMeter offset");
-        AssertEqual(28, Offset(ref s, ref s.BiYPelsPerMeter), "VLC_BITMAPINFOHEADER.biYPelsPerMeter offset");
-        AssertEqual(32, Offset(ref s, ref s.BiClrUsed), "VLC_BITMAPINFOHEADER.biClrUsed offset");
-        AssertEqual(36, Offset(ref s, ref s.BiClrImportant), "VLC_BITMAPINFOHEADER.biClrImportant offset");
-    }
-
-    [Fact]
-    public void Guid_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Guid);
-        AssertEqual(16, global::VLCLR.Native.Interop.Guid.SizeOf, "_GUID sizeof");
-        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Guid>(), "_GUID Unsafe.SizeOf");
-    }
-
-    [Fact]
     [SupportedOSPlatform("windows")]
     public void ScopeId_Layout()
     {
+        if (!OperatingSystem.IsWindows())
+            return;
         var s = default(global::VLCLR.Native.Interop.ScopeId);
         AssertEqual(4, global::VLCLR.Native.Interop.ScopeId.SizeOf, "_SCOPE_ID sizeof");
         AssertEqual(4, Unsafe.SizeOf<global::VLCLR.Native.Interop.ScopeId>(), "_SCOPE_ID Unsafe.SizeOf");
@@ -64,80 +39,11 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
-    public void Waveformatex_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Waveformatex);
-        AssertEqual(18, global::VLCLR.Native.Interop.Waveformatex.SizeOf, "_WAVEFORMATEX sizeof");
-        AssertEqual(18, Unsafe.SizeOf<global::VLCLR.Native.Interop.Waveformatex>(), "_WAVEFORMATEX Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.WFormatTag), "_WAVEFORMATEX.wFormatTag offset");
-        AssertEqual(2, Offset(ref s, ref s.NChannels), "_WAVEFORMATEX.nChannels offset");
-        AssertEqual(4, Offset(ref s, ref s.NSamplesPerSec), "_WAVEFORMATEX.nSamplesPerSec offset");
-        AssertEqual(8, Offset(ref s, ref s.NAvgBytesPerSec), "_WAVEFORMATEX.nAvgBytesPerSec offset");
-        AssertEqual(12, Offset(ref s, ref s.NBlockAlign), "_WAVEFORMATEX.nBlockAlign offset");
-        AssertEqual(14, Offset(ref s, ref s.WBitsPerSample), "_WAVEFORMATEX.wBitsPerSample offset");
-        AssertEqual(16, Offset(ref s, ref s.CbSize), "_WAVEFORMATEX.cbSize offset");
-    }
-
-    [Fact]
-    public void Waveformatextensible_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Waveformatextensible);
-        AssertEqual(40, global::VLCLR.Native.Interop.Waveformatextensible.SizeOf, "_WAVEFORMATEXTENSIBLE sizeof");
-        AssertEqual(40, Unsafe.SizeOf<global::VLCLR.Native.Interop.Waveformatextensible>(), "_WAVEFORMATEXTENSIBLE Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Format), "_WAVEFORMATEXTENSIBLE.Format offset");
-        AssertEqual(18, Offset(ref s, ref s.Samples), "_WAVEFORMATEXTENSIBLE.Samples offset");
-        AssertEqual(20, Offset(ref s, ref s.DwChannelMask), "_WAVEFORMATEXTENSIBLE.dwChannelMask offset");
-        AssertEqual(24, Offset(ref s, ref s.SubFormat), "_WAVEFORMATEXTENSIBLE.SubFormat offset");
-    }
-
-    [Fact]
-    public void WaveformatextensibleSamples_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.WaveformatextensibleSamples);
-        AssertEqual(2, global::VLCLR.Native.Interop.WaveformatextensibleSamples.SizeOf, "_WAVEFORMATEXTENSIBLE::Samples sizeof");
-        AssertEqual(2, Unsafe.SizeOf<global::VLCLR.Native.Interop.WaveformatextensibleSamples>(), "_WAVEFORMATEXTENSIBLE::Samples Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.WValidBitsPerSample), "_WAVEFORMATEXTENSIBLE::Samples.wValidBitsPerSample offset");
-        AssertEqual(0, Offset(ref s, ref s.WSamplesPerBlock), "_WAVEFORMATEXTENSIBLE::Samples.wSamplesPerBlock offset");
-        AssertEqual(0, Offset(ref s, ref s.WReserved), "_WAVEFORMATEXTENSIBLE::Samples.wReserved offset");
-    }
-
-    [Fact]
-    public void WaveformatextensibleIec61937_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.WaveformatextensibleIec61937);
-        AssertEqual(52, global::VLCLR.Native.Interop.WaveformatextensibleIec61937.SizeOf, "_WAVEFORMATEXTENSIBLE_IEC61937 sizeof");
-        AssertEqual(52, Unsafe.SizeOf<global::VLCLR.Native.Interop.WaveformatextensibleIec61937>(), "_WAVEFORMATEXTENSIBLE_IEC61937 Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.FormatExt), "_WAVEFORMATEXTENSIBLE_IEC61937.FormatExt offset");
-        AssertEqual(40, Offset(ref s, ref s.DwEncodedSamplesPerSec), "_WAVEFORMATEXTENSIBLE_IEC61937.dwEncodedSamplesPerSec offset");
-        AssertEqual(44, Offset(ref s, ref s.DwEncodedChannelCount), "_WAVEFORMATEXTENSIBLE_IEC61937.dwEncodedChannelCount offset");
-        AssertEqual(48, Offset(ref s, ref s.DwAverageBytesPerSec), "_WAVEFORMATEXTENSIBLE_IEC61937.dwAverageBytesPerSec offset");
-    }
-
-    [Fact]
-    public void Waveheader_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Waveheader);
-        AssertEqual(44, global::VLCLR.Native.Interop.Waveheader.SizeOf, "_WAVEHEADER sizeof");
-        AssertEqual(44, Unsafe.SizeOf<global::VLCLR.Native.Interop.Waveheader>(), "_WAVEHEADER Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.MainChunkID), "_WAVEHEADER.MainChunkID offset");
-        AssertEqual(4, Offset(ref s, ref s.Length), "_WAVEHEADER.Length offset");
-        AssertEqual(8, Offset(ref s, ref s.ChunkTypeID), "_WAVEHEADER.ChunkTypeID offset");
-        AssertEqual(12, Offset(ref s, ref s.SubChunkID), "_WAVEHEADER.SubChunkID offset");
-        AssertEqual(16, Offset(ref s, ref s.SubChunkLength), "_WAVEHEADER.SubChunkLength offset");
-        AssertEqual(20, Offset(ref s, ref s.Format), "_WAVEHEADER.Format offset");
-        AssertEqual(22, Offset(ref s, ref s.Modus), "_WAVEHEADER.Modus offset");
-        AssertEqual(24, Offset(ref s, ref s.SampleFreq), "_WAVEHEADER.SampleFreq offset");
-        AssertEqual(28, Offset(ref s, ref s.BytesPerSec), "_WAVEHEADER.BytesPerSec offset");
-        AssertEqual(32, Offset(ref s, ref s.BytesPerSample), "_WAVEHEADER.BytesPerSample offset");
-        AssertEqual(34, Offset(ref s, ref s.BitsPerSample), "_WAVEHEADER.BitsPerSample offset");
-        AssertEqual(36, Offset(ref s, ref s.DataChunkID), "_WAVEHEADER.DataChunkID offset");
-        AssertEqual(40, Offset(ref s, ref s.DataLength), "_WAVEHEADER.DataLength offset");
-    }
-
-    [Fact]
     [UnsupportedOSPlatform("windows")]
     public void VaListTag_Layout()
     {
+        if (OperatingSystem.IsWindows())
+            return;
         var s = default(global::VLCLR.Native.Interop.VaListTag);
         AssertEqual(24, global::VLCLR.Native.Interop.VaListTag.SizeOf, "__va_list_tag sizeof");
         AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.VaListTag>(), "__va_list_tag Unsafe.SizeOf");
@@ -616,129 +522,6 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
-    public void ExtensionDialogCommand_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionDialogCommand);
-        AssertEqual(24, global::VLCLR.Native.Interop.ExtensionDialogCommand.SizeOf, "extension_dialog_command_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionDialogCommand>(), "extension_dialog_command_t Unsafe.SizeOf");
-        { ref var r = ref s.Dlg; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extension_dialog_command_t.p_dlg offset"); }
-        AssertEqual(8, Offset(ref s, ref s.Event), "extension_dialog_command_t.event offset");
-        { ref var r = ref s.Data; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "extension_dialog_command_t.p_data offset"); }
-    }
-
-    [Fact]
-    public void ExtensionDialog_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionDialog);
-        AssertEqual(104, global::VLCLR.Native.Interop.ExtensionDialog.SizeOf, "extension_dialog_t sizeof");
-        AssertEqual(104, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionDialog>(), "extension_dialog_t Unsafe.SizeOf");
-        { ref var r = ref s.Object; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extension_dialog_t.p_object offset"); }
-        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_dialog_t.psz_title offset"); }
-        AssertEqual(16, Offset(ref s, ref s.Width), "extension_dialog_t.i_width offset");
-        AssertEqual(20, Offset(ref s, ref s.Height), "extension_dialog_t.i_height offset");
-        AssertEqual(24, Offset(ref s, ref s.Widgets), "extension_dialog_t.widgets offset");
-        AssertEqual(40, Offset(ref s, ref s.Hide), "extension_dialog_t.b_hide offset");
-        AssertEqual(41, Offset(ref s, ref s.Kill), "extension_dialog_t.b_kill offset");
-        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "extension_dialog_t.p_sys offset"); }
-        { ref var r = ref s.SysIntf; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "extension_dialog_t.p_sys_intf offset"); }
-        AssertEqual(64, PointerOffset(ref s, s.Lock), "extension_dialog_t.lock offset");
-        AssertEqual(80, Offset(ref s, ref s.Cond), "extension_dialog_t.cond offset");
-    }
-
-    [Fact]
-    public void ExtensionDialogWidgets_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionDialogWidgets);
-        AssertEqual(16, global::VLCLR.Native.Interop.ExtensionDialogWidgets.SizeOf, "extension_dialog_t::widgets sizeof");
-        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionDialogWidgets>(), "extension_dialog_t::widgets Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Alloc), "extension_dialog_t::widgets.i_alloc offset");
-        AssertEqual(4, Offset(ref s, ref s.Size), "extension_dialog_t::widgets.i_size offset");
-        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_dialog_t::widgets.p_elems offset"); }
-    }
-
-    [Fact]
-    public void Extension_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Extension);
-        AssertEqual(88, global::VLCLR.Native.Interop.Extension.SizeOf, "extension_t sizeof");
-        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.Extension>(), "extension_t Unsafe.SizeOf");
-        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "extension_t.p_sys offset"); }
-        { ref var r = ref s.Logger; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_t.logger offset"); }
-        { ref var r = ref s.Name; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "extension_t.psz_name offset"); }
-        { ref var r = ref s.Title; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "extension_t.psz_title offset"); }
-        { ref var r = ref s.Author; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "extension_t.psz_author offset"); }
-        { ref var r = ref s.Version; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "extension_t.psz_version offset"); }
-        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "extension_t.psz_url offset"); }
-        { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "extension_t.psz_description offset"); }
-        { ref var r = ref s.Shortdescription; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "extension_t.psz_shortdescription offset"); }
-        { ref var r = ref s.Icondata; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "extension_t.p_icondata offset"); }
-        AssertEqual(80, Offset(ref s, ref s.IcondataSize), "extension_t.i_icondata_size offset");
-    }
-
-    [Fact]
-    public void ExtensionWidget_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionWidget);
-        AssertEqual(88, global::VLCLR.Native.Interop.ExtensionWidget.SizeOf, "extension_widget_t sizeof");
-        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionWidget>(), "extension_widget_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Type), "extension_widget_t.type offset");
-        { ref var r = ref s.Text; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_widget_t.psz_text offset"); }
-        { ref var r = ref s.Values; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "extension_widget_t.p_values offset"); }
-        AssertEqual(24, Offset(ref s, ref s.Checked), "extension_widget_t.b_checked offset");
-        AssertEqual(28, Offset(ref s, ref s.Row), "extension_widget_t.i_row offset");
-        AssertEqual(32, Offset(ref s, ref s.Column), "extension_widget_t.i_column offset");
-        AssertEqual(36, Offset(ref s, ref s.HorizSpan), "extension_widget_t.i_horiz_span offset");
-        AssertEqual(40, Offset(ref s, ref s.VertSpan), "extension_widget_t.i_vert_span offset");
-        AssertEqual(44, Offset(ref s, ref s.Width), "extension_widget_t.i_width offset");
-        AssertEqual(48, Offset(ref s, ref s.Height), "extension_widget_t.i_height offset");
-        AssertEqual(52, Offset(ref s, ref s.Hide), "extension_widget_t.b_hide offset");
-        AssertEqual(56, Offset(ref s, ref s.SpinLoops), "extension_widget_t.i_spin_loops offset");
-        AssertEqual(60, Offset(ref s, ref s.Kill), "extension_widget_t.b_kill offset");
-        AssertEqual(61, Offset(ref s, ref s.Update), "extension_widget_t.b_update offset");
-        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "extension_widget_t.p_sys offset"); }
-        { ref var r = ref s.SysIntf; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "extension_widget_t.p_sys_intf offset"); }
-        { ref var r = ref s.Dialog; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "extension_widget_t.p_dialog offset"); }
-    }
-
-    [Fact]
-    public void ExtensionWidgetValue_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionWidgetValue);
-        AssertEqual(32, global::VLCLR.Native.Interop.ExtensionWidgetValue.SizeOf, "extension_widget_value_t sizeof");
-        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionWidgetValue>(), "extension_widget_value_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Id), "extension_widget_value_t.i_id offset");
-        { ref var r = ref s.Text; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extension_widget_value_t.psz_text offset"); }
-        AssertEqual(16, Offset(ref s, ref s.Selected), "extension_widget_value_t.b_selected offset");
-        { ref var r = ref s.Next; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "extension_widget_value_t.p_next offset"); }
-    }
-
-    [Fact]
-    public void ExtensionsManager_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionsManager);
-        AssertEqual(96, global::VLCLR.Native.Interop.ExtensionsManager.SizeOf, "extensions_manager_t sizeof");
-        AssertEqual(96, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionsManager>(), "extensions_manager_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Obj), "extensions_manager_t.obj offset");
-        { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "extensions_manager_t.p_module offset"); }
-        { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "extensions_manager_t.p_sys offset"); }
-        { ref var r = ref s.Player; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "extensions_manager_t.player offset"); }
-        AssertEqual(48, Offset(ref s, ref s.Extensions), "extensions_manager_t.extensions offset");
-        AssertEqual(64, PointerOffset(ref s, s.Lock), "extensions_manager_t.lock offset");
-        { ref var r = ref s.Ops; fixed (void* p = &r) AssertEqual(88, PointerOffset(ref s, p), "extensions_manager_t.ops offset"); }
-    }
-
-    [Fact]
-    public void ExtensionsManagerExtensions_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionsManagerExtensions);
-        AssertEqual(16, global::VLCLR.Native.Interop.ExtensionsManagerExtensions.SizeOf, "extensions_manager_t::extensions sizeof");
-        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionsManagerExtensions>(), "extensions_manager_t::extensions Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Alloc), "extensions_manager_t::extensions.i_alloc offset");
-        AssertEqual(4, Offset(ref s, ref s.Size), "extensions_manager_t::extensions.i_size offset");
-        { ref var r = ref s.Elems; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "extensions_manager_t::extensions.p_elems offset"); }
-    }
-
-    [Fact]
     public void ExtraLanguages_Layout()
     {
         var s = default(global::VLCLR.Native.Interop.ExtraLanguages);
@@ -1123,18 +906,6 @@ public unsafe class InteropLayoutTests
         { ref var r = ref s.Module; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "intf_thread_t.p_module offset"); }
         { ref var r = ref s.ShowDialog; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "intf_thread_t.pf_show_dialog offset"); }
         { ref var r = ref s.Cfg; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "intf_thread_t.p_cfg offset"); }
-    }
-
-    [Fact]
-    public void Iso639Lang_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Iso639Lang);
-        AssertEqual(24, global::VLCLR.Native.Interop.Iso639Lang.SizeOf, "iso639_lang_t sizeof");
-        AssertEqual(24, Unsafe.SizeOf<global::VLCLR.Native.Interop.Iso639Lang>(), "iso639_lang_t Unsafe.SizeOf");
-        { ref var r = ref s.EngName; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "iso639_lang_t.psz_eng_name offset"); }
-        AssertEqual(8, Offset(ref s, ref s.Iso6391), "iso639_lang_t.psz_iso639_1 offset");
-        AssertEqual(11, Offset(ref s, ref s.Iso6392T), "iso639_lang_t.psz_iso639_2T offset");
-        AssertEqual(15, Offset(ref s, ref s.Iso6392B), "iso639_lang_t.psz_iso639_2B offset");
     }
 
     [Fact]
@@ -1718,20 +1489,6 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
-    public void UpdateRelease_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.UpdateRelease);
-        AssertEqual(32, global::VLCLR.Native.Interop.UpdateRelease.SizeOf, "update_release_t sizeof");
-        AssertEqual(32, Unsafe.SizeOf<global::VLCLR.Native.Interop.UpdateRelease>(), "update_release_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Major), "update_release_t.i_major offset");
-        AssertEqual(4, Offset(ref s, ref s.Minor), "update_release_t.i_minor offset");
-        AssertEqual(8, Offset(ref s, ref s.Revision), "update_release_t.i_revision offset");
-        AssertEqual(12, Offset(ref s, ref s.Extra), "update_release_t.i_extra offset");
-        { ref var r = ref s.Url; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "update_release_t.psz_url offset"); }
-        { ref var r = ref s.Desc; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "update_release_t.psz_desc offset"); }
-    }
-
-    [Fact]
     public void VideoFormat_Layout()
     {
         var s = default(global::VLCLR.Native.Interop.VideoFormat);
@@ -2289,25 +2046,6 @@ public unsafe class InteropLayoutTests
         { ref var r = ref s.Event; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_epg_t.pp_event offset"); }
         AssertEqual(32, Offset(ref s, ref s.Present), "vlc_epg_t.b_present offset");
         { ref var r = ref s.Current; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_epg_t.p_current offset"); }
-    }
-
-    [Fact]
-    public void ExtensionsManagerOperations_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.ExtensionsManagerOperations);
-        AssertEqual(88, global::VLCLR.Native.Interop.ExtensionsManagerOperations.SizeOf, "vlc_extensions_manager_operations sizeof");
-        AssertEqual(88, Unsafe.SizeOf<global::VLCLR.Native.Interop.ExtensionsManagerOperations>(), "vlc_extensions_manager_operations Unsafe.SizeOf");
-        { ref var r = ref s.Activate; fixed (void* p = &r) AssertEqual(0, PointerOffset(ref s, p), "vlc_extensions_manager_operations.activate offset"); }
-        { ref var r = ref s.Deactivate; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "vlc_extensions_manager_operations.deactivate offset"); }
-        { ref var r = ref s.IsActivated; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_extensions_manager_operations.is_activated offset"); }
-        { ref var r = ref s.HasMenu; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_extensions_manager_operations.has_menu offset"); }
-        { ref var r = ref s.GetMenu; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_extensions_manager_operations.get_menu offset"); }
-        { ref var r = ref s.TriggerOnly; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_extensions_manager_operations.trigger_only offset"); }
-        { ref var r = ref s.Trigger; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_extensions_manager_operations.trigger offset"); }
-        { ref var r = ref s.TriggerMenu; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_extensions_manager_operations.trigger_menu offset"); }
-        { ref var r = ref s.SetInput; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_extensions_manager_operations.set_input offset"); }
-        { ref var r = ref s.PlayingChanged; fixed (void* p = &r) AssertEqual(72, PointerOffset(ref s, p), "vlc_extensions_manager_operations.playing_changed offset"); }
-        { ref var r = ref s.MetaChanged; fixed (void* p = &r) AssertEqual(80, PointerOffset(ref s, p), "vlc_extensions_manager_operations.meta_changed offset"); }
     }
 
     [Fact]
@@ -4054,6 +3792,8 @@ public unsafe class InteropLayoutTests
     [UnsupportedOSPlatform("windows")]
     public void ThreadHandle_Layout()
     {
+        if (OperatingSystem.IsWindows())
+            return;
         var s = default(global::VLCLR.Native.Interop.ThreadHandle);
         AssertEqual(8, global::VLCLR.Native.Interop.ThreadHandle.SizeOf, "vlc_thread_t sizeof");
         AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThreadHandle>(), "vlc_thread_t Unsafe.SizeOf");

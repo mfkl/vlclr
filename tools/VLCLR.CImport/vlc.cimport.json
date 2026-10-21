@@ -7,13 +7,21 @@
     "includeDir": "../../artifacts/vlc-headers/include",
     "symbols": "../../artifacts/vlc-headers/libvlccore.sym"
   },
-  // One translation unit: vlc_common.h first, then every other public header
-  // ("*", in name order), but the ones that do not parse on their own.
+  // One translation unit: vlc_common.h first, then every other header VLC
+  // installs for plugins ("*", in name order).
   "headers": ["vlc_common.h", "*"],
   "excludeHeaders": [
-    "vlc_fixups.h",   // the replacement functions of VLC's own build, needs its config.h
-    "vlc_gcrypt.h",   // needs libgcrypt's headers
-    "vlc_xlib.h"      // needs Xlib's headers
+    // Not installed with the plugin SDK: noinst_HEADERS in src/Makefile.am.
+    "vlc_codecs.h",
+    "vlc_extensions.h",
+    "vlc_fixups.h",
+    "vlc_intf_strings.h",
+    "vlc_iso_lang.h",
+    "vlc_pgpkey.h",
+    "vlc_update.h",
+    // Installed, but need other libraries' headers.
+    "vlc_gcrypt.h",   // libgcrypt
+    "vlc_xlib.h"      // Xlib
   ],
   // As VLC's build defines them (configure.ac, meson.build): libvlccore's
   // layouts are those of these settings.
@@ -33,8 +41,6 @@
     "probe": "../../tests/AbiValidation/vlclr_abi.g.c",
     // MSVC is not a VLC compiler; it checks what it can parse.
     "probeMsvcExcludeHeaders": [
-      "vlc_codecs.h",    // GCC's packed attribute
-      "vlc_cpu.h",       // x86 constants under __x86_64__, which MSVC does not define
       "vlc_network.h",   // POSIX headers (unistd.h)
       "vlc_opengl_picture.h", // C99 array parameters
       "vlc_opengl_sampler.h", // includes vlc_opengl_picture.h

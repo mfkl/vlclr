@@ -46,15 +46,10 @@ typedef SSIZE_T ssize_t;
 #include <vlc_chroma_probe.h>
 #include <vlc_clock.h>
 #include <vlc_codec.h>
-#if !defined(_MSC_VER)
-#include <vlc_codecs.h>
-#endif
 #include <vlc_config.h>
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
-#if !defined(_MSC_VER)
 #include <vlc_cpu.h>
-#endif
 #include <vlc_decoder.h>
 #include <vlc_demux.h>
 #include <vlc_dialog.h>
@@ -63,7 +58,6 @@ typedef SSIZE_T ssize_t;
 #include <vlc_es.h>
 #include <vlc_es_out.h>
 #include <vlc_executor.h>
-#include <vlc_extensions.h>
 #include <vlc_filter.h>
 #include <vlc_fingerprinter.h>
 #include <vlc_fourcc.h>
@@ -78,8 +72,6 @@ typedef SSIZE_T ssize_t;
 #include <vlc_input_item.h>
 #include <vlc_interface.h>
 #include <vlc_interrupt.h>
-#include <vlc_intf_strings.h>
-#include <vlc_iso_lang.h>
 #include <vlc_keystore.h>
 #include <vlc_list.h>
 #include <vlc_media_library.h>
@@ -104,7 +96,6 @@ typedef SSIZE_T ssize_t;
 #if !defined(_MSC_VER)
 #include <vlc_opengl_sampler.h>
 #endif
-#include <vlc_pgpkey.h>
 #include <vlc_picture.h>
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
@@ -142,7 +133,6 @@ typedef SSIZE_T ssize_t;
 #include <vlc_tls.h>
 #endif
 #include <vlc_tracer.h>
-#include <vlc_update.h>
 #include <vlc_url.h>
 #include <vlc_variables.h>
 #include <vlc_vector.h>
@@ -174,9 +164,6 @@ _Static_assert(sizeof(void *) == 8, "VLCLR currently targets the 64-bit VLC ABI"
     _Static_assert((unsigned long long)(name) == (expected), "VLCLR value mismatch: " #name)
 
 // Anonymous records used as the type of a named field.
-#if !defined(_MSC_VER)
-typedef __typeof__(((struct _WAVEFORMATEXTENSIBLE *)0)->Samples) cimport__WAVEFORMATEXTENSIBLE_Samples;
-#endif
 typedef __typeof__(((addon_entry_t *)0)->files) cimport_addon_entry_t_files;
 typedef __typeof__(((addons_finder_t *)0)->entries) cimport_addons_finder_t_entries;
 typedef __typeof__(((struct audio_output *)0)->current_sink_info) cimport_audio_output_current_sink_info;
@@ -184,8 +171,6 @@ typedef __typeof__(((struct decoder_owner_callbacks *)0)->audio) cimport_decoder
 typedef __typeof__(((struct decoder_owner_callbacks *)0)->spu) cimport_decoder_owner_callbacks_anon0_spu;
 typedef __typeof__(((struct decoder_owner_callbacks *)0)->video) cimport_decoder_owner_callbacks_anon0_video;
 typedef __typeof__(((struct encoder_owner_callbacks *)0)->video) cimport_encoder_owner_callbacks_video;
-typedef __typeof__(((extension_dialog_t *)0)->widgets) cimport_extension_dialog_t_widgets;
-typedef __typeof__(((extensions_manager_t *)0)->extensions) cimport_extensions_manager_t_extensions;
 typedef __typeof__(((struct filter_audio_callbacks *)0)->meter_loudness) cimport_filter_audio_callbacks_meter_loudness;
 typedef __typeof__(((fingerprint_request_t *)0)->results) cimport_fingerprint_request_t_results;
 typedef __typeof__(((module_config_t *)0)->list) cimport_module_config_t_list;
@@ -238,99 +223,11 @@ typedef __typeof__(((struct vlc_window *)0)->handle) cimport_vlc_window_handle;
 typedef __typeof__(((struct vlc_window *)0)->info) cimport_vlc_window_info;
 typedef __typeof__(((vlm_media_t *)0)->broadcast) cimport_vlm_media_t_broadcast;
 
-// VLC_BITMAPINFOHEADER
-#if !defined(_MSC_VER)
-VLCLR_SIZE(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", 40);
-VLCLR_ALIGN(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", 1);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biSize, 0);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biWidth, 4);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biHeight, 8);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biPlanes, 12);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biBitCount, 14);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biCompression, 16);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biSizeImage, 20);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biXPelsPerMeter, 24);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biYPelsPerMeter, 28);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biClrUsed, 32);
-VLCLR_OFFSET(VLC_BITMAPINFOHEADER, "VLC_BITMAPINFOHEADER", biClrImportant, 36);
-#endif
-
-// _GUID
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct _GUID, "_GUID", 16);
-VLCLR_ALIGN(struct _GUID, "_GUID", 4);
-VLCLR_OFFSET(struct _GUID, "_GUID", Data1, 0);
-VLCLR_OFFSET(struct _GUID, "_GUID", Data2, 4);
-VLCLR_OFFSET(struct _GUID, "_GUID", Data3, 6);
-VLCLR_OFFSET(struct _GUID, "_GUID", Data4, 8);
-#endif
-
 // _SCOPE_ID
 #if !defined(_MSC_VER) && defined(_WIN32)
 VLCLR_SIZE(struct _SCOPE_ID, "_SCOPE_ID", 4);
 VLCLR_ALIGN(struct _SCOPE_ID, "_SCOPE_ID", 4);
 VLCLR_OFFSET(struct _SCOPE_ID, "_SCOPE_ID", Value, 0);
-#endif
-
-// _WAVEFORMATEX
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct _WAVEFORMATEX, "_WAVEFORMATEX", 18);
-VLCLR_ALIGN(struct _WAVEFORMATEX, "_WAVEFORMATEX", 1);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", wFormatTag, 0);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", nChannels, 2);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", nSamplesPerSec, 4);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", nAvgBytesPerSec, 8);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", nBlockAlign, 12);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", wBitsPerSample, 14);
-VLCLR_OFFSET(struct _WAVEFORMATEX, "_WAVEFORMATEX", cbSize, 16);
-#endif
-
-// _WAVEFORMATEXTENSIBLE
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct _WAVEFORMATEXTENSIBLE, "_WAVEFORMATEXTENSIBLE", 40);
-VLCLR_ALIGN(struct _WAVEFORMATEXTENSIBLE, "_WAVEFORMATEXTENSIBLE", 1);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE, "_WAVEFORMATEXTENSIBLE", Format, 0);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE, "_WAVEFORMATEXTENSIBLE", Samples, 18);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE, "_WAVEFORMATEXTENSIBLE", dwChannelMask, 20);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE, "_WAVEFORMATEXTENSIBLE", SubFormat, 24);
-#endif
-
-// _WAVEFORMATEXTENSIBLE::Samples
-#if !defined(_MSC_VER)
-VLCLR_SIZE(cimport__WAVEFORMATEXTENSIBLE_Samples, "_WAVEFORMATEXTENSIBLE::Samples", 2);
-VLCLR_ALIGN(cimport__WAVEFORMATEXTENSIBLE_Samples, "_WAVEFORMATEXTENSIBLE::Samples", 2);
-VLCLR_OFFSET(cimport__WAVEFORMATEXTENSIBLE_Samples, "_WAVEFORMATEXTENSIBLE::Samples", wValidBitsPerSample, 0);
-VLCLR_OFFSET(cimport__WAVEFORMATEXTENSIBLE_Samples, "_WAVEFORMATEXTENSIBLE::Samples", wSamplesPerBlock, 0);
-VLCLR_OFFSET(cimport__WAVEFORMATEXTENSIBLE_Samples, "_WAVEFORMATEXTENSIBLE::Samples", wReserved, 0);
-#endif
-
-// _WAVEFORMATEXTENSIBLE_IEC61937
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct _WAVEFORMATEXTENSIBLE_IEC61937, "_WAVEFORMATEXTENSIBLE_IEC61937", 52);
-VLCLR_ALIGN(struct _WAVEFORMATEXTENSIBLE_IEC61937, "_WAVEFORMATEXTENSIBLE_IEC61937", 1);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE_IEC61937, "_WAVEFORMATEXTENSIBLE_IEC61937", FormatExt, 0);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE_IEC61937, "_WAVEFORMATEXTENSIBLE_IEC61937", dwEncodedSamplesPerSec, 40);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE_IEC61937, "_WAVEFORMATEXTENSIBLE_IEC61937", dwEncodedChannelCount, 44);
-VLCLR_OFFSET(struct _WAVEFORMATEXTENSIBLE_IEC61937, "_WAVEFORMATEXTENSIBLE_IEC61937", dwAverageBytesPerSec, 48);
-#endif
-
-// _WAVEHEADER
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct _WAVEHEADER, "_WAVEHEADER", 44);
-VLCLR_ALIGN(struct _WAVEHEADER, "_WAVEHEADER", 1);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", MainChunkID, 0);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", Length, 4);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", ChunkTypeID, 8);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", SubChunkID, 12);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", SubChunkLength, 16);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", Format, 20);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", Modus, 22);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", SampleFreq, 24);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", BytesPerSec, 28);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", BytesPerSample, 32);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", BitsPerSample, 34);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", DataChunkID, 36);
-VLCLR_OFFSET(struct _WAVEHEADER, "_WAVEHEADER", DataLength, 40);
 #endif
 
 // addon_entry_t
@@ -662,98 +559,6 @@ VLCLR_SIZE(es_out_t, "es_out_t", 8);
 VLCLR_ALIGN(es_out_t, "es_out_t", 8);
 VLCLR_OFFSET(es_out_t, "es_out_t", cbs, 0);
 
-// extension_dialog_command_t
-VLCLR_SIZE(extension_dialog_command_t, "extension_dialog_command_t", 24);
-VLCLR_ALIGN(extension_dialog_command_t, "extension_dialog_command_t", 8);
-VLCLR_OFFSET(extension_dialog_command_t, "extension_dialog_command_t", p_dlg, 0);
-VLCLR_OFFSET(extension_dialog_command_t, "extension_dialog_command_t", event, 8);
-VLCLR_OFFSET(extension_dialog_command_t, "extension_dialog_command_t", p_data, 16);
-
-// extension_dialog_t
-VLCLR_SIZE(extension_dialog_t, "extension_dialog_t", 104);
-VLCLR_ALIGN(extension_dialog_t, "extension_dialog_t", 8);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", p_object, 0);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", psz_title, 8);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", i_width, 16);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", i_height, 20);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", widgets, 24);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", b_hide, 40);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", b_kill, 41);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", p_sys, 48);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", p_sys_intf, 56);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", lock, 64);
-VLCLR_OFFSET(extension_dialog_t, "extension_dialog_t", cond, 80);
-
-// extension_dialog_t::widgets
-VLCLR_SIZE(cimport_extension_dialog_t_widgets, "extension_dialog_t::widgets", 16);
-VLCLR_ALIGN(cimport_extension_dialog_t_widgets, "extension_dialog_t::widgets", 8);
-VLCLR_OFFSET(cimport_extension_dialog_t_widgets, "extension_dialog_t::widgets", i_alloc, 0);
-VLCLR_OFFSET(cimport_extension_dialog_t_widgets, "extension_dialog_t::widgets", i_size, 4);
-VLCLR_OFFSET(cimport_extension_dialog_t_widgets, "extension_dialog_t::widgets", p_elems, 8);
-
-// extension_t
-VLCLR_SIZE(extension_t, "extension_t", 88);
-VLCLR_ALIGN(extension_t, "extension_t", 8);
-VLCLR_OFFSET(extension_t, "extension_t", p_sys, 0);
-VLCLR_OFFSET(extension_t, "extension_t", logger, 8);
-VLCLR_OFFSET(extension_t, "extension_t", psz_name, 16);
-VLCLR_OFFSET(extension_t, "extension_t", psz_title, 24);
-VLCLR_OFFSET(extension_t, "extension_t", psz_author, 32);
-VLCLR_OFFSET(extension_t, "extension_t", psz_version, 40);
-VLCLR_OFFSET(extension_t, "extension_t", psz_url, 48);
-VLCLR_OFFSET(extension_t, "extension_t", psz_description, 56);
-VLCLR_OFFSET(extension_t, "extension_t", psz_shortdescription, 64);
-VLCLR_OFFSET(extension_t, "extension_t", p_icondata, 72);
-VLCLR_OFFSET(extension_t, "extension_t", i_icondata_size, 80);
-
-// extension_widget_t
-VLCLR_SIZE(extension_widget_t, "extension_widget_t", 88);
-VLCLR_ALIGN(extension_widget_t, "extension_widget_t", 8);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", type, 0);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", psz_text, 8);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", p_values, 16);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", b_checked, 24);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_row, 28);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_column, 32);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_horiz_span, 36);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_vert_span, 40);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_width, 44);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_height, 48);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", b_hide, 52);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", i_spin_loops, 56);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", b_kill, 60);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", b_update, 61);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", p_sys, 64);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", p_sys_intf, 72);
-VLCLR_OFFSET(extension_widget_t, "extension_widget_t", p_dialog, 80);
-
-// extension_widget_value_t
-VLCLR_SIZE(struct extension_widget_value_t, "extension_widget_value_t", 32);
-VLCLR_ALIGN(struct extension_widget_value_t, "extension_widget_value_t", 8);
-VLCLR_OFFSET(struct extension_widget_value_t, "extension_widget_value_t", i_id, 0);
-VLCLR_OFFSET(struct extension_widget_value_t, "extension_widget_value_t", psz_text, 8);
-VLCLR_OFFSET(struct extension_widget_value_t, "extension_widget_value_t", b_selected, 16);
-VLCLR_OFFSET(struct extension_widget_value_t, "extension_widget_value_t", p_next, 24);
-
-// extensions_manager_t
-VLCLR_SIZE(extensions_manager_t, "extensions_manager_t", 96);
-VLCLR_ALIGN(extensions_manager_t, "extensions_manager_t", 8);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", obj, 0);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", p_module, 24);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", p_sys, 32);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", player, 40);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", extensions, 48);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", lock, 64);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", pf_control, 80);
-VLCLR_OFFSET(extensions_manager_t, "extensions_manager_t", ops, 88);
-
-// extensions_manager_t::extensions
-VLCLR_SIZE(cimport_extensions_manager_t_extensions, "extensions_manager_t::extensions", 16);
-VLCLR_ALIGN(cimport_extensions_manager_t_extensions, "extensions_manager_t::extensions", 8);
-VLCLR_OFFSET(cimport_extensions_manager_t_extensions, "extensions_manager_t::extensions", i_alloc, 0);
-VLCLR_OFFSET(cimport_extensions_manager_t_extensions, "extensions_manager_t::extensions", i_size, 4);
-VLCLR_OFFSET(cimport_extensions_manager_t_extensions, "extensions_manager_t::extensions", p_elems, 8);
-
 // extra_languages_t
 VLCLR_SIZE(extra_languages_t, "extra_languages_t", 16);
 VLCLR_ALIGN(extra_languages_t, "extra_languages_t", 8);
@@ -1029,14 +834,6 @@ VLCLR_OFFSET(intf_thread_t, "intf_thread_t", p_sys, 32);
 VLCLR_OFFSET(intf_thread_t, "intf_thread_t", p_module, 40);
 VLCLR_OFFSET(intf_thread_t, "intf_thread_t", pf_show_dialog, 48);
 VLCLR_OFFSET(intf_thread_t, "intf_thread_t", p_cfg, 56);
-
-// iso639_lang_t
-VLCLR_SIZE(iso639_lang_t, "iso639_lang_t", 24);
-VLCLR_ALIGN(iso639_lang_t, "iso639_lang_t", 8);
-VLCLR_OFFSET(iso639_lang_t, "iso639_lang_t", psz_eng_name, 0);
-VLCLR_OFFSET(iso639_lang_t, "iso639_lang_t", psz_iso639_1, 8);
-VLCLR_OFFSET(iso639_lang_t, "iso639_lang_t", psz_iso639_2T, 11);
-VLCLR_OFFSET(iso639_lang_t, "iso639_lang_t", psz_iso639_2B, 15);
 
 // libvlc_int_t
 VLCLR_SIZE(libvlc_int_t, "libvlc_int_t", 24);
@@ -1461,16 +1258,6 @@ VLCLR_OFFSET(timestamp_fifo_t, "timestamp_fifo_t", size, 4);
 VLCLR_OFFSET(timestamp_fifo_t, "timestamp_fifo_t", capacity, 8);
 VLCLR_OFFSET(timestamp_fifo_t, "timestamp_fifo_t", buffer, 16);
 
-// update_release_t
-VLCLR_SIZE(update_release_t, "update_release_t", 32);
-VLCLR_ALIGN(update_release_t, "update_release_t", 8);
-VLCLR_OFFSET(update_release_t, "update_release_t", i_major, 0);
-VLCLR_OFFSET(update_release_t, "update_release_t", i_minor, 4);
-VLCLR_OFFSET(update_release_t, "update_release_t", i_revision, 8);
-VLCLR_OFFSET(update_release_t, "update_release_t", i_extra, 12);
-VLCLR_OFFSET(update_release_t, "update_release_t", psz_url, 16);
-VLCLR_OFFSET(update_release_t, "update_release_t", psz_desc, 24);
-
 // video_format_t
 VLCLR_SIZE(video_format_t, "video_format_t", VLCLR_ABI(152, 144));
 VLCLR_ALIGN(video_format_t, "video_format_t", 8);
@@ -1832,21 +1619,6 @@ VLCLR_OFFSET(vlc_epg_t, "vlc_epg_t", i_event, 16);
 VLCLR_OFFSET(vlc_epg_t, "vlc_epg_t", pp_event, 24);
 VLCLR_OFFSET(vlc_epg_t, "vlc_epg_t", b_present, 32);
 VLCLR_OFFSET(vlc_epg_t, "vlc_epg_t", p_current, 40);
-
-// vlc_extensions_manager_operations
-VLCLR_SIZE(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", 88);
-VLCLR_ALIGN(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", 8);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", activate, 0);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", deactivate, 8);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", is_activated, 16);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", has_menu, 24);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", get_menu, 32);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", trigger_only, 40);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", trigger, 48);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", trigger_menu, 56);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", set_input, 64);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", playing_changed, 72);
-VLCLR_OFFSET(struct vlc_extensions_manager_operations, "vlc_extensions_manager_operations", meta_changed, 80);
 
 // vlc_filter_operations
 VLCLR_SIZE(struct vlc_filter_operations, "vlc_filter_operations", 48);
@@ -3499,19 +3271,6 @@ VLCLR_VALUE(DIALOG_OK_YES, 0LL);
 VLCLR_VALUE(DIALOG_NO, 1LL);
 VLCLR_VALUE(DIALOG_CANCELLED, 2LL);
 
-// enum @EXTENSION_ACTIVATE
-VLCLR_VALUE(EXTENSION_ACTIVATE, 0LL);
-VLCLR_VALUE(EXTENSION_DEACTIVATE, 1LL);
-VLCLR_VALUE(EXTENSION_IS_ACTIVATED, 2LL);
-VLCLR_VALUE(EXTENSION_HAS_MENU, 3LL);
-VLCLR_VALUE(EXTENSION_GET_MENU, 4LL);
-VLCLR_VALUE(EXTENSION_TRIGGER_ONLY, 5LL);
-VLCLR_VALUE(EXTENSION_TRIGGER, 6LL);
-VLCLR_VALUE(EXTENSION_TRIGGER_MENU, 7LL);
-VLCLR_VALUE(EXTENSION_SET_INPUT, 8LL);
-VLCLR_VALUE(EXTENSION_PLAYING_CHANGED, 9LL);
-VLCLR_VALUE(EXTENSION_META_CHANGED, 10LL);
-
 // enum @GET_FROM_URL
 VLCLR_VALUE(GET_FROM_URL, 0LL);
 VLCLR_VALUE(GET_FROM_OPTION, 1LL);
@@ -3696,22 +3455,6 @@ VLCLR_VALUE(ES_OUT_VOUT_ADD_OVERLAY, 24LL);
 VLCLR_VALUE(ES_OUT_VOUT_DEL_OVERLAY, 25LL);
 VLCLR_VALUE(ES_OUT_SPU_SET_HIGHLIGHT, 26LL);
 VLCLR_VALUE(ES_OUT_PRIVATE_START, 65536LL);
-
-// enum extension_dialog_event_e
-VLCLR_VALUE(EXTENSION_EVENT_CLICK, 0LL);
-VLCLR_VALUE(EXTENSION_EVENT_CLOSE, 1LL);
-
-// enum extension_widget_type_e
-VLCLR_VALUE(EXTENSION_WIDGET_LABEL, 0LL);
-VLCLR_VALUE(EXTENSION_WIDGET_BUTTON, 1LL);
-VLCLR_VALUE(EXTENSION_WIDGET_IMAGE, 2LL);
-VLCLR_VALUE(EXTENSION_WIDGET_HTML, 3LL);
-VLCLR_VALUE(EXTENSION_WIDGET_TEXT_FIELD, 4LL);
-VLCLR_VALUE(EXTENSION_WIDGET_PASSWORD, 5LL);
-VLCLR_VALUE(EXTENSION_WIDGET_DROPDOWN, 6LL);
-VLCLR_VALUE(EXTENSION_WIDGET_LIST, 7LL);
-VLCLR_VALUE(EXTENSION_WIDGET_CHECK_BOX, 8LL);
-VLCLR_VALUE(EXTENSION_WIDGET_SPIN_ICON, 9LL);
 
 // enum input_item_net_type
 VLCLR_VALUE(ITEM_NET_UNKNOWN, 0LL);
@@ -4764,1250 +4507,2845 @@ VLCLR_VALUE(VLM_END_S, 4LL);
 VLCLR_VALUE(VLM_ERROR_S, 5LL);
 
 // Integer constants
+#if defined(A52_FRAME_NB)
 VLCLR_VALUE(A52_FRAME_NB, 1536LL);
+#endif
+#if defined(ADDON_MAX_SCORE)
 VLCLR_VALUE(ADDON_MAX_SCORE, 500LL);
+#endif
+#if defined(ADDON_UUID_PSZ_SIZE)
 VLCLR_VALUE(ADDON_UUID_PSZ_SIZE, 36LL);
+#endif
+#if defined(ADDON_UUID_SIZE)
 VLCLR_VALUE(ADDON_UUID_SIZE, 16LL);
-#if !defined(_MSC_VER)
+#endif
+#if defined(AI_IDN) && !defined(_MSC_VER)
 VLCLR_VALUE(AI_IDN, 0LL);
 #endif
+#if defined(AOUT_CHANMODE_BINAURAL)
 VLCLR_VALUE(AOUT_CHANMODE_BINAURAL, 4LL);
+#endif
+#if defined(AOUT_CHANMODE_DOLBYSTEREO)
 VLCLR_VALUE(AOUT_CHANMODE_DOLBYSTEREO, 2LL);
+#endif
+#if defined(AOUT_CHANMODE_DUALMONO)
 VLCLR_VALUE(AOUT_CHANMODE_DUALMONO, 1LL);
+#endif
+#if defined(AOUT_CHANS_2_0)
 VLCLR_VALUE(AOUT_CHANS_2_0, 6LL);
+#endif
+#if defined(AOUT_CHANS_2_1)
 VLCLR_VALUE(AOUT_CHANS_2_1, 4102LL);
+#endif
+#if defined(AOUT_CHANS_3_0)
 VLCLR_VALUE(AOUT_CHANS_3_0, 7LL);
+#endif
+#if defined(AOUT_CHANS_3_1)
 VLCLR_VALUE(AOUT_CHANS_3_1, 4103LL);
+#endif
+#if defined(AOUT_CHANS_4_0)
 VLCLR_VALUE(AOUT_CHANS_4_0, 102LL);
+#endif
+#if defined(AOUT_CHANS_4_0_MIDDLE)
 VLCLR_VALUE(AOUT_CHANS_4_0_MIDDLE, 774LL);
+#endif
+#if defined(AOUT_CHANS_4_1)
 VLCLR_VALUE(AOUT_CHANS_4_1, 4198LL);
+#endif
+#if defined(AOUT_CHANS_4_CENTER_REAR)
 VLCLR_VALUE(AOUT_CHANS_4_CENTER_REAR, 23LL);
+#endif
+#if defined(AOUT_CHANS_5_0)
 VLCLR_VALUE(AOUT_CHANS_5_0, 103LL);
+#endif
+#if defined(AOUT_CHANS_5_0_MIDDLE)
 VLCLR_VALUE(AOUT_CHANS_5_0_MIDDLE, 775LL);
+#endif
+#if defined(AOUT_CHANS_5_1)
 VLCLR_VALUE(AOUT_CHANS_5_1, 4199LL);
+#endif
+#if defined(AOUT_CHANS_6_0)
 VLCLR_VALUE(AOUT_CHANS_6_0, 870LL);
+#endif
+#if defined(AOUT_CHANS_6_1_MIDDLE)
 VLCLR_VALUE(AOUT_CHANS_6_1_MIDDLE, 4887LL);
+#endif
+#if defined(AOUT_CHANS_7_0)
 VLCLR_VALUE(AOUT_CHANS_7_0, 871LL);
+#endif
+#if defined(AOUT_CHANS_7_1)
 VLCLR_VALUE(AOUT_CHANS_7_1, 4967LL);
+#endif
+#if defined(AOUT_CHANS_8_1)
 VLCLR_VALUE(AOUT_CHANS_8_1, 4983LL);
+#endif
+#if defined(AOUT_CHANS_CENTER)
 VLCLR_VALUE(AOUT_CHANS_CENTER, 17LL);
+#endif
+#if defined(AOUT_CHANS_FRONT)
 VLCLR_VALUE(AOUT_CHANS_FRONT, 6LL);
+#endif
+#if defined(AOUT_CHANS_MIDDLE)
 VLCLR_VALUE(AOUT_CHANS_MIDDLE, 768LL);
+#endif
+#if defined(AOUT_CHANS_REAR)
 VLCLR_VALUE(AOUT_CHANS_REAR, 96LL);
+#endif
+#if defined(AOUT_CHANS_STEREO)
 VLCLR_VALUE(AOUT_CHANS_STEREO, 6LL);
+#endif
+#if defined(AOUT_CHAN_CENTER)
 VLCLR_VALUE(AOUT_CHAN_CENTER, 1LL);
+#endif
+#if defined(AOUT_CHAN_LEFT)
 VLCLR_VALUE(AOUT_CHAN_LEFT, 2LL);
+#endif
+#if defined(AOUT_CHAN_LFE)
 VLCLR_VALUE(AOUT_CHAN_LFE, 4096LL);
+#endif
+#if defined(AOUT_CHAN_MAX)
 VLCLR_VALUE(AOUT_CHAN_MAX, 9LL);
+#endif
+#if defined(AOUT_CHAN_MIDDLELEFT)
 VLCLR_VALUE(AOUT_CHAN_MIDDLELEFT, 256LL);
+#endif
+#if defined(AOUT_CHAN_MIDDLERIGHT)
 VLCLR_VALUE(AOUT_CHAN_MIDDLERIGHT, 512LL);
+#endif
+#if defined(AOUT_CHAN_REARCENTER)
 VLCLR_VALUE(AOUT_CHAN_REARCENTER, 16LL);
+#endif
+#if defined(AOUT_CHAN_REARLEFT)
 VLCLR_VALUE(AOUT_CHAN_REARLEFT, 32LL);
+#endif
+#if defined(AOUT_CHAN_REARRIGHT)
 VLCLR_VALUE(AOUT_CHAN_REARRIGHT, 64LL);
+#endif
+#if defined(AOUT_CHAN_RIGHT)
 VLCLR_VALUE(AOUT_CHAN_RIGHT, 4LL);
+#endif
+#if defined(AOUT_MAX_ADVANCE_TIME)
 VLCLR_VALUE(AOUT_MAX_ADVANCE_TIME, 3000000LL);
+#endif
+#if defined(AOUT_MAX_PREPARE_TIME)
 VLCLR_VALUE(AOUT_MAX_PREPARE_TIME, 2000000LL);
+#endif
+#if defined(AOUT_MAX_PTS_ADVANCE)
 VLCLR_VALUE(AOUT_MAX_PTS_ADVANCE, 40000LL);
+#endif
+#if defined(AOUT_MAX_PTS_DELAY)
 VLCLR_VALUE(AOUT_MAX_PTS_DELAY, 60000LL);
+#endif
+#if defined(AOUT_MAX_RESAMPLING)
 VLCLR_VALUE(AOUT_MAX_RESAMPLING, 10LL);
+#endif
+#if defined(AOUT_MIN_PREPARE_TIME)
 VLCLR_VALUE(AOUT_MIN_PREPARE_TIME, 40000LL);
+#endif
+#if defined(AOUT_MIX_MODE_4_0)
 VLCLR_VALUE(AOUT_MIX_MODE_4_0, 3LL);
+#endif
+#if defined(AOUT_MIX_MODE_5_1)
 VLCLR_VALUE(AOUT_MIX_MODE_5_1, 4LL);
+#endif
+#if defined(AOUT_MIX_MODE_7_1)
 VLCLR_VALUE(AOUT_MIX_MODE_7_1, 5LL);
+#endif
+#if defined(AOUT_MIX_MODE_BINAURAL)
 VLCLR_VALUE(AOUT_MIX_MODE_BINAURAL, 2LL);
+#endif
+#if defined(AOUT_MIX_MODE_STEREO)
 VLCLR_VALUE(AOUT_MIX_MODE_STEREO, 1LL);
+#endif
+#if defined(AOUT_MIX_MODE_UNSET)
 VLCLR_VALUE(AOUT_MIX_MODE_UNSET, 0LL);
+#endif
+#if defined(AOUT_SPDIF_SIZE)
 VLCLR_VALUE(AOUT_SPDIF_SIZE, 6144LL);
+#endif
+#if defined(AOUT_VAR_CHAN_DOLBYS)
 VLCLR_VALUE(AOUT_VAR_CHAN_DOLBYS, 5LL);
+#endif
+#if defined(AOUT_VAR_CHAN_LEFT)
 VLCLR_VALUE(AOUT_VAR_CHAN_LEFT, 3LL);
+#endif
+#if defined(AOUT_VAR_CHAN_MONO)
 VLCLR_VALUE(AOUT_VAR_CHAN_MONO, 7LL);
+#endif
+#if defined(AOUT_VAR_CHAN_RIGHT)
 VLCLR_VALUE(AOUT_VAR_CHAN_RIGHT, 4LL);
+#endif
+#if defined(AOUT_VAR_CHAN_RSTEREO)
 VLCLR_VALUE(AOUT_VAR_CHAN_RSTEREO, 2LL);
+#endif
+#if defined(AOUT_VAR_CHAN_STEREO)
 VLCLR_VALUE(AOUT_VAR_CHAN_STEREO, 1LL);
+#endif
+#if defined(AOUT_VAR_CHAN_UNSET)
 VLCLR_VALUE(AOUT_VAR_CHAN_UNSET, 0LL);
+#endif
+#if defined(AOUT_VOLUME_DEFAULT)
 VLCLR_VALUE(AOUT_VOLUME_DEFAULT, 256LL);
+#endif
+#if defined(AOUT_VOLUME_MAX)
 VLCLR_VALUE(AOUT_VOLUME_MAX, 512LL);
+#endif
+#if defined(AUDIO_REPLAY_GAIN_ALBUM)
 VLCLR_VALUE(AUDIO_REPLAY_GAIN_ALBUM, 1LL);
+#endif
+#if defined(AUDIO_REPLAY_GAIN_MAX)
 VLCLR_VALUE(AUDIO_REPLAY_GAIN_MAX, 2LL);
+#endif
+#if defined(AUDIO_REPLAY_GAIN_TRACK)
 VLCLR_VALUE(AUDIO_REPLAY_GAIN_TRACK, 0LL);
+#endif
+#if defined(BLOCK_FLAG_AU_END)
 VLCLR_VALUE(BLOCK_FLAG_AU_END, 2048LL);
+#endif
+#if defined(BLOCK_FLAG_BOTTOM_FIELD_FIRST)
 VLCLR_VALUE(BLOCK_FLAG_BOTTOM_FIELD_FIRST, 8192LL);
+#endif
+#if defined(BLOCK_FLAG_CORE_PRIVATE_MASK)
 VLCLR_VALUE(BLOCK_FLAG_CORE_PRIVATE_MASK, 16711680LL);
+#endif
+#if defined(BLOCK_FLAG_CORE_PRIVATE_SHIFT)
 VLCLR_VALUE(BLOCK_FLAG_CORE_PRIVATE_SHIFT, 16LL);
+#endif
+#if defined(BLOCK_FLAG_CORRUPTED)
 VLCLR_VALUE(BLOCK_FLAG_CORRUPTED, 1024LL);
+#endif
+#if defined(BLOCK_FLAG_DISCONTINUITY)
 VLCLR_VALUE(BLOCK_FLAG_DISCONTINUITY, 1LL);
+#endif
+#if defined(BLOCK_FLAG_END_OF_SEQUENCE)
 VLCLR_VALUE(BLOCK_FLAG_END_OF_SEQUENCE, 64LL);
+#endif
+#if defined(BLOCK_FLAG_HEADER)
 VLCLR_VALUE(BLOCK_FLAG_HEADER, 32LL);
+#endif
+#if defined(BLOCK_FLAG_INTERLACED_MASK)
 VLCLR_VALUE(BLOCK_FLAG_INTERLACED_MASK, 28672LL);
+#endif
+#if defined(BLOCK_FLAG_PREROLL)
 VLCLR_VALUE(BLOCK_FLAG_PREROLL, 512LL);
+#endif
+#if defined(BLOCK_FLAG_PRIVATE_MASK)
 VLCLR_VALUE(BLOCK_FLAG_PRIVATE_MASK, 4278190080LL);
+#endif
+#if defined(BLOCK_FLAG_PRIVATE_SHIFT)
 VLCLR_VALUE(BLOCK_FLAG_PRIVATE_SHIFT, 24LL);
+#endif
+#if defined(BLOCK_FLAG_SCRAMBLED)
 VLCLR_VALUE(BLOCK_FLAG_SCRAMBLED, 256LL);
+#endif
+#if defined(BLOCK_FLAG_SINGLE_FIELD)
 VLCLR_VALUE(BLOCK_FLAG_SINGLE_FIELD, 16384LL);
+#endif
+#if defined(BLOCK_FLAG_TOP_FIELD_FIRST)
 VLCLR_VALUE(BLOCK_FLAG_TOP_FIELD_FIRST, 4096LL);
+#endif
+#if defined(BLOCK_FLAG_TYPE_B)
 VLCLR_VALUE(BLOCK_FLAG_TYPE_B, 8LL);
+#endif
+#if defined(BLOCK_FLAG_TYPE_I)
 VLCLR_VALUE(BLOCK_FLAG_TYPE_I, 2LL);
+#endif
+#if defined(BLOCK_FLAG_TYPE_MASK)
 VLCLR_VALUE(BLOCK_FLAG_TYPE_MASK, 30LL);
+#endif
+#if defined(BLOCK_FLAG_TYPE_P)
 VLCLR_VALUE(BLOCK_FLAG_TYPE_P, 4LL);
+#endif
+#if defined(BLOCK_FLAG_TYPE_PB)
 VLCLR_VALUE(BLOCK_FLAG_TYPE_PB, 16LL);
+#endif
+#if defined(CHROMA_LOCATION_MAX)
 VLCLR_VALUE(CHROMA_LOCATION_MAX, 6LL);
+#endif
+#if defined(CLOCK_FREQ)
 VLCLR_VALUE(CLOCK_FREQ, 1000000LL);
+#endif
+#if defined(COLOR_PRIMARIES_BT470_BG)
 VLCLR_VALUE(COLOR_PRIMARIES_BT470_BG, 2LL);
+#endif
+#if defined(COLOR_PRIMARIES_BT470_M)
 VLCLR_VALUE(COLOR_PRIMARIES_BT470_M, 6LL);
+#endif
+#if defined(COLOR_PRIMARIES_EBU_3213)
 VLCLR_VALUE(COLOR_PRIMARIES_EBU_3213, 2LL);
+#endif
+#if defined(COLOR_PRIMARIES_MAX)
 VLCLR_VALUE(COLOR_PRIMARIES_MAX, 6LL);
+#endif
+#if defined(COLOR_PRIMARIES_SMTPE_170)
 VLCLR_VALUE(COLOR_PRIMARIES_SMTPE_170, 1LL);
+#endif
+#if defined(COLOR_PRIMARIES_SMTPE_240)
 VLCLR_VALUE(COLOR_PRIMARIES_SMTPE_240, 1LL);
+#endif
+#if defined(COLOR_PRIMARIES_SMTPE_RP145)
 VLCLR_VALUE(COLOR_PRIMARIES_SMTPE_RP145, 1LL);
+#endif
+#if defined(COLOR_PRIMARIES_SRGB)
 VLCLR_VALUE(COLOR_PRIMARIES_SRGB, 3LL);
+#endif
+#if defined(COLOR_RANGE_MAX)
 VLCLR_VALUE(COLOR_RANGE_MAX, 2LL);
+#endif
+#if defined(COLOR_RANGE_STUDIO)
 VLCLR_VALUE(COLOR_RANGE_STUDIO, 2LL);
+#endif
+#if defined(COLOR_SPACE_MAX)
 VLCLR_VALUE(COLOR_SPACE_MAX, 3LL);
+#endif
+#if defined(COLOR_SPACE_SMPTE_170)
 VLCLR_VALUE(COLOR_SPACE_SMPTE_170, 1LL);
+#endif
+#if defined(COLOR_SPACE_SMPTE_240)
 VLCLR_VALUE(COLOR_SPACE_SMPTE_240, 1LL);
+#endif
+#if defined(COLOR_SPACE_SRGB)
 VLCLR_VALUE(COLOR_SPACE_SRGB, 2LL);
+#endif
+#if defined(CONFIG_HINT_CATEGORY)
 VLCLR_VALUE(CONFIG_HINT_CATEGORY, 2LL);
+#endif
+#if defined(CONFIG_ITEM_BOOL)
 VLCLR_VALUE(CONFIG_ITEM_BOOL, 96LL);
+#endif
+#if defined(CONFIG_ITEM_DIRECTORY)
 VLCLR_VALUE(CONFIG_ITEM_DIRECTORY, 142LL);
+#endif
+#if defined(CONFIG_ITEM_FLOAT)
 VLCLR_VALUE(CONFIG_ITEM_FLOAT, 32LL);
+#endif
+#if defined(CONFIG_ITEM_FONT)
 VLCLR_VALUE(CONFIG_ITEM_FONT, 143LL);
+#endif
+#if defined(CONFIG_ITEM_INTEGER)
 VLCLR_VALUE(CONFIG_ITEM_INTEGER, 64LL);
+#endif
+#if defined(CONFIG_ITEM_KEY)
 VLCLR_VALUE(CONFIG_ITEM_KEY, 130LL);
+#endif
+#if defined(CONFIG_ITEM_LOADFILE)
 VLCLR_VALUE(CONFIG_ITEM_LOADFILE, 140LL);
+#endif
+#if defined(CONFIG_ITEM_MODULE)
 VLCLR_VALUE(CONFIG_ITEM_MODULE, 132LL);
+#endif
+#if defined(CONFIG_ITEM_MODULE_CAT)
 VLCLR_VALUE(CONFIG_ITEM_MODULE_CAT, 133LL);
+#endif
+#if defined(CONFIG_ITEM_MODULE_LIST)
 VLCLR_VALUE(CONFIG_ITEM_MODULE_LIST, 134LL);
+#endif
+#if defined(CONFIG_ITEM_MODULE_LIST_CAT)
 VLCLR_VALUE(CONFIG_ITEM_MODULE_LIST_CAT, 135LL);
+#endif
+#if defined(CONFIG_ITEM_PASSWORD)
 VLCLR_VALUE(CONFIG_ITEM_PASSWORD, 129LL);
+#endif
+#if defined(CONFIG_ITEM_RGB)
 VLCLR_VALUE(CONFIG_ITEM_RGB, 65LL);
+#endif
+#if defined(CONFIG_ITEM_SAVEFILE)
 VLCLR_VALUE(CONFIG_ITEM_SAVEFILE, 141LL);
+#endif
+#if defined(CONFIG_ITEM_STRING)
 VLCLR_VALUE(CONFIG_ITEM_STRING, 128LL);
+#endif
+#if defined(CONFIG_SECTION)
 VLCLR_VALUE(CONFIG_SECTION, 8LL);
+#endif
+#if defined(CONFIG_SUBCATEGORY)
 VLCLR_VALUE(CONFIG_SUBCATEGORY, 7LL);
+#endif
+#if defined(DEFAULT_PTS_DELAY)
 VLCLR_VALUE(DEFAULT_PTS_DELAY, 300000LL);
+#endif
+#if defined(DIALOG_BLOCKING_ERROR)
 VLCLR_VALUE(DIALOG_BLOCKING_ERROR, 16LL);
+#endif
+#if defined(DIALOG_GOT_ANSWER)
 VLCLR_VALUE(DIALOG_GOT_ANSWER, 1LL);
+#endif
+#if defined(DIALOG_INTF_PROGRESS)
 VLCLR_VALUE(DIALOG_INTF_PROGRESS, 256LL);
+#endif
+#if defined(DIALOG_LOGIN_PW_OK_CANCEL)
 VLCLR_VALUE(DIALOG_LOGIN_PW_OK_CANCEL, 4LL);
+#endif
+#if defined(DIALOG_NONBLOCKING_ERROR)
 VLCLR_VALUE(DIALOG_NONBLOCKING_ERROR, 32LL);
+#endif
+#if defined(DIALOG_PSZ_INPUT_OK_CANCEL)
 VLCLR_VALUE(DIALOG_PSZ_INPUT_OK_CANCEL, 8LL);
+#endif
+#if defined(DIALOG_USER_PROGRESS)
 VLCLR_VALUE(DIALOG_USER_PROGRESS, 128LL);
+#endif
+#if defined(DIALOG_YES_NO_CANCEL)
 VLCLR_VALUE(DIALOG_YES_NO_CANCEL, 2LL);
+#endif
+#if defined(DIR_SEP_CHAR)
 VLCLR_VALUE(DIR_SEP_CHAR, VLCLR_ABI(92LL, 47LL));
+#endif
+#if defined(ES_CATEGORY_COUNT)
 VLCLR_VALUE(ES_CATEGORY_COUNT, 5LL);
+#endif
+#if defined(ES_PRIORITY_MIN)
 VLCLR_VALUE(ES_PRIORITY_MIN, -2LL);
+#endif
+#if defined(ES_PRIORITY_NOT_DEFAULTABLE)
 VLCLR_VALUE(ES_PRIORITY_NOT_DEFAULTABLE, -1LL);
+#endif
+#if defined(ES_PRIORITY_NOT_SELECTABLE)
 VLCLR_VALUE(ES_PRIORITY_NOT_SELECTABLE, -2LL);
+#endif
+#if defined(ES_PRIORITY_SELECTABLE_MIN)
 VLCLR_VALUE(ES_PRIORITY_SELECTABLE_MIN, 0LL);
-#if !defined(_MSC_VER)
+#endif
+#if defined(HAVE_FPU)
 VLCLR_VALUE(HAVE_FPU, 1LL);
 #endif
+#if defined(INPUT_CHAN_MAX)
 VLCLR_VALUE(INPUT_CHAN_MAX, 64LL);
+#endif
+#if defined(INPUT_DURATION_INDEFINITE)
 VLCLR_VALUE(INPUT_DURATION_INDEFINITE, -1LL);
+#endif
+#if defined(INPUT_DURATION_UNSET)
 VLCLR_VALUE(INPUT_DURATION_UNSET, 0LL);
+#endif
+#if defined(INPUT_IDLE_SLEEP)
 VLCLR_VALUE(INPUT_IDLE_SLEEP, 100000LL);
+#endif
+#if defined(INPUT_TITLE_INTERACTIVE)
 VLCLR_VALUE(INPUT_TITLE_INTERACTIVE, 2LL);
+#endif
+#if defined(INPUT_TITLE_MAIN)
 VLCLR_VALUE(INPUT_TITLE_MAIN, 4LL);
+#endif
+#if defined(INPUT_TITLE_MENU)
 VLCLR_VALUE(INPUT_TITLE_MENU, 1LL);
+#endif
+#if defined(INPUT_UPDATE_META)
 VLCLR_VALUE(INPUT_UPDATE_META, 64LL);
+#endif
+#if defined(INPUT_UPDATE_SEEKPOINT)
 VLCLR_VALUE(INPUT_UPDATE_SEEKPOINT, 32LL);
+#endif
+#if defined(INPUT_UPDATE_TITLE)
 VLCLR_VALUE(INPUT_UPDATE_TITLE, 16LL);
+#endif
+#if defined(INPUT_UPDATE_TITLE_LIST)
 VLCLR_VALUE(INPUT_UPDATE_TITLE_LIST, 256LL);
+#endif
+#if defined(INTF_IDLE_SLEEP)
 VLCLR_VALUE(INTF_IDLE_SLEEP, 50000LL);
+#endif
+#if defined(ITEM_ART_FETCHED)
 VLCLR_VALUE(ITEM_ART_FETCHED, 2LL);
+#endif
+#if defined(ITEM_ART_NOTFOUND)
 VLCLR_VALUE(ITEM_ART_NOTFOUND, 4LL);
+#endif
+#if defined(ITEM_PREPARSED)
 VLCLR_VALUE(ITEM_PREPARSED, 1LL);
+#endif
+#if defined(KEY_BACKSPACE)
 VLCLR_VALUE(KEY_BACKSPACE, 8LL);
+#endif
+#if defined(KEY_BRIGHTNESS_DOWN)
 VLCLR_VALUE(KEY_BRIGHTNESS_DOWN, 7274496LL);
+#endif
+#if defined(KEY_BRIGHTNESS_UP)
 VLCLR_VALUE(KEY_BRIGHTNESS_UP, 7208960LL);
+#endif
+#if defined(KEY_BROWSER_BACK)
 VLCLR_VALUE(KEY_BROWSER_BACK, 5242880LL);
+#endif
+#if defined(KEY_BROWSER_FAVORITES)
 VLCLR_VALUE(KEY_BROWSER_FAVORITES, 5570560LL);
+#endif
+#if defined(KEY_BROWSER_FORWARD)
 VLCLR_VALUE(KEY_BROWSER_FORWARD, 5308416LL);
+#endif
+#if defined(KEY_BROWSER_HOME)
 VLCLR_VALUE(KEY_BROWSER_HOME, 5636096LL);
+#endif
+#if defined(KEY_BROWSER_REFRESH)
 VLCLR_VALUE(KEY_BROWSER_REFRESH, 5373952LL);
+#endif
+#if defined(KEY_BROWSER_SEARCH)
 VLCLR_VALUE(KEY_BROWSER_SEARCH, 5505024LL);
+#endif
+#if defined(KEY_BROWSER_STOP)
 VLCLR_VALUE(KEY_BROWSER_STOP, 5439488LL);
+#endif
+#if defined(KEY_DELETE)
 VLCLR_VALUE(KEY_DELETE, 4849664LL);
+#endif
+#if defined(KEY_DOWN)
 VLCLR_VALUE(KEY_DOWN, 2293760LL);
+#endif
+#if defined(KEY_END)
 VLCLR_VALUE(KEY_END, 4718592LL);
+#endif
+#if defined(KEY_ENTER)
 VLCLR_VALUE(KEY_ENTER, 13LL);
+#endif
+#if defined(KEY_ESC)
 VLCLR_VALUE(KEY_ESC, 27LL);
+#endif
+#if defined(KEY_F1)
 VLCLR_VALUE(KEY_F1, 2359296LL);
+#endif
+#if defined(KEY_F10)
 VLCLR_VALUE(KEY_F10, 2949120LL);
+#endif
+#if defined(KEY_F11)
 VLCLR_VALUE(KEY_F11, 3014656LL);
+#endif
+#if defined(KEY_F12)
 VLCLR_VALUE(KEY_F12, 3080192LL);
+#endif
+#if defined(KEY_F2)
 VLCLR_VALUE(KEY_F2, 2424832LL);
+#endif
+#if defined(KEY_F3)
 VLCLR_VALUE(KEY_F3, 2490368LL);
+#endif
+#if defined(KEY_F4)
 VLCLR_VALUE(KEY_F4, 2555904LL);
+#endif
+#if defined(KEY_F5)
 VLCLR_VALUE(KEY_F5, 2621440LL);
+#endif
+#if defined(KEY_F6)
 VLCLR_VALUE(KEY_F6, 2686976LL);
+#endif
+#if defined(KEY_F7)
 VLCLR_VALUE(KEY_F7, 2752512LL);
+#endif
+#if defined(KEY_F8)
 VLCLR_VALUE(KEY_F8, 2818048LL);
+#endif
+#if defined(KEY_F9)
 VLCLR_VALUE(KEY_F9, 2883584LL);
+#endif
+#if defined(KEY_HOME)
 VLCLR_VALUE(KEY_HOME, 4653056LL);
+#endif
+#if defined(KEY_INSERT)
 VLCLR_VALUE(KEY_INSERT, 4784128LL);
+#endif
+#if defined(KEY_LEFT)
 VLCLR_VALUE(KEY_LEFT, 2097152LL);
+#endif
+#if defined(KEY_MEDIA_ANGLE)
 VLCLR_VALUE(KEY_MEDIA_ANGLE, 6619136LL);
+#endif
+#if defined(KEY_MEDIA_AUDIO)
 VLCLR_VALUE(KEY_MEDIA_AUDIO, 6553600LL);
+#endif
+#if defined(KEY_MEDIA_FORWARD)
 VLCLR_VALUE(KEY_MEDIA_FORWARD, 6291456LL);
+#endif
+#if defined(KEY_MEDIA_FRAME_NEXT)
 VLCLR_VALUE(KEY_MEDIA_FRAME_NEXT, 6815744LL);
+#endif
+#if defined(KEY_MEDIA_FRAME_PREV)
 VLCLR_VALUE(KEY_MEDIA_FRAME_PREV, 6750208LL);
+#endif
+#if defined(KEY_MEDIA_MENU)
 VLCLR_VALUE(KEY_MEDIA_MENU, 7012352LL);
+#endif
+#if defined(KEY_MEDIA_NEXT_TRACK)
 VLCLR_VALUE(KEY_MEDIA_NEXT_TRACK, 5898240LL);
+#endif
+#if defined(KEY_MEDIA_PLAY_PAUSE)
 VLCLR_VALUE(KEY_MEDIA_PLAY_PAUSE, 6094848LL);
+#endif
+#if defined(KEY_MEDIA_PREV_TRACK)
 VLCLR_VALUE(KEY_MEDIA_PREV_TRACK, 5963776LL);
+#endif
+#if defined(KEY_MEDIA_RECORD)
 VLCLR_VALUE(KEY_MEDIA_RECORD, 6160384LL);
+#endif
+#if defined(KEY_MEDIA_REPEAT)
 VLCLR_VALUE(KEY_MEDIA_REPEAT, 6356992LL);
+#endif
+#if defined(KEY_MEDIA_REWIND)
 VLCLR_VALUE(KEY_MEDIA_REWIND, 6225920LL);
+#endif
+#if defined(KEY_MEDIA_SELECT)
 VLCLR_VALUE(KEY_MEDIA_SELECT, 6881280LL);
+#endif
+#if defined(KEY_MEDIA_SHUFFLE)
 VLCLR_VALUE(KEY_MEDIA_SHUFFLE, 6422528LL);
+#endif
+#if defined(KEY_MEDIA_STOP)
 VLCLR_VALUE(KEY_MEDIA_STOP, 6029312LL);
+#endif
+#if defined(KEY_MEDIA_SUBTITLE)
 VLCLR_VALUE(KEY_MEDIA_SUBTITLE, 6488064LL);
+#endif
+#if defined(KEY_MEDIA_TIME)
 VLCLR_VALUE(KEY_MEDIA_TIME, 6684672LL);
+#endif
+#if defined(KEY_MEDIA_VIEW)
 VLCLR_VALUE(KEY_MEDIA_VIEW, 6946816LL);
+#endif
+#if defined(KEY_MENU)
 VLCLR_VALUE(KEY_MENU, 4915200LL);
+#endif
+#if defined(KEY_MODIFIER)
 VLCLR_VALUE(KEY_MODIFIER, 4278190080LL);
+#endif
+#if defined(KEY_MODIFIER_ALT)
 VLCLR_VALUE(KEY_MODIFIER_ALT, 16777216LL);
+#endif
+#if defined(KEY_MODIFIER_COMMAND)
 VLCLR_VALUE(KEY_MODIFIER_COMMAND, 268435456LL);
+#endif
+#if defined(KEY_MODIFIER_CTRL)
 VLCLR_VALUE(KEY_MODIFIER_CTRL, 67108864LL);
+#endif
+#if defined(KEY_MODIFIER_META)
 VLCLR_VALUE(KEY_MODIFIER_META, 134217728LL);
+#endif
+#if defined(KEY_MODIFIER_SHIFT)
 VLCLR_VALUE(KEY_MODIFIER_SHIFT, 33554432LL);
+#endif
+#if defined(KEY_MOUSEWHEELDOWN)
 VLCLR_VALUE(KEY_MOUSEWHEELDOWN, 15794176LL);
+#endif
+#if defined(KEY_MOUSEWHEELLEFT)
 VLCLR_VALUE(KEY_MOUSEWHEELLEFT, 15859712LL);
+#endif
+#if defined(KEY_MOUSEWHEELRIGHT)
 VLCLR_VALUE(KEY_MOUSEWHEELRIGHT, 15925248LL);
+#endif
+#if defined(KEY_MOUSEWHEELUP)
 VLCLR_VALUE(KEY_MOUSEWHEELUP, 15728640LL);
+#endif
+#if defined(KEY_PAGEDOWN)
 VLCLR_VALUE(KEY_PAGEDOWN, 5046272LL);
+#endif
+#if defined(KEY_PAGEUP)
 VLCLR_VALUE(KEY_PAGEUP, 4980736LL);
+#endif
+#if defined(KEY_PAUSE)
 VLCLR_VALUE(KEY_PAUSE, 5177344LL);
+#endif
+#if defined(KEY_PRINT)
 VLCLR_VALUE(KEY_PRINT, 5111808LL);
+#endif
+#if defined(KEY_RIGHT)
 VLCLR_VALUE(KEY_RIGHT, 2162688LL);
+#endif
+#if defined(KEY_TAB)
 VLCLR_VALUE(KEY_TAB, 9LL);
+#endif
+#if defined(KEY_UNSET)
 VLCLR_VALUE(KEY_UNSET, 0LL);
+#endif
+#if defined(KEY_UP)
 VLCLR_VALUE(KEY_UP, 2228224LL);
+#endif
+#if defined(KEY_VOLUME_DOWN)
 VLCLR_VALUE(KEY_VOLUME_DOWN, 5767168LL);
+#endif
+#if defined(KEY_VOLUME_MUTE)
 VLCLR_VALUE(KEY_VOLUME_MUTE, 5701632LL);
+#endif
+#if defined(KEY_VOLUME_UP)
 VLCLR_VALUE(KEY_VOLUME_UP, 5832704LL);
+#endif
+#if defined(KEY_ZOOM_IN)
 VLCLR_VALUE(KEY_ZOOM_IN, 7077888LL);
+#endif
+#if defined(KEY_ZOOM_OUT)
 VLCLR_VALUE(KEY_ZOOM_OUT, 7143424LL);
-#if !defined(_WIN32)
+#endif
+#if defined(LIBVLC_USE_PTHREAD) && !defined(_WIN32)
 VLCLR_VALUE(LIBVLC_USE_PTHREAD, 1LL);
 #endif
-#if !defined(_WIN32)
+#if defined(LIBVLC_USE_PTHREAD_CLEANUP) && !defined(_WIN32)
 VLCLR_VALUE(LIBVLC_USE_PTHREAD_CLEANUP, 1LL);
 #endif
+#if defined(MSTRTIME_MAX_SIZE)
 VLCLR_VALUE(MSTRTIME_MAX_SIZE, 22LL);
+#endif
+#if defined(MULTIVIEW_STEREO_MAX)
 VLCLR_VALUE(MULTIVIEW_STEREO_MAX, 6LL);
-#if !defined(_MSC_VER)
+#endif
+#if defined(NI_MAXNUMERICHOST) && !defined(_MSC_VER)
 VLCLR_VALUE(NI_MAXNUMERICHOST, 64LL);
 #endif
+#if defined(ORIENT_MAX)
 VLCLR_UVALUE(ORIENT_MAX, 7ULL);
-#if defined(_WIN32)
+#endif
+#if defined(O_NONBLOCK) && defined(_WIN32)
 VLCLR_VALUE(O_NONBLOCK, 0LL);
 #endif
+#if defined(PATH_SEP_CHAR)
 VLCLR_VALUE(PATH_SEP_CHAR, VLCLR_ABI(59LL, 58LL));
+#endif
+#if defined(PICTURE_PLANE_MAX)
 VLCLR_VALUE(PICTURE_PLANE_MAX, 5LL);
-#if !defined(_MSC_VER) && defined(_WIN32)
+#endif
+#if defined(SHUT_RD) && !defined(_MSC_VER) && defined(_WIN32)
 VLCLR_VALUE(SHUT_RD, 0LL);
 #endif
-#if !defined(_MSC_VER) && defined(_WIN32)
+#if defined(SHUT_RDWR) && !defined(_MSC_VER) && defined(_WIN32)
 VLCLR_VALUE(SHUT_RDWR, 2LL);
 #endif
-#if !defined(_MSC_VER) && defined(_WIN32)
+#if defined(SHUT_WR) && !defined(_MSC_VER) && defined(_WIN32)
 VLCLR_VALUE(SHUT_WR, 1LL);
 #endif
+#if defined(STYLE_ALPHA_OPAQUE)
 VLCLR_VALUE(STYLE_ALPHA_OPAQUE, 255LL);
+#endif
+#if defined(STYLE_ALPHA_TRANSPARENT)
 VLCLR_VALUE(STYLE_ALPHA_TRANSPARENT, 0LL);
+#endif
+#if defined(STYLE_BACKGROUND)
 VLCLR_VALUE(STYLE_BACKGROUND, 16LL);
+#endif
+#if defined(STYLE_BLINK_BACKGROUND)
 VLCLR_VALUE(STYLE_BLINK_BACKGROUND, 2048LL);
+#endif
+#if defined(STYLE_BLINK_FOREGROUND)
 VLCLR_VALUE(STYLE_BLINK_FOREGROUND, 1024LL);
+#endif
+#if defined(STYLE_BOLD)
 VLCLR_VALUE(STYLE_BOLD, 1LL);
+#endif
+#if defined(STYLE_DEFAULT_FONT_SIZE)
 VLCLR_VALUE(STYLE_DEFAULT_FONT_SIZE, 20LL);
+#endif
+#if defined(STYLE_DOUBLEWIDTH)
 VLCLR_VALUE(STYLE_DOUBLEWIDTH, 512LL);
+#endif
+#if defined(STYLE_FULLY_SET)
 VLCLR_VALUE(STYLE_FULLY_SET, 65535LL);
+#endif
+#if defined(STYLE_HALFWIDTH)
 VLCLR_VALUE(STYLE_HALFWIDTH, 128LL);
+#endif
+#if defined(STYLE_HAS_BACKGROUND_ALPHA)
 VLCLR_VALUE(STYLE_HAS_BACKGROUND_ALPHA, 256LL);
+#endif
+#if defined(STYLE_HAS_BACKGROUND_COLOR)
 VLCLR_VALUE(STYLE_HAS_BACKGROUND_COLOR, 128LL);
+#endif
+#if defined(STYLE_HAS_BLENDING_MODE)
 VLCLR_VALUE(STYLE_HAS_BLENDING_MODE, 1024LL);
+#endif
+#if defined(STYLE_HAS_FLAGS)
 VLCLR_VALUE(STYLE_HAS_FLAGS, 4LL);
+#endif
+#if defined(STYLE_HAS_FONT_ALPHA)
 VLCLR_VALUE(STYLE_HAS_FONT_ALPHA, 2LL);
+#endif
+#if defined(STYLE_HAS_FONT_COLOR)
 VLCLR_VALUE(STYLE_HAS_FONT_COLOR, 1LL);
+#endif
+#if defined(STYLE_HAS_OUTLINE_ALPHA)
 VLCLR_VALUE(STYLE_HAS_OUTLINE_ALPHA, 16LL);
+#endif
+#if defined(STYLE_HAS_OUTLINE_COLOR)
 VLCLR_VALUE(STYLE_HAS_OUTLINE_COLOR, 8LL);
+#endif
+#if defined(STYLE_HAS_SHADOW_ALPHA)
 VLCLR_VALUE(STYLE_HAS_SHADOW_ALPHA, 64LL);
+#endif
+#if defined(STYLE_HAS_SHADOW_COLOR)
 VLCLR_VALUE(STYLE_HAS_SHADOW_COLOR, 32LL);
+#endif
+#if defined(STYLE_HAS_WRAP_INFO)
 VLCLR_VALUE(STYLE_HAS_WRAP_INFO, 512LL);
+#endif
+#if defined(STYLE_ITALIC)
 VLCLR_VALUE(STYLE_ITALIC, 2LL);
+#endif
+#if defined(STYLE_MONOSPACED)
 VLCLR_VALUE(STYLE_MONOSPACED, 256LL);
+#endif
+#if defined(STYLE_NO_DEFAULTS)
 VLCLR_VALUE(STYLE_NO_DEFAULTS, 0LL);
+#endif
+#if defined(STYLE_OUTLINE)
 VLCLR_VALUE(STYLE_OUTLINE, 4LL);
+#endif
+#if defined(STYLE_SHADOW)
 VLCLR_VALUE(STYLE_SHADOW, 8LL);
+#endif
+#if defined(STYLE_STRIKEOUT)
 VLCLR_VALUE(STYLE_STRIKEOUT, 64LL);
+#endif
+#if defined(STYLE_UNDERLINE)
 VLCLR_VALUE(STYLE_UNDERLINE, 32LL);
+#endif
+#if defined(SUBPICTURE_ALIGN_BOTTOM)
 VLCLR_VALUE(SUBPICTURE_ALIGN_BOTTOM, 8LL);
+#endif
+#if defined(SUBPICTURE_ALIGN_LEFT)
 VLCLR_VALUE(SUBPICTURE_ALIGN_LEFT, 1LL);
+#endif
+#if defined(SUBPICTURE_ALIGN_MASK)
 VLCLR_VALUE(SUBPICTURE_ALIGN_MASK, 15LL);
+#endif
+#if defined(SUBPICTURE_ALIGN_RIGHT)
 VLCLR_VALUE(SUBPICTURE_ALIGN_RIGHT, 2LL);
+#endif
+#if defined(SUBPICTURE_ALIGN_TOP)
 VLCLR_VALUE(SUBPICTURE_ALIGN_TOP, 4LL);
+#endif
+#if defined(TRANSFER_FUNC_ARIB_B67)
 VLCLR_VALUE(TRANSFER_FUNC_ARIB_B67, 8LL);
+#endif
+#if defined(TRANSFER_FUNC_BT2020)
 VLCLR_VALUE(TRANSFER_FUNC_BT2020, 5LL);
+#endif
+#if defined(TRANSFER_FUNC_MAX)
 VLCLR_VALUE(TRANSFER_FUNC_MAX, 8LL);
+#endif
+#if defined(TRANSFER_FUNC_SMPTE_170)
 VLCLR_VALUE(TRANSFER_FUNC_SMPTE_170, 5LL);
+#endif
+#if defined(TRANSFER_FUNC_SMPTE_274)
 VLCLR_VALUE(TRANSFER_FUNC_SMPTE_274, 5LL);
+#endif
+#if defined(TRANSFER_FUNC_SMPTE_293)
 VLCLR_VALUE(TRANSFER_FUNC_SMPTE_293, 5LL);
+#endif
+#if defined(TRANSFER_FUNC_SMPTE_296)
 VLCLR_VALUE(TRANSFER_FUNC_SMPTE_296, 5LL);
+#endif
+#if defined(VIDEO_PALETTE_CLUT_COUNT)
 VLCLR_VALUE(VIDEO_PALETTE_CLUT_COUNT, 16LL);
+#endif
+#if defined(VIDEO_PALETTE_COLORS_MAX)
 VLCLR_VALUE(VIDEO_PALETTE_COLORS_MAX, 256LL);
+#endif
+#if defined(VIDEO_STEREO_OUTPUT_MAX)
 VLCLR_VALUE(VIDEO_STEREO_OUTPUT_MAX, 4LL);
+#endif
+#if defined(VLCDEC_ECRITICAL)
 VLCLR_VALUE(VLCDEC_ECRITICAL, -2147483648LL);
+#endif
+#if defined(VLCDEC_RELOAD)
 VLCLR_VALUE(VLCDEC_RELOAD, -100LL);
+#endif
+#if defined(VLCDEC_SUCCESS)
 VLCLR_VALUE(VLCDEC_SUCCESS, 0LL);
+#endif
+#if defined(VLC_ACCESS_REDIRECT)
 VLCLR_VALUE(VLC_ACCESS_REDIRECT, VLCLR_ABI(-138LL, -110LL));
+#endif
+#if defined(VLC_ANCILLARY_ID_DOVI)
 VLCLR_VALUE(VLC_ANCILLARY_ID_DOVI, 1767272260LL);
+#endif
+#if defined(VLC_ANCILLARY_ID_HDR10PLUS)
 VLCLR_VALUE(VLC_ANCILLARY_ID_HDR10PLUS, 726811720LL);
+#endif
+#if defined(VLC_ANCILLARY_ID_ICC)
 VLCLR_VALUE(VLC_ANCILLARY_ID_ICC, 1346585449LL);
+#endif
+#if defined(VLC_ANCILLARY_ID_VPX_ALPHA)
 VLCLR_VALUE(VLC_ANCILLARY_ID_VPX_ALPHA, 1098412150LL);
+#endif
+#if defined(VLC_CHROMA_CONV_CHAIN_COUNT_MAX)
 VLCLR_VALUE(VLC_CHROMA_CONV_CHAIN_COUNT_MAX, 3LL);
+#endif
+#if defined(VLC_CHROMA_CONV_FLAG_ONLY_RGB)
 VLCLR_VALUE(VLC_CHROMA_CONV_FLAG_ONLY_RGB, 2LL);
+#endif
+#if defined(VLC_CHROMA_CONV_FLAG_ONLY_YUV)
 VLCLR_VALUE(VLC_CHROMA_CONV_FLAG_ONLY_YUV, 1LL);
+#endif
+#if defined(VLC_CHROMA_CONV_FLAG_SORT_COST)
 VLCLR_VALUE(VLC_CHROMA_CONV_FLAG_SORT_COST, 4LL);
+#endif
+#if defined(VLC_CHROMA_CONV_MAX_INDIRECT_STEPS)
 VLCLR_VALUE(VLC_CHROMA_CONV_MAX_INDIRECT_STEPS, 1LL);
+#endif
+#if defined(VLC_CODEC_302M)
 VLCLR_VALUE(VLC_CODEC_302M, 1832005683LL);
+#endif
+#if defined(VLC_CODEC_4XM)
 VLCLR_VALUE(VLC_CODEC_4XM, 1447909428LL);
+#endif
+#if defined(VLC_CODEC_8BPS)
 VLCLR_VALUE(VLC_CODEC_8BPS, 1397768760LL);
+#endif
+#if defined(VLC_CODEC_A52)
 VLCLR_VALUE(VLC_CODEC_A52, 540161377LL);
+#endif
+#if defined(VLC_CODEC_AASC)
 VLCLR_VALUE(VLC_CODEC_AASC, 1129529665LL);
+#endif
+#if defined(VLC_CODEC_ABGR)
 VLCLR_VALUE(VLC_CODEC_ABGR, 1380401729LL);
+#endif
+#if defined(VLC_CODEC_AC4)
 VLCLR_VALUE(VLC_CODEC_AC4, 875389793LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_4XM)
 VLCLR_VALUE(VLC_CODEC_ADPCM_4XM, 1634564148LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_ADX)
 VLCLR_VALUE(VLC_CODEC_ADPCM_ADX, 544760929LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_CREATIVE)
 VLCLR_VALUE(VLC_CODEC_ADPCM_CREATIVE, 3221255021LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_DK3)
 VLCLR_VALUE(VLC_CODEC_ADPCM_DK3, 1644196717LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_DK4)
 VLCLR_VALUE(VLC_CODEC_ADPCM_DK4, 1627419501LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_EA)
 VLCLR_VALUE(VLC_CODEC_ADPCM_EA, 1095058497LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_EA_R1)
 VLCLR_VALUE(VLC_CODEC_ADPCM_EA_R1, 827474245LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_EA_R3)
 VLCLR_VALUE(VLC_CODEC_ADPCM_EA_R3, 861028677LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_G722)
 VLCLR_VALUE(VLC_CODEC_ADPCM_G722, 842151783LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_G726)
 VLCLR_VALUE(VLC_CODEC_ADPCM_G726, 909260647LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_G726_LE)
 VLCLR_VALUE(VLC_CODEC_ADPCM_G726_LE, 1932670823LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_IMA_AMV)
 VLCLR_VALUE(VLC_CODEC_ADPCM_IMA_AMV, 1986096489LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_IMA_APC)
 VLCLR_VALUE(VLC_CODEC_ADPCM_IMA_APC, 1129335105LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_IMA_EA_SEAD)
 VLCLR_VALUE(VLC_CODEC_ADPCM_IMA_EA_SEAD, 1145128275LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_IMA_QT)
 VLCLR_VALUE(VLC_CODEC_ADPCM_IMA_QT, 878800233LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_IMA_WAV)
 VLCLR_VALUE(VLC_CODEC_ADPCM_IMA_WAV, 285242221LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_IMA_WS)
 VLCLR_VALUE(VLC_CODEC_ADPCM_IMA_WS, 1398229313LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_MS)
 VLCLR_VALUE(VLC_CODEC_ADPCM_MS, 33583981LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_SBPRO_2)
 VLCLR_VALUE(VLC_CODEC_ADPCM_SBPRO_2, 3254809453LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_SBPRO_3)
 VLCLR_VALUE(VLC_CODEC_ADPCM_SBPRO_3, 3271586669LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_SBPRO_4)
 VLCLR_VALUE(VLC_CODEC_ADPCM_SBPRO_4, 3288363885LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_SWF)
 VLCLR_VALUE(VLC_CODEC_ADPCM_SWF, 1631999827LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_THP)
 VLCLR_VALUE(VLC_CODEC_ADPCM_THP, 1095780436LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_XA)
 VLCLR_VALUE(VLC_CODEC_ADPCM_XA, 538993016LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_XA_EA)
 VLCLR_VALUE(VLC_CODEC_ADPCM_XA_EA, 4866392LL);
+#endif
+#if defined(VLC_CODEC_ADPCM_YAMAHA)
 VLCLR_VALUE(VLC_CODEC_ADPCM_YAMAHA, 536900461LL);
+#endif
+#if defined(VLC_CODEC_AGM)
 VLCLR_VALUE(VLC_CODEC_AGM, 810370881LL);
+#endif
+#if defined(VLC_CODEC_ALAC)
 VLCLR_VALUE(VLC_CODEC_ALAC, 1667329121LL);
+#endif
+#if defined(VLC_CODEC_ALAW)
 VLCLR_VALUE(VLC_CODEC_ALAW, 2002873441LL);
+#endif
+#if defined(VLC_CODEC_ALS)
 VLCLR_VALUE(VLC_CODEC_ALS, 544435297LL);
+#endif
+#if defined(VLC_CODEC_AMR_NB)
 VLCLR_VALUE(VLC_CODEC_AMR_NB, 1919770995LL);
+#endif
+#if defined(VLC_CODEC_AMR_WB)
 VLCLR_VALUE(VLC_CODEC_AMR_WB, 1651990899LL);
+#endif
+#if defined(VLC_CODEC_AMV)
 VLCLR_VALUE(VLC_CODEC_AMV, 542526785LL);
+#endif
+#if defined(VLC_CODEC_ANDROID_OPAQUE)
 VLCLR_VALUE(VLC_CODEC_ANDROID_OPAQUE, 1347374657LL);
+#endif
+#if defined(VLC_CODEC_ANM)
 VLCLR_VALUE(VLC_CODEC_ANM, 1296649793LL);
+#endif
+#if defined(VLC_CODEC_APE)
 VLCLR_VALUE(VLC_CODEC_APE, 541413441LL);
+#endif
+#if defined(VLC_CODEC_APV)
 VLCLR_VALUE(VLC_CODEC_APV, 829845601LL);
+#endif
+#if defined(VLC_CODEC_ARGB)
 VLCLR_VALUE(VLC_CODEC_ARGB, 1111970369LL);
+#endif
+#if defined(VLC_CODEC_ARIB_A)
 VLCLR_VALUE(VLC_CODEC_ARIB_A, 1633841761LL);
+#endif
+#if defined(VLC_CODEC_ARIB_C)
 VLCLR_VALUE(VLC_CODEC_ARIB_C, 1667396193LL);
+#endif
+#if defined(VLC_CODEC_ASV1)
 VLCLR_VALUE(VLC_CODEC_ASV1, 827740993LL);
+#endif
+#if defined(VLC_CODEC_ASV2)
 VLCLR_VALUE(VLC_CODEC_ASV2, 844518209LL);
+#endif
+#if defined(VLC_CODEC_ATRAC1)
 VLCLR_VALUE(VLC_CODEC_ATRAC1, 829584481LL);
+#endif
+#if defined(VLC_CODEC_ATRAC3)
 VLCLR_VALUE(VLC_CODEC_ATRAC3, 1668445281LL);
+#endif
+#if defined(VLC_CODEC_ATRAC3AL)
 VLCLR_VALUE(VLC_CODEC_ATRAC3AL, 1819440225LL);
+#endif
+#if defined(VLC_CODEC_ATRAC3P)
 VLCLR_VALUE(VLC_CODEC_ATRAC3P, 1886549089LL);
+#endif
+#if defined(VLC_CODEC_ATRAC3PAL)
 VLCLR_VALUE(VLC_CODEC_ATRAC3PAL, 1819309153LL);
+#endif
+#if defined(VLC_CODEC_ATRAC9)
 VLCLR_VALUE(VLC_CODEC_ATRAC9, 963802209LL);
+#endif
+#if defined(VLC_CODEC_AURA)
 VLCLR_VALUE(VLC_CODEC_AURA, 1095914817LL);
+#endif
+#if defined(VLC_CODEC_AV1)
 VLCLR_VALUE(VLC_CODEC_AV1, 825259617LL);
+#endif
+#if defined(VLC_CODEC_AVS)
 VLCLR_VALUE(VLC_CODEC_AVS, 1448302145LL);
+#endif
+#if defined(VLC_CODEC_BD_LPCM)
 VLCLR_VALUE(VLC_CODEC_BD_LPCM, 1835233378LL);
+#endif
+#if defined(VLC_CODEC_BD_PG)
 VLCLR_VALUE(VLC_CODEC_BD_PG, 1735418978LL);
+#endif
+#if defined(VLC_CODEC_BD_TEXT)
 VLCLR_VALUE(VLC_CODEC_BD_TEXT, 2020893794LL);
+#endif
+#if defined(VLC_CODEC_BETHSOFTVID)
 VLCLR_VALUE(VLC_CODEC_BETHSOFTVID, 1145656898LL);
+#endif
+#if defined(VLC_CODEC_BFI)
 VLCLR_VALUE(VLC_CODEC_BFI, 1227245122LL);
+#endif
+#if defined(VLC_CODEC_BGR233)
 VLCLR_VALUE(VLC_CODEC_BGR233, 858993218LL);
+#endif
+#if defined(VLC_CODEC_BGR24)
 VLCLR_VALUE(VLC_CODEC_BGR24, 861030210LL);
+#endif
+#if defined(VLC_CODEC_BGR555)
 VLCLR_VALUE(VLC_CODEC_BGR555, 892423234LL);
+#endif
+#if defined(VLC_CODEC_BGR555BE)
 VLCLR_VALUE(VLC_CODEC_BGR555BE, 892420674LL);
+#endif
+#if defined(VLC_CODEC_BGR555LE)
 VLCLR_VALUE(VLC_CODEC_BGR555LE, 892423234LL);
+#endif
+#if defined(VLC_CODEC_BGR565)
 VLCLR_VALUE(VLC_CODEC_BGR565, 909200450LL);
+#endif
+#if defined(VLC_CODEC_BGR565BE)
 VLCLR_VALUE(VLC_CODEC_BGR565BE, 909197890LL);
+#endif
+#if defined(VLC_CODEC_BGR565LE)
 VLCLR_VALUE(VLC_CODEC_BGR565LE, 909200450LL);
+#endif
+#if defined(VLC_CODEC_BGRA)
 VLCLR_VALUE(VLC_CODEC_BGRA, 1095911234LL);
+#endif
+#if defined(VLC_CODEC_BGRX)
 VLCLR_VALUE(VLC_CODEC_BGRX, 1481787202LL);
+#endif
+#if defined(VLC_CODEC_BINKAUDIO_DCT)
 VLCLR_VALUE(VLC_CODEC_BINKAUDIO_DCT, 827670850LL);
+#endif
+#if defined(VLC_CODEC_BINKAUDIO_RDFT)
 VLCLR_VALUE(VLC_CODEC_BINKAUDIO_RDFT, 844448066LL);
+#endif
+#if defined(VLC_CODEC_BINKVIDEO)
 VLCLR_VALUE(VLC_CODEC_BINKVIDEO, 1716209986LL);
+#endif
+#if defined(VLC_CODEC_BMP)
 VLCLR_VALUE(VLC_CODEC_BMP, 544238946LL);
+#endif
+#if defined(VLC_CODEC_BMVAUDIO)
 VLCLR_VALUE(VLC_CODEC_BMVAUDIO, 1096174914LL);
+#endif
+#if defined(VLC_CODEC_BMVVIDEO)
 VLCLR_VALUE(VLC_CODEC_BMVVIDEO, 1448496450LL);
+#endif
+#if defined(VLC_CODEC_BPG)
 VLCLR_VALUE(VLC_CODEC_BPG, 4215754818LL);
+#endif
+#if defined(VLC_CODEC_C93)
 VLCLR_VALUE(VLC_CODEC_C93, 859390793LL);
+#endif
+#if defined(VLC_CODEC_CAVS)
 VLCLR_VALUE(VLC_CODEC_CAVS, 1398161731LL);
+#endif
+#if defined(VLC_CODEC_CAVS2)
 VLCLR_VALUE(VLC_CODEC_CAVS2, 844322369LL);
+#endif
+#if defined(VLC_CODEC_CAVS3)
 VLCLR_VALUE(VLC_CODEC_CAVS3, 861099585LL);
+#endif
+#if defined(VLC_CODEC_CDG)
 VLCLR_VALUE(VLC_CODEC_CDG, 541541443LL);
+#endif
+#if defined(VLC_CODEC_CDXL)
 VLCLR_VALUE(VLC_CODEC_CDXL, 1280853059LL);
+#endif
+#if defined(VLC_CODEC_CEA608)
 VLCLR_VALUE(VLC_CODEC_CEA608, 942683747LL);
+#endif
+#if defined(VLC_CODEC_CEA708)
 VLCLR_VALUE(VLC_CODEC_CEA708, 942684003LL);
+#endif
+#if defined(VLC_CODEC_CINEFORM)
 VLCLR_VALUE(VLC_CODEC_CINEFORM, 1145587267LL);
+#endif
+#if defined(VLC_CODEC_CINEPAK)
 VLCLR_VALUE(VLC_CODEC_CINEPAK, 1145656899LL);
+#endif
+#if defined(VLC_CODEC_CLJR)
 VLCLR_VALUE(VLC_CODEC_CLJR, 1380600899LL);
+#endif
+#if defined(VLC_CODEC_CLLC)
 VLCLR_VALUE(VLC_CODEC_CLLC, 1129073731LL);
+#endif
+#if defined(VLC_CODEC_CMML)
 VLCLR_VALUE(VLC_CODEC_CMML, 1819110755LL);
+#endif
+#if defined(VLC_CODEC_CMV)
 VLCLR_VALUE(VLC_CODEC_CMV, 1447904069LL);
+#endif
+#if defined(VLC_CODEC_CODEC2)
 VLCLR_VALUE(VLC_CODEC_CODEC2, 1162096707LL);
+#endif
+#if defined(VLC_CODEC_COOK)
 VLCLR_VALUE(VLC_CODEC_COOK, 1802465123LL);
+#endif
+#if defined(VLC_CODEC_CSCD)
 VLCLR_VALUE(VLC_CODEC_CSCD, 1145262915LL);
+#endif
+#if defined(VLC_CODEC_CVD)
 VLCLR_VALUE(VLC_CODEC_CVD, 543454819LL);
+#endif
+#if defined(VLC_CODEC_CVPX_BGRA)
 VLCLR_VALUE(VLC_CODEC_CVPX_BGRA, 1112561219LL);
+#endif
+#if defined(VLC_CODEC_CVPX_I420)
 VLCLR_VALUE(VLC_CODEC_CVPX_I420, 1230001731LL);
+#endif
+#if defined(VLC_CODEC_CVPX_NV12)
 VLCLR_VALUE(VLC_CODEC_CVPX_NV12, 1313887811LL);
+#endif
+#if defined(VLC_CODEC_CVPX_P010)
 VLCLR_VALUE(VLC_CODEC_CVPX_P010, 1347442243LL);
+#endif
+#if defined(VLC_CODEC_CVPX_UYVY)
 VLCLR_VALUE(VLC_CODEC_CVPX_UYVY, 1498437187LL);
+#endif
+#if defined(VLC_CODEC_CYUV)
 VLCLR_VALUE(VLC_CODEC_CYUV, 1987410275LL);
+#endif
+#if defined(VLC_CODEC_D3D11_OPAQUE)
 VLCLR_VALUE(VLC_CODEC_D3D11_OPAQUE, 825317444LL);
+#endif
+#if defined(VLC_CODEC_D3D11_OPAQUE_10B)
 VLCLR_VALUE(VLC_CODEC_D3D11_OPAQUE_10B, 808540228LL);
+#endif
+#if defined(VLC_CODEC_D3D11_OPAQUE_ALPHA)
 VLCLR_VALUE(VLC_CODEC_D3D11_OPAQUE_ALPHA, 825311556LL);
+#endif
+#if defined(VLC_CODEC_D3D11_OPAQUE_BGRA)
 VLCLR_VALUE(VLC_CODEC_D3D11_OPAQUE_BGRA, 1380401476LL);
+#endif
+#if defined(VLC_CODEC_D3D11_OPAQUE_RGBA)
 VLCLR_VALUE(VLC_CODEC_D3D11_OPAQUE_RGBA, 1196578884LL);
+#endif
+#if defined(VLC_CODEC_D3D9_OPAQUE)
 VLCLR_VALUE(VLC_CODEC_D3D9_OPAQUE, 960583748LL);
+#endif
+#if defined(VLC_CODEC_D3D9_OPAQUE_10B)
 VLCLR_VALUE(VLC_CODEC_D3D9_OPAQUE_10B, 809588804LL);
+#endif
+#if defined(VLC_CODEC_DAALA)
 VLCLR_VALUE(VLC_CODEC_DAALA, 1818321252LL);
+#endif
+#if defined(VLC_CODEC_DAT12)
 VLCLR_VALUE(VLC_CODEC_DAT12, 842092620LL);
+#endif
+#if defined(VLC_CODEC_DFA)
 VLCLR_VALUE(VLC_CODEC_DFA, 1095321156LL);
+#endif
+#if defined(VLC_CODEC_DFPWM)
 VLCLR_VALUE(VLC_CODEC_DFPWM, 1464878660LL);
+#endif
+#if defined(VLC_CODEC_DIRAC)
 VLCLR_VALUE(VLC_CODEC_DIRAC, 1667330660LL);
+#endif
+#if defined(VLC_CODEC_DIV1)
 VLCLR_VALUE(VLC_CODEC_DIV1, 827738436LL);
+#endif
+#if defined(VLC_CODEC_DIV2)
 VLCLR_VALUE(VLC_CODEC_DIV2, 844515652LL);
+#endif
+#if defined(VLC_CODEC_DIV3)
 VLCLR_VALUE(VLC_CODEC_DIV3, 861292868LL);
+#endif
+#if defined(VLC_CODEC_DNXHD)
 VLCLR_VALUE(VLC_CODEC_DNXHD, 1852069441LL);
+#endif
+#if defined(VLC_CODEC_DSD_LSBF)
 VLCLR_VALUE(VLC_CODEC_DSD_LSBF, 1816417092LL);
+#endif
+#if defined(VLC_CODEC_DSD_LSBF_PLANAR)
 VLCLR_VALUE(VLC_CODEC_DSD_LSBF_PLANAR, 1816548164LL);
+#endif
+#if defined(VLC_CODEC_DSD_MSBF)
 VLCLR_VALUE(VLC_CODEC_DSD_MSBF, 541348676LL);
+#endif
+#if defined(VLC_CODEC_DSD_MSBF_PLANAR)
 VLCLR_VALUE(VLC_CODEC_DSD_MSBF_PLANAR, 1833325380LL);
+#endif
+#if defined(VLC_CODEC_DSICINAUDIO)
 VLCLR_VALUE(VLC_CODEC_DSICINAUDIO, 1095320388LL);
+#endif
+#if defined(VLC_CODEC_DSICINVIDEO)
 VLCLR_VALUE(VLC_CODEC_DSICINVIDEO, 1447641924LL);
+#endif
+#if defined(VLC_CODEC_DTS)
 VLCLR_VALUE(VLC_CODEC_DTS, 544437348LL);
+#endif
+#if defined(VLC_CODEC_DTSHD)
 VLCLR_VALUE(VLC_CODEC_DTSHD, 1752396900LL);
+#endif
+#if defined(VLC_CODEC_DV)
 VLCLR_VALUE(VLC_CODEC_DV, 538998372LL);
+#endif
+#if defined(VLC_CODEC_DVAUDIO)
 VLCLR_VALUE(VLC_CODEC_DVAUDIO, 1969321572LL);
+#endif
+#if defined(VLC_CODEC_DVBS)
 VLCLR_VALUE(VLC_CODEC_DVBS, 1935832676LL);
+#endif
+#if defined(VLC_CODEC_DVDA_LPCM)
 VLCLR_VALUE(VLC_CODEC_DVDA_LPCM, 1835233377LL);
+#endif
+#if defined(VLC_CODEC_DVD_LPCM)
 VLCLR_VALUE(VLC_CODEC_DVD_LPCM, 1835233388LL);
+#endif
+#if defined(VLC_CODEC_DXA)
 VLCLR_VALUE(VLC_CODEC_DXA, 1096303940LL);
+#endif
+#if defined(VLC_CODEC_DXTORY)
 VLCLR_VALUE(VLC_CODEC_DXTORY, 1919906936LL);
+#endif
+#if defined(VLC_CODEC_DXV)
 VLCLR_VALUE(VLC_CODEC_DXV, 860117060LL);
+#endif
+#if defined(VLC_CODEC_EAC3)
 VLCLR_VALUE(VLC_CODEC_EAC3, 862151013LL);
+#endif
+#if defined(VLC_CODEC_EBU_STL)
 VLCLR_VALUE(VLC_CODEC_EBU_STL, 541873235LL);
+#endif
+#if defined(VLC_CODEC_ESCAPE124)
 VLCLR_VALUE(VLC_CODEC_ESCAPE124, 875704645LL);
+#endif
+#if defined(VLC_CODEC_F32B)
 VLCLR_VALUE(VLC_CODEC_F32B, 1647457126LL);
+#endif
+#if defined(VLC_CODEC_F32L)
 VLCLR_VALUE(VLC_CODEC_F32L, 1815229286LL);
+#endif
+#if defined(VLC_CODEC_F64B)
 VLCLR_VALUE(VLC_CODEC_F64B, 1647588966LL);
+#endif
+#if defined(VLC_CODEC_F64L)
 VLCLR_VALUE(VLC_CODEC_F64L, 1815361126LL);
+#endif
+#if defined(VLC_CODEC_FARBFELD)
 VLCLR_VALUE(VLC_CODEC_FARBFELD, 1651663206LL);
+#endif
+#if defined(VLC_CODEC_FFV1)
 VLCLR_VALUE(VLC_CODEC_FFV1, 827737670LL);
+#endif
+#if defined(VLC_CODEC_FFVHUFF)
 VLCLR_VALUE(VLC_CODEC_FFVHUFF, 1213613638LL);
+#endif
+#if defined(VLC_CODEC_FIC)
 VLCLR_VALUE(VLC_CODEC_FIC, 1447250246LL);
+#endif
+#if defined(VLC_CODEC_FL32)
 VLCLR_VALUE(VLC_CODEC_FL32, 1815229286LL);
+#endif
+#if defined(VLC_CODEC_FL64)
 VLCLR_VALUE(VLC_CODEC_FL64, 1815361126LL);
+#endif
+#if defined(VLC_CODEC_FLAC)
 VLCLR_VALUE(VLC_CODEC_FLAC, 1667329126LL);
+#endif
+#if defined(VLC_CODEC_FLASHSV)
 VLCLR_VALUE(VLC_CODEC_FLASHSV, 827740998LL);
+#endif
+#if defined(VLC_CODEC_FLASHSV2)
 VLCLR_VALUE(VLC_CODEC_FLASHSV2, 844518214LL);
+#endif
+#if defined(VLC_CODEC_FLIC)
 VLCLR_VALUE(VLC_CODEC_FLIC, 1128877126LL);
+#endif
+#if defined(VLC_CODEC_FLV1)
 VLCLR_VALUE(VLC_CODEC_FLV1, 827739206LL);
+#endif
+#if defined(VLC_CODEC_FMVC)
 VLCLR_VALUE(VLC_CODEC_FMVC, 1129729350LL);
+#endif
+#if defined(VLC_CODEC_FRAPS)
 VLCLR_VALUE(VLC_CODEC_FRAPS, 827543622LL);
+#endif
+#if defined(VLC_CODEC_FRWU)
 VLCLR_VALUE(VLC_CODEC_FRWU, 1431786054LL);
+#endif
+#if defined(VLC_CODEC_G2M2)
 VLCLR_VALUE(VLC_CODEC_G2M2, 843919943LL);
+#endif
+#if defined(VLC_CODEC_G2M3)
 VLCLR_VALUE(VLC_CODEC_G2M3, 860697159LL);
+#endif
+#if defined(VLC_CODEC_G2M4)
 VLCLR_VALUE(VLC_CODEC_G2M4, 877474375LL);
+#endif
+#if defined(VLC_CODEC_G723_1)
 VLCLR_VALUE(VLC_CODEC_G723_1, 825374567LL);
+#endif
+#if defined(VLC_CODEC_G729)
 VLCLR_VALUE(VLC_CODEC_G729, 959592295LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR, 942686791LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR_10B)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR_10B, 1110458951LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR_10L)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR_10L, 1278231111LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR_12B)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR_12B, 1111704135LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR_12L)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR_12L, 1279476295LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR_16B)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR_16B, 1111835207LL);
+#endif
+#if defined(VLC_CODEC_GBRA_PLANAR_16L)
 VLCLR_VALUE(VLC_CODEC_GBRA_PLANAR_16L, 1279607367LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR, 944915015LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_10B)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_10B, 1111573063LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_10L)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_10L, 1279345223LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_12B)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_12B, 1111638599LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_12L)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_12L, 1279410759LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_14B)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_14B, 1111769671LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_14L)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_14L, 1279541831LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_16B)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_16B, 1111900743LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_16L)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_16L, 1279672903LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_9B)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_9B, 1111048775LL);
+#endif
+#if defined(VLC_CODEC_GBR_PLANAR_9L)
 VLCLR_VALUE(VLC_CODEC_GBR_PLANAR_9L, 1278820935LL);
+#endif
+#if defined(VLC_CODEC_GIF)
 VLCLR_VALUE(VLC_CODEC_GIF, 543582567LL);
+#endif
+#if defined(VLC_CODEC_GREY)
 VLCLR_VALUE(VLC_CODEC_GREY, 1497715271LL);
+#endif
+#if defined(VLC_CODEC_GREY_10B)
 VLCLR_VALUE(VLC_CODEC_GREY_10B, 1111896135LL);
+#endif
+#if defined(VLC_CODEC_GREY_10L)
 VLCLR_VALUE(VLC_CODEC_GREY_10L, 1279668295LL);
+#endif
+#if defined(VLC_CODEC_GREY_12B)
 VLCLR_VALUE(VLC_CODEC_GREY_12B, 1111896647LL);
+#endif
+#if defined(VLC_CODEC_GREY_12L)
 VLCLR_VALUE(VLC_CODEC_GREY_12L, 1279668807LL);
+#endif
+#if defined(VLC_CODEC_GREY_16B)
 VLCLR_VALUE(VLC_CODEC_GREY_16B, 1111904839LL);
+#endif
+#if defined(VLC_CODEC_GREY_16L)
 VLCLR_VALUE(VLC_CODEC_GREY_16L, 1279676999LL);
+#endif
+#if defined(VLC_CODEC_GSM)
 VLCLR_VALUE(VLC_CODEC_GSM, 544043879LL);
+#endif
+#if defined(VLC_CODEC_GSM_MS)
 VLCLR_VALUE(VLC_CODEC_GSM_MS, 1836279649LL);
+#endif
+#if defined(VLC_CODEC_GST_MEM_OPAQUE)
 VLCLR_VALUE(VLC_CODEC_GST_MEM_OPAQUE, 1297371975LL);
+#endif
+#if defined(VLC_CODEC_H261)
 VLCLR_VALUE(VLC_CODEC_H261, 825635432LL);
+#endif
+#if defined(VLC_CODEC_H263)
 VLCLR_VALUE(VLC_CODEC_H263, 859189864LL);
+#endif
+#if defined(VLC_CODEC_H263I)
 VLCLR_VALUE(VLC_CODEC_H263I, 859189833LL);
+#endif
+#if defined(VLC_CODEC_H263P)
 VLCLR_VALUE(VLC_CODEC_H263P, 1381387337LL);
+#endif
+#if defined(VLC_CODEC_H264)
 VLCLR_VALUE(VLC_CODEC_H264, 875967080LL);
+#endif
+#if defined(VLC_CODEC_HAP)
 VLCLR_VALUE(VLC_CODEC_HAP, 827343176LL);
+#endif
+#if defined(VLC_CODEC_HEVC)
 VLCLR_VALUE(VLC_CODEC_HEVC, 1668703592LL);
+#endif
+#if defined(VLC_CODEC_HNM4_VIDEO)
 VLCLR_VALUE(VLC_CODEC_HNM4_VIDEO, 877481544LL);
+#endif
+#if defined(VLC_CODEC_HQX)
 VLCLR_VALUE(VLC_CODEC_HQX, 1481721923LL);
+#endif
+#if defined(VLC_CODEC_HQ_HQA)
 VLCLR_VALUE(VLC_CODEC_HQ_HQA, 1129731395LL);
+#endif
+#if defined(VLC_CODEC_HUFFYUV)
 VLCLR_VALUE(VLC_CODEC_HUFFYUV, 1431914056LL);
+#endif
+#if defined(VLC_CODEC_I410)
 VLCLR_VALUE(VLC_CODEC_I410, 808531017LL);
+#endif
+#if defined(VLC_CODEC_I411)
 VLCLR_VALUE(VLC_CODEC_I411, 825308233LL);
+#endif
+#if defined(VLC_CODEC_I420)
 VLCLR_VALUE(VLC_CODEC_I420, 808596553LL);
+#endif
+#if defined(VLC_CODEC_I420_10B)
 VLCLR_VALUE(VLC_CODEC_I420_10B, 1111568457LL);
+#endif
+#if defined(VLC_CODEC_I420_10L)
 VLCLR_VALUE(VLC_CODEC_I420_10L, 1279340617LL);
+#endif
+#if defined(VLC_CODEC_I420_12B)
 VLCLR_VALUE(VLC_CODEC_I420_12B, 1111699529LL);
+#endif
+#if defined(VLC_CODEC_I420_12L)
 VLCLR_VALUE(VLC_CODEC_I420_12L, 1279471689LL);
+#endif
+#if defined(VLC_CODEC_I420_16B)
 VLCLR_VALUE(VLC_CODEC_I420_16B, 1111896137LL);
+#endif
+#if defined(VLC_CODEC_I420_16L)
 VLCLR_VALUE(VLC_CODEC_I420_16L, 1279668297LL);
+#endif
+#if defined(VLC_CODEC_I420_9B)
 VLCLR_VALUE(VLC_CODEC_I420_9B, 1111044169LL);
+#endif
+#if defined(VLC_CODEC_I420_9L)
 VLCLR_VALUE(VLC_CODEC_I420_9L, 1278816329LL);
+#endif
+#if defined(VLC_CODEC_I422)
 VLCLR_VALUE(VLC_CODEC_I422, 842150985LL);
+#endif
+#if defined(VLC_CODEC_I422_10B)
 VLCLR_VALUE(VLC_CODEC_I422_10B, 1111568969LL);
+#endif
+#if defined(VLC_CODEC_I422_10L)
 VLCLR_VALUE(VLC_CODEC_I422_10L, 1279341129LL);
+#endif
+#if defined(VLC_CODEC_I422_12B)
 VLCLR_VALUE(VLC_CODEC_I422_12B, 1111700041LL);
+#endif
+#if defined(VLC_CODEC_I422_12L)
 VLCLR_VALUE(VLC_CODEC_I422_12L, 1279472201LL);
+#endif
+#if defined(VLC_CODEC_I422_16B)
 VLCLR_VALUE(VLC_CODEC_I422_16B, 1111896649LL);
+#endif
+#if defined(VLC_CODEC_I422_16L)
 VLCLR_VALUE(VLC_CODEC_I422_16L, 1279668809LL);
+#endif
+#if defined(VLC_CODEC_I422_9B)
 VLCLR_VALUE(VLC_CODEC_I422_9B, 1111044681LL);
+#endif
+#if defined(VLC_CODEC_I422_9L)
 VLCLR_VALUE(VLC_CODEC_I422_9L, 1278816841LL);
+#endif
+#if defined(VLC_CODEC_I440)
 VLCLR_VALUE(VLC_CODEC_I440, 808727625LL);
+#endif
+#if defined(VLC_CODEC_I444)
 VLCLR_VALUE(VLC_CODEC_I444, 875836489LL);
+#endif
+#if defined(VLC_CODEC_I444_10B)
 VLCLR_VALUE(VLC_CODEC_I444_10B, 1111569481LL);
+#endif
+#if defined(VLC_CODEC_I444_10L)
 VLCLR_VALUE(VLC_CODEC_I444_10L, 1279341641LL);
+#endif
+#if defined(VLC_CODEC_I444_12B)
 VLCLR_VALUE(VLC_CODEC_I444_12B, 1111700553LL);
+#endif
+#if defined(VLC_CODEC_I444_12L)
 VLCLR_VALUE(VLC_CODEC_I444_12L, 1279472713LL);
+#endif
+#if defined(VLC_CODEC_I444_16B)
 VLCLR_VALUE(VLC_CODEC_I444_16B, 1111897161LL);
+#endif
+#if defined(VLC_CODEC_I444_16L)
 VLCLR_VALUE(VLC_CODEC_I444_16L, 1279669321LL);
+#endif
+#if defined(VLC_CODEC_I444_9B)
 VLCLR_VALUE(VLC_CODEC_I444_9B, 1111045193LL);
+#endif
+#if defined(VLC_CODEC_I444_9L)
 VLCLR_VALUE(VLC_CODEC_I444_9L, 1278817353LL);
+#endif
+#if defined(VLC_CODEC_ICOD)
 VLCLR_VALUE(VLC_CODEC_ICOD, 1685021545LL);
+#endif
+#if defined(VLC_CODEC_IDCIN)
 VLCLR_VALUE(VLC_CODEC_IDCIN, 1229145161LL);
+#endif
+#if defined(VLC_CODEC_IMC)
 VLCLR_VALUE(VLC_CODEC_IMC, 1025LL);
+#endif
+#if defined(VLC_CODEC_IMM4)
 VLCLR_VALUE(VLC_CODEC_IMM4, 877481289LL);
+#endif
+#if defined(VLC_CODEC_IMM5)
 VLCLR_VALUE(VLC_CODEC_IMM5, 894258505LL);
+#endif
+#if defined(VLC_CODEC_INDEO2)
 VLCLR_VALUE(VLC_CODEC_INDEO2, 808605257LL);
+#endif
+#if defined(VLC_CODEC_INDEO3)
 VLCLR_VALUE(VLC_CODEC_INDEO3, 825448009LL);
+#endif
+#if defined(VLC_CODEC_INDEO4)
 VLCLR_VALUE(VLC_CODEC_INDEO4, 825513545LL);
+#endif
+#if defined(VLC_CODEC_INDEO5)
 VLCLR_VALUE(VLC_CODEC_INDEO5, 808801865LL);
+#endif
+#if defined(VLC_CODEC_INDEO_AUDIO)
 VLCLR_VALUE(VLC_CODEC_INDEO_AUDIO, 33846125LL);
+#endif
+#if defined(VLC_CODEC_INTERPLAY)
 VLCLR_VALUE(VLC_CODEC_INTERPLAY, 1702260073LL);
+#endif
+#if defined(VLC_CODEC_INTERPLAY_DPCM)
 VLCLR_VALUE(VLC_CODEC_INTERPLAY_DPCM, 1668310121LL);
+#endif
+#if defined(VLC_CODEC_ITU_T140)
 VLCLR_VALUE(VLC_CODEC_ITU_T140, 808726900LL);
+#endif
+#if defined(VLC_CODEC_JPEG)
 VLCLR_VALUE(VLC_CODEC_JPEG, 1734701162LL);
+#endif
+#if defined(VLC_CODEC_JPEG2000)
 VLCLR_VALUE(VLC_CODEC_JPEG2000, 1261588554LL);
+#endif
+#if defined(VLC_CODEC_JPEGLS)
 VLCLR_VALUE(VLC_CODEC_JPEGLS, 1397508685LL);
+#endif
+#if defined(VLC_CODEC_JV)
 VLCLR_VALUE(VLC_CODEC_JV, 808474186LL);
+#endif
+#if defined(VLC_CODEC_KATE)
 VLCLR_VALUE(VLC_CODEC_KATE, 1702125931LL);
+#endif
+#if defined(VLC_CODEC_KGV1)
 VLCLR_VALUE(VLC_CODEC_KGV1, 827737931LL);
+#endif
+#if defined(VLC_CODEC_KMVC)
 VLCLR_VALUE(VLC_CODEC_KMVC, 1129729355LL);
+#endif
+#if defined(VLC_CODEC_LAGARITH)
 VLCLR_VALUE(VLC_CODEC_LAGARITH, 1397178700LL);
+#endif
+#if defined(VLC_CODEC_LCL_MSZH)
 VLCLR_VALUE(VLC_CODEC_LCL_MSZH, 1213879117LL);
+#endif
+#if defined(VLC_CODEC_LCL_ZLIB)
 VLCLR_VALUE(VLC_CODEC_LCL_ZLIB, 1112099930LL);
+#endif
+#if defined(VLC_CODEC_LJPG)
 VLCLR_VALUE(VLC_CODEC_LJPG, 1196444236LL);
+#endif
+#if defined(VLC_CODEC_LOCO)
 VLCLR_VALUE(VLC_CODEC_LOCO, 1329811276LL);
+#endif
+#if defined(VLC_CODEC_MACE3)
 VLCLR_VALUE(VLC_CODEC_MACE3, 860045645LL);
+#endif
+#if defined(VLC_CODEC_MACE6)
 VLCLR_VALUE(VLC_CODEC_MACE6, 910377293LL);
+#endif
+#if defined(VLC_CODEC_MAD)
 VLCLR_VALUE(VLC_CODEC_MAD, 1447313741LL);
+#endif
+#if defined(VLC_CODEC_MAGICYUV)
 VLCLR_VALUE(VLC_CODEC_MAGICYUV, 811153485LL);
+#endif
+#if defined(VLC_CODEC_MDEC)
 VLCLR_VALUE(VLC_CODEC_MDEC, 1128612941LL);
+#endif
+#if defined(VLC_CODEC_METASOUND)
 VLCLR_VALUE(VLC_CODEC_METASOUND, 1962963821LL);
+#endif
+#if defined(VLC_CODEC_MIDI)
 VLCLR_VALUE(VLC_CODEC_MIDI, 1229211981LL);
+#endif
+#if defined(VLC_CODEC_MIMIC)
 VLCLR_VALUE(VLC_CODEC_MIMIC, 1328696397LL);
+#endif
+#if defined(VLC_CODEC_MJPG)
 VLCLR_VALUE(VLC_CODEC_MJPG, 1196444237LL);
+#endif
+#if defined(VLC_CODEC_MJPGB)
 VLCLR_VALUE(VLC_CODEC_MJPGB, 1651534445LL);
+#endif
+#if defined(VLC_CODEC_MLP)
 VLCLR_VALUE(VLC_CODEC_MLP, 544238701LL);
+#endif
+#if defined(VLC_CODEC_MMAL_OPAQUE)
 VLCLR_VALUE(VLC_CODEC_MMAL_OPAQUE, 1279348045LL);
+#endif
+#if defined(VLC_CODEC_MMVIDEO)
 VLCLR_VALUE(VLC_CODEC_MMVIDEO, 1230392653LL);
+#endif
+#if defined(VLC_CODEC_MOTIONPIXELS)
 VLCLR_VALUE(VLC_CODEC_MOTIONPIXELS, 1481199693LL);
+#endif
+#if defined(VLC_CODEC_MP1V)
 VLCLR_VALUE(VLC_CODEC_MP1V, 1982951533LL);
+#endif
+#if defined(VLC_CODEC_MP2)
 VLCLR_VALUE(VLC_CODEC_MP2, 540176493LL);
+#endif
+#if defined(VLC_CODEC_MP2V)
 VLCLR_VALUE(VLC_CODEC_MP2V, 1983017069LL);
+#endif
+#if defined(VLC_CODEC_MP3)
 VLCLR_VALUE(VLC_CODEC_MP3, 540242029LL);
+#endif
+#if defined(VLC_CODEC_MP4A)
 VLCLR_VALUE(VLC_CODEC_MP4A, 1630826605LL);
+#endif
+#if defined(VLC_CODEC_MP4V)
 VLCLR_VALUE(VLC_CODEC_MP4V, 1983148141LL);
+#endif
+#if defined(VLC_CODEC_MPEGH)
 VLCLR_VALUE(VLC_CODEC_MPEGH, 1396787277LL);
+#endif
+#if defined(VLC_CODEC_MPGA)
 VLCLR_VALUE(VLC_CODEC_MPGA, 1634168941LL);
+#endif
+#if defined(VLC_CODEC_MPGV)
 VLCLR_VALUE(VLC_CODEC_MPGV, 1986490477LL);
+#endif
+#if defined(VLC_CODEC_MSA1)
 VLCLR_VALUE(VLC_CODEC_MSA1, 826364749LL);
+#endif
+#if defined(VLC_CODEC_MSRLE)
 VLCLR_VALUE(VLC_CODEC_MSRLE, 1701605997LL);
+#endif
+#if defined(VLC_CODEC_MSS1)
 VLCLR_VALUE(VLC_CODEC_MSS1, 827544397LL);
+#endif
+#if defined(VLC_CODEC_MSS2)
 VLCLR_VALUE(VLC_CODEC_MSS2, 844321613LL);
+#endif
+#if defined(VLC_CODEC_MSVIDEO1)
 VLCLR_VALUE(VLC_CODEC_MSVIDEO1, 1129730893LL);
+#endif
+#if defined(VLC_CODEC_MTS2)
 VLCLR_VALUE(VLC_CODEC_MTS2, 844321869LL);
+#endif
+#if defined(VLC_CODEC_MULAW)
 VLCLR_VALUE(VLC_CODEC_MULAW, 2002873453LL);
+#endif
+#if defined(VLC_CODEC_MUSEPACK7)
 VLCLR_VALUE(VLC_CODEC_MUSEPACK7, 541282381LL);
+#endif
+#if defined(VLC_CODEC_MUSEPACK8)
 VLCLR_VALUE(VLC_CODEC_MUSEPACK8, 1262702669LL);
+#endif
+#if defined(VLC_CODEC_MXPEG)
 VLCLR_VALUE(VLC_CODEC_MXPEG, 1196447821LL);
+#endif
+#if defined(VLC_CODEC_NELLYMOSER)
 VLCLR_VALUE(VLC_CODEC_NELLYMOSER, 1280066894LL);
+#endif
+#if defined(VLC_CODEC_NOTCHLC)
 VLCLR_VALUE(VLC_CODEC_NOTCHLC, 1668047726LL);
+#endif
+#if defined(VLC_CODEC_NUV)
 VLCLR_VALUE(VLC_CODEC_NUV, 1196444238LL);
+#endif
+#if defined(VLC_CODEC_NV12)
 VLCLR_VALUE(VLC_CODEC_NV12, 842094158LL);
+#endif
+#if defined(VLC_CODEC_NV16)
 VLCLR_VALUE(VLC_CODEC_NV16, 909203022LL);
+#endif
+#if defined(VLC_CODEC_NV21)
 VLCLR_VALUE(VLC_CODEC_NV21, 825382478LL);
+#endif
+#if defined(VLC_CODEC_NV24)
 VLCLR_VALUE(VLC_CODEC_NV24, 875714126LL);
+#endif
+#if defined(VLC_CODEC_NV42)
 VLCLR_VALUE(VLC_CODEC_NV42, 842290766LL);
+#endif
+#if defined(VLC_CODEC_NV61)
 VLCLR_VALUE(VLC_CODEC_NV61, 825644622LL);
+#endif
+#if defined(VLC_CODEC_NVDEC_OPAQUE)
 VLCLR_VALUE(VLC_CODEC_NVDEC_OPAQUE, 944002638LL);
+#endif
+#if defined(VLC_CODEC_NVDEC_OPAQUE_10B)
 VLCLR_VALUE(VLC_CODEC_NVDEC_OPAQUE_10B, 809784910LL);
+#endif
+#if defined(VLC_CODEC_NVDEC_OPAQUE_16B)
 VLCLR_VALUE(VLC_CODEC_NVDEC_OPAQUE_16B, 910448206LL);
+#endif
+#if defined(VLC_CODEC_NVDEC_OPAQUE_444)
 VLCLR_VALUE(VLC_CODEC_NVDEC_OPAQUE_444, 942954062LL);
+#endif
+#if defined(VLC_CODEC_NVDEC_OPAQUE_444_16B)
 VLCLR_VALUE(VLC_CODEC_NVDEC_OPAQUE_444_16B, 909399630LL);
+#endif
+#if defined(VLC_CODEC_OGGSPOTS)
 VLCLR_VALUE(VLC_CODEC_OGGSPOTS, 1414484051LL);
+#endif
+#if defined(VLC_CODEC_OGT)
 VLCLR_VALUE(VLC_CODEC_OGT, 544499567LL);
+#endif
+#if defined(VLC_CODEC_ON2AVC)
 VLCLR_VALUE(VLC_CODEC_ON2AVC, 357229LL);
+#endif
+#if defined(VLC_CODEC_OPUS)
 VLCLR_VALUE(VLC_CODEC_OPUS, 1937076303LL);
+#endif
+#if defined(VLC_CODEC_P010)
 VLCLR_VALUE(VLC_CODEC_P010, 808530000LL);
+#endif
+#if defined(VLC_CODEC_P012)
 VLCLR_VALUE(VLC_CODEC_P012, 842084432LL);
+#endif
+#if defined(VLC_CODEC_P016)
 VLCLR_VALUE(VLC_CODEC_P016, 909193296LL);
+#endif
+#if defined(VLC_CODEC_PAM)
 VLCLR_VALUE(VLC_CODEC_PAM, 544039280LL);
+#endif
+#if defined(VLC_CODEC_PCX)
 VLCLR_VALUE(VLC_CODEC_PCX, 544760688LL);
+#endif
+#if defined(VLC_CODEC_PGM)
 VLCLR_VALUE(VLC_CODEC_PGM, 544040816LL);
+#endif
+#if defined(VLC_CODEC_PGMYUV)
 VLCLR_VALUE(VLC_CODEC_PGMYUV, 2037213040LL);
+#endif
+#if defined(VLC_CODEC_PIXLET)
 VLCLR_VALUE(VLC_CODEC_PIXLET, 1953265776LL);
+#endif
+#if defined(VLC_CODEC_PNG)
 VLCLR_VALUE(VLC_CODEC_PNG, 543649392LL);
+#endif
+#if defined(VLC_CODEC_PNM)
 VLCLR_VALUE(VLC_CODEC_PNM, 544042608LL);
+#endif
+#if defined(VLC_CODEC_PPM)
 VLCLR_VALUE(VLC_CODEC_PPM, 544043120LL);
+#endif
+#if defined(VLC_CODEC_PRORES)
 VLCLR_VALUE(VLC_CODEC_PRORES, 1852010593LL);
+#endif
+#if defined(VLC_CODEC_QCELP)
 VLCLR_VALUE(VLC_CODEC_QCELP, 1886151505LL);
+#endif
+#if defined(VLC_CODEC_QDM2)
 VLCLR_VALUE(VLC_CODEC_QDM2, 843924561LL);
+#endif
+#if defined(VLC_CODEC_QDMC)
 VLCLR_VALUE(VLC_CODEC_QDMC, 1129137233LL);
+#endif
+#if defined(VLC_CODEC_QDRAW)
 VLCLR_VALUE(VLC_CODEC_QDRAW, 2003985521LL);
+#endif
+#if defined(VLC_CODEC_QOA)
 VLCLR_VALUE(VLC_CODEC_QOA, 1717661553LL);
+#endif
+#if defined(VLC_CODEC_QOI)
 VLCLR_VALUE(VLC_CODEC_QOI, 1718185841LL);
+#endif
+#if defined(VLC_CODEC_QPEG)
 VLCLR_VALUE(VLC_CODEC_QPEG, 1195724881LL);
+#endif
+#if defined(VLC_CODEC_QTRLE)
 VLCLR_VALUE(VLC_CODEC_QTRLE, 543517810LL);
+#endif
+#if defined(VLC_CODEC_QTXT)
 VLCLR_VALUE(VLC_CODEC_QTXT, 1954051185LL);
+#endif
+#if defined(VLC_CODEC_R420)
 VLCLR_VALUE(VLC_CODEC_R420, 808596594LL);
+#endif
+#if defined(VLC_CODEC_RALF)
 VLCLR_VALUE(VLC_CODEC_RALF, 1179402578LL);
+#endif
+#if defined(VLC_CODEC_RA_144)
 VLCLR_VALUE(VLC_CODEC_RA_144, 878654513LL);
+#endif
+#if defined(VLC_CODEC_RA_288)
 VLCLR_VALUE(VLC_CODEC_RA_288, 945764402LL);
+#endif
+#if defined(VLC_CODEC_RGB233)
 VLCLR_VALUE(VLC_CODEC_RGB233, 943867730LL);
+#endif
+#if defined(VLC_CODEC_RGB24)
 VLCLR_VALUE(VLC_CODEC_RGB24, 875714130LL);
+#endif
+#if defined(VLC_CODEC_RGB332)
 VLCLR_VALUE(VLC_CODEC_RGB332, 842216274LL);
+#endif
+#if defined(VLC_CODEC_RGB555)
 VLCLR_VALUE(VLC_CODEC_RGB555, 892425810LL);
+#endif
+#if defined(VLC_CODEC_RGB555BE)
 VLCLR_VALUE(VLC_CODEC_RGB555BE, 892420690LL);
+#endif
+#if defined(VLC_CODEC_RGB555LE)
 VLCLR_VALUE(VLC_CODEC_RGB555LE, 892425810LL);
+#endif
+#if defined(VLC_CODEC_RGB565)
 VLCLR_VALUE(VLC_CODEC_RGB565, 909203026LL);
+#endif
+#if defined(VLC_CODEC_RGB565BE)
 VLCLR_VALUE(VLC_CODEC_RGB565BE, 909197906LL);
+#endif
+#if defined(VLC_CODEC_RGB565LE)
 VLCLR_VALUE(VLC_CODEC_RGB565LE, 909203026LL);
+#endif
+#if defined(VLC_CODEC_RGBA)
 VLCLR_VALUE(VLC_CODEC_RGBA, 1094862674LL);
+#endif
+#if defined(VLC_CODEC_RGBA10LE)
 VLCLR_VALUE(VLC_CODEC_RGBA10LE, 809584466LL);
+#endif
+#if defined(VLC_CODEC_RGBA64)
 VLCLR_VALUE(VLC_CODEC_RGBA64, 876693330LL);
+#endif
+#if defined(VLC_CODEC_RGBP)
 VLCLR_VALUE(VLC_CODEC_RGBP, 1346520914LL);
+#endif
+#if defined(VLC_CODEC_RGBX)
 VLCLR_VALUE(VLC_CODEC_RGBX, 1480738642LL);
+#endif
+#if defined(VLC_CODEC_RL2)
 VLCLR_VALUE(VLC_CODEC_RL2, 844516434LL);
+#endif
+#if defined(VLC_CODEC_ROQ)
 VLCLR_VALUE(VLC_CODEC_ROQ, 1985048402LL);
+#endif
+#if defined(VLC_CODEC_ROQ_DPCM)
 VLCLR_VALUE(VLC_CODEC_ROQ_DPCM, 1632726866LL);
+#endif
+#if defined(VLC_CODEC_RPZA)
 VLCLR_VALUE(VLC_CODEC_RPZA, 1635414130LL);
+#endif
+#if defined(VLC_CODEC_RTP_VIDEO_RAW)
 VLCLR_VALUE(VLC_CODEC_RTP_VIDEO_RAW, 1448105042LL);
+#endif
+#if defined(VLC_CODEC_RV10)
 VLCLR_VALUE(VLC_CODEC_RV10, 808539730LL);
+#endif
+#if defined(VLC_CODEC_RV13)
 VLCLR_VALUE(VLC_CODEC_RV13, 858871378LL);
+#endif
+#if defined(VLC_CODEC_RV20)
 VLCLR_VALUE(VLC_CODEC_RV20, 808605266LL);
+#endif
+#if defined(VLC_CODEC_RV30)
 VLCLR_VALUE(VLC_CODEC_RV30, 808670802LL);
+#endif
+#if defined(VLC_CODEC_RV40)
 VLCLR_VALUE(VLC_CODEC_RV40, 808736338LL);
+#endif
+#if defined(VLC_CODEC_S16B)
 VLCLR_VALUE(VLC_CODEC_S16B, 1647718771LL);
+#endif
+#if defined(VLC_CODEC_S16I)
 VLCLR_VALUE(VLC_CODEC_S16I, 1647718771LL);
+#endif
+#if defined(VLC_CODEC_S16L)
 VLCLR_VALUE(VLC_CODEC_S16L, 1815490931LL);
+#endif
+#if defined(VLC_CODEC_S16L_PLANAR)
 VLCLR_VALUE(VLC_CODEC_S16L_PLANAR, 1886138739LL);
+#endif
+#if defined(VLC_CODEC_S16N)
 VLCLR_VALUE(VLC_CODEC_S16N, 1815490931LL);
+#endif
+#if defined(VLC_CODEC_S20B)
 VLCLR_VALUE(VLC_CODEC_S20B, 1647325811LL);
+#endif
+#if defined(VLC_CODEC_S24B)
 VLCLR_VALUE(VLC_CODEC_S24B, 1647587955LL);
+#endif
+#if defined(VLC_CODEC_S24B32)
 VLCLR_VALUE(VLC_CODEC_S24B32, 875835987LL);
+#endif
+#if defined(VLC_CODEC_S24DAUD)
 VLCLR_VALUE(VLC_CODEC_S24DAUD, 1685414244LL);
+#endif
+#if defined(VLC_CODEC_S24I)
 VLCLR_VALUE(VLC_CODEC_S24I, 1647587955LL);
+#endif
+#if defined(VLC_CODEC_S24L)
 VLCLR_VALUE(VLC_CODEC_S24L, 1815360115LL);
+#endif
+#if defined(VLC_CODEC_S24L32)
 VLCLR_VALUE(VLC_CODEC_S24L32, 875836019LL);
+#endif
+#if defined(VLC_CODEC_S24N)
 VLCLR_VALUE(VLC_CODEC_S24N, 1815360115LL);
+#endif
+#if defined(VLC_CODEC_S32B)
 VLCLR_VALUE(VLC_CODEC_S32B, 1647457139LL);
+#endif
+#if defined(VLC_CODEC_S32I)
 VLCLR_VALUE(VLC_CODEC_S32I, 1647457139LL);
+#endif
+#if defined(VLC_CODEC_S32L)
 VLCLR_VALUE(VLC_CODEC_S32L, 1815229299LL);
+#endif
+#if defined(VLC_CODEC_S32N)
 VLCLR_VALUE(VLC_CODEC_S32N, 1815229299LL);
+#endif
+#if defined(VLC_CODEC_S8)
 VLCLR_VALUE(VLC_CODEC_S8, 538982515LL);
+#endif
+#if defined(VLC_CODEC_SCTE_18)
 VLCLR_VALUE(VLC_CODEC_SCTE_18, 942752595LL);
+#endif
+#if defined(VLC_CODEC_SCTE_27)
 VLCLR_VALUE(VLC_CODEC_SCTE_27, 926040915LL);
+#endif
+#if defined(VLC_CODEC_SDDS)
 VLCLR_VALUE(VLC_CODEC_SDDS, 1935959155LL);
+#endif
+#if defined(VLC_CODEC_SGI)
 VLCLR_VALUE(VLC_CODEC_SGI, 543778675LL);
+#endif
+#if defined(VLC_CODEC_SHORTEN)
 VLCLR_VALUE(VLC_CODEC_SHORTEN, 544106611LL);
+#endif
+#if defined(VLC_CODEC_SIPR)
 VLCLR_VALUE(VLC_CODEC_SIPR, 1919969651LL);
+#endif
+#if defined(VLC_CODEC_SMACKAUDIO)
 VLCLR_VALUE(VLC_CODEC_SMACKAUDIO, 1095454035LL);
+#endif
+#if defined(VLC_CODEC_SMACKVIDEO)
 VLCLR_VALUE(VLC_CODEC_SMACKVIDEO, 843795795LL);
+#endif
+#if defined(VLC_CODEC_SMC)
 VLCLR_VALUE(VLC_CODEC_SMC, 543386995LL);
+#endif
+#if defined(VLC_CODEC_SP5X)
 VLCLR_VALUE(VLC_CODEC_SP5X, 1479888979LL);
+#endif
+#if defined(VLC_CODEC_SPDIFB)
 VLCLR_VALUE(VLC_CODEC_SPDIFB, 1650749555LL);
+#endif
+#if defined(VLC_CODEC_SPDIFL)
 VLCLR_VALUE(VLC_CODEC_SPDIFL, 1768190067LL);
+#endif
+#if defined(VLC_CODEC_SPEEDHQ)
 VLCLR_VALUE(VLC_CODEC_SPEEDHQ, 844187731LL);
+#endif
+#if defined(VLC_CODEC_SPEEX)
 VLCLR_VALUE(VLC_CODEC_SPEEX, 544764019LL);
+#endif
+#if defined(VLC_CODEC_SPU)
 VLCLR_VALUE(VLC_CODEC_SPU, 544567411LL);
+#endif
+#if defined(VLC_CODEC_SSA)
 VLCLR_VALUE(VLC_CODEC_SSA, 543257459LL);
+#endif
+#if defined(VLC_CODEC_SUBT)
 VLCLR_VALUE(VLC_CODEC_SUBT, 1952609651LL);
+#endif
+#if defined(VLC_CODEC_SVG)
 VLCLR_VALUE(VLC_CODEC_SVG, 543651443LL);
+#endif
+#if defined(VLC_CODEC_SVQ1)
 VLCLR_VALUE(VLC_CODEC_SVQ1, 827414099LL);
+#endif
+#if defined(VLC_CODEC_SVQ3)
 VLCLR_VALUE(VLC_CODEC_SVQ3, 860968531LL);
+#endif
+#if defined(VLC_CODEC_TAK)
 VLCLR_VALUE(VLC_CODEC_TAK, 543908212LL);
+#endif
+#if defined(VLC_CODEC_TARGA)
 VLCLR_VALUE(VLC_CODEC_TARGA, 543254388LL);
+#endif
+#if defined(VLC_CODEC_TARKIN)
 VLCLR_VALUE(VLC_CODEC_TARKIN, 1802658164LL);
+#endif
+#if defined(VLC_CODEC_TDSC)
 VLCLR_VALUE(VLC_CODEC_TDSC, 1129530452LL);
+#endif
+#if defined(VLC_CODEC_TELETEXT)
 VLCLR_VALUE(VLC_CODEC_TELETEXT, 2020369780LL);
+#endif
+#if defined(VLC_CODEC_TEXT)
 VLCLR_VALUE(VLC_CODEC_TEXT, 1415071060LL);
+#endif
+#if defined(VLC_CODEC_TGQ)
 VLCLR_VALUE(VLC_CODEC_TGQ, 1448167252LL);
+#endif
+#if defined(VLC_CODEC_TGV)
 VLCLR_VALUE(VLC_CODEC_TGV, 1448494932LL);
+#endif
+#if defined(VLC_CODEC_THEORA)
 VLCLR_VALUE(VLC_CODEC_THEORA, 1868916852LL);
+#endif
+#if defined(VLC_CODEC_THP)
 VLCLR_VALUE(VLC_CODEC_THP, 810567764LL);
+#endif
+#if defined(VLC_CODEC_TIERTEXSEQVIDEO)
 VLCLR_VALUE(VLC_CODEC_TIERTEXSEQVIDEO, 1363497812LL);
+#endif
+#if defined(VLC_CODEC_TIFF)
 VLCLR_VALUE(VLC_CODEC_TIFF, 1717987700LL);
+#endif
+#if defined(VLC_CODEC_TMV)
 VLCLR_VALUE(VLC_CODEC_TMV, 1447120212LL);
+#endif
+#if defined(VLC_CODEC_TQI)
 VLCLR_VALUE(VLC_CODEC_TQI, 1447645524LL);
+#endif
+#if defined(VLC_CODEC_TRUEHD)
 VLCLR_VALUE(VLC_CODEC_TRUEHD, 1634757741LL);
+#endif
+#if defined(VLC_CODEC_TRUEMOTION1)
 VLCLR_VALUE(VLC_CODEC_TRUEMOTION1, 1262703940LL);
+#endif
+#if defined(VLC_CODEC_TRUEMOTION2)
 VLCLR_VALUE(VLC_CODEC_TRUEMOTION2, 808602964LL);
+#endif
+#if defined(VLC_CODEC_TRUESPEECH)
 VLCLR_VALUE(VLC_CODEC_TRUESPEECH, 34LL);
+#endif
+#if defined(VLC_CODEC_TSC2)
 VLCLR_VALUE(VLC_CODEC_TSC2, 843273044LL);
+#endif
+#if defined(VLC_CODEC_TSCC)
 VLCLR_VALUE(VLC_CODEC_TSCC, 1128485716LL);
+#endif
+#if defined(VLC_CODEC_TTA)
 VLCLR_VALUE(VLC_CODEC_TTA, 826365012LL);
+#endif
+#if defined(VLC_CODEC_TTML)
 VLCLR_VALUE(VLC_CODEC_TTML, 1886418035LL);
+#endif
+#if defined(VLC_CODEC_TTML_TS)
 VLCLR_VALUE(VLC_CODEC_TTML_TS, 1349547123LL);
+#endif
+#if defined(VLC_CODEC_TWINVQ)
 VLCLR_VALUE(VLC_CODEC_TWINVQ, 1313429332LL);
+#endif
+#if defined(VLC_CODEC_TX3G)
 VLCLR_VALUE(VLC_CODEC_TX3G, 1731426420LL);
+#endif
+#if defined(VLC_CODEC_TXD)
 VLCLR_VALUE(VLC_CODEC_TXD, 541349972LL);
+#endif
+#if defined(VLC_CODEC_U16B)
 VLCLR_VALUE(VLC_CODEC_U16B, 1647718773LL);
+#endif
+#if defined(VLC_CODEC_U16I)
 VLCLR_VALUE(VLC_CODEC_U16I, 1647718773LL);
+#endif
+#if defined(VLC_CODEC_U16L)
 VLCLR_VALUE(VLC_CODEC_U16L, 1815490933LL);
+#endif
+#if defined(VLC_CODEC_U16N)
 VLCLR_VALUE(VLC_CODEC_U16N, 1815490933LL);
+#endif
+#if defined(VLC_CODEC_U24B)
 VLCLR_VALUE(VLC_CODEC_U24B, 1647587957LL);
+#endif
+#if defined(VLC_CODEC_U24I)
 VLCLR_VALUE(VLC_CODEC_U24I, 1647587957LL);
+#endif
+#if defined(VLC_CODEC_U24L)
 VLCLR_VALUE(VLC_CODEC_U24L, 1815360117LL);
+#endif
+#if defined(VLC_CODEC_U24N)
 VLCLR_VALUE(VLC_CODEC_U24N, 1815360117LL);
+#endif
+#if defined(VLC_CODEC_U32B)
 VLCLR_VALUE(VLC_CODEC_U32B, 1647457141LL);
+#endif
+#if defined(VLC_CODEC_U32I)
 VLCLR_VALUE(VLC_CODEC_U32I, 1647457141LL);
+#endif
+#if defined(VLC_CODEC_U32L)
 VLCLR_VALUE(VLC_CODEC_U32L, 1815229301LL);
+#endif
+#if defined(VLC_CODEC_U32N)
 VLCLR_VALUE(VLC_CODEC_U32N, 1815229301LL);
+#endif
+#if defined(VLC_CODEC_U8)
 VLCLR_VALUE(VLC_CODEC_U8, 538982517LL);
+#endif
+#if defined(VLC_CODEC_ULEAD_DV_AUDIO_NTSC)
 VLCLR_VALUE(VLC_CODEC_ULEAD_DV_AUDIO_NTSC, 352482157LL);
+#endif
+#if defined(VLC_CODEC_ULEAD_DV_AUDIO_PAL)
 VLCLR_VALUE(VLC_CODEC_ULEAD_DV_AUDIO_PAL, 369259373LL);
+#endif
+#if defined(VLC_CODEC_ULTI)
 VLCLR_VALUE(VLC_CODEC_ULTI, 1230261333LL);
+#endif
+#if defined(VLC_CODEC_UNKNOWN)
 VLCLR_VALUE(VLC_CODEC_UNKNOWN, 1717857909LL);
+#endif
+#if defined(VLC_CODEC_USF)
 VLCLR_VALUE(VLC_CODEC_USF, 543585141LL);
+#endif
+#if defined(VLC_CODEC_UTVIDEO)
 VLCLR_VALUE(VLC_CODEC_UTVIDEO, 1095912533LL);
+#endif
+#if defined(VLC_CODEC_UYVY)
 VLCLR_VALUE(VLC_CODEC_UYVY, 1498831189LL);
+#endif
+#if defined(VLC_CODEC_V210)
 VLCLR_VALUE(VLC_CODEC_V210, 808530550LL);
+#endif
+#if defined(VLC_CODEC_V308)
 VLCLR_VALUE(VLC_CODEC_V308, 942682998LL);
+#endif
+#if defined(VLC_CODEC_V408)
 VLCLR_VALUE(VLC_CODEC_V408, 942683254LL);
+#endif
+#if defined(VLC_CODEC_V410)
 VLCLR_VALUE(VLC_CODEC_V410, 808531062LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_420)
 VLCLR_VALUE(VLC_CODEC_VAAPI_420, 1347371350LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_420_10BPP)
 VLCLR_VALUE(VLC_CODEC_VAAPI_420_10BPP, 810500438LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_420_12BPP)
 VLCLR_VALUE(VLC_CODEC_VAAPI_420_12BPP, 844054870LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_422_10BPP)
 VLCLR_VALUE(VLC_CODEC_VAAPI_422_10BPP, 808599894LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_422_12BPP)
 VLCLR_VALUE(VLC_CODEC_VAAPI_422_12BPP, 842154326LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_444)
 VLCLR_VALUE(VLC_CODEC_VAAPI_444, 1345601878LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_444_10BPP)
 VLCLR_VALUE(VLC_CODEC_VAAPI_444_10BPP, 808730966LL);
+#endif
+#if defined(VLC_CODEC_VAAPI_444_12BPP)
 VLCLR_VALUE(VLC_CODEC_VAAPI_444_12BPP, 842285398LL);
+#endif
+#if defined(VLC_CODEC_VB)
 VLCLR_VALUE(VLC_CODEC_VB, 827736662LL);
+#endif
+#if defined(VLC_CODEC_VBLE)
 VLCLR_VALUE(VLC_CODEC_VBLE, 1162625622LL);
+#endif
+#if defined(VLC_CODEC_VC1)
 VLCLR_VALUE(VLC_CODEC_VC1, 825049942LL);
+#endif
+#if defined(VLC_CODEC_VCR1)
 VLCLR_VALUE(VLC_CODEC_VCR1, 827474774LL);
+#endif
+#if defined(VLC_CODEC_VDPAU_OUTPUT)
 VLCLR_VALUE(VLC_CODEC_VDPAU_OUTPUT, 1380926550LL);
+#endif
+#if defined(VLC_CODEC_VDPAU_VIDEO)
 VLCLR_VALUE(VLC_CODEC_VDPAU_VIDEO, 1498825814LL);
+#endif
+#if defined(VLC_CODEC_VIXL)
 VLCLR_VALUE(VLC_CODEC_VIXL, 1280854358LL);
+#endif
+#if defined(VLC_CODEC_VMDAUDIO)
 VLCLR_VALUE(VLC_CODEC_VMDAUDIO, 1633971574LL);
+#endif
+#if defined(VLC_CODEC_VMDVIDEO)
 VLCLR_VALUE(VLC_CODEC_VMDVIDEO, 1447316822LL);
+#endif
+#if defined(VLC_CODEC_VMNC)
 VLCLR_VALUE(VLC_CODEC_VMNC, 1668173142LL);
+#endif
+#if defined(VLC_CODEC_VORBIS)
 VLCLR_VALUE(VLC_CODEC_VORBIS, 1651666806LL);
+#endif
+#if defined(VLC_CODEC_VP10)
 VLCLR_VALUE(VLC_CODEC_VP10, 809128022LL);
+#endif
+#if defined(VLC_CODEC_VP3)
 VLCLR_VALUE(VLC_CODEC_VP3, 540233814LL);
+#endif
+#if defined(VLC_CODEC_VP4)
 VLCLR_VALUE(VLC_CODEC_VP4, 808734806LL);
+#endif
+#if defined(VLC_CODEC_VP5)
 VLCLR_VALUE(VLC_CODEC_VP5, 540364886LL);
+#endif
+#if defined(VLC_CODEC_VP6)
 VLCLR_VALUE(VLC_CODEC_VP6, 842420310LL);
+#endif
+#if defined(VLC_CODEC_VP6A)
 VLCLR_VALUE(VLC_CODEC_VP6A, 1094078550LL);
+#endif
+#if defined(VLC_CODEC_VP6F)
 VLCLR_VALUE(VLC_CODEC_VP6F, 1177964630LL);
+#endif
+#if defined(VLC_CODEC_VP7)
 VLCLR_VALUE(VLC_CODEC_VP7, 808931414LL);
+#endif
+#if defined(VLC_CODEC_VP8)
 VLCLR_VALUE(VLC_CODEC_VP8, 808996950LL);
+#endif
+#if defined(VLC_CODEC_VP8ALPHA_ES)
 VLCLR_VALUE(VLC_CODEC_VP8ALPHA_ES, 1631080534LL);
+#endif
+#if defined(VLC_CODEC_VP9)
 VLCLR_VALUE(VLC_CODEC_VP9, 809062486LL);
+#endif
+#if defined(VLC_CODEC_VP9ALPHA_ES)
 VLCLR_VALUE(VLC_CODEC_VP9ALPHA_ES, 1631146070LL);
+#endif
+#if defined(VLC_CODEC_VUYA)
 VLCLR_VALUE(VLC_CODEC_VUYA, 1096373590LL);
+#endif
+#if defined(VLC_CODEC_VUYX)
 VLCLR_VALUE(VLC_CODEC_VUYX, 1482249558LL);
+#endif
+#if defined(VLC_CODEC_VVC)
 VLCLR_VALUE(VLC_CODEC_VVC, 909521512LL);
+#endif
+#if defined(VLC_CODEC_VYUY)
 VLCLR_VALUE(VLC_CODEC_VYUY, 1498765654LL);
+#endif
+#if defined(VLC_CODEC_WAVPACK)
 VLCLR_VALUE(VLC_CODEC_WAVPACK, 1263556183LL);
+#endif
+#if defined(VLC_CODEC_WEBP)
 VLCLR_VALUE(VLC_CODEC_WEBP, 1346520407LL);
+#endif
+#if defined(VLC_CODEC_WEBVTT)
 VLCLR_VALUE(VLC_CODEC_WEBVTT, 1953789559LL);
+#endif
+#if defined(VLC_CODEC_WIDI_LPCM)
 VLCLR_VALUE(VLC_CODEC_WIDI_LPCM, 1835233399LL);
+#endif
+#if defined(VLC_CODEC_WMA1)
 VLCLR_VALUE(VLC_CODEC_WMA1, 826363223LL);
+#endif
+#if defined(VLC_CODEC_WMA2)
 VLCLR_VALUE(VLC_CODEC_WMA2, 843140439LL);
+#endif
+#if defined(VLC_CODEC_WMAL)
 VLCLR_VALUE(VLC_CODEC_WMAL, 1279348055LL);
+#endif
+#if defined(VLC_CODEC_WMAP)
 VLCLR_VALUE(VLC_CODEC_WMAP, 1346456919LL);
+#endif
+#if defined(VLC_CODEC_WMAS)
 VLCLR_VALUE(VLC_CODEC_WMAS, 1396788567LL);
+#endif
+#if defined(VLC_CODEC_WMV1)
 VLCLR_VALUE(VLC_CODEC_WMV1, 827739479LL);
+#endif
+#if defined(VLC_CODEC_WMV2)
 VLCLR_VALUE(VLC_CODEC_WMV2, 844516695LL);
+#endif
+#if defined(VLC_CODEC_WMV3)
 VLCLR_VALUE(VLC_CODEC_WMV3, 861293911LL);
+#endif
+#if defined(VLC_CODEC_WMVA)
 VLCLR_VALUE(VLC_CODEC_WMVA, 1096174935LL);
+#endif
+#if defined(VLC_CODEC_WMVP)
 VLCLR_VALUE(VLC_CODEC_WMVP, 1347833175LL);
+#endif
+#if defined(VLC_CODEC_WMVP2)
 VLCLR_VALUE(VLC_CODEC_WMVP2, 844125783LL);
+#endif
+#if defined(VLC_CODEC_WNV1)
 VLCLR_VALUE(VLC_CODEC_WNV1, 827739735LL);
+#endif
+#if defined(VLC_CODEC_WS_VQA)
 VLCLR_VALUE(VLC_CODEC_WS_VQA, 1095849559LL);
+#endif
+#if defined(VLC_CODEC_XAN_WC3)
 VLCLR_VALUE(VLC_CODEC_XAN_WC3, 860766552LL);
+#endif
+#if defined(VLC_CODEC_XAN_WC4)
 VLCLR_VALUE(VLC_CODEC_XAN_WC4, 1851881560LL);
+#endif
+#if defined(VLC_CODEC_XBGR)
 VLCLR_VALUE(VLC_CODEC_XBGR, 1380401752LL);
+#endif
+#if defined(VLC_CODEC_XRGB)
 VLCLR_VALUE(VLC_CODEC_XRGB, 842225234LL);
+#endif
+#if defined(VLC_CODEC_XSUB)
 VLCLR_VALUE(VLC_CODEC_XSUB, 1112888152LL);
+#endif
+#if defined(VLC_CODEC_XWD)
 VLCLR_VALUE(VLC_CODEC_XWD, 541349720LL);
+#endif
+#if defined(VLC_CODEC_XYZ_12B)
 VLCLR_VALUE(VLC_CODEC_XYZ_12B, 1113807192LL);
+#endif
+#if defined(VLC_CODEC_XYZ_12L)
 VLCLR_VALUE(VLC_CODEC_XYZ_12L, 1281579352LL);
+#endif
+#if defined(VLC_CODEC_Y210)
 VLCLR_VALUE(VLC_CODEC_Y210, 808530521LL);
+#endif
+#if defined(VLC_CODEC_Y211)
 VLCLR_VALUE(VLC_CODEC_Y211, 825307737LL);
+#endif
+#if defined(VLC_CODEC_Y212)
 VLCLR_VALUE(VLC_CODEC_Y212, 842084953LL);
+#endif
+#if defined(VLC_CODEC_Y410)
 VLCLR_VALUE(VLC_CODEC_Y410, 808531033LL);
+#endif
+#if defined(VLC_CODEC_Y412)
 VLCLR_VALUE(VLC_CODEC_Y412, 842085465LL);
+#endif
+#if defined(VLC_CODEC_YOP)
 VLCLR_VALUE(VLC_CODEC_YOP, 1448103769LL);
+#endif
+#if defined(VLC_CODEC_YUV2)
 VLCLR_VALUE(VLC_CODEC_YUV2, 846624121LL);
+#endif
+#if defined(VLC_CODEC_YUV4)
 VLCLR_VALUE(VLC_CODEC_YUV4, 880178553LL);
+#endif
+#if defined(VLC_CODEC_YUV420A)
 VLCLR_VALUE(VLC_CODEC_YUV420A, 1093678153LL);
+#endif
+#if defined(VLC_CODEC_YUV422A)
 VLCLR_VALUE(VLC_CODEC_YUV422A, 1093809225LL);
+#endif
+#if defined(VLC_CODEC_YUVA)
 VLCLR_VALUE(VLC_CODEC_YUVA, 1096176985LL);
+#endif
+#if defined(VLC_CODEC_YUVA_444_10B)
 VLCLR_VALUE(VLC_CODEC_YUVA_444_10B, 1110458713LL);
+#endif
+#if defined(VLC_CODEC_YUVA_444_10L)
 VLCLR_VALUE(VLC_CODEC_YUVA_444_10L, 1278230873LL);
+#endif
+#if defined(VLC_CODEC_YUVA_444_12B)
 VLCLR_VALUE(VLC_CODEC_YUVA_444_12B, 1110589785LL);
+#endif
+#if defined(VLC_CODEC_YUVA_444_12L)
 VLCLR_VALUE(VLC_CODEC_YUVA_444_12L, 1278361945LL);
+#endif
+#if defined(VLC_CODEC_YUVP)
 VLCLR_VALUE(VLC_CODEC_YUVP, 1347835225LL);
+#endif
+#if defined(VLC_CODEC_YUYV)
 VLCLR_VALUE(VLC_CODEC_YUYV, 844715353LL);
+#endif
+#if defined(VLC_CODEC_YV12)
 VLCLR_VALUE(VLC_CODEC_YV12, 842094169LL);
+#endif
+#if defined(VLC_CODEC_YVYU)
 VLCLR_VALUE(VLC_CODEC_YVYU, 1431918169LL);
+#endif
+#if defined(VLC_CODEC_ZMBV)
 VLCLR_VALUE(VLC_CODEC_ZMBV, 1447185754LL);
-#if !defined(_MSC_VER)
+#endif
+#if defined(VLC_CPU_AVX)
 VLCLR_VALUE(VLC_CPU_AVX, 8192LL);
 #endif
-#if !defined(_MSC_VER)
+#if defined(VLC_CPU_AVX2)
 VLCLR_VALUE(VLC_CPU_AVX2, 16384LL);
 #endif
-#if !defined(_MSC_VER)
+#if defined(VLC_CPU_SSE2)
 VLCLR_VALUE(VLC_CPU_SSE2, 128LL);
 #endif
-#if !defined(_MSC_VER)
+#if defined(VLC_CPU_SSE3)
 VLCLR_VALUE(VLC_CPU_SSE3, 256LL);
 #endif
-#if !defined(_MSC_VER)
+#if defined(VLC_CPU_SSE4_1)
 VLCLR_VALUE(VLC_CPU_SSE4_1, 1024LL);
 #endif
-#if !defined(_MSC_VER)
+#if defined(VLC_CPU_SSSE3)
 VLCLR_VALUE(VLC_CPU_SSSE3, 512LL);
 #endif
+#if defined(VLC_DEMUXER_BUFFERING)
 VLCLR_VALUE(VLC_DEMUXER_BUFFERING, 2LL);
+#endif
+#if defined(VLC_DEMUXER_EGENERIC)
 VLCLR_VALUE(VLC_DEMUXER_EGENERIC, -1LL);
+#endif
+#if defined(VLC_DEMUXER_EOF)
 VLCLR_VALUE(VLC_DEMUXER_EOF, 0LL);
+#endif
+#if defined(VLC_DEMUXER_SUCCESS)
 VLCLR_VALUE(VLC_DEMUXER_SUCCESS, 1LL);
+#endif
+#if defined(VLC_EACCES)
 VLCLR_VALUE(VLC_EACCES, -13LL);
+#endif
+#if defined(VLC_EGENERIC)
 VLCLR_VALUE(VLC_EGENERIC, -2147483648LL);
+#endif
+#if defined(VLC_EINVAL)
 VLCLR_VALUE(VLC_EINVAL, -22LL);
+#endif
+#if defined(VLC_ENOENT)
 VLCLR_VALUE(VLC_ENOENT, -2LL);
+#endif
+#if defined(VLC_ENOMEM)
 VLCLR_VALUE(VLC_ENOMEM, -12LL);
+#endif
+#if defined(VLC_ENOTSUP)
 VLCLR_VALUE(VLC_ENOTSUP, VLCLR_ABI(-129LL, -95LL));
+#endif
+#if defined(VLC_ETIMEOUT)
 VLCLR_VALUE(VLC_ETIMEOUT, VLCLR_ABI(-138LL, -110LL));
+#endif
+#if defined(VLC_FRAME_FLAG_AU_END)
 VLCLR_VALUE(VLC_FRAME_FLAG_AU_END, 2048LL);
+#endif
+#if defined(VLC_FRAME_FLAG_BOTTOM_FIELD_FIRST)
 VLCLR_VALUE(VLC_FRAME_FLAG_BOTTOM_FIELD_FIRST, 8192LL);
+#endif
+#if defined(VLC_FRAME_FLAG_CORE_PRIVATE_MASK)
 VLCLR_VALUE(VLC_FRAME_FLAG_CORE_PRIVATE_MASK, 16711680LL);
+#endif
+#if defined(VLC_FRAME_FLAG_CORE_PRIVATE_SHIFT)
 VLCLR_VALUE(VLC_FRAME_FLAG_CORE_PRIVATE_SHIFT, 16LL);
+#endif
+#if defined(VLC_FRAME_FLAG_CORRUPTED)
 VLCLR_VALUE(VLC_FRAME_FLAG_CORRUPTED, 1024LL);
+#endif
+#if defined(VLC_FRAME_FLAG_DISCONTINUITY)
 VLCLR_VALUE(VLC_FRAME_FLAG_DISCONTINUITY, 1LL);
+#endif
+#if defined(VLC_FRAME_FLAG_END_OF_SEQUENCE)
 VLCLR_VALUE(VLC_FRAME_FLAG_END_OF_SEQUENCE, 64LL);
+#endif
+#if defined(VLC_FRAME_FLAG_HEADER)
 VLCLR_VALUE(VLC_FRAME_FLAG_HEADER, 32LL);
+#endif
+#if defined(VLC_FRAME_FLAG_INTERLACED_MASK)
 VLCLR_VALUE(VLC_FRAME_FLAG_INTERLACED_MASK, 28672LL);
+#endif
+#if defined(VLC_FRAME_FLAG_PREROLL)
 VLCLR_VALUE(VLC_FRAME_FLAG_PREROLL, 512LL);
+#endif
+#if defined(VLC_FRAME_FLAG_PRIVATE_MASK)
 VLCLR_VALUE(VLC_FRAME_FLAG_PRIVATE_MASK, 4278190080LL);
+#endif
+#if defined(VLC_FRAME_FLAG_PRIVATE_SHIFT)
 VLCLR_VALUE(VLC_FRAME_FLAG_PRIVATE_SHIFT, 24LL);
+#endif
+#if defined(VLC_FRAME_FLAG_SCRAMBLED)
 VLCLR_VALUE(VLC_FRAME_FLAG_SCRAMBLED, 256LL);
+#endif
+#if defined(VLC_FRAME_FLAG_SINGLE_FIELD)
 VLCLR_VALUE(VLC_FRAME_FLAG_SINGLE_FIELD, 16384LL);
+#endif
+#if defined(VLC_FRAME_FLAG_TOP_FIELD_FIRST)
 VLCLR_VALUE(VLC_FRAME_FLAG_TOP_FIELD_FIRST, 4096LL);
+#endif
+#if defined(VLC_FRAME_FLAG_TYPE_B)
 VLCLR_VALUE(VLC_FRAME_FLAG_TYPE_B, 8LL);
+#endif
+#if defined(VLC_FRAME_FLAG_TYPE_I)
 VLCLR_VALUE(VLC_FRAME_FLAG_TYPE_I, 2LL);
+#endif
+#if defined(VLC_FRAME_FLAG_TYPE_MASK)
 VLCLR_VALUE(VLC_FRAME_FLAG_TYPE_MASK, 30LL);
+#endif
+#if defined(VLC_FRAME_FLAG_TYPE_P)
 VLCLR_VALUE(VLC_FRAME_FLAG_TYPE_P, 4LL);
+#endif
+#if defined(VLC_FRAME_FLAG_TYPE_PB)
 VLCLR_VALUE(VLC_FRAME_FLAG_TYPE_PB, 16LL);
+#endif
+#if defined(VLC_HARD_MIN_SLEEP)
 VLCLR_VALUE(VLC_HARD_MIN_SLEEP, 10000LL);
+#endif
+#if defined(VLC_HASH_MD5_DIGEST_HEX_SIZE)
 VLCLR_VALUE(VLC_HASH_MD5_DIGEST_HEX_SIZE, 33LL);
+#endif
+#if defined(VLC_HASH_MD5_DIGEST_SIZE)
 VLCLR_VALUE(VLC_HASH_MD5_DIGEST_SIZE, 16LL);
+#endif
+#if defined(VLC_ICONV_ERR)
 VLCLR_UVALUE(VLC_ICONV_ERR, 18446744073709551615ULL);
+#endif
+#if defined(VLC_INHIBIT_AUDIO)
 VLCLR_VALUE(VLC_INHIBIT_AUDIO, 1LL);
+#endif
+#if defined(VLC_INHIBIT_VIDEO)
 VLCLR_VALUE(VLC_INHIBIT_VIDEO, 3LL);
+#endif
+#if defined(VLC_META_TYPE_COUNT)
 VLCLR_VALUE(VLC_META_TYPE_COUNT, 28LL);
+#endif
+#if defined(VLC_PLAYER_CAP_CHANGE_RATE)
 VLCLR_VALUE(VLC_PLAYER_CAP_CHANGE_RATE, 4LL);
+#endif
+#if defined(VLC_PLAYER_CAP_PAUSE)
 VLCLR_VALUE(VLC_PLAYER_CAP_PAUSE, 2LL);
+#endif
+#if defined(VLC_PLAYER_CAP_REWIND)
 VLCLR_VALUE(VLC_PLAYER_CAP_REWIND, 8LL);
+#endif
+#if defined(VLC_PLAYER_CAP_SEEK)
 VLCLR_VALUE(VLC_PLAYER_CAP_SEEK, 1LL);
+#endif
+#if defined(VLC_PLAYER_TELETEXT_KEY_BLUE)
 VLCLR_VALUE(VLC_PLAYER_TELETEXT_KEY_BLUE, 6422528LL);
+#endif
+#if defined(VLC_PLAYER_TELETEXT_KEY_GREEN)
 VLCLR_VALUE(VLC_PLAYER_TELETEXT_KEY_GREEN, 6750208LL);
+#endif
+#if defined(VLC_PLAYER_TELETEXT_KEY_INDEX)
 VLCLR_VALUE(VLC_PLAYER_TELETEXT_KEY_INDEX, 6881280LL);
+#endif
+#if defined(VLC_PLAYER_TELETEXT_KEY_RED)
 VLCLR_VALUE(VLC_PLAYER_TELETEXT_KEY_RED, 7471104LL);
+#endif
+#if defined(VLC_PLAYER_TELETEXT_KEY_YELLOW)
 VLCLR_VALUE(VLC_PLAYER_TELETEXT_KEY_YELLOW, 7929856LL);
+#endif
+#if defined(VLC_PLAYER_TITLE_INTERACTIVE)
 VLCLR_VALUE(VLC_PLAYER_TITLE_INTERACTIVE, 2LL);
+#endif
+#if defined(VLC_PLAYER_TITLE_MAIN)
 VLCLR_VALUE(VLC_PLAYER_TITLE_MAIN, 4LL);
+#endif
+#if defined(VLC_PLAYER_TITLE_MENU)
 VLCLR_VALUE(VLC_PLAYER_TITLE_MENU, 1LL);
+#endif
+#if defined(VLC_PREPARSER_MSG_SERDES_TYPE_ATTACHMENT)
 VLCLR_VALUE(VLC_PREPARSER_MSG_SERDES_TYPE_ATTACHMENT, 2LL);
+#endif
+#if defined(VLC_PREPARSER_MSG_SERDES_TYPE_DATA)
 VLCLR_VALUE(VLC_PREPARSER_MSG_SERDES_TYPE_DATA, 1LL);
+#endif
+#if defined(VLC_PREPARSER_MSG_SERDES_TYPE_END_ATTACHMENT)
 VLCLR_VALUE(VLC_PREPARSER_MSG_SERDES_TYPE_END_ATTACHMENT, 8LL);
+#endif
+#if defined(VLC_PREPARSER_MSG_SERDES_TYPE_END_DATA)
 VLCLR_VALUE(VLC_PREPARSER_MSG_SERDES_TYPE_END_DATA, 4LL);
+#endif
+#if defined(VLC_PREPARSER_OPTION_INTERACT)
 VLCLR_VALUE(VLC_PREPARSER_OPTION_INTERACT, 4096LL);
+#endif
+#if defined(VLC_PREPARSER_OPTION_SUBITEMS)
 VLCLR_VALUE(VLC_PREPARSER_OPTION_SUBITEMS, 8192LL);
+#endif
+#if defined(VLC_PREPARSER_TYPE_FETCHMETA_ALL)
 VLCLR_VALUE(VLC_PREPARSER_TYPE_FETCHMETA_ALL, 6LL);
+#endif
+#if defined(VLC_PREPARSER_TYPE_FETCHMETA_LOCAL)
 VLCLR_VALUE(VLC_PREPARSER_TYPE_FETCHMETA_LOCAL, 2LL);
+#endif
+#if defined(VLC_PREPARSER_TYPE_FETCHMETA_NET)
 VLCLR_VALUE(VLC_PREPARSER_TYPE_FETCHMETA_NET, 4LL);
+#endif
+#if defined(VLC_PREPARSER_TYPE_PARSE)
 VLCLR_VALUE(VLC_PREPARSER_TYPE_PARSE, 1LL);
+#endif
+#if defined(VLC_PREPARSER_TYPE_THUMBNAIL)
 VLCLR_VALUE(VLC_PREPARSER_TYPE_THUMBNAIL, 8LL);
+#endif
+#if defined(VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES)
 VLCLR_VALUE(VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES, 16LL);
+#endif
+#if defined(VLC_PROBE_CONTINUE)
 VLCLR_VALUE(VLC_PROBE_CONTINUE, -2147483648LL);
+#endif
+#if defined(VLC_PROBE_STOP)
 VLCLR_VALUE(VLC_PROBE_STOP, 0LL);
+#endif
+#if defined(VLC_RENDERER_CAN_AUDIO)
 VLCLR_VALUE(VLC_RENDERER_CAN_AUDIO, 1LL);
+#endif
+#if defined(VLC_RENDERER_CAN_VIDEO)
 VLCLR_VALUE(VLC_RENDERER_CAN_VIDEO, 2LL);
+#endif
+#if defined(VLC_SOFT_MIN_SLEEP)
 VLCLR_VALUE(VLC_SOFT_MIN_SLEEP, 9000000LL);
+#endif
+#if defined(VLC_SUBPIC_TEXT_FLAG_GRID_MODE)
 VLCLR_VALUE(VLC_SUBPIC_TEXT_FLAG_GRID_MODE, 32LL);
+#endif
+#if defined(VLC_SUBPIC_TEXT_FLAG_IS_TEXT)
 VLCLR_VALUE(VLC_SUBPIC_TEXT_FLAG_IS_TEXT, 128LL);
+#endif
+#if defined(VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG)
 VLCLR_VALUE(VLC_SUBPIC_TEXT_FLAG_NO_REGION_BG, 16LL);
+#endif
+#if defined(VLC_SUBPIC_TEXT_FLAG_TEXT_NOT_BALANCED)
 VLCLR_VALUE(VLC_SUBPIC_TEXT_FLAG_TEXT_NOT_BALANCED, 64LL);
+#endif
+#if defined(VLC_SUCCESS)
 VLCLR_VALUE(VLC_SUCCESS, 0LL);
+#endif
+#if defined(VLC_TICK_0)
 VLCLR_VALUE(VLC_TICK_0, 1LL);
+#endif
+#if defined(VLC_TICK_INVALID)
 VLCLR_VALUE(VLC_TICK_INVALID, 0LL);
+#endif
+#if defined(VLC_TICK_MAX)
 VLCLR_VALUE(VLC_TICK_MAX, 9223372036854775807LL);
+#endif
+#if defined(VLC_TICK_MIN)
 VLCLR_VALUE(VLC_TICK_MIN, (-9223372036854775807LL - 1));
+#endif
+#if defined(VLC_TIMER_DISARM)
 VLCLR_VALUE(VLC_TIMER_DISARM, 0LL);
+#endif
+#if defined(VLC_TIMER_FIRE_ONCE)
 VLCLR_VALUE(VLC_TIMER_FIRE_ONCE, 0LL);
+#endif
+#if defined(VLC_VAR_ADDCHOICE)
 VLCLR_VALUE(VLC_VAR_ADDCHOICE, 32LL);
+#endif
+#if defined(VLC_VAR_ADDRESS)
 VLCLR_VALUE(VLC_VAR_ADDRESS, 112LL);
+#endif
+#if defined(VLC_VAR_BOOL)
 VLCLR_VALUE(VLC_VAR_BOOL, 32LL);
+#endif
+#if defined(VLC_VAR_CHOICESCOUNT)
 VLCLR_VALUE(VLC_VAR_CHOICESCOUNT, 38LL);
+#endif
+#if defined(VLC_VAR_CLASS)
 VLCLR_VALUE(VLC_VAR_CLASS, 240LL);
+#endif
+#if defined(VLC_VAR_CLEARCHOICES)
 VLCLR_VALUE(VLC_VAR_CLEARCHOICES, 34LL);
+#endif
+#if defined(VLC_VAR_COORDS)
 VLCLR_VALUE(VLC_VAR_COORDS, 160LL);
+#endif
+#if defined(VLC_VAR_DELCHOICE)
 VLCLR_VALUE(VLC_VAR_DELCHOICE, 33LL);
+#endif
+#if defined(VLC_VAR_DOINHERIT)
 VLCLR_VALUE(VLC_VAR_DOINHERIT, 32768LL);
+#endif
+#if defined(VLC_VAR_FLAGS)
 VLCLR_VALUE(VLC_VAR_FLAGS, 65280LL);
+#endif
+#if defined(VLC_VAR_FLOAT)
 VLCLR_VALUE(VLC_VAR_FLOAT, 80LL);
+#endif
+#if defined(VLC_VAR_GETCHOICES)
 VLCLR_VALUE(VLC_VAR_GETCHOICES, 36LL);
+#endif
+#if defined(VLC_VAR_GETMAX)
 VLCLR_VALUE(VLC_VAR_GETMAX, 23LL);
+#endif
+#if defined(VLC_VAR_GETMIN)
 VLCLR_VALUE(VLC_VAR_GETMIN, 22LL);
+#endif
+#if defined(VLC_VAR_GETSTEP)
 VLCLR_VALUE(VLC_VAR_GETSTEP, 24LL);
+#endif
+#if defined(VLC_VAR_GETTEXT)
 VLCLR_VALUE(VLC_VAR_GETTEXT, 21LL);
+#endif
+#if defined(VLC_VAR_HASCHOICE)
 VLCLR_VALUE(VLC_VAR_HASCHOICE, 256LL);
+#endif
+#if defined(VLC_VAR_INTEGER)
 VLCLR_VALUE(VLC_VAR_INTEGER, 48LL);
+#endif
+#if defined(VLC_VAR_ISCOMMAND)
 VLCLR_VALUE(VLC_VAR_ISCOMMAND, 8192LL);
+#endif
+#if defined(VLC_VAR_SETMINMAX)
 VLCLR_VALUE(VLC_VAR_SETMINMAX, 39LL);
+#endif
+#if defined(VLC_VAR_SETSTEP)
 VLCLR_VALUE(VLC_VAR_SETSTEP, 18LL);
+#endif
+#if defined(VLC_VAR_SETTEXT)
 VLCLR_VALUE(VLC_VAR_SETTEXT, 20LL);
+#endif
+#if defined(VLC_VAR_SETVALUE)
 VLCLR_VALUE(VLC_VAR_SETVALUE, 19LL);
+#endif
+#if defined(VLC_VAR_STRING)
 VLCLR_VALUE(VLC_VAR_STRING, 64LL);
+#endif
+#if defined(VLC_VAR_TYPE)
 VLCLR_VALUE(VLC_VAR_TYPE, 255LL);
+#endif
+#if defined(VLC_VAR_VOID)
 VLCLR_VALUE(VLC_VAR_VOID, 16LL);
+#endif
+#if defined(VLC_VECTOR_FAILFLAG_)
 VLCLR_UVALUE(VLC_VECTOR_FAILFLAG_, 9223372036854775808ULL);
+#endif
+#if defined(VLC_VECTOR_MINCAP_)
 VLCLR_UVALUE(VLC_VECTOR_MINCAP_, 10ULL);
+#endif
+#if defined(VLC_VIDEO_ALIGN_BOTTOM)
 VLCLR_VALUE(VLC_VIDEO_ALIGN_BOTTOM, 2LL);
+#endif
+#if defined(VLC_VIDEO_ALIGN_CENTER)
 VLCLR_VALUE(VLC_VIDEO_ALIGN_CENTER, 0LL);
+#endif
+#if defined(VLC_VIDEO_ALIGN_LEFT)
 VLCLR_VALUE(VLC_VIDEO_ALIGN_LEFT, 1LL);
+#endif
+#if defined(VLC_VIDEO_ALIGN_RIGHT)
 VLCLR_VALUE(VLC_VIDEO_ALIGN_RIGHT, 2LL);
+#endif
+#if defined(VLC_VIDEO_ALIGN_TOP)
 VLCLR_VALUE(VLC_VIDEO_ALIGN_TOP, 1LL);
+#endif
+#if defined(VOUT_ALIGN_BOTTOM)
 VLCLR_VALUE(VOUT_ALIGN_BOTTOM, 8LL);
+#endif
+#if defined(VOUT_ALIGN_HMASK)
 VLCLR_VALUE(VOUT_ALIGN_HMASK, 3LL);
+#endif
+#if defined(VOUT_ALIGN_LEFT)
 VLCLR_VALUE(VOUT_ALIGN_LEFT, 1LL);
+#endif
+#if defined(VOUT_ALIGN_RIGHT)
 VLCLR_VALUE(VOUT_ALIGN_RIGHT, 2LL);
+#endif
+#if defined(VOUT_ALIGN_TOP)
 VLCLR_VALUE(VOUT_ALIGN_TOP, 4LL);
+#endif
+#if defined(VOUT_ALIGN_VMASK)
 VLCLR_VALUE(VOUT_ALIGN_VMASK, 12LL);
+#endif
+#if defined(VOUT_ASPECT_FACTOR)
 VLCLR_VALUE(VOUT_ASPECT_FACTOR, 432000LL);
+#endif
+#if defined(VOUT_MAX_PLANES)
 VLCLR_VALUE(VOUT_MAX_PLANES, 5LL);
+#endif
+#if defined(VOUT_MAX_WIDTH)
 VLCLR_VALUE(VOUT_MAX_WIDTH, 4096LL);
+#endif
+#if defined(VOUT_OUTMEM_SLEEP)
 VLCLR_VALUE(VOUT_OUTMEM_SLEEP, 20000LL);
+#endif
+#if defined(VOUT_SPU_CHANNEL_INVALID)
 VLCLR_VALUE(VOUT_SPU_CHANNEL_INVALID, -1LL);
+#endif
+#if defined(VOUT_SPU_CHANNEL_OSD)
 VLCLR_VALUE(VOUT_SPU_CHANNEL_OSD, 0LL);
+#endif
+#if defined(VOUT_SPU_CHANNEL_OSD_COUNT)
 VLCLR_VALUE(VOUT_SPU_CHANNEL_OSD_COUNT, 3LL);
+#endif
+#if defined(VOUT_SPU_CHANNEL_OSD_HSLIDER)
 VLCLR_VALUE(VOUT_SPU_CHANNEL_OSD_HSLIDER, 1LL);
+#endif
+#if defined(VOUT_SPU_CHANNEL_OSD_VSLIDER)
 VLCLR_VALUE(VOUT_SPU_CHANNEL_OSD_VSLIDER, 2LL);
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_A52, 8192LL);
 #endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AAC, 255LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AAC_2, 5633LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AAC_3, 41222LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AAC_ADTS, 5632LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AAC_LATM, 5634LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AAC_MS, 41222LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ADPCM, 2LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ALAC, 27745LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ALAW, 6LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AMR_NARROWBAND, 87LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AMR_NB, 29537LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AMR_NB_2, 56LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AMR_WB, 29538LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AMR_WIDEBAND, 88LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AMR_WP, 29539LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ATRAC3, 624LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_AVCODEC_AAC, 28781LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_CREATIVE_ADPCM, 512LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_DIVIO_AAC, 16707LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_DK3, 98LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_DK4, 97LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_DOLBY_AC3_SPDIF, 146LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_DTS, 8LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_DTSINC_DTS, 8193LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_EXTENSIBLE, 65534LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_FLAC, 61868LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_G723_1, 41216LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_G726_ADPCM, 100LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_GSM610, 49LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_GSM_AMR, 31266LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_GSM_AMR_FIXED, 31265LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_HEAAC, 5648LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_IEEE_FLOAT, 3LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_IMA_ADPCM, 17LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_IMC, 1025LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_INDEO_AUDIO, 1026LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_MPEG, 80LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_MPEGLAYER3, 85LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_MSG723, 66LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_MSNAUDIO, 50LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_MULAW, 7LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ON2_AVC, 1280LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ON2_AVC_2, 1281LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_OPUS, 28751LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_PCM, 1LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_QNAP_ADTS, 2732LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_SHARP_G726, 69LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_SIPRO, 304LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_SONY_ATRAC3, 626LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_SPEEX, 41225LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_TRUESPEECH, 34LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ULEAD_DV_AUDIO_NTSC, 533LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_ULEAD_DV_AUDIO_PAL, 534LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_UNKNOWN, 0LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VIVOG723, 273LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORBIS, 22127LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORB_1, 26447LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORB_1PLUS, 26479LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORB_2, 26448LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORB_2PLUS, 26480LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORB_3, 26449LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VORB_3PLUS, 26481LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_VOXWARE_RT29, 117LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_WMA1, 352LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_WMA2, 353LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_WMAL, 355LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_WMAP, 354LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_WMAS, 10LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_FORMAT_YAMAHA_ADPCM, 32LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_BACK_CENTER, 256LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_BACK_LEFT, 16LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_BACK_RIGHT, 32LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_FRONT_CENTER, 4LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_FRONT_LEFT, 1LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_FRONT_LEFT_OF_CENTER, 64LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_FRONT_RIGHT, 2LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_FRONT_RIGHT_OF_CENTER, 128LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_LOW_FREQUENCY, 8LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_RESERVED, 2147483648LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_SIDE_LEFT, 512LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_SIDE_RIGHT, 1024LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_BACK_CENTER, 65536LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_BACK_LEFT, 32768LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_BACK_RIGHT, 131072LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_CENTER, 2048LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_FRONT_CENTER, 8192LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_FRONT_LEFT, 4096LL);
-#endif
-#if !defined(_MSC_VER)
-VLCLR_VALUE(WAVE_SPEAKER_TOP_FRONT_RIGHT, 16384LL);
-#endif
-#if !defined(_MSC_VER) && defined(_WIN32)
+#if defined(_NO_OLDNAMES) && !defined(_MSC_VER) && defined(_WIN32)
 VLCLR_VALUE(_NO_OLDNAMES, 1LL);
 #endif
 
