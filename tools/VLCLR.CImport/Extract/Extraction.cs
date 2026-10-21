@@ -377,6 +377,7 @@ internal sealed partial class Extraction : IDisposable
                 IsOpaque = true,
                 IsAnonymous = state.Parent is not null,
                 Parent = state.Parent,
+                IsTypedefNamed = state.TypedefNamed,
             });
         }
 
