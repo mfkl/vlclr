@@ -7,9 +7,10 @@
 
 #define _FILE_OFFSET_BITS 64
 #define HAVE_ATTRIBUTE_PACKED
-#ifdef _WIN32
+#if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
 #define UNICODE
+#elif defined(__APPLE__)
 #else
 #endif
 
@@ -147,10 +148,12 @@ typedef SSIZE_T ssize_t;
 
 _Static_assert(sizeof(void *) == 8, "VLCLR currently targets the 64-bit VLC ABI");
 
-#ifdef _WIN32
-#define VLCLR_ABI(windows, sysv) windows
+#if defined(_WIN32)
+#define VLCLR_ABI(windows, sysv, darwin) windows
+#elif defined(__APPLE__)
+#define VLCLR_ABI(windows, sysv, darwin) darwin
 #else
-#define VLCLR_ABI(windows, sysv) sysv
+#define VLCLR_ABI(windows, sysv, darwin) sysv
 #endif
 #define VLCLR_SIZE(type, label, expected) \
     _Static_assert(sizeof(type) == (expected), "VLCLR size mismatch: " label)
@@ -223,6 +226,22 @@ typedef __typeof__(((struct vlc_window *)0)->handle) cimport_vlc_window_handle;
 typedef __typeof__(((struct vlc_window *)0)->info) cimport_vlc_window_info;
 typedef __typeof__(((vlm_media_t *)0)->broadcast) cimport_vlm_media_t_broadcast;
 
+// DIR
+#if !defined(_MSC_VER) && defined(__APPLE__)
+VLCLR_SIZE(struct DIR, "DIR", 136);
+VLCLR_ALIGN(struct DIR, "DIR", 8);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_fd, 0);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_loc, 8);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_size, 16);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_buf, 24);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_len, 32);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_seek, 40);
+VLCLR_OFFSET(struct DIR, "DIR", __padding, 48);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_flags, 56);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_lock, 64);
+VLCLR_OFFSET(struct DIR, "DIR", __dd_td, 128);
+#endif
+
 // _SCOPE_ID
 #if !defined(_MSC_VER) && defined(_WIN32)
 VLCLR_SIZE(struct _SCOPE_ID, "_SCOPE_ID", 4);
@@ -230,28 +249,36 @@ VLCLR_ALIGN(struct _SCOPE_ID, "_SCOPE_ID", 4);
 VLCLR_OFFSET(struct _SCOPE_ID, "_SCOPE_ID", Value, 0);
 #endif
 
+// _opaque_pthread_mutex_t
+#if !defined(_MSC_VER) && defined(__APPLE__)
+VLCLR_SIZE(struct _opaque_pthread_mutex_t, "_opaque_pthread_mutex_t", 64);
+VLCLR_ALIGN(struct _opaque_pthread_mutex_t, "_opaque_pthread_mutex_t", 8);
+VLCLR_OFFSET(struct _opaque_pthread_mutex_t, "_opaque_pthread_mutex_t", __sig, 0);
+VLCLR_OFFSET(struct _opaque_pthread_mutex_t, "_opaque_pthread_mutex_t", __opaque, 8);
+#endif
+
 // addon_entry_t
-VLCLR_SIZE(addon_entry_t, "addon_entry_t", VLCLR_ABI(152, 168));
+VLCLR_SIZE(addon_entry_t, "addon_entry_t", VLCLR_ABI(152, 168, 168));
 VLCLR_ALIGN(addon_entry_t, "addon_entry_t", 8);
 VLCLR_OFFSET(addon_entry_t, "addon_entry_t", lock, 0);
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", e_type, VLCLR_ABI(12, 16));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", e_state, VLCLR_ABI(16, 20));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", e_flags, VLCLR_ABI(20, 24));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", uuid, VLCLR_ABI(24, 28));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_name, VLCLR_ABI(40, 48));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_summary, VLCLR_ABI(48, 56));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_description, VLCLR_ABI(56, 64));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_author, VLCLR_ABI(64, 72));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_source_uri, VLCLR_ABI(72, 80));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_image_uri, VLCLR_ABI(80, 88));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_image_data, VLCLR_ABI(88, 96));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_version, VLCLR_ABI(96, 104));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", i_downloads, VLCLR_ABI(104, 112));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", i_score, VLCLR_ABI(108, 120));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_source_module, VLCLR_ABI(112, 128));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_archive_uri, VLCLR_ABI(120, 136));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", files, VLCLR_ABI(128, 144));
-VLCLR_OFFSET(addon_entry_t, "addon_entry_t", p_custom, VLCLR_ABI(144, 160));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", e_type, VLCLR_ABI(12, 16, 16));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", e_state, VLCLR_ABI(16, 20, 20));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", e_flags, VLCLR_ABI(20, 24, 24));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", uuid, VLCLR_ABI(24, 28, 28));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_name, VLCLR_ABI(40, 48, 48));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_summary, VLCLR_ABI(48, 56, 56));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_description, VLCLR_ABI(56, 64, 64));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_author, VLCLR_ABI(64, 72, 72));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_source_uri, VLCLR_ABI(72, 80, 80));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_image_uri, VLCLR_ABI(80, 88, 88));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_image_data, VLCLR_ABI(88, 96, 96));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_version, VLCLR_ABI(96, 104, 104));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", i_downloads, VLCLR_ABI(104, 112, 112));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", i_score, VLCLR_ABI(108, 120, 120));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_source_module, VLCLR_ABI(112, 128, 128));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", psz_archive_uri, VLCLR_ABI(120, 136, 136));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", files, VLCLR_ABI(128, 144, 144));
+VLCLR_OFFSET(addon_entry_t, "addon_entry_t", p_custom, VLCLR_ABI(144, 160, 160));
 
 // addon_entry_t::files
 VLCLR_SIZE(cimport_addon_entry_t_files, "addon_entry_t::files", 16);
@@ -469,21 +496,21 @@ VLCLR_OFFSET(cimport_decoder_owner_callbacks_anon0_video, "decoder_owner_callbac
 VLCLR_OFFSET(cimport_decoder_owner_callbacks_anon0_video, "decoder_owner_callbacks::@0::video", get_display_rate, 48);
 
 // decoder_t
-VLCLR_SIZE(decoder_t, "decoder_t", VLCLR_ABI(336, 328));
+VLCLR_SIZE(decoder_t, "decoder_t", VLCLR_ABI(336, 328, 328));
 VLCLR_ALIGN(decoder_t, "decoder_t", 8);
 VLCLR_OFFSET(decoder_t, "decoder_t", obj, 0);
 VLCLR_OFFSET(decoder_t, "decoder_t", p_module, 24);
 VLCLR_OFFSET(decoder_t, "decoder_t", p_sys, 32);
 VLCLR_OFFSET(decoder_t, "decoder_t", fmt_in, 40);
 VLCLR_OFFSET(decoder_t, "decoder_t", fmt_out, 48);
-VLCLR_OFFSET(decoder_t, "decoder_t", b_frame_drop_allowed, VLCLR_ABI(288, 280));
-VLCLR_OFFSET(decoder_t, "decoder_t", i_extra_picture_buffers, VLCLR_ABI(292, 284));
-VLCLR_OFFSET(decoder_t, "decoder_t", pf_decode, VLCLR_ABI(296, 288));
-VLCLR_OFFSET(decoder_t, "decoder_t", pf_packetize, VLCLR_ABI(296, 288));
-VLCLR_OFFSET(decoder_t, "decoder_t", pf_flush, VLCLR_ABI(304, 296));
-VLCLR_OFFSET(decoder_t, "decoder_t", pf_get_cc, VLCLR_ABI(312, 304));
-VLCLR_OFFSET(decoder_t, "decoder_t", p_description, VLCLR_ABI(320, 312));
-VLCLR_OFFSET(decoder_t, "decoder_t", cbs, VLCLR_ABI(328, 320));
+VLCLR_OFFSET(decoder_t, "decoder_t", b_frame_drop_allowed, VLCLR_ABI(288, 280, 280));
+VLCLR_OFFSET(decoder_t, "decoder_t", i_extra_picture_buffers, VLCLR_ABI(292, 284, 284));
+VLCLR_OFFSET(decoder_t, "decoder_t", pf_decode, VLCLR_ABI(296, 288, 288));
+VLCLR_OFFSET(decoder_t, "decoder_t", pf_packetize, VLCLR_ABI(296, 288, 288));
+VLCLR_OFFSET(decoder_t, "decoder_t", pf_flush, VLCLR_ABI(304, 296, 296));
+VLCLR_OFFSET(decoder_t, "decoder_t", pf_get_cc, VLCLR_ABI(312, 304, 304));
+VLCLR_OFFSET(decoder_t, "decoder_t", p_description, VLCLR_ABI(320, 312, 312));
+VLCLR_OFFSET(decoder_t, "decoder_t", cbs, VLCLR_ABI(328, 320, 320));
 
 // demux_meta_t
 VLCLR_SIZE(demux_meta_t, "demux_meta_t", 56);
@@ -505,24 +532,24 @@ VLCLR_ALIGN(cimport_encoder_owner_callbacks_video, "encoder_owner_callbacks::vid
 VLCLR_OFFSET(cimport_encoder_owner_callbacks_video, "encoder_owner_callbacks::video", get_device, 0);
 
 // encoder_t
-VLCLR_SIZE(encoder_t, "encoder_t", VLCLR_ABI(568, 552));
+VLCLR_SIZE(encoder_t, "encoder_t", VLCLR_ABI(568, 552, 552));
 VLCLR_ALIGN(encoder_t, "encoder_t", 8);
 VLCLR_OFFSET(encoder_t, "encoder_t", obj, 0);
 VLCLR_OFFSET(encoder_t, "encoder_t", p_module, 24);
 VLCLR_OFFSET(encoder_t, "encoder_t", p_sys, 32);
 VLCLR_OFFSET(encoder_t, "encoder_t", fmt_in, 40);
-VLCLR_OFFSET(encoder_t, "encoder_t", vctx_in, VLCLR_ABI(280, 272));
-VLCLR_OFFSET(encoder_t, "encoder_t", fmt_out, VLCLR_ABI(288, 280));
-VLCLR_OFFSET(encoder_t, "encoder_t", i_threads, VLCLR_ABI(528, 512));
-VLCLR_OFFSET(encoder_t, "encoder_t", i_iframes, VLCLR_ABI(532, 516));
-VLCLR_OFFSET(encoder_t, "encoder_t", i_bframes, VLCLR_ABI(536, 520));
-VLCLR_OFFSET(encoder_t, "encoder_t", i_tolerance, VLCLR_ABI(540, 524));
-VLCLR_OFFSET(encoder_t, "encoder_t", p_cfg, VLCLR_ABI(544, 528));
-VLCLR_OFFSET(encoder_t, "encoder_t", ops, VLCLR_ABI(552, 536));
-VLCLR_OFFSET(encoder_t, "encoder_t", cbs, VLCLR_ABI(560, 544));
+VLCLR_OFFSET(encoder_t, "encoder_t", vctx_in, VLCLR_ABI(280, 272, 272));
+VLCLR_OFFSET(encoder_t, "encoder_t", fmt_out, VLCLR_ABI(288, 280, 280));
+VLCLR_OFFSET(encoder_t, "encoder_t", i_threads, VLCLR_ABI(528, 512, 512));
+VLCLR_OFFSET(encoder_t, "encoder_t", i_iframes, VLCLR_ABI(532, 516, 516));
+VLCLR_OFFSET(encoder_t, "encoder_t", i_bframes, VLCLR_ABI(536, 520, 520));
+VLCLR_OFFSET(encoder_t, "encoder_t", i_tolerance, VLCLR_ABI(540, 524, 524));
+VLCLR_OFFSET(encoder_t, "encoder_t", p_cfg, VLCLR_ABI(544, 528, 528));
+VLCLR_OFFSET(encoder_t, "encoder_t", ops, VLCLR_ABI(552, 536, 536));
+VLCLR_OFFSET(encoder_t, "encoder_t", cbs, VLCLR_ABI(560, 544, 544));
 
 // es_format_t
-VLCLR_SIZE(es_format_t, "es_format_t", VLCLR_ABI(240, 232));
+VLCLR_SIZE(es_format_t, "es_format_t", VLCLR_ABI(240, 232, 232));
 VLCLR_ALIGN(es_format_t, "es_format_t", 8);
 VLCLR_OFFSET(es_format_t, "es_format_t", i_cat, 0);
 VLCLR_OFFSET(es_format_t, "es_format_t", i_codec, 4);
@@ -538,12 +565,12 @@ VLCLR_OFFSET(es_format_t, "es_format_t", audio, 56);
 VLCLR_OFFSET(es_format_t, "es_format_t", audio_replay_gain, 92);
 VLCLR_OFFSET(es_format_t, "es_format_t", video, 56);
 VLCLR_OFFSET(es_format_t, "es_format_t", subs, 56);
-VLCLR_OFFSET(es_format_t, "es_format_t", i_bitrate, VLCLR_ABI(208, 200));
-VLCLR_OFFSET(es_format_t, "es_format_t", i_profile, VLCLR_ABI(212, 204));
-VLCLR_OFFSET(es_format_t, "es_format_t", i_level, VLCLR_ABI(216, 208));
-VLCLR_OFFSET(es_format_t, "es_format_t", b_packetized, VLCLR_ABI(220, 212));
-VLCLR_OFFSET(es_format_t, "es_format_t", i_extra, VLCLR_ABI(224, 216));
-VLCLR_OFFSET(es_format_t, "es_format_t", p_extra, VLCLR_ABI(232, 224));
+VLCLR_OFFSET(es_format_t, "es_format_t", i_bitrate, VLCLR_ABI(208, 200, 200));
+VLCLR_OFFSET(es_format_t, "es_format_t", i_profile, VLCLR_ABI(212, 204, 204));
+VLCLR_OFFSET(es_format_t, "es_format_t", i_level, VLCLR_ABI(216, 208, 208));
+VLCLR_OFFSET(es_format_t, "es_format_t", b_packetized, VLCLR_ABI(220, 212, 212));
+VLCLR_OFFSET(es_format_t, "es_format_t", i_extra, VLCLR_ABI(224, 216, 216));
+VLCLR_OFFSET(es_format_t, "es_format_t", p_extra, VLCLR_ABI(232, 224, 224));
 
 // es_out_callbacks
 VLCLR_SIZE(struct es_out_callbacks, "es_out_callbacks", 40);
@@ -590,20 +617,20 @@ VLCLR_ALIGN(struct filter_subpicture_callbacks, "filter_subpicture_callbacks", 8
 VLCLR_OFFSET(struct filter_subpicture_callbacks, "filter_subpicture_callbacks", buffer_new, 0);
 
 // filter_t
-VLCLR_SIZE(filter_t, "filter_t", VLCLR_ABI(592, 576));
+VLCLR_SIZE(filter_t, "filter_t", VLCLR_ABI(592, 576, 576));
 VLCLR_ALIGN(filter_t, "filter_t", 8);
 VLCLR_OFFSET(filter_t, "filter_t", obj, 0);
 VLCLR_OFFSET(filter_t, "filter_t", p_module, 24);
 VLCLR_OFFSET(filter_t, "filter_t", p_sys, 32);
 VLCLR_OFFSET(filter_t, "filter_t", fmt_in, 40);
-VLCLR_OFFSET(filter_t, "filter_t", vctx_in, VLCLR_ABI(280, 272));
-VLCLR_OFFSET(filter_t, "filter_t", fmt_out, VLCLR_ABI(288, 280));
-VLCLR_OFFSET(filter_t, "filter_t", vctx_out, VLCLR_ABI(528, 512));
-VLCLR_OFFSET(filter_t, "filter_t", b_allow_fmt_out_change, VLCLR_ABI(536, 520));
-VLCLR_OFFSET(filter_t, "filter_t", psz_name, VLCLR_ABI(544, 528));
-VLCLR_OFFSET(filter_t, "filter_t", p_cfg, VLCLR_ABI(552, 536));
-VLCLR_OFFSET(filter_t, "filter_t", ops, VLCLR_ABI(560, 544));
-VLCLR_OFFSET(filter_t, "filter_t", owner, VLCLR_ABI(568, 552));
+VLCLR_OFFSET(filter_t, "filter_t", vctx_in, VLCLR_ABI(280, 272, 272));
+VLCLR_OFFSET(filter_t, "filter_t", fmt_out, VLCLR_ABI(288, 280, 280));
+VLCLR_OFFSET(filter_t, "filter_t", vctx_out, VLCLR_ABI(528, 512, 512));
+VLCLR_OFFSET(filter_t, "filter_t", b_allow_fmt_out_change, VLCLR_ABI(536, 520, 520));
+VLCLR_OFFSET(filter_t, "filter_t", psz_name, VLCLR_ABI(544, 528, 528));
+VLCLR_OFFSET(filter_t, "filter_t", p_cfg, VLCLR_ABI(552, 536, 536));
+VLCLR_OFFSET(filter_t, "filter_t", ops, VLCLR_ABI(560, 544, 544));
+VLCLR_OFFSET(filter_t, "filter_t", owner, VLCLR_ABI(568, 552, 552));
 
 // filter_video_callbacks
 VLCLR_SIZE(struct filter_video_callbacks, "filter_video_callbacks", 16);
@@ -694,11 +721,11 @@ VLCLR_OFFSET(input_attachment_t, "input_attachment_t", i_data, 24);
 VLCLR_OFFSET(input_attachment_t, "input_attachment_t", p_data, 32);
 
 // input_item_es
-VLCLR_SIZE(struct input_item_es, "input_item_es", VLCLR_ABI(256, 248));
+VLCLR_SIZE(struct input_item_es, "input_item_es", VLCLR_ABI(256, 248, 248));
 VLCLR_ALIGN(struct input_item_es, "input_item_es", 8);
 VLCLR_OFFSET(struct input_item_es, "input_item_es", es, 0);
-VLCLR_OFFSET(struct input_item_es, "input_item_es", id, VLCLR_ABI(240, 232));
-VLCLR_OFFSET(struct input_item_es, "input_item_es", id_stable, VLCLR_ABI(248, 240));
+VLCLR_OFFSET(struct input_item_es, "input_item_es", id, VLCLR_ABI(240, 232, 232));
+VLCLR_OFFSET(struct input_item_es, "input_item_es", id_stable, VLCLR_ABI(248, 240, 240));
 
 // input_item_es_vector
 VLCLR_SIZE(input_item_es_vector, "input_item_es_vector", 24);
@@ -759,8 +786,8 @@ VLCLR_OFFSET(input_item_t, "input_item_t", p_epg_table, 144);
 VLCLR_OFFSET(input_item_t, "input_item_t", i_slaves, 152);
 VLCLR_OFFSET(input_item_t, "input_item_t", pp_slaves, 160);
 VLCLR_OFFSET(input_item_t, "input_item_t", lock, 168);
-VLCLR_OFFSET(input_item_t, "input_item_t", i_type, VLCLR_ABI(180, 184));
-VLCLR_OFFSET(input_item_t, "input_item_t", b_net, VLCLR_ABI(184, 188));
+VLCLR_OFFSET(input_item_t, "input_item_t", i_type, VLCLR_ABI(180, 184, 184));
+VLCLR_OFFSET(input_item_t, "input_item_t", b_net, VLCLR_ABI(184, 188, 188));
 
 // input_stats_t
 VLCLR_SIZE(input_stats_t, "input_stats_t", 120);
@@ -924,22 +951,22 @@ VLCLR_OFFSET(cimport_picture_resource_t_p, "picture_resource_t::p", i_lines, 8);
 VLCLR_OFFSET(cimport_picture_resource_t_p, "picture_resource_t::p", i_pitch, 12);
 
 // picture_t
-VLCLR_SIZE(picture_t, "picture_t", VLCLR_ABI(376, 368));
+VLCLR_SIZE(picture_t, "picture_t", VLCLR_ABI(376, 368, 368));
 VLCLR_ALIGN(picture_t, "picture_t", 8);
 VLCLR_OFFSET(picture_t, "picture_t", format, 0);
-VLCLR_OFFSET(picture_t, "picture_t", p, VLCLR_ABI(152, 144));
-VLCLR_OFFSET(picture_t, "picture_t", i_planes, VLCLR_ABI(312, 304));
-VLCLR_OFFSET(picture_t, "picture_t", date, VLCLR_ABI(320, 312));
-VLCLR_OFFSET(picture_t, "picture_t", b_force, VLCLR_ABI(328, 320));
-VLCLR_OFFSET(picture_t, "picture_t", b_still, VLCLR_ABI(329, 321));
-VLCLR_OFFSET(picture_t, "picture_t", b_progressive, VLCLR_ABI(330, 322));
-VLCLR_OFFSET(picture_t, "picture_t", b_top_field_first, VLCLR_ABI(331, 323));
-VLCLR_OFFSET(picture_t, "picture_t", b_multiview_left_eye, VLCLR_ABI(332, 324));
-VLCLR_OFFSET(picture_t, "picture_t", i_nb_fields, VLCLR_ABI(336, 328));
-VLCLR_OFFSET(picture_t, "picture_t", context, VLCLR_ABI(344, 336));
-VLCLR_OFFSET(picture_t, "picture_t", p_sys, VLCLR_ABI(352, 344));
-VLCLR_OFFSET(picture_t, "picture_t", p_next, VLCLR_ABI(360, 352));
-VLCLR_OFFSET(picture_t, "picture_t", refs, VLCLR_ABI(368, 360));
+VLCLR_OFFSET(picture_t, "picture_t", p, VLCLR_ABI(152, 144, 144));
+VLCLR_OFFSET(picture_t, "picture_t", i_planes, VLCLR_ABI(312, 304, 304));
+VLCLR_OFFSET(picture_t, "picture_t", date, VLCLR_ABI(320, 312, 312));
+VLCLR_OFFSET(picture_t, "picture_t", b_force, VLCLR_ABI(328, 320, 320));
+VLCLR_OFFSET(picture_t, "picture_t", b_still, VLCLR_ABI(329, 321, 321));
+VLCLR_OFFSET(picture_t, "picture_t", b_progressive, VLCLR_ABI(330, 322, 322));
+VLCLR_OFFSET(picture_t, "picture_t", b_top_field_first, VLCLR_ABI(331, 323, 323));
+VLCLR_OFFSET(picture_t, "picture_t", b_multiview_left_eye, VLCLR_ABI(332, 324, 324));
+VLCLR_OFFSET(picture_t, "picture_t", i_nb_fields, VLCLR_ABI(336, 328, 328));
+VLCLR_OFFSET(picture_t, "picture_t", context, VLCLR_ABI(344, 336, 336));
+VLCLR_OFFSET(picture_t, "picture_t", p_sys, VLCLR_ABI(352, 344, 344));
+VLCLR_OFFSET(picture_t, "picture_t", p_next, VLCLR_ABI(360, 352, 352));
+VLCLR_OFFSET(picture_t, "picture_t", refs, VLCLR_ABI(368, 360, 360));
 
 // plane_t
 VLCLR_SIZE(plane_t, "plane_t", 32);
@@ -997,24 +1024,6 @@ VLCLR_OFFSET(services_discovery_t, "services_discovery_t", pf_control, 56);
 VLCLR_OFFSET(services_discovery_t, "services_discovery_t", p_sys, 64);
 VLCLR_OFFSET(services_discovery_t, "services_discovery_t", owner, 72);
 
-// sockaddr
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct sockaddr, "sockaddr", 16);
-VLCLR_ALIGN(struct sockaddr, "sockaddr", 2);
-VLCLR_OFFSET(struct sockaddr, "sockaddr", sa_family, 0);
-VLCLR_OFFSET(struct sockaddr, "sockaddr", sa_data, 2);
-#endif
-
-// sockaddr_in
-#if !defined(_MSC_VER)
-VLCLR_SIZE(struct sockaddr_in, "sockaddr_in", 16);
-VLCLR_ALIGN(struct sockaddr_in, "sockaddr_in", 4);
-VLCLR_OFFSET(struct sockaddr_in, "sockaddr_in", sin_family, 0);
-VLCLR_OFFSET(struct sockaddr_in, "sockaddr_in", sin_port, 2);
-VLCLR_OFFSET(struct sockaddr_in, "sockaddr_in", sin_addr, 4);
-VLCLR_OFFSET(struct sockaddr_in, "sockaddr_in", sin_zero, 8);
-#endif
-
 // sout_access_out_t
 VLCLR_SIZE(sout_access_out_t, "sout_access_out_t", 96);
 VLCLR_ALIGN(sout_access_out_t, "sout_access_out_t", 8);
@@ -1030,7 +1039,7 @@ VLCLR_OFFSET(sout_access_out_t, "sout_access_out_t", pf_control, 80);
 VLCLR_OFFSET(sout_access_out_t, "sout_access_out_t", p_cfg, 88);
 
 // sout_input_t
-VLCLR_SIZE(sout_input_t, "sout_input_t", VLCLR_ABI(264, 256));
+VLCLR_SIZE(sout_input_t, "sout_input_t", VLCLR_ABI(264, 256, 256));
 VLCLR_ALIGN(sout_input_t, "sout_input_t", 8);
 VLCLR_OFFSET(sout_input_t, "sout_input_t", p_fmt, 0);
 VLCLR_OFFSET(sout_input_t, "sout_input_t", p_fifo, 8);
@@ -1135,21 +1144,21 @@ VLCLR_OFFSET(struct subpicture_region_rendered, "subpicture_region_rendered", pl
 VLCLR_OFFSET(struct subpicture_region_rendered, "subpicture_region_rendered", i_alpha, 24);
 
 // subpicture_region_t
-VLCLR_SIZE(subpicture_region_t, "subpicture_region_t", VLCLR_ABI(224, 216));
+VLCLR_SIZE(subpicture_region_t, "subpicture_region_t", VLCLR_ABI(224, 216, 216));
 VLCLR_ALIGN(subpicture_region_t, "subpicture_region_t", 8);
 VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", fmt, 0);
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", p_picture, VLCLR_ABI(152, 144));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", b_absolute, VLCLR_ABI(160, 152));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", b_in_window, VLCLR_ABI(161, 153));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_x, VLCLR_ABI(164, 156));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_y, VLCLR_ABI(168, 160));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_align, VLCLR_ABI(172, 164));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_alpha, VLCLR_ABI(176, 168));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", p_text, VLCLR_ABI(184, 176));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", text_flags, VLCLR_ABI(192, 184));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_max_width, VLCLR_ABI(196, 188));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_max_height, VLCLR_ABI(200, 192));
-VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", node, VLCLR_ABI(208, 200));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", p_picture, VLCLR_ABI(152, 144, 144));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", b_absolute, VLCLR_ABI(160, 152, 152));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", b_in_window, VLCLR_ABI(161, 153, 153));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_x, VLCLR_ABI(164, 156, 156));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_y, VLCLR_ABI(168, 160, 160));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_align, VLCLR_ABI(172, 164, 164));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_alpha, VLCLR_ABI(176, 168, 168));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", p_text, VLCLR_ABI(184, 176, 176));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", text_flags, VLCLR_ABI(192, 184, 184));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_max_width, VLCLR_ABI(196, 188, 188));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", i_max_height, VLCLR_ABI(200, 192, 192));
+VLCLR_OFFSET(subpicture_region_t, "subpicture_region_t", node, VLCLR_ABI(208, 200, 200));
 
 // subpicture_t
 VLCLR_SIZE(subpicture_t, "subpicture_t", 96);
@@ -1259,7 +1268,7 @@ VLCLR_OFFSET(timestamp_fifo_t, "timestamp_fifo_t", capacity, 8);
 VLCLR_OFFSET(timestamp_fifo_t, "timestamp_fifo_t", buffer, 16);
 
 // video_format_t
-VLCLR_SIZE(video_format_t, "video_format_t", VLCLR_ABI(152, 144));
+VLCLR_SIZE(video_format_t, "video_format_t", VLCLR_ABI(152, 144, 144));
 VLCLR_ALIGN(video_format_t, "video_format_t", 8);
 VLCLR_OFFSET(video_format_t, "video_format_t", i_chroma, 0);
 VLCLR_OFFSET(video_format_t, "video_format_t", i_width, 4);
@@ -1286,10 +1295,10 @@ VLCLR_OFFSET(video_format_t, "video_format_t", pose, 92);
 VLCLR_OFFSET(video_format_t, "video_format_t", mastering, 108);
 VLCLR_OFFSET(video_format_t, "video_format_t", lighting, 132);
 VLCLR_OFFSET(video_format_t, "video_format_t", dovi, 136);
-VLCLR_OFFSET(video_format_t, "video_format_t", i_cubemap_padding, VLCLR_ABI(144, 140));
+VLCLR_OFFSET(video_format_t, "video_format_t", i_cubemap_padding, VLCLR_ABI(144, 140, 140));
 
 // video_format_t::dovi
-VLCLR_SIZE(cimport_video_format_t_dovi, "video_format_t::dovi", VLCLR_ABI(8, 4));
+VLCLR_SIZE(cimport_video_format_t_dovi, "video_format_t::dovi", VLCLR_ABI(8, 4, 4));
 VLCLR_ALIGN(cimport_video_format_t_dovi, "video_format_t::dovi", 4);
 VLCLR_OFFSET(cimport_video_format_t_dovi, "video_format_t::dovi", version_major, 0);
 VLCLR_OFFSET(cimport_video_format_t_dovi, "video_format_t::dovi", version_minor, 1);
@@ -1315,23 +1324,23 @@ VLCLR_OFFSET(video_palette_t, "video_palette_t", i_entries, 0);
 VLCLR_OFFSET(video_palette_t, "video_palette_t", palette, 4);
 
 // video_splitter_output_t
-VLCLR_SIZE(video_splitter_output_t, "video_splitter_output_t", VLCLR_ABI(160, 152));
+VLCLR_SIZE(video_splitter_output_t, "video_splitter_output_t", VLCLR_ABI(160, 152, 152));
 VLCLR_ALIGN(video_splitter_output_t, "video_splitter_output_t", 8);
 VLCLR_OFFSET(video_splitter_output_t, "video_splitter_output_t", fmt, 0);
-VLCLR_OFFSET(video_splitter_output_t, "video_splitter_output_t", psz_module, VLCLR_ABI(152, 144));
+VLCLR_OFFSET(video_splitter_output_t, "video_splitter_output_t", psz_module, VLCLR_ABI(152, 144, 144));
 
 // video_splitter_t
-VLCLR_SIZE(video_splitter_t, "video_splitter_t", VLCLR_ABI(232, 224));
+VLCLR_SIZE(video_splitter_t, "video_splitter_t", VLCLR_ABI(232, 224, 224));
 VLCLR_ALIGN(video_splitter_t, "video_splitter_t", 8);
 VLCLR_OFFSET(video_splitter_t, "video_splitter_t", obj, 0);
 VLCLR_OFFSET(video_splitter_t, "video_splitter_t", p_module, 24);
 VLCLR_OFFSET(video_splitter_t, "video_splitter_t", p_cfg, 32);
 VLCLR_OFFSET(video_splitter_t, "video_splitter_t", fmt, 40);
-VLCLR_OFFSET(video_splitter_t, "video_splitter_t", i_output, VLCLR_ABI(192, 184));
-VLCLR_OFFSET(video_splitter_t, "video_splitter_t", p_output, VLCLR_ABI(200, 192));
-VLCLR_OFFSET(video_splitter_t, "video_splitter_t", pf_filter, VLCLR_ABI(208, 200));
-VLCLR_OFFSET(video_splitter_t, "video_splitter_t", mouse, VLCLR_ABI(216, 208));
-VLCLR_OFFSET(video_splitter_t, "video_splitter_t", p_sys, VLCLR_ABI(224, 216));
+VLCLR_OFFSET(video_splitter_t, "video_splitter_t", i_output, VLCLR_ABI(192, 184, 184));
+VLCLR_OFFSET(video_splitter_t, "video_splitter_t", p_output, VLCLR_ABI(200, 192, 192));
+VLCLR_OFFSET(video_splitter_t, "video_splitter_t", pf_filter, VLCLR_ABI(208, 200, 200));
+VLCLR_OFFSET(video_splitter_t, "video_splitter_t", mouse, VLCLR_ABI(216, 208, 208));
+VLCLR_OFFSET(video_splitter_t, "video_splitter_t", p_sys, VLCLR_ABI(224, 216, 216));
 
 // vlc_ancillary_array
 VLCLR_SIZE(vlc_ancillary_array, "vlc_ancillary_array", 24);
@@ -1696,21 +1705,21 @@ VLCLR_OFFSET(struct vlc_gl_input_meta, "vlc_gl_input_meta", dovi_rpu, 16);
 VLCLR_OFFSET(struct vlc_gl_input_meta, "vlc_gl_input_meta", orientation, 24);
 
 // vlc_gl_interop
-VLCLR_SIZE(struct vlc_gl_interop, "vlc_gl_interop", VLCLR_ABI(536, 520));
+VLCLR_SIZE(struct vlc_gl_interop, "vlc_gl_interop", VLCLR_ABI(536, 520, 520));
 VLCLR_ALIGN(struct vlc_gl_interop, "vlc_gl_interop", 8);
 VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", obj, 0);
 VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", module, 24);
 VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", gl, 32);
 VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", tex_target, 40);
 VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", fmt_in, 48);
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", fmt_out, VLCLR_ABI(200, 192));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", vctx, VLCLR_ABI(352, 336));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", handle_texs_gen, VLCLR_ABI(360, 344));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", texs, VLCLR_ABI(364, 348));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", tex_count, VLCLR_ABI(504, 488));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", priv, VLCLR_ABI(512, 496));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", ops, VLCLR_ABI(520, 504));
-VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", get_tex_format_size, VLCLR_ABI(528, 512));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", fmt_out, VLCLR_ABI(200, 192, 192));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", vctx, VLCLR_ABI(352, 336, 336));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", handle_texs_gen, VLCLR_ABI(360, 344, 344));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", texs, VLCLR_ABI(364, 348, 348));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", tex_count, VLCLR_ABI(504, 488, 488));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", priv, VLCLR_ABI(512, 496, 496));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", ops, VLCLR_ABI(520, 504, 504));
+VLCLR_OFFSET(struct vlc_gl_interop, "vlc_gl_interop", get_tex_format_size, VLCLR_ABI(528, 512, 512));
 
 // vlc_gl_interop_ops
 VLCLR_SIZE(struct vlc_gl_interop_ops, "vlc_gl_interop_ops", 40);
@@ -1743,22 +1752,22 @@ VLCLR_OFFSET(struct vlc_gl_picture, "vlc_gl_picture", mtx_has_changed, 44);
 
 // vlc_gl_sampler
 #if !defined(_MSC_VER)
-VLCLR_SIZE(struct vlc_gl_sampler, "vlc_gl_sampler", VLCLR_ABI(320, 312));
+VLCLR_SIZE(struct vlc_gl_sampler, "vlc_gl_sampler", VLCLR_ABI(320, 312, 312));
 VLCLR_ALIGN(struct vlc_gl_sampler, "vlc_gl_sampler", 8);
 VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", obj, 0);
 VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", module, 24);
 VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", gl, 32);
 VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", fmt_in, 40);
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_count, VLCLR_ABI(192, 184));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_widths, VLCLR_ABI(196, 188));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_heights, VLCLR_ABI(216, 208));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_target, VLCLR_ABI(236, 228));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", formats, VLCLR_ABI(240, 232));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", half_float, VLCLR_ABI(260, 252));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", pic_to_tex_matrix, VLCLR_ABI(264, 256));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", shader, VLCLR_ABI(272, 264));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", ops, VLCLR_ABI(304, 296));
-VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", sys, VLCLR_ABI(312, 304));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_count, VLCLR_ABI(192, 184, 184));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_widths, VLCLR_ABI(196, 188, 188));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_heights, VLCLR_ABI(216, 208, 208));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", tex_target, VLCLR_ABI(236, 228, 228));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", formats, VLCLR_ABI(240, 232, 232));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", half_float, VLCLR_ABI(260, 252, 252));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", pic_to_tex_matrix, VLCLR_ABI(264, 256, 256));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", shader, VLCLR_ABI(272, 264, 264));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", ops, VLCLR_ABI(304, 296, 296));
+VLCLR_OFFSET(struct vlc_gl_sampler, "vlc_gl_sampler", sys, VLCLR_ABI(312, 304, 304));
 #endif
 
 // vlc_gl_sampler::shader
@@ -2374,16 +2383,16 @@ VLCLR_OFFSET(vlc_mouse_t, "vlc_mouse_t", i_pressed, 8);
 VLCLR_OFFSET(vlc_mouse_t, "vlc_mouse_t", b_double_click, 12);
 
 // vlc_mutex_t
-VLCLR_SIZE(vlc_mutex_t, "vlc_mutex_t", VLCLR_ABI(12, 16));
-VLCLR_ALIGN(vlc_mutex_t, "vlc_mutex_t", VLCLR_ABI(4, 8));
+VLCLR_SIZE(vlc_mutex_t, "vlc_mutex_t", VLCLR_ABI(12, 16, 16));
+VLCLR_ALIGN(vlc_mutex_t, "vlc_mutex_t", VLCLR_ABI(4, 8, 8));
 VLCLR_OFFSET(vlc_mutex_t, "vlc_mutex_t", value, 0);
 VLCLR_OFFSET(vlc_mutex_t, "vlc_mutex_t", recursion, 4);
 VLCLR_OFFSET(vlc_mutex_t, "vlc_mutex_t", owner, 8);
 VLCLR_OFFSET(vlc_mutex_t, "vlc_mutex_t", dummy, 0);
 
 // vlc_mutex_t::@0::dummy
-VLCLR_SIZE(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", VLCLR_ABI(12, 16));
-VLCLR_ALIGN(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", VLCLR_ABI(4, 8));
+VLCLR_SIZE(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", VLCLR_ABI(12, 16, 16));
+VLCLR_ALIGN(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", VLCLR_ABI(4, 8, 8));
 VLCLR_OFFSET(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", value, 0);
 VLCLR_OFFSET(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", recursion, 4);
 VLCLR_OFFSET(cimport_vlc_mutex_t_anon0_dummy, "vlc_mutex_t::@0::dummy", owner, 8);
@@ -2520,12 +2529,12 @@ VLCLR_OFFSET(struct vlc_player_title, "vlc_player_title", chapter_count, 24);
 VLCLR_OFFSET(struct vlc_player_title, "vlc_player_title", chapters, 32);
 
 // vlc_player_track
-VLCLR_SIZE(struct vlc_player_track, "vlc_player_track", VLCLR_ABI(264, 256));
+VLCLR_SIZE(struct vlc_player_track, "vlc_player_track", VLCLR_ABI(264, 256, 256));
 VLCLR_ALIGN(struct vlc_player_track, "vlc_player_track", 8);
 VLCLR_OFFSET(struct vlc_player_track, "vlc_player_track", es_id, 0);
 VLCLR_OFFSET(struct vlc_player_track, "vlc_player_track", name, 8);
 VLCLR_OFFSET(struct vlc_player_track, "vlc_player_track", fmt, 16);
-VLCLR_OFFSET(struct vlc_player_track, "vlc_player_track", selected, VLCLR_ABI(256, 248));
+VLCLR_OFFSET(struct vlc_player_track, "vlc_player_track", selected, VLCLR_ABI(256, 248, 248));
 
 // vlc_player_vout_cbs
 VLCLR_SIZE(struct vlc_player_vout_cbs, "vlc_player_vout_cbs", 16);
@@ -2855,7 +2864,7 @@ VLCLR_OFFSET(cimport_vlc_stream_operations_anon0_stream, "vlc_stream_operations:
 VLCLR_OFFSET(cimport_vlc_stream_operations_anon0_stream, "vlc_stream_operations::@0::stream", set_private_id_ca, 128);
 
 // vlc_thread_t
-#if !defined(_WIN32)
+#if ((!defined(_WIN32) && !defined(__APPLE__)) || defined(__APPLE__))
 VLCLR_SIZE(vlc_thread_t, "vlc_thread_t", 8);
 VLCLR_ALIGN(vlc_thread_t, "vlc_thread_t", 8);
 VLCLR_OFFSET(vlc_thread_t, "vlc_thread_t", handle, 0);
@@ -4889,7 +4898,7 @@ VLCLR_VALUE(DIALOG_USER_PROGRESS, 128LL);
 VLCLR_VALUE(DIALOG_YES_NO_CANCEL, 2LL);
 #endif
 #if defined(DIR_SEP_CHAR)
-VLCLR_VALUE(DIR_SEP_CHAR, VLCLR_ABI(92LL, 47LL));
+VLCLR_VALUE(DIR_SEP_CHAR, VLCLR_ABI(92LL, 47LL, 47LL));
 #endif
 #if defined(ES_CATEGORY_COUNT)
 VLCLR_VALUE(ES_CATEGORY_COUNT, 5LL);
@@ -5170,10 +5179,10 @@ VLCLR_VALUE(KEY_ZOOM_IN, 7077888LL);
 #if defined(KEY_ZOOM_OUT)
 VLCLR_VALUE(KEY_ZOOM_OUT, 7143424LL);
 #endif
-#if defined(LIBVLC_USE_PTHREAD) && !defined(_WIN32)
+#if defined(LIBVLC_USE_PTHREAD) && ((!defined(_WIN32) && !defined(__APPLE__)) || defined(__APPLE__))
 VLCLR_VALUE(LIBVLC_USE_PTHREAD, 1LL);
 #endif
-#if defined(LIBVLC_USE_PTHREAD_CLEANUP) && !defined(_WIN32)
+#if defined(LIBVLC_USE_PTHREAD_CLEANUP) && ((!defined(_WIN32) && !defined(__APPLE__)) || defined(__APPLE__))
 VLCLR_VALUE(LIBVLC_USE_PTHREAD_CLEANUP, 1LL);
 #endif
 #if defined(MSTRTIME_MAX_SIZE)
@@ -5192,7 +5201,7 @@ VLCLR_UVALUE(ORIENT_MAX, 7ULL);
 VLCLR_VALUE(O_NONBLOCK, 0LL);
 #endif
 #if defined(PATH_SEP_CHAR)
-VLCLR_VALUE(PATH_SEP_CHAR, VLCLR_ABI(59LL, 58LL));
+VLCLR_VALUE(PATH_SEP_CHAR, VLCLR_ABI(59LL, 58LL, 58LL));
 #endif
 #if defined(PICTURE_PLANE_MAX)
 VLCLR_VALUE(PICTURE_PLANE_MAX, 5LL);
@@ -5345,7 +5354,7 @@ VLCLR_VALUE(VLCDEC_RELOAD, -100LL);
 VLCLR_VALUE(VLCDEC_SUCCESS, 0LL);
 #endif
 #if defined(VLC_ACCESS_REDIRECT)
-VLCLR_VALUE(VLC_ACCESS_REDIRECT, VLCLR_ABI(-138LL, -110LL));
+VLCLR_VALUE(VLC_ACCESS_REDIRECT, VLCLR_ABI(-138LL, -110LL, -60LL));
 #endif
 #if defined(VLC_ANCILLARY_ID_DOVI)
 VLCLR_VALUE(VLC_ANCILLARY_ID_DOVI, 1767272260LL);
@@ -6995,10 +7004,10 @@ VLCLR_VALUE(VLC_ENOENT, -2LL);
 VLCLR_VALUE(VLC_ENOMEM, -12LL);
 #endif
 #if defined(VLC_ENOTSUP)
-VLCLR_VALUE(VLC_ENOTSUP, VLCLR_ABI(-129LL, -95LL));
+VLCLR_VALUE(VLC_ENOTSUP, VLCLR_ABI(-129LL, -95LL, -45LL));
 #endif
 #if defined(VLC_ETIMEOUT)
-VLCLR_VALUE(VLC_ETIMEOUT, VLCLR_ABI(-138LL, -110LL));
+VLCLR_VALUE(VLC_ETIMEOUT, VLCLR_ABI(-138LL, -110LL, -60LL));
 #endif
 #if defined(VLC_FRAME_FLAG_AU_END)
 VLCLR_VALUE(VLC_FRAME_FLAG_AU_END, 2048LL);

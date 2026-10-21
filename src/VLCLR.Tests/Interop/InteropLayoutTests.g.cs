@@ -13,10 +13,31 @@ namespace VLCLR.Tests.Interop;
 public unsafe class InteropLayoutTests
 {
     [Fact]
+    [SupportedOSPlatform("macos")]
+    public void Dir_Layout()
+    {
+        if (!(OperatingSystem.IsMacOS()))
+            return;
+        var s = default(global::VLCLR.Native.Interop.Dir);
+        AssertEqual(136, global::VLCLR.Native.Interop.Dir.SizeOf, "DIR sizeof");
+        AssertEqual(136, Unsafe.SizeOf<global::VLCLR.Native.Interop.Dir>(), "DIR Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.DdFd), "DIR.__dd_fd offset");
+        AssertEqual(8, Offset(ref s, ref s.DdLoc), "DIR.__dd_loc offset");
+        AssertEqual(16, Offset(ref s, ref s.DdSize), "DIR.__dd_size offset");
+        { ref var r = ref s.DdBuf; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "DIR.__dd_buf offset"); }
+        AssertEqual(32, Offset(ref s, ref s.DdLen), "DIR.__dd_len offset");
+        AssertEqual(40, Offset(ref s, ref s.DdSeek), "DIR.__dd_seek offset");
+        AssertEqual(48, Offset(ref s, ref s.Padding), "DIR.__padding offset");
+        AssertEqual(56, Offset(ref s, ref s.DdFlags), "DIR.__dd_flags offset");
+        AssertEqual(64, Offset(ref s, ref s.DdLock), "DIR.__dd_lock offset");
+        { ref var r = ref s.DdTd; fixed (void* p = &r) AssertEqual(128, PointerOffset(ref s, p), "DIR.__dd_td offset"); }
+    }
+
+    [Fact]
     [SupportedOSPlatform("windows")]
     public void ScopeId_Layout()
     {
-        if (!OperatingSystem.IsWindows())
+        if (!(OperatingSystem.IsWindows()))
             return;
         var s = default(global::VLCLR.Native.Interop.ScopeId);
         AssertEqual(4, global::VLCLR.Native.Interop.ScopeId.SizeOf, "_SCOPE_ID sizeof");
@@ -39,10 +60,11 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
-    [UnsupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
     public void VaListTag_Layout()
     {
-        if (OperatingSystem.IsWindows())
+        if (!(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
             return;
         var s = default(global::VLCLR.Native.Interop.VaListTag);
         AssertEqual(24, global::VLCLR.Native.Interop.VaListTag.SizeOf, "__va_list_tag sizeof");
@@ -51,6 +73,19 @@ public unsafe class InteropLayoutTests
         AssertEqual(4, Offset(ref s, ref s.FpOffset), "__va_list_tag.fp_offset offset");
         { ref var r = ref s.OverflowArgArea; fixed (void* p = &r) AssertEqual(8, PointerOffset(ref s, p), "__va_list_tag.overflow_arg_area offset"); }
         { ref var r = ref s.RegSaveArea; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "__va_list_tag.reg_save_area offset"); }
+    }
+
+    [Fact]
+    [SupportedOSPlatform("macos")]
+    public void OpaquePthreadMutex_Layout()
+    {
+        if (!(OperatingSystem.IsMacOS()))
+            return;
+        var s = default(global::VLCLR.Native.Interop.OpaquePthreadMutex);
+        AssertEqual(64, global::VLCLR.Native.Interop.OpaquePthreadMutex.SizeOf, "_opaque_pthread_mutex_t sizeof");
+        AssertEqual(64, Unsafe.SizeOf<global::VLCLR.Native.Interop.OpaquePthreadMutex>(), "_opaque_pthread_mutex_t Unsafe.SizeOf");
+        AssertEqual(0, Offset(ref s, ref s.Sig), "_opaque_pthread_mutex_t.__sig offset");
+        AssertEqual(8, Offset(ref s, ref s.Opaque), "_opaque_pthread_mutex_t.__opaque offset");
     }
 
     [Fact]
@@ -1143,23 +1178,6 @@ public unsafe class InteropLayoutTests
         { ref var r = ref s.Description; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "services_discovery_t.description offset"); }
         { ref var r = ref s.Sys; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "services_discovery_t.p_sys offset"); }
         AssertEqual(72, Offset(ref s, ref s.Owner), "services_discovery_t.owner offset");
-    }
-
-    [Fact]
-    public void Sockaddr_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.Sockaddr);
-        AssertEqual(16, global::VLCLR.Native.Interop.Sockaddr.SizeOf, "sockaddr sizeof");
-        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.Sockaddr>(), "sockaddr Unsafe.SizeOf");
-        AssertEqual(2, Offset(ref s, ref s.SaData), "sockaddr.sa_data offset");
-    }
-
-    [Fact]
-    public void SockaddrIn_Layout()
-    {
-        var s = default(global::VLCLR.Native.Interop.SockaddrIn);
-        AssertEqual(16, global::VLCLR.Native.Interop.SockaddrIn.SizeOf, "sockaddr_in sizeof");
-        AssertEqual(16, Unsafe.SizeOf<global::VLCLR.Native.Interop.SockaddrIn>(), "sockaddr_in Unsafe.SizeOf");
     }
 
     [Fact]
@@ -3647,11 +3665,8 @@ public unsafe class InteropLayoutTests
     [Fact]
     public void VlcSockaddr_Layout()
     {
-        var s = default(global::VLCLR.Native.Interop.VlcSockaddr);
         AssertEqual(128, global::VLCLR.Native.Interop.VlcSockaddr.SizeOf, "vlc_sockaddr sizeof");
         AssertEqual(128, Unsafe.SizeOf<global::VLCLR.Native.Interop.VlcSockaddr>(), "vlc_sockaddr Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Sa), "vlc_sockaddr.sa offset");
-        AssertEqual(0, Offset(ref s, ref s.Sin), "vlc_sockaddr.sin offset");
     }
 
     [Fact]
@@ -3711,7 +3726,7 @@ public unsafe class InteropLayoutTests
         { ref var r = ref s.CanControlPace; fixed (void* p = &r) AssertEqual(16, PointerOffset(ref s, p), "vlc_stream_operations.can_control_pace offset"); }
         { ref var r = ref s.GetSignal; fixed (void* p = &r) AssertEqual(24, PointerOffset(ref s, p), "vlc_stream_operations.get_signal offset"); }
         { ref var r = ref s.GetMeta; fixed (void* p = &r) AssertEqual(32, PointerOffset(ref s, p), "vlc_stream_operations.get_meta offset"); }
-        { ref var r = ref s.GetType; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_stream_operations.get_type offset"); }
+        { ref var r = ref s.GetTypeValue; fixed (void* p = &r) AssertEqual(40, PointerOffset(ref s, p), "vlc_stream_operations.get_type offset"); }
         { ref var r = ref s.SetPauseState; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "vlc_stream_operations.set_pause_state offset"); }
         { ref var r = ref s.SetSeekPoint; fixed (void* p = &r) AssertEqual(56, PointerOffset(ref s, p), "vlc_stream_operations.set_seek_point offset"); }
         { ref var r = ref s.SetTitle; fixed (void* p = &r) AssertEqual(64, PointerOffset(ref s, p), "vlc_stream_operations.set_title offset"); }
@@ -3789,15 +3804,14 @@ public unsafe class InteropLayoutTests
     }
 
     [Fact]
-    [UnsupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
     public void ThreadHandle_Layout()
     {
-        if (OperatingSystem.IsWindows())
+        if (!(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
             return;
-        var s = default(global::VLCLR.Native.Interop.ThreadHandle);
         AssertEqual(8, global::VLCLR.Native.Interop.ThreadHandle.SizeOf, "vlc_thread_t sizeof");
         AssertEqual(8, Unsafe.SizeOf<global::VLCLR.Native.Interop.ThreadHandle>(), "vlc_thread_t Unsafe.SizeOf");
-        AssertEqual(0, Offset(ref s, ref s.Handle), "vlc_thread_t.handle offset");
     }
 
     [Fact]
@@ -4372,8 +4386,11 @@ public unsafe class InteropLayoutTests
         { ref var r = ref s.CatalogAdd; fixed (void* p = &r) AssertEqual(48, PointerOffset(ref s, p), "xml_t.pf_catalog_add offset"); }
     }
 
-    // Windows value, then SysV value, for the ABI the tests run on.
+    // Windows value, then SysV value (Linux and macOS), for the ABI the tests run on.
     private static int Abi(int w, int s) => OperatingSystem.IsWindows() ? w : s;
+
+    // Windows, Linux, then macOS value.
+    private static int Abi(int w, int s, int d) => OperatingSystem.IsWindows() ? w : OperatingSystem.IsMacOS() ? d : s;
 
     private static nint Offset<TOwner, TField>(ref TOwner owner, ref TField field)
         => Unsafe.ByteOffset(ref Unsafe.As<TOwner, byte>(ref owner), ref Unsafe.As<TField, byte>(ref field));

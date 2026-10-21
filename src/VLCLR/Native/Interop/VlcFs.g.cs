@@ -12,7 +12,7 @@ public partial struct Iovec { }
 
 /// <summary>vlc_DIR</summary>
 [SupportedOSPlatform("windows")]
-public partial struct Dir { }
+public partial struct VlcDir { }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcFs

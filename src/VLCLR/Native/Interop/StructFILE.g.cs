@@ -8,5 +8,5 @@ using System.Runtime.Versioning;
 namespace VLCLR.Native.Interop;
 
 /// <summary>_IO_FILE</summary>
-[UnsupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
 public partial struct IoFile { }

@@ -11,7 +11,7 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class VlcAccess
 {
     /// <summary>VLC_ACCESS_REDIRECT</summary>
-    public static int AccessRedirect { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -138 : -110; }
+    public static int AccessRedirect { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -138 : OperatingSystem.IsMacOS() ? -60 : -110; }
 
     /// <summary>vlc_access_NewMRL</summary>
     [LibraryImport("libvlccore", EntryPoint = "vlc_access_NewMRL")]

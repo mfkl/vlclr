@@ -132,10 +132,10 @@ public static unsafe partial class VlcCommon
     public const int Enomem = -12;
 
     /// <summary>VLC_ENOTSUP</summary>
-    public static int Enotsup { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -129 : -95; }
+    public static int Enotsup { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -129 : OperatingSystem.IsMacOS() ? -45 : -95; }
 
     /// <summary>VLC_ETIMEOUT</summary>
-    public static int Etimeout { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -138 : -110; }
+    public static int Etimeout { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -138 : OperatingSystem.IsMacOS() ? -60 : -110; }
 
     /// <summary>VLC_SUCCESS</summary>
     public const int Success = 0;
