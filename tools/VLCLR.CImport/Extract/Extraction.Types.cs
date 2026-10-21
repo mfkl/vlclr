@@ -14,6 +14,7 @@ internal sealed partial class Extraction
         public required string Header { get; init; }
         public required bool Defined { get; init; }
         public string? Parent { get; init; }
+        public bool TypedefNamed { get; init; }
         public bool Full { get; set; }
         public bool Failed { get; set; }
         public TypeDecl? Decl { get; set; }
@@ -106,6 +107,16 @@ internal sealed partial class Extraction
 
     // ---- records ---------------------------------------------------------------------------------
 
+    /// <summary>
+    /// <c>typedef struct { ... } DIR;</c>: no tag, the typedef names it. C
+    /// spells the type of a tagged record <c>struct x</c>, of this one <c>DIR</c>.
+    /// </summary>
+    private static bool IsTypedefNamed(CXCursor record)
+    {
+        var spelling = record.Type.Spelling.ToString();
+        return !spelling.StartsWith("struct ", StringComparison.Ordinal) && !spelling.StartsWith("union ", StringComparison.Ordinal);
+    }
+
     private string RecordName(CXCursor declaration)
     {
         if (!declaration.IsTagless())
@@ -138,6 +149,7 @@ internal sealed partial class Extraction
                 Header = Where(cursor).Header,
                 Defined = defined,
                 Parent = _anonymousNames.TryGetValue(key, out var assigned) ? assigned.Parent : null,
+                TypedefNamed = IsTypedefNamed(cursor),
             };
             _records[key] = state;
         }
@@ -215,6 +227,7 @@ internal sealed partial class Extraction
             Header = state.Header,
             IsAnonymous = state.Parent is not null,
             Parent = state.Parent,
+            IsTypedefNamed = state.TypedefNamed,
             Size = size,
             Alignment = alignment,
             IsPacked = packed,
