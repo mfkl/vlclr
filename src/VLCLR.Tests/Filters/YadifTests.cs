@@ -62,16 +62,65 @@ public unsafe class YadifTests
         {
             foreach (int parity in new[] { 0, 1, 2 })
             {
+                string picture = $"{width}x{height}, {bitDepth} bits, field {field}, parity {parity}";
                 byte[] reference = Render(YadifImplementation.Reference, width, height, bitDepth, field, parity);
+                // Same inputs, same output: a difference here is not the implementation's.
+                AssertSame(reference, Render(YadifImplementation.Reference, width, height, bitDepth, field, parity),
+                    width, height, bitDepth, $"Reference differs from itself ({picture})");
                 foreach (YadifImplementation implementation in SupportedImplementations())
                 {
                     byte[] result = Render(implementation, width, height, bitDepth, field, parity);
-                    Assert.True(reference.AsSpan().SequenceEqual(result),
-                        $"{implementation} differs from the reference ({width}x{height}, {bitDepth} bits, field {field}, parity {parity})");
+                    AssertSame(reference, result, width, height, bitDepth, $"{implementation} differs from the reference ({picture})");
+                    AssertSame(result, Render(implementation, width, height, bitDepth, field, parity),
+                        width, height, bitDepth, $"{implementation} differs from itself ({picture})");
                 }
             }
         }
     }
+
+    // On a mismatch, where and how: the first differing sample (plane, x, y,
+    // both values), how many differ, and the runtime and CPU it ran on.
+    private static void AssertSame(byte[] expected, byte[] actual, int width, int height, int bitDepth, string what)
+    {
+        if (expected.AsSpan().SequenceEqual(actual))
+        {
+            return;
+        }
+
+        int pixelSize = bitDepth > 8 ? 2 : 1;
+        int first = expected.AsSpan().CommonPrefixLength(actual);
+        int count = 0;
+        for (int i = 0; i < expected.Length; i += pixelSize)
+        {
+            if (!expected.AsSpan(i, pixelSize).SequenceEqual(actual.AsSpan(i, pixelSize)))
+            {
+                count++;
+            }
+        }
+
+        // Visible() concatenates the visible lines of the three 4:2:0 planes.
+        int offset = first - first % pixelSize;
+        int plane = 0;
+        int planeWidth = width;
+        int planeHeight = height;
+        while (plane < 2 && offset >= planeWidth * planeHeight * pixelSize)
+        {
+            offset -= planeWidth * planeHeight * pixelSize;
+            plane++;
+            planeWidth = (width + 1) / 2;
+            planeHeight = (height + 1) / 2;
+        }
+        int x = offset / pixelSize % planeWidth;
+        int y = offset / pixelSize / planeWidth;
+
+        Assert.Fail($"{what}: {count} of {expected.Length / pixelSize} samples differ, first at plane {plane} x {x} y {y}: "
+            + $"{Sample(expected, first - first % pixelSize, pixelSize)} vs {Sample(actual, first - first % pixelSize, pixelSize)}. "
+            + $"{RuntimeInformation.FrameworkDescription}, {RuntimeInformation.ProcessArchitecture}, "
+            + $"AVX2 {Avx2.IsSupported}, AVX-512 BW {Avx512BW.IsSupported}, Vector512 accelerated {Vector512.IsHardwareAccelerated}.");
+    }
+
+    private static int Sample(byte[] bytes, int index, int pixelSize)
+        => pixelSize == 1 ? bytes[index] : BitConverter.ToUInt16(bytes, index);
 
     [Fact]
     public void Render_CopiesTheKeptFieldAndDuplicatesTheEdgeLines()
