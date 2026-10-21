@@ -5,8 +5,9 @@
 // cl /std:clatest /experimental:c11atomics /TC /c.
 // </auto-generated>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #define PROBE_ABI_WINDOWS 1
+#elif defined(__APPLE__)
 #else
 #define PROBE_ABI_SYSV 1
 #endif
@@ -30,10 +31,12 @@ typedef SSIZE_T ssize_t;
 
 _Static_assert(sizeof(void *) == 8, "VLCLR currently targets the 64-bit VLC ABI");
 
-#ifdef _WIN32
-#define VLCLR_ABI(windows, sysv) windows
+#if defined(_WIN32)
+#define VLCLR_ABI(windows, sysv, darwin) windows
+#elif defined(__APPLE__)
+#define VLCLR_ABI(windows, sysv, darwin) darwin
 #else
-#define VLCLR_ABI(windows, sysv) sysv
+#define VLCLR_ABI(windows, sysv, darwin) sysv
 #endif
 #define VLCLR_SIZE(type, label, expected) \
     _Static_assert(sizeof(type) == (expected), "VLCLR size mismatch: " label)
@@ -50,13 +53,13 @@ _Static_assert(sizeof(void *) == 8, "VLCLR currently targets the 64-bit VLC ABI"
 typedef __typeof__(((struct video_format_t *)0)->dovi) cimport_video_format_t_dovi;
 
 // es_format_t
-VLCLR_SIZE(struct es_format_t, "es_format_t", VLCLR_ABI(36, 32));
+VLCLR_SIZE(struct es_format_t, "es_format_t", VLCLR_ABI(36, 32, 32));
 VLCLR_ALIGN(struct es_format_t, "es_format_t", 4);
 VLCLR_OFFSET(struct es_format_t, "es_format_t", i_cat, 0);
 VLCLR_OFFSET(struct es_format_t, "es_format_t", i_array, 4);
 VLCLR_OFFSET(struct es_format_t, "es_format_t", video, 16);
 VLCLR_OFFSET(struct es_format_t, "es_format_t", i_codec_data, 16);
-VLCLR_OFFSET(struct es_format_t, "es_format_t", i_bitrate, VLCLR_ABI(32, 28));
+VLCLR_OFFSET(struct es_format_t, "es_format_t", i_bitrate, VLCLR_ABI(32, 28, 28));
 
 // plane_t
 VLCLR_SIZE(struct plane_t, "plane_t", 16);
@@ -71,11 +74,11 @@ VLCLR_ALIGN(struct probe_bits_t, "probe_bits_t", 4);
 VLCLR_OFFSET(struct probe_bits_t, "probe_bits_t", c, 4);
 
 // probe_long_t
-VLCLR_SIZE(struct probe_long_t, "probe_long_t", VLCLR_ABI(16, 24));
+VLCLR_SIZE(struct probe_long_t, "probe_long_t", VLCLR_ABI(16, 24, 24));
 VLCLR_ALIGN(struct probe_long_t, "probe_long_t", 8);
 VLCLR_OFFSET(struct probe_long_t, "probe_long_t", l, 0);
-VLCLR_OFFSET(struct probe_long_t, "probe_long_t", i, VLCLR_ABI(4, 8));
-VLCLR_OFFSET(struct probe_long_t, "probe_long_t", u, VLCLR_ABI(8, 16));
+VLCLR_OFFSET(struct probe_long_t, "probe_long_t", i, VLCLR_ABI(4, 8, 8));
+VLCLR_OFFSET(struct probe_long_t, "probe_long_t", u, VLCLR_ABI(8, 16, 16));
 
 // probe_value_t
 VLCLR_SIZE(union probe_value_t, "probe_value_t", 8);
@@ -85,14 +88,14 @@ VLCLR_OFFSET(union probe_value_t, "probe_value_t", d, 0);
 VLCLR_OFFSET(union probe_value_t, "probe_value_t", c, 0);
 
 // video_format_t
-VLCLR_SIZE(struct video_format_t, "video_format_t", VLCLR_ABI(16, 12));
+VLCLR_SIZE(struct video_format_t, "video_format_t", VLCLR_ABI(16, 12, 12));
 VLCLR_ALIGN(struct video_format_t, "video_format_t", 4);
 VLCLR_OFFSET(struct video_format_t, "video_format_t", i_chroma, 0);
 VLCLR_OFFSET(struct video_format_t, "video_format_t", dovi, 4);
-VLCLR_OFFSET(struct video_format_t, "video_format_t", i_cubemap_padding, VLCLR_ABI(12, 8));
+VLCLR_OFFSET(struct video_format_t, "video_format_t", i_cubemap_padding, VLCLR_ABI(12, 8, 8));
 
 // video_format_t::dovi
-VLCLR_SIZE(cimport_video_format_t_dovi, "video_format_t::dovi", VLCLR_ABI(8, 4));
+VLCLR_SIZE(cimport_video_format_t_dovi, "video_format_t::dovi", VLCLR_ABI(8, 4, 4));
 VLCLR_ALIGN(cimport_video_format_t_dovi, "video_format_t::dovi", 4);
 VLCLR_OFFSET(cimport_video_format_t_dovi, "video_format_t::dovi", version_major, 0);
 VLCLR_OFFSET(cimport_video_format_t_dovi, "video_format_t::dovi", version_minor, 1);

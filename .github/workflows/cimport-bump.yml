@@ -88,6 +88,8 @@ jobs:
             os: ubuntu-24.04
           - abi: windows
             os: windows-latest
+          - abi: darwin
+            os: macos-15
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -114,7 +116,8 @@ jobs:
 
       - name: Pin the manifest to the checked commit
         run: |
-          sed -i -E "s/(\"commit\": *\")[0-9a-f]{40}/\1$COMMIT/" "$MANIFEST"
+          # -i.bak: the one in-place form GNU and BSD (macOS) sed both accept.
+          sed -i.bak -E "s/(\"commit\": *\")[0-9a-f]{40}/\1$COMMIT/" "$MANIFEST" && rm -f "$MANIFEST.bak"
           grep -q "\"$COMMIT\"" "$MANIFEST"
 
       - name: Fetch the VLC headers
@@ -159,7 +162,8 @@ jobs:
 
       - name: Pin the manifest to the checked commit
         run: |
-          sed -i -E "s/(\"commit\": *\")[0-9a-f]{40}/\1$COMMIT/" "$MANIFEST"
+          # -i.bak: the one in-place form GNU and BSD (macOS) sed both accept.
+          sed -i.bak -E "s/(\"commit\": *\")[0-9a-f]{40}/\1$COMMIT/" "$MANIFEST" && rm -f "$MANIFEST.bak"
           grep -q "\"$COMMIT\"" "$MANIFEST"
 
       - uses: actions/download-artifact@v4

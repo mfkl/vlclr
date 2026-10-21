@@ -13,12 +13,12 @@ public class CSharpEmitterBehaviorTests
         => new CSharpEmitter(merged, names ?? new TestNameMap(), new CSharpEmitOptions("libvlccore")).Emit();
 
     private static MergedSnapshot Merge(Func<bool, Snapshot> build)
-        => AbiMerger.Merge(build(true), build(false));
+        => AbiMerger.Merge(build(true), build(false), TestAbis.DarwinLike(build(false)));
 
     [Fact]
     public void Error_diagnostics_stop_emission()
     {
-        var merged = AbiMerger.Merge(Snapshot(true), Snapshot(false));
+        var merged = AbiMerger.Merge(Snapshot(true), Snapshot(false), TestAbis.DarwinLike(Snapshot(false)));
         merged = merged with { Diagnostics = [new(DiagnosticSeverity.Error, "broken_t", "does not merge")] };
 
         var error = Assert.Throws<InvalidOperationException>(() => Emit(merged));
@@ -28,14 +28,18 @@ public class CSharpEmitterBehaviorTests
     [Fact]
     public void Symbols_of_one_abi_are_marked_for_its_platform()
     {
+        var unix = Struct("only_unix_t", "vlc_a.h", 4, 4, F("x", Int, 0));
         var merged = AbiMerger.Merge(
             Snapshot(true, types: [Struct("only_win_t", "vlc_a.h", 4, 4, F("x", Int, 0))]),
-            Snapshot(false, types: [Struct("only_sysv_t", "vlc_a.h", 4, 4, F("x", Int, 0))]));
+            Snapshot(false, types: [unix, Struct("only_linux_t", "vlc_a.h", 4, 4, F("x", Int, 0))]),
+            TestAbis.DarwinLike(Snapshot(false, types: [unix, Struct("only_mac_t", "vlc_a.h", 4, 4, F("x", Int, 0))])));
 
         var file = Assert.Single(Emit(merged).Files, f => f.Key != CSharpHelpers.FileName).Value;
 
         Assert.Contains("[SupportedOSPlatform(\"windows\")]\n[StructLayout(LayoutKind.Explicit, Size = 4)]\npublic unsafe partial struct OnlyWin", file);
-        Assert.Contains("[UnsupportedOSPlatform(\"windows\")]\n[StructLayout(LayoutKind.Explicit, Size = 4)]\npublic unsafe partial struct OnlySysv", file);
+        Assert.Contains("[SupportedOSPlatform(\"linux\")]\n[StructLayout(LayoutKind.Explicit, Size = 4)]\npublic unsafe partial struct OnlyLinux", file);
+        Assert.Contains("[SupportedOSPlatform(\"macos\")]\n[StructLayout(LayoutKind.Explicit, Size = 4)]\npublic unsafe partial struct OnlyMac", file);
+        Assert.Contains("[SupportedOSPlatform(\"linux\")]\n[SupportedOSPlatform(\"macos\")]\n[StructLayout(LayoutKind.Explicit, Size = 4)]\npublic unsafe partial struct OnlyUnix", file);
         Assert.Contains("using System.Runtime.Versioning;", file);
     }
 

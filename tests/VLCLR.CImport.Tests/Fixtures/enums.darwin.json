@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "abi": "darwin",
+  "target": "x86_64-apple-darwin",
+  "vlcCommit": "fixture",
+  "pointerSize": 8,
+  "headers": [
+    "enums.h"
+  ],
+  "types": [
+    {
+      "name": "uses_enums",
+      "kind": "struct",
+      "header": "enums.h",
+      "size": 12,
+      "alignment": 4,
+      "fields": [
+        {
+          "name": "s",
+          "type": {
+            "kind": "enum",
+            "name": "signed_e"
+          },
+          "offset": 0
+        },
+        {
+          "name": "t",
+          "type": {
+            "kind": "typedef",
+            "name": "typedef_e",
+            "element": {
+              "kind": "enum",
+              "name": "typedef_e"
+            }
+          },
+          "offset": 4
+        },
+        {
+          "name": "f",
+          "type": {
+            "kind": "enum",
+            "name": "fixed_e"
+          },
+          "offset": 8
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "@ANON_A",
+      "header": "enums.h",
+      "isAnonymous": true,
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "members": [
+        {
+          "name": "ANON_A",
+          "value": 10
+        },
+        {
+          "name": "ANON_B",
+          "value": 11
+        },
+        {
+          "name": "ANON_C",
+          "value": 32
+        }
+      ]
+    },
+    {
+      "name": "fixed_e",
+      "header": "enums.h",
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "uChar"
+      },
+      "hasFixedUnderlyingType": true,
+      "members": [
+        {
+          "name": "FIXED_A",
+          "value": 1
+        },
+        {
+          "name": "FIXED_B",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "name": "signed_e",
+      "header": "enums.h",
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "members": [
+        {
+          "name": "SIGNED_NEG",
+          "value": -1
+        },
+        {
+          "name": "SIGNED_ZERO",
+          "value": 0
+        },
+        {
+          "name": "SIGNED_POS",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "name": "typedef_e",
+      "header": "enums.h",
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "members": [
+        {
+          "name": "TYPEDEF_ONE",
+          "value": 1
+        },
+        {
+          "name": "TYPEDEF_TWO",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "unsigned_e",
+      "header": "enums.h",
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "uInt"
+      },
+      "members": [
+        {
+          "name": "UNSIGNED_BIG",
+          "value": 4294967295
+        }
+      ]
+    },
+    {
+      "name": "wide_e",
+      "header": "enums.h",
+      "underlyingType": {
+        "kind": "builtin",
+        "builtin": "uLong"
+      },
+      "members": [
+        {
+          "name": "WIDE_SMALL",
+          "value": 1
+        },
+        {
+          "name": "WIDE_BIG",
+          "value": 4294967296
+        }
+      ]
+    }
+  ],
+  "typedefs": [
+    {
+      "name": "typedef_e",
+      "header": "enums.h",
+      "target": {
+        "kind": "enum",
+        "name": "typedef_e"
+      }
+    }
+  ],
+  "functions": [],
+  "constants": [],
+  "skipped": []
+}

@@ -13,7 +13,7 @@ internal sealed partial class CSharpGeneration
         var typeName = names.Type(t.Name);
         var w = new CSharpWriter();
         w.Line($"/// <summary>{CSharpLiterals.Xml(t.Name)}</summary>");
-        if (PlatformAttribute(t.Name) is { } platform)
+        foreach (var platform in PlatformAttributes(t.Name))
             w.Line(platform);
 
         if (t.IsOpaque)

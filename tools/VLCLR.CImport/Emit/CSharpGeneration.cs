@@ -113,8 +113,7 @@ internal sealed partial class CSharpGeneration
     {
         RegisterMember(q.Class, q.Member, cName);
         var lines = new List<string> { $"/// <summary>{CSharpLiterals.Xml(cName)}</summary>" };
-        if (PlatformAttribute(platformOf ?? cName) is { } platform)
-            lines.Add(platform);
+        lines.AddRange(PlatformAttributes(platformOf ?? cName));
         lines.Add(values.IsUniform
             ? $"public const {type} {q.Member} = {values[0]};"
             : Getter($"public static {type} {q.Member}", AbiText.Choice(values, v => v)));
@@ -285,8 +284,7 @@ internal sealed partial class CSharpGeneration
         RegisterMember(q.Class, q.Member, d.Name);
         var convention = d.CallingConvention == Model.CallingConvention.Stdcall ? "CallConvStdcall" : "CallConvCdecl";
         var lines = new List<string> { $"/// <summary>{CSharpLiterals.Xml(d.Name)}</summary>" };
-        if (PlatformAttribute(d.Name) is { } platform)
-            lines.Add(platform);
+        lines.AddRange(PlatformAttributes(d.Name));
         lines.AddRange(
         [
             $"[LibraryImport({CSharpLiterals.String(options.Library)}, EntryPoint = {CSharpLiterals.String(d.Name)})]",
@@ -299,17 +297,12 @@ internal sealed partial class CSharpGeneration
     }
 
     /// <summary>
-    /// The attribute that limits a symbol to the platforms of the ABIs it
-    /// exists on, so callers get CA1416 where it may be missing; null when it
+    /// The attributes that limit a symbol to the platforms of the ABIs it
+    /// exists on, so callers get CA1416 where it may be missing; none when it
     /// exists on every ABI.
     /// </summary>
-    private string? PlatformAttribute(string cName) => merged.PlatformsOf(cName) switch
-    {
-        null => null,
-        [Abis.Windows] => "[SupportedOSPlatform(\"windows\")]",
-        [Abis.SysV] => "[UnsupportedOSPlatform(\"windows\")]",
-        var abis => throw new InvalidOperationException($"'{cName}' exists on {string.Join(", ", abis)} only, which no platform attribute expresses."),
-    };
+    private IEnumerable<string> PlatformAttributes(string cName)
+        => (merged.PlatformsOf(cName) ?? []).Select(abi => $"[SupportedOSPlatform(\"{Abis.Platform(abi)}\")]");
 
     // ---- naming ----------------------------------------------------------------------------------
 

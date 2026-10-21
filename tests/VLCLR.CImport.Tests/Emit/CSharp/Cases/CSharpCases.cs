@@ -36,7 +36,7 @@ internal static class CSharpCases
     public static MergedSnapshot Merged(string name)
     {
         var (windows, sysv) = Snapshots(name);
-        return AbiMerger.Merge(windows, sysv);
+        return AbiMerger.Merge(windows, sysv, TestAbis.DarwinLike(sysv));
     }
 
     public static INameMap NameMap(string name) => name switch

@@ -63,15 +63,15 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         var csType = Qualified(typeName);
         Line("    [Fact]");
         var platforms = merged.PlatformsOf(type.Name);
-        if (platforms is not null)
-            Line(platforms is [Abis.Windows] ? "    [SupportedOSPlatform(\"windows\")]" : "    [UnsupportedOSPlatform(\"windows\")]");
+        foreach (var abi in platforms ?? [])
+            Line($"    [SupportedOSPlatform(\"{Abis.Platform(abi)}\")]");
         Line($"    public void {typeName}_Layout()");
         Line("    {");
-        // The layout of a record of one platform only holds there: C long is
+        // The layout of a record of some platforms only holds there: C long is
         // 32-bit on windows and 64-bit elsewhere.
         if (platforms is not null)
         {
-            Line(platforms is [Abis.Windows] ? "        if (!OperatingSystem.IsWindows())" : "        if (OperatingSystem.IsWindows())");
+            Line($"        if (!({string.Join(" || ", platforms.Select(Abis.CSharpTest))}))");
             Line("            return;");
         }
         Line($"        var s = default({csType});");
@@ -158,17 +158,24 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
 
     private string Qualified(string csType) => $"global::{names.Namespace}.{csType}";
 
+    // Linux and macOS share most layouts: the macOS value only where it differs.
     private static string Abi(PerAbi<long> value)
-        => value.IsUniform
-            ? value[0].ToString(CultureInfo.InvariantCulture)
-            : $"Abi({value[0].ToString(CultureInfo.InvariantCulture)}, {value[1].ToString(CultureInfo.InvariantCulture)})";
+    {
+        if (value.IsUniform)
+            return value[0].ToString(CultureInfo.InvariantCulture);
+        var text = value.Values.Select(v => v.ToString(CultureInfo.InvariantCulture)).ToList();
+        return value.SysV == value.Darwin ? $"Abi({text[0]}, {text[1]})" : $"Abi({text[0]}, {text[1]}, {text[2]})";
+    }
 
     private static string Escape(string text) => text.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
     private void WriteHelpers()
     {
-        Line("    // Windows value, then SysV value, for the ABI the tests run on.");
+        Line("    // Windows value, then SysV value (Linux and macOS), for the ABI the tests run on.");
         Line("    private static int Abi(int w, int s) => OperatingSystem.IsWindows() ? w : s;");
+        Line();
+        Line("    // Windows, Linux, then macOS value.");
+        Line("    private static int Abi(int w, int s, int d) => OperatingSystem.IsWindows() ? w : OperatingSystem.IsMacOS() ? d : s;");
         Line();
         Line("    private static nint Offset<TOwner, TField>(ref TOwner owner, ref TField field)");
         Line("        => Unsafe.ByteOffset(ref Unsafe.As<TOwner, byte>(ref owner), ref Unsafe.As<TField, byte>(ref field));");

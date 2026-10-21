@@ -7,7 +7,8 @@ signatures; the generated C# is committed.
 
 ```
 vlc.cimport.json ──> fetch-headers ──> extract (windows) ──> abi/windows.json ─┐
-                                   └─> extract (sysv)    ──> abi/sysv.json   ──┴─> emit ──> *.g.cs
+                                   ├─> extract (sysv)    ──> abi/sysv.json   ──┤
+                                   └─> extract (darwin)  ──> abi/darwin.json ──┴─> emit ──> *.g.cs
                                                                                      ├─> cimport-report.md
                                                                                      ├─> tests/AbiValidation/vlclr_abi.g.c
                                                                                      └─> src/VLCLR.Tests/Interop/InteropLayoutTests.g.cs
@@ -18,17 +19,21 @@ vlc.cimport.json ──> fetch-headers ──> extract (windows) ──> abi/win
   offsets, enums, functions, and the object-like macros clang can evaluate.
   `windows` targets `x86_64-w64-windows-gnu` with the headers of a mingw-w64
   toolchain (llvm-mingw), the one VLC's Windows builds are made with; `sysv`
-  targets `x86_64-pc-linux-gnu` and runs on Linux (macOS uses the same
-  layouts, which the per-OS probe in CI checks). A function counts as
-  exported when it is `VLC_API` and in `libvlccore.sym`.
-- **emit** runs anywhere. It merges the two snapshots: a member at the same
-  offset on both ABIs becomes a `[FieldOffset]` field, one that moves becomes a
-  `ref` property that picks the offset with `OperatingSystem.IsWindows()`
-  (a constant under Native AOT). A symbol that exists on one ABI only gets
-  `[SupportedOSPlatform("windows")]` or `[UnsupportedOSPlatform("windows")]`;
-  one whose shape differs between ABIs is left out and reported. It also writes
-  the C probe and the C# layout tests that check the snapshots against the
-  compiler and the generated C# against the snapshots.
+  targets `x86_64-pc-linux-gnu` and runs on Linux; `darwin` targets
+  `x86_64-apple-darwin` with the macOS SDK and runs on macOS. macOS lays out
+  VLC's own records like Linux, but its C library differs (BSD `sockaddr`,
+  errno values, so `VLC_ETIMEOUT`); arm64 differs from x86-64 only in a few
+  constants (`VLC_CPU_*`), which the probe checks where they exist. A function
+  counts as exported when it is `VLC_API` and in `libvlccore.sym`.
+- **emit** runs anywhere. It merges the three snapshots: a member at the same
+  offset on every ABI becomes a `[FieldOffset]` field, one that moves becomes a
+  `ref` property that picks the offset with `OperatingSystem.IsWindows()`, and
+  `OperatingSystem.IsMacOS()` where macOS differs from Linux (constants under
+  Native AOT). A symbol that exists on some ABIs only gets a
+  `[SupportedOSPlatform]` for each; one whose shape differs between ABIs is
+  left out and reported. It also writes the C probe and the C# layout tests
+  that check the snapshots against the compiler and the generated C# against
+  the snapshots.
 
 The generated layer is the raw C API, named after it and changing whenever
 VLC's headers do. The hand-written layer in `src/VLCLR` (`VLCCore`,
@@ -53,13 +58,20 @@ dotnet run --project tools/VLCLR.CImport -- extract --abi windows \
 dotnet run --project tools/VLCLR.CImport -- extract --abi sysv \
     --manifest tools/VLCLR.CImport/vlc.cimport.json \
     --out src/VLCLR/Native/Interop/abi/sysv.json             # on Linux or WSL
+dotnet run --project tools/VLCLR.CImport -- extract --abi darwin \
+    --manifest tools/VLCLR.CImport/vlc.cimport.json \
+    --out src/VLCLR/Native/Interop/abi/darwin.json           # on macOS (arm64)
 
 # 3. C#, report, probe and layout tests
 dotnet run --project tools/VLCLR.CImport -- emit --manifest tools/VLCLR.CImport/vlc.cimport.json
 ```
 
-Without a Linux machine, run the `CImport` workflow with `upload-snapshots`
-set and take `sysv.json` from its `cimport-snapshots` artifact.
+Without a Linux machine or a Mac, run the `CImport` workflow with
+`upload-snapshots` set and take `sysv.json` and `darwin.json` from its
+`cimport-snapshots` artifact. The darwin snapshot needs the macOS SDK, which
+only comes with Xcode: extract finds it with `xcrun`, or takes `--sysroot
+<MacOSX.sdk>` or `$CIMPORT_MACOS_SDK`. libclang 21 is packaged for macOS on
+arm64 only, so extract runs there.
 
 libclang comes from NuGet without clang's builtin headers (`stddef.h`, ...).
 extract looks for them in `$CIMPORT_RESOURCE_DIR`, then an installed LLVM
@@ -89,7 +101,7 @@ generated files carry the commit too (the `*.g.cs` headers, `vlcCommit` in
    the full one is the `id` of
    `https://code.videolan.org/api/v4/projects/videolan%2Fvlc/repository/commits/<short sha>`.
 2. Set `vlc.commit` to the full 40-character SHA.
-3. Run the three steps of [Regenerate](#regenerate), both ABIs. In WSL, run
+3. Run the three steps of [Regenerate](#regenerate), every ABI. In WSL, run
    extract from a separate clone: sharing `bin/` and `obj/` with a Windows
    build breaks the Linux build.
 4. Review the diff without the lines that only carry the commit:
@@ -121,7 +133,7 @@ generated files carry the commit too (the `*.g.cs` headers, `vlcCommit` in
    stops when that commit is the pin, was already checked by an earlier run,
    or changed no libvlccore header (`include/*.h`) since then. Most runs end
    here, in a few seconds.
-2. Otherwise extract runs on Linux and Windows and emit on Linux. When nothing
+2. Otherwise extract runs on Linux, Windows and macOS, and emit on Linux. When nothing
    but the commit lines changed, it stops: the VLC change touched nothing
    VLCLR imports.
 3. Otherwise it commits to `cimport/vlc-bump` and opens or updates one PR, with
@@ -179,7 +191,7 @@ add overrides. Include guards (`VLC_COMMON_H`) are not constants.
 - One file per header (`vlc_es.h` → `VlcEs.g.cs`), plus `CImport.g.cs` with
   the internal helpers.
 - Every record has `SizeOf` (running ABI), `MinSizeOf`, `MaxSizeOf` and an
-  `Offsets` class (constants where both ABIs agree), so hand-written wrappers
+  `Offsets` class (constants where every ABI agrees), so hand-written wrappers
   can place fields with `[FieldOffset(Plane.Offsets.Pixels)]`.
 - `StructLayout.Size` is the largest ABI size. Do not copy a record whose size
   differs between ABIs by value into VLC memory: on the smaller ABI it writes

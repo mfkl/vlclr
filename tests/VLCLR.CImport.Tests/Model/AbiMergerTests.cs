@@ -5,14 +5,14 @@ namespace VLCLR.CImport.Tests.Model;
 
 public class AbiMergerTests
 {
-    private static MergedSnapshot Merged => AbiMerger.Merge(SampleSnapshots.Windows, SampleSnapshots.SysV);
+    private static MergedSnapshot Merged => AbiMerger.Merge(SampleSnapshots.Windows, SampleSnapshots.SysV, TestAbis.DarwinLike(SampleSnapshots.SysV));
 
     [Fact]
     public void SizesAndOffsetsArePerAbi()
     {
         var format = Merged.FindType("video_format_t")!;
 
-        Assert.Equal([24L, 16L], format.Size!.Values);
+        Assert.Equal([24L, 16L, 16L], format.Size!.Values);
         Assert.False(format.Size.IsUniform);
         var chroma = format.Fields.Single(f => f.Name == "i_chroma");
         Assert.True(chroma.Offset.IsUniform);
@@ -28,7 +28,7 @@ public class AbiMergerTests
 
         Assert.True(level.IsBitfield);
         Assert.Equal(6, level.BitWidth);
-        Assert.Equal([39L, 23L], level.BitOffset!.Values);
+        Assert.Equal([39L, 23L, 23L], level.BitOffset!.Values);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class AbiMergerTests
 
         Assert.Contains(merged.Diagnostics, d => d is { Severity: DiagnosticSeverity.Warning, Symbol: "es_format_category_e" });
         Assert.Contains(merged.Diagnostics, d => d is { Severity: DiagnosticSeverity.Warning, Symbol: "DIR_SEP" });
-        Assert.Equal(["\\", "/"], merged.Constants.Single(c => c.Name == "DIR_SEP").String!.Values);
+        Assert.Equal(["\\", "/", "/"], merged.Constants.Single(c => c.Name == "DIR_SEP").String!.Values);
         Assert.DoesNotContain(merged.Diagnostics, d => d.Severity == DiagnosticSeverity.Error);
     }
 
@@ -71,7 +71,7 @@ public class AbiMergerTests
         var sysv = SampleSnapshots.SysV;
         sysv = sysv with { Types = [.. sysv.Types.Where(t => t.Name != "vlc_filter_operations")] };
 
-        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv);
+        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv, TestAbis.DarwinLike(sysv));
 
         var type = merged.FindType("vlc_filter_operations");
         Assert.NotNull(type);
@@ -90,7 +90,7 @@ public class AbiMergerTests
             Types = [.. sysv.Types.Select(t => t.Name == "vlc_filter_operations" ? t with { Fields = [.. t.Fields.Skip(1)] } : t)],
         };
 
-        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv);
+        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv, TestAbis.DarwinLike(sysv));
 
         Assert.Null(merged.FindType("vlc_filter_operations"));
         var warning = Assert.Single(merged.Diagnostics, d => d.Symbol == "vlc_filter_operations");
@@ -107,7 +107,7 @@ public class AbiMergerTests
             Functions = [.. sysv.Functions.Select(f => f.Name == "vlc_tick_now" ? f with { ReturnType = TypeRef.Of(BuiltinType.Int) } : f)],
         };
 
-        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv);
+        var merged = AbiMerger.Merge(SampleSnapshots.Windows, sysv, TestAbis.DarwinLike(sysv));
 
         Assert.True(merged.Functions.Single(f => f.Name == "vlc_tick_now").SignatureDiffers);
     }
@@ -117,13 +117,13 @@ public class AbiMergerTests
     {
         var sysv = SampleSnapshots.SysV with { VlcCommit = "deadbeef" };
 
-        Assert.Throws<InvalidOperationException>(() => AbiMerger.Merge(SampleSnapshots.Windows, sysv));
+        Assert.Throws<InvalidOperationException>(() => AbiMerger.Merge(SampleSnapshots.Windows, sysv, TestAbis.DarwinLike(sysv)));
     }
 
     [Fact]
     public void AbisAreRecordedInOrder()
     {
-        Assert.Equal([Abis.Windows, Abis.SysV], Merged.Abis);
+        Assert.Equal([Abis.Windows, Abis.SysV, Abis.Darwin], Merged.Abis);
         Assert.Equal("dc69496e", Merged.VlcCommit);
     }
 
@@ -133,8 +133,8 @@ public class AbiMergerTests
         var skipped = Merged.Skipped;
 
         Assert.Equal(["VLC_TICK_FROM_SEC", "vlc_va_list_fn"], skipped.Select(s => s.Declaration.Name));
-        Assert.Equal([Abis.Windows, Abis.SysV], skipped[0].Abis);
-        Assert.Equal([Abis.SysV], skipped[1].Abis);
+        Assert.Equal([Abis.Windows, Abis.SysV, Abis.Darwin], skipped[0].Abis);
+        Assert.Equal([Abis.SysV, Abis.Darwin], skipped[1].Abis);
     }
 
     [Fact]

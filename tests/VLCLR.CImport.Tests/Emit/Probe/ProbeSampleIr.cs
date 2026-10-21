@@ -14,7 +14,7 @@ internal static class ProbeSampleIr
     private static readonly TypeRef Int = TypeRef.Of(BuiltinType.Int);
     private static readonly TypeRef Char = TypeRef.Of(BuiltinType.Char);
 
-    public static MergedSnapshot Merged => AbiMerger.Merge(Create(Abis.Windows), Create(Abis.SysV));
+    public static MergedSnapshot Merged => AbiMerger.Merge(Create(Abis.Windows), Create(Abis.SysV), TestAbis.DarwinLike(Create(Abis.SysV)));
 
     public static Snapshot Create(string abi)
     {
