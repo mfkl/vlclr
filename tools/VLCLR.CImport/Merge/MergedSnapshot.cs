@@ -78,6 +78,7 @@ public sealed record MergedType
     public required string Header { get; init; }
     public bool IsAnonymous { get; init; }
     public string? Parent { get; init; }
+    public bool IsTypedefNamed { get; init; }
     public bool IsOpaque { get; init; }
     public bool IsPacked { get; init; }
 

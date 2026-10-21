@@ -284,7 +284,7 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
         if (!type.IsAnonymous)
         {
             _typedefNames ??= [.. merged.Typedefs.Select(t => t.Name)];
-            return _typedefNames.Contains(type.Name) ? type.Name : $"{(type.Kind == RecordKind.Union ? "union" : "struct")} {type.Name}";
+            return type.IsTypedefNamed || _typedefNames.Contains(type.Name) ? type.Name : $"{(type.Kind == RecordKind.Union ? "union" : "struct")} {type.Name}";
         }
         if (_aliases.TryGetValue(type.Name, out var existing))
             return existing;

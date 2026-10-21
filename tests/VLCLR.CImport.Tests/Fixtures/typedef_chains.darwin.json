@@ -12,6 +12,7 @@
       "name": "anon_t",
       "kind": "struct",
       "header": "typedef_chains.h",
+      "isTypedefNamed": true,
       "size": 8,
       "alignment": 4,
       "fields": [

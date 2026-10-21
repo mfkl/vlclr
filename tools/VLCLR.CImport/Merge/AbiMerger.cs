@@ -223,6 +223,7 @@ public static class AbiMerger
                 Header = first.Header,
                 IsAnonymous = first.IsAnonymous,
                 Parent = first.Parent,
+                IsTypedefNamed = first.IsTypedefNamed,
                 IsOpaque = first.IsOpaque,
                 IsPacked = first.IsPacked,
                 Size = first.IsOpaque ? null : new([.. decls.Select(d => d.Size!.Value)]),

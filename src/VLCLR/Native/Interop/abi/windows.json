@@ -1081,6 +1081,7 @@
       "name": "aout_filters_cfg_t",
       "kind": "struct",
       "header": "vlc_aout.h",
+      "isTypedefNamed": true,
       "size": 40,
       "alignment": 4,
       "fields": [
@@ -1681,6 +1682,7 @@
       "name": "audio_replay_gain_t",
       "kind": "struct",
       "header": "vlc_replay_gain.h",
+      "isTypedefNamed": true,
       "size": 32,
       "alignment": 4,
       "fields": [
@@ -1970,6 +1972,7 @@
       "name": "bs_byte_callbacks_t",
       "kind": "struct",
       "header": "vlc_bits.h",
+      "isTypedefNamed": true,
       "size": 16,
       "alignment": 8,
       "fields": [
@@ -5128,6 +5131,7 @@
       "name": "httpd_header",
       "kind": "struct",
       "header": "vlc_httpd.h",
+      "isTypedefNamed": true,
       "size": 16,
       "alignment": 8,
       "fields": [
@@ -6254,6 +6258,7 @@
       "name": "input_item_es_vector",
       "kind": "struct",
       "header": "vlc_input_item.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -8052,6 +8057,7 @@
       "name": "module_value_t",
       "kind": "union",
       "header": "vlc_configuration.h",
+      "isTypedefNamed": true,
       "size": 8,
       "alignment": 8,
       "fields": [
@@ -8250,6 +8256,7 @@
       "name": "picture_resource_t",
       "kind": "struct",
       "header": "vlc_picture.h",
+      "isTypedefNamed": true,
       "size": 96,
       "alignment": 8,
       "fields": [
@@ -8804,6 +8811,7 @@
       "name": "services_discovery_descriptor_t",
       "kind": "struct",
       "header": "vlc_services_discovery.h",
+      "isTypedefNamed": true,
       "size": 32,
       "alignment": 8,
       "fields": [
@@ -11567,6 +11575,7 @@
       "name": "subpicture_updater_t",
       "kind": "struct",
       "header": "vlc_subpicture.h",
+      "isTypedefNamed": true,
       "size": 16,
       "alignment": 8,
       "fields": [
@@ -11922,6 +11931,7 @@
       "name": "text_style_t",
       "kind": "struct",
       "header": "vlc_text_style.h",
+      "isTypedefNamed": true,
       "size": 80,
       "alignment": 8,
       "fields": [
@@ -12136,6 +12146,7 @@
       "name": "timestamp_fifo_t",
       "kind": "struct",
       "header": "vlc_timestamp_helper.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -12703,6 +12714,7 @@
       "name": "video_splitter_output_t",
       "kind": "struct",
       "header": "vlc_video_splitter.h",
+      "isTypedefNamed": true,
       "size": 160,
       "alignment": 8,
       "fields": [
@@ -12956,6 +12968,7 @@
       "name": "vlc_ancillary_array",
       "kind": "struct",
       "header": "vlc_ancillary.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -13789,6 +13802,7 @@
       "name": "vlc_chroma_conv_vec",
       "kind": "struct",
       "header": "vlc_chroma_probe.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -13833,6 +13847,7 @@
       "name": "vlc_chroma_description_t",
       "kind": "struct",
       "header": "vlc_fourcc.h",
+      "isTypedefNamed": true,
       "size": 88,
       "alignment": 4,
       "fields": [
@@ -14023,6 +14038,7 @@
       "name": "vlc_cond_t",
       "kind": "struct",
       "header": "vlc_threads.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -14846,6 +14862,7 @@
       "name": "vlc_diffutil_callback_t",
       "kind": "struct",
       "header": "vlc_diffutil.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -14986,6 +15003,7 @@
       "name": "vlc_diffutil_change_t",
       "kind": "struct",
       "header": "vlc_diffutil.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 4,
       "fields": [
@@ -15058,6 +15076,7 @@
       "name": "vlc_diffutil_changelist_t",
       "kind": "struct",
       "header": "vlc_diffutil.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -15253,6 +15272,7 @@
       "name": "vlc_diffutil_snake_callback_t",
       "kind": "struct",
       "header": "vlc_diffutil.h",
+      "isTypedefNamed": true,
       "size": 24,
       "alignment": 8,
       "fields": [
@@ -16557,6 +16577,7 @@
       "name": "vlc_epg_event_t",
       "kind": "struct",
       "header": "vlc_epg.h",
+      "isTypedefNamed": true,
       "size": 56,
       "alignment": 8,
       "fields": [
@@ -16675,6 +16696,7 @@
       "name": "vlc_epg_t",
       "kind": "struct",
       "header": "vlc_epg.h",
+      "isTypedefNamed": true,
       "size": 48,
       "alignment": 8,
       "fields": [
@@ -20141,6 +20163,7 @@
       "name": "vlc_latch_t",
       "kind": "struct",
       "header": "vlc_threads.h",
+      "isTypedefNamed": true,
       "size": 16,
       "alignment": 8,
       "fields": [
@@ -24347,6 +24370,7 @@
       "name": "vlc_mutex_t",
       "kind": "struct",
       "header": "vlc_threads.h",
+      "isTypedefNamed": true,
       "size": 12,
       "alignment": 4,
       "fields": [
@@ -24567,6 +24591,7 @@
       "name": "vlc_once_t",
       "kind": "struct",
       "header": "vlc_threads.h",
+      "isTypedefNamed": true,
       "size": 4,
       "alignment": 4,
       "fields": [
@@ -29778,6 +29803,7 @@
       "name": "vlc_rational_t",
       "kind": "struct",
       "header": "vlc_common.h",
+      "isTypedefNamed": true,
       "size": 8,
       "alignment": 4,
       "fields": [
@@ -30231,6 +30257,7 @@
       "name": "vlc_sem_t",
       "kind": "struct",
       "header": "vlc_threads.h",
+      "isTypedefNamed": true,
       "size": 4,
       "alignment": 4,
       "fields": [
@@ -30280,6 +30307,7 @@
       "name": "vlc_sockaddr",
       "kind": "union",
       "header": "vlc_network.h",
+      "isTypedefNamed": true,
       "size": 128,
       "alignment": 8,
       "fields": [
@@ -34392,6 +34420,7 @@
       "name": "vlc_tracer_value_t",
       "kind": "union",
       "header": "vlc_tracer.h",
+      "isTypedefNamed": true,
       "size": 8,
       "alignment": 8,
       "fields": [
@@ -34561,6 +34590,7 @@
       "name": "vlc_value_t",
       "kind": "union",
       "header": "vlc_variables.h",
+      "isTypedefNamed": true,
       "size": 8,
       "alignment": 8,
       "fields": [
@@ -36239,6 +36269,7 @@
       "name": "vlm_event_t",
       "kind": "struct",
       "header": "vlc_vlm.h",
+      "isTypedefNamed": true,
       "size": 40,
       "alignment": 8,
       "fields": [
@@ -36304,6 +36335,7 @@
       "name": "vlm_media_instance_t",
       "kind": "struct",
       "header": "vlc_vlm.h",
+      "isTypedefNamed": true,
       "size": 40,
       "alignment": 8,
       "fields": [
@@ -36372,6 +36404,7 @@
       "name": "vlm_media_t",
       "kind": "struct",
       "header": "vlc_vlm.h",
+      "isTypedefNamed": true,
       "size": 72,
       "alignment": 8,
       "fields": [
@@ -36651,6 +36684,7 @@
       "name": "vout_display_info_t",
       "kind": "struct",
       "header": "vlc_vout_display.h",
+      "isTypedefNamed": true,
       "size": 8,
       "alignment": 8,
       "fields": [

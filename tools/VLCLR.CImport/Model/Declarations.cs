@@ -26,6 +26,12 @@ public sealed record TypeDecl
     public string? Parent { get; init; }
 
     /// <summary>
+    /// The record has no tag and takes the name of its typedef
+    /// (<c>typedef struct { ... } DIR;</c>): C spells it <c>DIR</c>, not <c>struct DIR</c>.
+    /// </summary>
+    public bool IsTypedefNamed { get; init; }
+
+    /// <summary>
     /// Size, alignment and fields are absent: the record is never defined in
     /// the parsed headers, or it is reached only through pointers (it is not a
     /// root and no kept record embeds it by value).
