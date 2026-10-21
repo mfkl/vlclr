@@ -493,6 +493,16 @@ public class NameMapTests
     }
 
     [Fact]
+    public void FieldNamedLikeAnObjectMember_GetsValue()
+    {
+        var merged = Merged(types: [Record("stream_operations", "vlc_stream.h", Field("get_type"), Field("to_string"))]);
+
+        var map = Map(merged);
+        Assert.Equal("GetTypeValue", map.Field("stream_operations", "get_type"));
+        Assert.Equal("ToStringValue", map.Field("stream_operations", "to_string"));
+    }
+
+    [Fact]
     public void NoCollision_SameFieldNameInDifferentStructs()
     {
         var merged = Merged(types: [Record("a_t", "vlc_common.h", Field("i_x")), Record("b_t", "vlc_common.h", Field("i_x"))]);

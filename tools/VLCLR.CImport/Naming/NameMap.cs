@@ -205,6 +205,11 @@ public sealed class NameMap : INameMap
 
         // Fields
 
+        private static readonly HashSet<string> ObjectMembers = new(StringComparer.Ordinal)
+        {
+            "Equals", "Finalize", "GetHashCode", "GetType", "MemberwiseClone", "ReferenceEquals", "ToString",
+        };
+
         private void NameFields()
         {
             var overridden = new HashSet<(string, string)>();
@@ -224,7 +229,9 @@ public sealed class NameMap : INameMap
                     }
 
                     var name = NameRules.Pascal(NameRules.StripHungarian(field.Name));
-                    if (name == EnclosingTypeName(field.DeclaringType).TrimStart('@'))
+                    // Named like its struct, or like a member every struct inherits
+                    // from object (stream_operations.get_type).
+                    if (name == EnclosingTypeName(field.DeclaringType).TrimStart('@') || ObjectMembers.Contains(name))
                         name += "Value";
                     map._fields[key] = NameRules.Escape(name, $"field '{field.DeclaringType}.{field.Name}'");
                 }
