@@ -271,12 +271,15 @@ public sealed class ProbeEmitter(MergedSnapshot merged, ProbeOptions options)
         if (constants.Count == 0)
             return;
 
+        // Each under #ifdef: some are defined for one architecture only
+        // (VLC_CPU_SSE2 on x86), and the snapshots are x86-64's.
         Line("// Integer constants");
         foreach (var c in constants)
         {
             var unsigned = c.Type.Values.Any(IsUnsigned64);
             var values = c.Integer!.Values.Select(v => v!.Value);
-            Guarded(Condition(c.Name, c.Header), () => Line($"{(unsigned ? "VLCLR_UVALUE" : "VLCLR_VALUE")}({c.Name}, {Value(values, unsigned)});"));
+            var condition = Condition(c.Name, c.Header) is { } platform ? $"defined({c.Name}) && {platform}" : $"defined({c.Name})";
+            Guarded(condition, () => Line($"{(unsigned ? "VLCLR_UVALUE" : "VLCLR_VALUE")}({c.Name}, {Value(values, unsigned)});"));
         }
         Line();
     }

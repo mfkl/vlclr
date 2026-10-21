@@ -62,11 +62,18 @@ public sealed class LayoutTestEmitter(MergedSnapshot merged, INameMap names, Lay
         var typeName = names.Type(type.Name);
         var csType = Qualified(typeName);
         Line("    [Fact]");
-        // Only the analyzer cares: the test is managed code and runs anywhere.
-        if (merged.PlatformsOf(type.Name) is { } platforms)
+        var platforms = merged.PlatformsOf(type.Name);
+        if (platforms is not null)
             Line(platforms is [Abis.Windows] ? "    [SupportedOSPlatform(\"windows\")]" : "    [UnsupportedOSPlatform(\"windows\")]");
         Line($"    public void {typeName}_Layout()");
         Line("    {");
+        // The layout of a record of one platform only holds there: C long is
+        // 32-bit on windows and 64-bit elsewhere.
+        if (platforms is not null)
+        {
+            Line(platforms is [Abis.Windows] ? "        if (!OperatingSystem.IsWindows())" : "        if (OperatingSystem.IsWindows())");
+            Line("            return;");
+        }
         Line($"        var s = default({csType});");
         Line($"        AssertEqual({Abi(type.Size!)}, {csType}.SizeOf, \"{Escape(type.Name)} sizeof\");");
         Line($"        AssertEqual({type.Size!.Values.Max()}, Unsafe.SizeOf<{csType}>(), \"{Escape(type.Name)} Unsafe.SizeOf\");");
