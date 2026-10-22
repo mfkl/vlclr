@@ -1,8 +1,10 @@
 // Text canvas for rendering styled text to an ImageSharp image
 // Renders text segments with outline, shadow, and background effects
 
+using System.Runtime.InteropServices;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 #if DEBUG
 using SixLabors.ImageSharp.Formats.Png;
@@ -47,15 +49,24 @@ public sealed class TextCanvasOptions
 /// This class is designed for efficient rendering of subtitle-like text overlays.
 /// It reuses the canvas buffer when dimensions don't change, and renders effects
 /// in the correct order: background → shadow → outline → foreground text.
+/// The text is laid out and rasterized once per render, into a coverage mask
+/// the fill, the shadow (the mask shifted) and the outline (the mask grown by
+/// the outline width) are blended from: drawing each with ImageSharp laid the
+/// text out again each time and stroked the outline as a new path, about
+/// 2 MB per render for one outlined line.
 /// </remarks>
 public sealed class TextCanvas : IDisposable
 {
     // Minimal ImageSharp configuration with no format decoders/encoders registered.
     // This allows the trimmer to strip all image codec code (PNG, JPEG, GIF, BMP, TIFF, etc.)
     // since we only create blank images, draw on them, and copy raw pixels out.
-    private static readonly Configuration s_minimalConfig = new();
+    // Contiguous buffers let the blending work on one span per image.
+    private static readonly Configuration s_minimalConfig = new() { PreferContiguousImageBuffers = true };
 
     private Image<Rgba32>? _canvas;
+    private Image<A8>? _mask;
+    private byte[] _outline = [];
+    private readonly Dictionary<int, DiscKernel> _kernels = new();
     private int _width;
     private int _height;
     private byte[]? _pixelBuffer;
@@ -105,9 +116,11 @@ public sealed class TextCanvas : IDisposable
         }
 
         _canvas?.Dispose();
+        _mask?.Dispose();
         _width = width;
         _height = height;
         _canvas = new Image<Rgba32>(s_minimalConfig, width, height);
+        _mask = new Image<A8>(s_minimalConfig, width, height);
         _pixelBuffer = null;
     }
 
@@ -308,51 +321,219 @@ public sealed class TextCanvas : IDisposable
         float backgroundY,
         FontRectangle textBounds)
     {
-        Color backgroundColor = ColorFromRgbAlpha(style.BackgroundColor, style.BackgroundAlpha);
         var bgRect = new RectangleF(
             backgroundX - _options.BackgroundPadding,
             backgroundY - _options.BackgroundPadding,
             textBounds.Width + (_options.BackgroundPadding * 2),
             textBounds.Height + (_options.BackgroundPadding * 2));
 
-        Color shadowColor = ColorFromRgbAlpha(style.ShadowColor, style.ShadowAlpha);
-        var shadowOptions = new RichTextOptions(textOptions)
-        {
-            Origin = new PointF(textOptions.Origin.X + style.ShadowOffset, textOptions.Origin.Y + style.ShadowOffset)
-        };
-
-        var textBrush = new SolidBrush(ColorFromRgbAlpha(style.ForegroundColor, style.ForegroundAlpha));
-        var outlinePen = new SolidPen(
-            ColorFromRgbAlpha(style.OutlineColor, style.OutlineAlpha),
-            Math.Max(1f, style.OutlineWidth * 2f));
-
-        // Queue every operation on one processing context. Drawing the outline
-        // once and then restoring the fill produces the same outward outline
-        // width as the former eight offset rasterizations with far less work.
-        _canvas!.Mutate(ctx =>
+        // The background is the one shape ImageSharp still draws: an
+        // antialiased rectangle at a fractional position.
+        Image<Rgba32> canvasImage = _canvas!;
+        Image<A8> maskImage = _mask!;
+        Color backgroundColor = ColorFromRgbAlpha(style.BackgroundColor, style.BackgroundAlpha);
+        bool hasBackground = style.HasBackground;
+        canvasImage.Mutate(ctx =>
         {
             ctx.Clear(Color.Transparent);
-
-            if (style.HasBackground)
+            if (hasBackground)
             {
                 ctx.Fill(backgroundColor, bgRect);
             }
-
-            if (style.HasShadow)
-            {
-                ctx.DrawText(shadowOptions, text, shadowColor);
-            }
-
-            if (style.HasOutline)
-            {
-                ctx.DrawText(textOptions, text, outlinePen);
-                ctx.DrawText(textOptions, text, textBrush);
-            }
-            else
-            {
-                ctx.DrawText(textOptions, text, textBrush);
-            }
         });
+
+        // Lay out and rasterize the text once.
+        IPathCollection glyphs = TextBuilder.GenerateGlyphs(text, textOptions);
+        maskImage.Mutate(ctx => ctx.Clear(Color.Transparent).Fill(Color.White, glyphs));
+
+        if (!canvasImage.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> canvasMemory)
+            || !maskImage.DangerousTryGetSinglePixelMemory(out Memory<A8> maskMemory))
+        {
+            throw new InvalidOperationException("Text canvas buffers are not contiguous.");
+        }
+
+        Span<Rgba32> canvas = canvasMemory.Span;
+        ReadOnlySpan<byte> mask = MemoryMarshal.AsBytes(maskMemory.Span);
+
+        if (style.HasShadow)
+        {
+            BlendShifted(canvas, mask, style.ShadowOffset, style.ShadowColor, style.ShadowAlpha);
+        }
+
+        if (style.HasOutline)
+        {
+            // The pen this replaces was centered on the glyph edges, twice the
+            // outline width wide: it covered the width outside the edge and the
+            // width inside, which shows only under a translucent fill.
+            int radius = Math.Max(1, style.OutlineWidth);
+            ReadOnlySpan<byte> outline = Outline(mask, radius, insideBandOnly: style.ForegroundAlpha < 255);
+            Blend(canvas, outline, style.OutlineColor, style.OutlineAlpha);
+        }
+
+        Blend(canvas, mask, style.ForegroundColor, style.ForegroundAlpha);
+    }
+
+    /// <summary>
+    /// The coverage of the mask grown by <paramref name="radius"/> pixels (a disc),
+    /// less, when <paramref name="insideBandOnly"/>, the mask shrunk by as much.
+    /// </summary>
+    private ReadOnlySpan<byte> Outline(ReadOnlySpan<byte> mask, int radius, bool insideBandOnly)
+    {
+        if (_outline.Length < mask.Length)
+        {
+            _outline = new byte[mask.Length];
+        }
+
+        Span<byte> outline = _outline.AsSpan(0, mask.Length);
+        if (!_kernels.TryGetValue(radius, out DiscKernel? kernel))
+        {
+            kernel = new DiscKernel(radius);
+            _kernels[radius] = kernel;
+        }
+
+        // Only the ink's bounds grown by the kernel can be covered: the text
+        // is a small part of the canvas, and the kernel grows as r².
+        outline.Clear();
+        int minX = _width, maxX = -1, minY = -1, maxY = -1;
+        for (int y = 0; y < _height; y++)
+        {
+            ReadOnlySpan<byte> row = mask.Slice(y * _width, _width);
+            int first = row.IndexOfAnyExcept((byte)0);
+            if (first < 0)
+            {
+                continue;
+            }
+            minX = Math.Min(minX, first);
+            maxX = Math.Max(maxX, row.LastIndexOfAnyExcept((byte)0));
+            minY = minY < 0 ? y : minY;
+            maxY = y;
+        }
+        if (maxY < 0)
+        {
+            return outline;
+        }
+
+        int x0 = Math.Max(0, minX - radius - 1), x1 = Math.Min(_width - 1, maxX + radius + 1);
+        int y0 = Math.Max(0, minY - radius - 1), y1 = Math.Min(_height - 1, maxY + radius + 1);
+
+        // A pixel q of coverage c puts the glyph edge about c - 1/2 pixel past
+        // its center toward p, so the grown edge covers p by r - |pq| + c.
+        int reach = radius * 255;
+        for (int y = y0; y <= y1; y++)
+        {
+            for (int x = x0; x <= x1; x++)
+            {
+                int grown = 0;
+                int outside = 0;
+                for (int k = 0; k < kernel.Count; k++)
+                {
+                    int sx = x + kernel.Dx[k];
+                    int sy = y + kernel.Dy[k];
+                    int coverage = (uint)sx < (uint)_width && (uint)sy < (uint)_height ? mask[sy * _width + sx] : 0;
+                    int left = reach - kernel.Distance[k];
+                    if (coverage > 0)
+                    {
+                        grown = Math.Max(grown, left + coverage);
+                    }
+                    if (insideBandOnly && coverage < 255)
+                    {
+                        outside = Math.Max(outside, left + 255 - coverage);
+                    }
+                }
+
+                grown = Math.Min(grown, 255);
+                int shrunk = 255 - Math.Min(outside, 255);
+                outline[y * _width + x] = (byte)(insideBandOnly ? Math.Max(0, grown - shrunk) : grown);
+            }
+        }
+
+        return outline;
+    }
+
+    /// <summary>
+    /// The offsets closer than <c>radius + 1</c> pixels, with their distance
+    /// (in 1/255 pixel).
+    /// </summary>
+    private sealed class DiscKernel
+    {
+        public readonly int[] Dx;
+        public readonly int[] Dy;
+        public readonly int[] Distance;
+        public readonly int Count;
+
+        public DiscKernel(int radius)
+        {
+            var dx = new List<int>();
+            var dy = new List<int>();
+            var distance = new List<int>();
+            for (int y = -radius - 1; y <= radius + 1; y++)
+            {
+                for (int x = -radius - 1; x <= radius + 1; x++)
+                {
+                    float d = MathF.Sqrt(x * x + y * y);
+                    if (d < radius + 1)
+                    {
+                        dx.Add(x);
+                        dy.Add(y);
+                        distance.Add((int)MathF.Round(d * 255));
+                    }
+                }
+            }
+
+            Dx = dx.ToArray();
+            Dy = dy.ToArray();
+            Distance = distance.ToArray();
+            Count = Distance.Length;
+        }
+    }
+
+    /// <summary>A color over the canvas, with the coverage of the mask shifted by <paramref name="offset"/> on both axes.</summary>
+    private void BlendShifted(Span<Rgba32> canvas, ReadOnlySpan<byte> mask, int offset, uint rgb, byte alpha)
+    {
+        for (int y = 0; y < _height; y++)
+        {
+            int sy = y - offset;
+            if ((uint)sy >= (uint)_height)
+            {
+                continue;
+            }
+
+            for (int x = 0; x < _width; x++)
+            {
+                int sx = x - offset;
+                if ((uint)sx < (uint)_width)
+                {
+                    Over(ref canvas[y * _width + x], rgb, alpha, mask[sy * _width + sx]);
+                }
+            }
+        }
+    }
+
+    /// <summary>A color over the canvas, with the coverage of the mask.</summary>
+    private static void Blend(Span<Rgba32> canvas, ReadOnlySpan<byte> coverage, uint rgb, byte alpha)
+    {
+        for (int i = 0; i < canvas.Length; i++)
+        {
+            Over(ref canvas[i], rgb, alpha, coverage[i]);
+        }
+    }
+
+    /// <summary>Source-over with straight alpha, as ImageSharp's normal blending.</summary>
+    private static void Over(ref Rgba32 dst, uint rgb, byte alpha, byte coverage)
+    {
+        if (coverage == 0 || alpha == 0)
+        {
+            return;
+        }
+
+        float sa = alpha * coverage / (255f * 255f);
+        float da = dst.A / 255f;
+        float outA = sa + da * (1 - sa);
+        float dstWeight = da * (1 - sa);
+        dst.R = (byte)MathF.Round((((rgb >> 16) & 0xFF) * sa + dst.R * dstWeight) / outA);
+        dst.G = (byte)MathF.Round((((rgb >> 8) & 0xFF) * sa + dst.G * dstWeight) / outA);
+        dst.B = (byte)MathF.Round(((rgb & 0xFF) * sa + dst.B * dstWeight) / outA);
+        dst.A = (byte)MathF.Round(outA * 255);
     }
 
     /// <summary>
@@ -422,6 +603,8 @@ public sealed class TextCanvas : IDisposable
 
         _canvas?.Dispose();
         _canvas = null;
+        _mask?.Dispose();
+        _mask = null;
         _pixelBuffer = null;
         _disposed = true;
     }
