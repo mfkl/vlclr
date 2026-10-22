@@ -313,6 +313,63 @@ public class TextCanvasTests
     }
 
     [Fact]
+    public void RenderTextRegion_OutlineWidensTheTextByItsWidthOnEachSide()
+    {
+        using var canvas = new TextCanvas(1, 1);
+        var plain = new TextStyleWrapper { FontSize = 48 };
+        var outlined = new TextStyleWrapper { FontSize = 48, HasOutline = true, OutlineWidth = 3 };
+
+        int plainWidth = InkWidth(canvas, "Outline", plain);
+        int outlinedWidth = InkWidth(canvas, "Outline", outlined);
+
+        Assert.InRange(outlinedWidth - plainWidth, 2 * 3 - 2, 2 * 3 + 2);
+    }
+
+    [Fact]
+    public void RenderTextRegion_AllocatesLittlePerRender()
+    {
+        using var canvas = new TextCanvas(1, 1);
+        var style = new TextStyleWrapper
+        {
+            FontSize = 36,
+            HasOutline = true,
+            OutlineWidth = 3,
+            HasShadow = true,
+            ShadowOffset = 2
+        };
+
+        // Buffers and the outline kernel are allocated on the first render.
+        canvas.RenderTextRegion("A subtitle line", style, maximumWidth: 1280);
+        canvas.RenderTextRegion("A subtitle line", style, maximumWidth: 1280);
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        canvas.RenderTextRegion("A subtitle line", style, maximumWidth: 1280);
+        long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        // Laid out and stroked by ImageSharp for each effect, this took 2-4 MB.
+        Assert.True(allocated < 1_000_000, $"One render allocated {allocated:N0} bytes");
+    }
+
+    private static int InkWidth(TextCanvas canvas, string text, TextStyleWrapper style)
+    {
+        var image = canvas.RenderTextRegion(text, style, maximumWidth: 1280)!;
+        var pixels = canvas.GetPixels();
+        int minimumX = int.MaxValue;
+        int maximumX = -1;
+        for (int y = 0; y < image.Height; y++)
+        {
+            for (int x = 0; x < image.Width; x++)
+            {
+                if (pixels[((y * image.Width) + x) * 4 + 3] >= 128)
+                {
+                    minimumX = Math.Min(minimumX, x);
+                    maximumX = Math.Max(maximumX, x);
+                }
+            }
+        }
+        return maximumX - minimumX + 1;
+    }
+
+    [Fact]
     public void RenderRegion_WithEmptySegments_ReturnsNull()
     {
         using var canvas = new TextCanvas(100, 100);
