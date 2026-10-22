@@ -117,7 +117,9 @@ public partial class VideoOverlayFilter : VLCVideoFilterBase
         // Log format issues on first frame only
         if (!success && FrameCount == 1)
         {
+#pragma warning disable VLCLR001 // once, on the first frame
             Context.Logger.Warning($"[VideoOverlay] Compositing failed for chroma: {VLCFourCC.ToString(frame.Chroma)}");
+#pragma warning restore VLCLR001
         }
 
 #if DEBUG
