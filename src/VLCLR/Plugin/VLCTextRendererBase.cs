@@ -24,6 +24,11 @@ public abstract class VLCTextRendererBase : IDisposable
     private GCHandle _opsHandle;
     private VLCTextRendererOperations _ops;
 
+    // Reported, not warned about: ParseRegion builds the text of each request
+    // as a string, so a render allocates at least that.
+    private readonly FrameAllocationMeter? _allocations =
+        VLCLRFeatures.FrameAllocationCheck ? new(warmUpFrames: 1) : null;
+
     /// <summary>
     /// Whether the renderer is initialized.
     /// </summary>
@@ -142,13 +147,14 @@ public abstract class VLCTextRendererBase : IDisposable
             _currentChromaListPtr = chromaListPtr;
             _currentRegionPtr = regionPtr;
 
+            _allocations?.BeginFrame();
+
             // Parse the input region to extract text and style
             var request = ParseRegion(regionPtr);
-            if (!request.HasText)
-                return 0;
+            nint output = request.HasText ? RenderText(request) : 0;
 
-            // Call the derived class to render
-            return RenderText(request);
+            _allocations?.EndFrame();
+            return output;
         }
         catch (Exception ex)
         {
@@ -161,6 +167,9 @@ public abstract class VLCTextRendererBase : IDisposable
             {
                 // Ignore logging failures
             }
+
+            // Only the render itself can throw: count it, exception and message included.
+            _allocations?.EndFrame();
             return 0;
         }
     }
@@ -173,7 +182,10 @@ public abstract class VLCTextRendererBase : IDisposable
     {
         try
         {
+            _allocations?.Stop();
             _context.Logger.Info($"[VLCLR] Closing text renderer: {GetType().Name}");
+            if (_allocations is not null)
+                _context.Logger.Info($"[VLCLR] {GetType().Name}: {_allocations.Summary("render")}");
 
             OnClose();
 

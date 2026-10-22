@@ -23,6 +23,8 @@ public abstract class VLCVideoFilterBase : IDisposable
     private VLCFilterContext _context;
     private GCHandle _filterOpsHandle;
     private VLCFilterOperations _filterOps;
+    private readonly FrameAllocationMeter? _allocations =
+        VLCLRFeatures.FrameAllocationCheck ? new() : null;
 
     /// <summary>
     /// Current frame count (increments each frame).
@@ -168,6 +170,7 @@ public abstract class VLCVideoFilterBase : IDisposable
             if (!_initialized || picturePtr == 0)
                 return picturePtr;
 
+            _allocations?.BeginFrame();
             var frame = new VLCFrame(picturePtr, _context);
 
             // Handle first frame
@@ -192,6 +195,7 @@ public abstract class VLCVideoFilterBase : IDisposable
                 VLCCore.PictureRelease(picturePtr);
             }
 
+            _allocations?.EndFrame();
             return outputPicture;
         }
         catch (Exception ex)
@@ -205,6 +209,9 @@ public abstract class VLCVideoFilterBase : IDisposable
             {
                 // Ignore logging failures
             }
+
+            // Only the frame itself can throw: count it, exception and message included.
+            _allocations?.EndFrame();
             return picturePtr;
         }
     }
@@ -217,7 +224,9 @@ public abstract class VLCVideoFilterBase : IDisposable
     {
         try
         {
+            _allocations?.Stop();
             _context.Logger.Info($"[VLCLR] Closing video filter: {GetType().Name} (processed {FrameCount} frames)");
+            ReportAllocations();
 
             OnClose();
 
@@ -243,6 +252,26 @@ public abstract class VLCVideoFilterBase : IDisposable
     }
 
     /// <summary>
+    /// Logs what the frames allocated on the managed heap after the warm-up:
+    /// a warning when they allocated anything (see <see cref="FrameAllocationMeter"/>).
+    /// </summary>
+    private void ReportAllocations()
+    {
+        if (_allocations is null)
+            return;
+
+        string message = $"[VLCLR] {GetType().Name}: {_allocations.Summary()}";
+        if (_allocations.IsAllocationFree)
+        {
+            _context.Logger.Info(message);
+        }
+        else
+        {
+            _context.Logger.Warning(message);
+        }
+    }
+
+    /// <summary>
     /// Internal: Called by the Flush callback.
     /// </summary>
     /// <param name="filterPtr">Pointer to filter_t</param>
@@ -252,6 +281,7 @@ public abstract class VLCVideoFilterBase : IDisposable
         {
             OnFlush();
             _firstFrame = true; // Reset first frame flag on flush
+            _allocations?.Restart();
         }
         catch (Exception ex)
         {

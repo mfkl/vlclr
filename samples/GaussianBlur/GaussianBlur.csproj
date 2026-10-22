@@ -37,4 +37,6 @@
     <LinkerArg Include="-Wl,-undefined,dynamic_lookup" Condition="$(RuntimeIdentifier.StartsWith('osx'))" />
   </ItemGroup>
 
+  <Import Project="..\..\src\VLCLR\build\VLCLR.targets" />
+
 </Project>

@@ -1,5 +1,7 @@
 # Build output
 build/
+# ...but not the MSBuild files VLCLR's package ships in build/
+!src/VLCLR/build/
 bin/
 obj/
 

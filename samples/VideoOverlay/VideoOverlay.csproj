@@ -44,4 +44,6 @@
     <EmbeddedResource Include="Resources\JetBrainsMono-Regular.ttf" />
   </ItemGroup>
 
+  <Import Project="..\..\src\VLCLR\build\VLCLR.targets" />
+
 </Project>
