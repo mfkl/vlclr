@@ -1,0 +1,20 @@
+<Project>
+  <!--
+    Build settings for VLCLR plugins. The NuGet package imports this file
+    automatically; projects referencing VLCLR from source import it.
+
+    VLCLRFrameAllocationCheck (default false): log, when a video filter
+    closes, what its frames allocated on the managed heap after a warm-up
+    (a warning when anything). For tests and benchmarks: when it is false the
+    AOT compiler leaves the measurement out of the plugin.
+  -->
+  <PropertyGroup>
+    <VLCLRFrameAllocationCheck Condition="'$(VLCLRFrameAllocationCheck)' == ''">false</VLCLRFrameAllocationCheck>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="VLCLR.FrameAllocationCheck"
+                                    Value="$(VLCLRFrameAllocationCheck)"
+                                    Trim="true" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+<!--
+  net8.0 has no FeatureSwitchDefinitionAttribute: this tells the trimmer and
+  the AOT compiler the value of VLCLRFeatures.FrameAllocationCheck, so they
+  leave out the code of a switch that is off, as on .NET 9 and later.
+-->
+<linker>
+  <assembly fullname="VLCLR">
+    <type fullname="VLCLR.VLCLRFeatures">
+      <method signature="System.Boolean get_FrameAllocationCheck()" body="stub" value="false"
+              feature="VLCLR.FrameAllocationCheck" featurevalue="false" />
+      <method signature="System.Boolean get_FrameAllocationCheck()" body="stub" value="true"
+              feature="VLCLR.FrameAllocationCheck" featurevalue="true" />
+    </type>
+  </assembly>
+</linker>
