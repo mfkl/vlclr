@@ -39,6 +39,25 @@ The source generator supplies `vlc_entry`, module registration, native
 callbacks, exception handling, and per-instance state. Advanced plugins can use
 `VLCLR.Module.ModuleBuilder` directly.
 
+## No allocations per frame
+
+Each plugin has its own garbage collector. One whose frames allocate keeps
+several MB more and makes the GC run while video plays; one that allocates
+nothing per frame costs about 0.5 MB. Allocate in `OnOpen` or on the first
+frame, and reuse buffers. Two tools check it:
+
+- **Analyzer VLCLR001** (on by default) reports, on build, what the overrides
+  of `ProcessFrame`, `ProcessFrameToOutput` and `SetOutputProperties`, the
+  methods marked `[VLCPerFrame]`, and the methods of the project they call
+  allocate. It does not see inside other libraries.
+- **`-p:VLCLRFrameAllocationCheck=true`** builds the plugin so that each video
+  filter logs, when it closes, what its frames allocated after a three-frame
+  warm-up, as a warning when anything:
+  `Frame allocations: none in 22 frames after a warm-up of 3`. It counts
+  everything, libraries included. Off by default: the AOT compiler then
+  leaves the measurement out. `tests/VlcEndToEnd/run.sh` turns it on and fails
+  on any allocating filter.
+
 ## What libvlccore offers
 
 A VLC plugin is a module of one kind (video filter, decoder, demuxer, ...)
