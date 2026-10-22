@@ -210,3 +210,17 @@ public enum VLCConfigType
     /// <summary>Key binding</summary>
     Key
 }
+
+/// <summary>
+/// Marks a method that runs for each frame, so that the VLCLR001 analyzer
+/// reports what it, and the methods of the same project it calls, allocate on
+/// the managed heap. Overrides of <see cref="VLCVideoFilterBase.ProcessFrame"/>,
+/// <see cref="VLCVideoFilterBase.ProcessFrameToOutput"/> and
+/// <see cref="VLCVideoFilterBase.SetOutputProperties"/> are checked without it;
+/// mark the methods the analyzer cannot find from those, such as one called
+/// through a delegate or an interface.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = false, Inherited = false)]
+public sealed class VLCPerFrameAttribute : Attribute
+{
+}
