@@ -9,7 +9,10 @@
 #   - dotnet_yadif must give the output of VLC's deinterlace filter in yadif
 #     mode on every frame of an interlaced clip, the same way,
 #   - dotnet_overlay must process every frame and change the picture,
-#   - dotnet_subtitle must render the subtitles.
+#   - dotnet_subtitle must render the subtitles,
+#   - no video filter may allocate on the managed heap per frame after its
+#     warm-up (the plugins are built with VLCLRFrameAllocationCheck, which
+#     logs what the frames allocated when a filter closes).
 # A struct layout that does not match the platform ABI makes these fail
 # (the filter refuses the formats it is given, or reads garbage).
 #
@@ -57,6 +60,7 @@ esac
 echo "== Publishing plugins"
 for sample in GaussianBlur Yadif VideoOverlay SubtitleRenderer; do
     dotnet publish "$repo/samples/$sample" -c Release -o "$work/plugins/$sample" --nologo -v quiet \
+        -p:VLCLRFrameAllocationCheck=true \
         > "$work/publish-$sample.log" 2>&1 \
         || { grep -E ' error ' "$work/publish-$sample.log" | sort -u; fail "publishing $sample"; continue; }
     plugin="$(find "$work/plugins/$sample" -maxdepth 1 -name "lib*_plugin.$library_suffix" | head -n 1)"
@@ -195,6 +199,15 @@ fi
 play dotnet-subtitle "scene" --text-renderer=dotnet_subtitle --sub-file="$(native_path "$subtitles")"
 expect_log dotnet-subtitle 'Renderer SubtitleTextRenderer initialized successfully' "renderer did not open"
 expect_log dotnet-subtitle 'rendered [1-9][0-9]* subtitles' "renderer rendered nothing"
+
+echo "== Per-frame allocations"
+expect_log blur-2-dotnet-1 'GaussianBlurPlugin: Frame allocations: none in [1-9]' "allocations were not measured"
+expect_log yadif-dotnet-1 'YadifPlugin: Frame allocations: none in [1-9]' "allocations were not measured"
+expect_log dotnet-overlay 'VideoOverlayFilter: Frame allocations: none in [1-9]' "allocations were not measured"
+# Any video filter, in any run above, whose frames allocated.
+while IFS= read -r line; do
+    fail "${line#*\[VLCLR\] }"
+done < <(grep -ahE '\[VLCLR\] [A-Za-z0-9_]+: Frame allocations: [0-9]+ bytes' "$work"/out/*.log | grep -v ' renders ' | sort -u)
 
 if [ "$failures" -ne 0 ]; then
     echo "== $failures check(s) failed; logs and snapshots in $work"
