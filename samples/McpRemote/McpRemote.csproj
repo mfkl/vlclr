@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>libdotnet_mcp_plugin</AssemblyName>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <EventSourceSupport>false</EventSourceSupport>
+    <DebuggerSupport>false</DebuggerSupport>
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Kestrel and the MCP SDK's HTTP transport, both Native AOT compatible -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VLCLR\VLCLR.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DirectPInvoke Include="libvlccore" />
+    <NativeLibrary Include="..\..\lib\libvlccore.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+    <LinkerArg Include="-Wl,-undefined,dynamic_lookup" Condition="$(RuntimeIdentifier.StartsWith('osx'))" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\VLCLR\build\VLCLR.targets" />
+
+</Project>
