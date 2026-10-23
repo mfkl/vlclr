@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Server;
 using VLCLR;
+using VLCLR.Native;
 using VLCLR.Types;
 
 namespace McpRemote;
@@ -23,6 +24,10 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
     // How far the time may move between two polls, 50 ms apart, and still
     // count as steady playback rather than a jump.
     private static readonly TimeSpan Tolerance = TimeSpan.FromSeconds(0.3);
+
+    // How far before a seek target VLC may land and still be on it; playback
+    // goes on after the seek, so it may be up to three times that past it.
+    private static readonly TimeSpan NearTarget = TimeSpan.FromSeconds(0.5);
 
     [McpServerTool(Name = "open")]
     [Description("Add a local file or a URL to the playlist, and play it.")]
@@ -101,9 +106,11 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
             return $"state: stopped\n{PlaylistLine()}";
 
         TimeSpan length = player.LengthTimeSpan;
-        string time = length > TimeSpan.Zero
-            ? $"{Format(player.TimeSpan)} of {Format(length)} ({player.Position * 100:F0}%)"
-            : Format(player.TimeSpan);
+        string time = Time() is not { } now
+            ? "not known yet"
+            : length > TimeSpan.Zero
+                ? $"{Format(now)} of {Format(length)} ({player.Position * 100:F0}%)"
+                : Format(now);
         float volume = player.Volume;
 
         return string.Join('\n',
@@ -129,11 +136,11 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
                     return "Cannot start: the playlist is empty.";
                 break;
             default:
-                return $"Already playing, at {Format(player.TimeSpan)}.";
+                return $"Already playing, at {FormatTime()}.";
         }
 
         return await WaitUntil(() => player.State == VLCPlayerState.Playing, cancellationToken)
-            ? $"Playing {player.CurrentMediaName}, at {Format(player.TimeSpan)}."
+            ? $"Playing {player.CurrentMediaName}, at {FormatTime()}."
             : "VLC has not started playing yet.";
     }
 
@@ -146,7 +153,7 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
 
         player.Pause();
         return await WaitUntil(() => player.State == VLCPlayerState.Paused, cancellationToken)
-            ? $"Paused at {Format(player.TimeSpan)}."
+            ? $"Paused at {FormatTime()}."
             : "VLC has not paused yet.";
     }
 
@@ -157,11 +164,16 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
         [Description("Count from the current time instead of from the start; negative goes back")] bool relative = false,
         CancellationToken cancellationToken = default)
     {
+        if (!double.IsFinite(seconds))
+            return "Give the time as a number of seconds.";
         if (!player.CanSeek)
             return "This media cannot seek.";
 
-        TimeSpan before = player.TimeSpan;
-        TimeSpan target = TimeSpan.FromSeconds(seconds) + (relative ? before : TimeSpan.Zero);
+        // Unknown before the first picture or sound: the start of the media.
+        TimeSpan before = Time() ?? TimeSpan.Zero;
+        // TimeSpan.FromSeconds overflows past some 29 000 years: no media
+        // is longer than 1e9 s, about 31 years.
+        TimeSpan target = TimeSpan.FromSeconds(Math.Clamp(seconds, -1e9, 1e9)) + (relative ? before : TimeSpan.Zero);
         TimeSpan length = player.LengthTimeSpan;
         if (target < TimeSpan.Zero)
             target = TimeSpan.Zero;
@@ -170,22 +182,30 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
         player.SeekByTime(target);
 
         // VLC lands on the target when playing, and sometimes seconds away
-        // from it when paused: wait until the time has left where it was and
-        // stopped jumping, then say where it landed.
+        // from it when paused. While it seeks, it may not know the time, or
+        // report one from before the seek for a moment. So a time near the
+        // target counts at once; any other, only after a second, once the
+        // time has left where it was and held steady for a while.
+        var elapsed = Stopwatch.StartNew();
         TimeSpan last = before;
+        int steady = 0;
         bool arrived = await WaitUntil(() =>
         {
-            TimeSpan now = player.TimeSpan;
-            bool moved = (now - before).Duration() > Tolerance || (target - before).Duration() <= Tolerance;
-            bool settled = (now - last).Duration() <= Tolerance;
+            if (Time() is not { } now)
+                return false;
+            steady = (now - last).Duration() <= Tolerance ? steady + 1 : 0;
             last = now;
-            return moved && settled;
+            TimeSpan off = now - target;
+            if (off > -NearTarget && off < 3 * NearTarget)
+                return true;
+            bool moved = (now - before).Duration() > Tolerance;
+            return elapsed.Elapsed > TimeSpan.FromSeconds(1) && moved && steady >= 4;
         }, cancellationToken);
         if (!arrived)
             return $"Seeking to {Format(target)}; VLC has not got there yet.";
 
-        TimeSpan landed = player.TimeSpan;
-        return (landed - target).Duration() <= TimeSpan.FromSeconds(1)
+        TimeSpan landed = last;
+        return (landed - target).Duration() < 3 * NearTarget
             ? $"Now at {Format(landed)}."
             : $"Now at {Format(landed)}, the nearest VLC could get to {Format(target)}.";
     }
@@ -247,6 +267,16 @@ public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentS
     // player once the server has stopped.
     private CancellationTokenSource Stoppable(CancellationToken cancellationToken)
         => CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, lifetime.ApplicationStopping);
+
+    // The current time, or null while VLC does not know it (VLC_TICK_INVALID):
+    // before the first picture or sound, and during a seek.
+    private TimeSpan? Time()
+    {
+        long time = player.Time;
+        return time == VLCTick.Invalid ? null : TimeSpan.FromTicks(time * 10);
+    }
+
+    private string FormatTime() => Time() is { } time ? Format(time) : "an unknown time";
 
     private static string Format(TimeSpan time) => time.ToString(time.TotalHours >= 1 ? @"h\:mm\:ss\.f" : @"m\:ss\.f");
 }
