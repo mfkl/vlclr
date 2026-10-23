@@ -24,14 +24,14 @@ internal sealed class McpServerHost : IDisposable
         _logger = logger;
     }
 
-    public static McpServerHost Start(VLCPlayer player, VLCPlaylist playlist, int port, VLCLogger logger)
+    public static McpServerHost Start(VLCPlayer player, VLCPlaylist playlist, IMomentSearch search, int port, VLCLogger logger)
     {
         // An empty builder reads no appsettings.json, environment variables
         // or command line: VLC's own options configure the plugin.
         WebApplicationBuilder builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
         builder.WebHost.UseKestrelCore().ConfigureKestrel(o => o.Listen(IPAddress.Loopback, port));
         builder.Services.AddRoutingCore();
-        builder.Services.AddSingleton(player).AddSingleton(playlist);
+        builder.Services.AddSingleton(player).AddSingleton(playlist).AddSingleton(search);
         builder.Services.AddMcpServer(o => o.ServerInfo = new() { Name = "VLC", Version = "1.0" })
             .WithHttpTransport(o => o.Stateless = true)
             .WithTools<PlayerTools>();
@@ -39,7 +39,16 @@ internal sealed class McpServerHost : IDisposable
         WebApplication app = builder.Build();
         app.Use(LocalOnly);
         app.MapMcp("/mcp");
-        app.StartAsync().GetAwaiter().GetResult();
+        try
+        {
+            // An IOException when the port is taken.
+            app.StartAsync().GetAwaiter().GetResult();
+        }
+        catch
+        {
+            app.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            throw;
+        }
 
         logger.Info($"[McpRemote] MCP server on http://127.0.0.1:{port}/mcp");
         return new McpServerHost(app, logger);
