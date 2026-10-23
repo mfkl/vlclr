@@ -10,8 +10,71 @@ namespace McpRemote;
 /// Commands return before VLC applies them; call status to see the result.
 /// </summary>
 [McpServerToolType]
-public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist)
+public sealed class PlayerTools(VLCPlayer player, VLCPlaylist playlist, IMomentSearch search)
 {
+    [McpServerTool(Name = "open")]
+    [Description("Add a local file or a URL to the playlist, and play it.")]
+    public string Open(
+        [Description("Absolute path of a local file, or a URL")] string location,
+        [Description("Start playing it; false only adds it to the playlist")] bool play = true)
+    {
+        if (!Uri.TryCreate(location, UriKind.Absolute, out Uri? uri))
+            return "Give an absolute path or a URL.";
+        if (uri.IsFile && !File.Exists(uri.LocalPath))
+            return $"There is no file at {uri.LocalPath}.";
+
+        long index = playlist.Append(uri.AbsoluteUri);
+        if (index < 0)
+            return "VLC could not add it to the playlist.";
+        if (!play)
+            return $"Added as playlist item {index + 1}.";
+
+        return playlist.PlayAt(index)
+            ? $"Playing playlist item {index + 1}."
+            : $"Added as playlist item {index + 1}, but VLC could not play it.";
+    }
+
+    [McpServerTool(Name = "search", ReadOnly = true)]
+    [Description("Find the moments of the current media that match a description, best first, with their times: " +
+                 "then seek to one. Depending on the search VLC is set up with, it matches what is said (the subtitles) " +
+                 "or what is shown.")]
+    public async Task<string> Search(
+        [Description("What to find, in plain words")] string query,
+        [Description("How many moments to return")] int count = 5,
+        CancellationToken cancellationToken = default)
+    {
+        string? media = player.CurrentMediaUri;
+        if (media is null)
+            return "Nothing is playing: open a media first.";
+
+        IReadOnlyList<Moment> moments;
+        try
+        {
+            moments = await search.SearchAsync(media, query, Math.Clamp(count, 1, 20), cancellationToken);
+        }
+        // The plugin is built without the runtime's own messages
+        // (UseSystemResourceKeys): say what failed in words.
+        catch (InvalidOperationException ex)
+        {
+            return $"Search failed: {ex.Message}";
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Search failed: the search service did not answer ({ex.HttpRequestError}).";
+        }
+        catch (TaskCanceledException)
+        {
+            return "Search failed: the search service took too long.";
+        }
+
+        if (moments.Count == 0)
+            return $"No moment matches \"{query}\".";
+
+        return string.Join('\n', moments.Select(m =>
+            $"{Format(TimeSpan.FromSeconds(m.Time))} ({m.Time:0.#} s), score {m.Score:0.##}" +
+            (string.IsNullOrEmpty(m.Text) ? "" : $": {m.Text}")));
+    }
+
     [McpServerTool(Name = "status", ReadOnly = true)]
     [Description("What VLC is playing: state, media name, time and length, volume, and position in the playlist.")]
     public string Status()
