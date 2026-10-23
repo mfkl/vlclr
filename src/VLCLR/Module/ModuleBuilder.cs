@@ -407,6 +407,13 @@ public unsafe ref struct ModuleBuilder
 
     private void SetConfigFloat(nint config, int key, double first, double second = 0)
     {
+        // VLC loading the plugin from its plugins cache only resolves the open
+        // and close callbacks: there is no config item to read.
+        if (config == 0)
+        {
+            return;
+        }
+
         byte* item = (byte*)config + VlcParamItemOffset;
         if (*item != VLCConfigTypes.CONFIG_ITEM_FLOAT || *(nint*)(item + ModuleConfigNameOffset) != _configName)
         {

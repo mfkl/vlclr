@@ -87,6 +87,23 @@ public unsafe class ModuleBuilderTests : IDisposable
         Assert.Equal(VLCConfigTypes.CONFIG_ITEM_FLOAT, *(byte*)(Config(0) + 24));
     }
 
+    [Fact]
+    public void FromThePluginsCache_ConfigsAreNotTouched()
+    {
+        // VLC loading a plugin from its plugins cache runs vlc_entry for the
+        // open and close callbacks only: it answers 0 and creates no module
+        // and no config item.
+        var result = ModuleBuilder.Create(FakeVlcSymbols, 123)
+            .AddFloatConfig("float", 0.5, "Float")
+            .AddFloatConfig("ranged", 0.5, 0.0, 1.0, "Ranged")
+            .AddIntegerConfig("integer", 5, 0, 10, "Integer")
+            .AddBoolConfig("bool", true, "Bool")
+            .Register();
+
+        Assert.Equal(0, result);
+        Assert.Equal(4, s_calls.Count(c => c.Property == VLCModuleConstants.VLC_CONFIG_CREATE));
+    }
+
     private static long FloatBits(float value) => (uint)BitConverter.SingleToInt32Bits(value);
 
     private static nint Config(int index) => (nint)(s_configs + index * 64);
@@ -103,6 +120,26 @@ public unsafe class ModuleBuilderTests : IDisposable
     private static int VlcSetAppleArm64(
         nint opaque, nint target, int property, nint x3, nint x4, nint x5, nint x6, nint x7, long first, long second)
         => Handle(target, property, first, second);
+
+    /// <summary>vlc_set as VLC's vlc_plugin_gpa_cb: records the call, writes nothing back.</summary>
+    private static nint FakeVlcSymbols => VLCVariadic.IsAppleArm64
+        ? (nint)(delegate* unmanaged[Cdecl]<nint, nint, int, nint, nint, nint, nint, nint, long, long, int>)&VlcSymbolsAppleArm64
+        : (nint)(delegate* unmanaged[Cdecl]<nint, nint, int, long, long, int>)&VlcSymbols;
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static int VlcSymbols(nint opaque, nint target, int property, long first, long second)
+    {
+        s_calls.Add(new Call(target, property, 0, first, second));
+        return 0;
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static int VlcSymbolsAppleArm64(
+        nint opaque, nint target, int property, nint x3, nint x4, nint x5, nint x6, nint x7, long first, long second)
+    {
+        s_calls.Add(new Call(target, property, 0, first, second));
+        return 0;
+    }
 
     private static int Handle(nint target, int property, long first, long second)
     {
