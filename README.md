@@ -62,7 +62,7 @@ frame, and reuse buffers. Two tools check it:
 
 A VLC plugin is a module of one kind (video filter, decoder, demuxer, ...)
 that calls into libvlccore, VLC's core library. VLCLR has base classes for
-two kinds; any other kind is registered with `ModuleBuilder` and uses the
+three kinds; any other kind is registered with `ModuleBuilder` and uses the
 generated bindings directly.
 
 ```mermaid
@@ -70,6 +70,7 @@ flowchart LR
   subgraph base["With a VLCLR base class"]
     VF["video filter<br/>VLCVideoFilterBase"]
     TR["text renderer<br/>VLCTextRendererBase"]
+    IF["interface<br/>VLCInterfaceBase"]
   end
   subgraph builder["Any other kind, with ModuleBuilder"]
     AF[audio filter]
@@ -77,7 +78,6 @@ flowchart LR
     DMX[demuxer]
     ACC[access, stream filter]
     SO[stream output]
-    IF[interface]
   end
   VF --> VID[Video]
   TR --> SUB[Subtitles and text]

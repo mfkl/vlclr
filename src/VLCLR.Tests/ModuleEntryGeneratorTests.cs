@@ -49,6 +49,23 @@ public class ModuleEntryGeneratorTests
     }
 
     [Fact]
+    public void GeneratedInterface_RegistersOpenAndCloseWithExceptionSafeLifecycle()
+    {
+        var generated = Generate("VLCInterfaceBase", "protected override bool OnOpen() => true;");
+
+        Assert.Contains(".WithCapability(\"interface\")", generated);
+        Assert.Contains(".WithSubcategory(VLCConfigSubcategory.SUBCAT_INTERFACE_CONTROL)", generated);
+        Assert.Contains(".WithDescription(\"FixturePlugin interface\")", generated);
+        Assert.Contains(".WithOpenCallback(&InterfaceOpen)\n            .WithCloseCallback(&InterfaceClose);", generated);
+        Assert.Contains("var result = instance.InternalOpen(intfPtr);", generated);
+        Assert.Contains("instance?.InternalClose(intfPtr);", generated);
+        Assert.Contains("if (!opened)", generated);
+        Assert.Contains("try { context.SetSys(0); } catch { }", generated);
+        Assert.Contains("try { if (handle.IsAllocated) handle.Free(); } catch { }", generated);
+        Assert.DoesNotContain("SetOperations", generated);
+    }
+
+    [Fact]
     public void GeneratedConfiguration_ExposesTypedPrefixTrimmedProperties()
     {
         var generated = Generate(
