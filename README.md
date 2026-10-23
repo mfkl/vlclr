@@ -127,6 +127,7 @@ for how the bindings are generated and kept in step with VLC.
 | [SubtitleRenderer](samples/SubtitleRenderer/README.md) | ImageSharp text renderer | Windows, Linux, macOS |
 | [GaussianBlur](samples/GaussianBlur/README.md) | Port of VLC's Gaussian blur video filter with the same output, SIMD included | Windows, Linux, macOS |
 | [Yadif](samples/Yadif/README.md) | Port of VLC's yadif deinterlacer with the same output, SIMD included | Windows, Linux, macOS |
+| [McpRemote](samples/McpRemote/README.md) | Interface module that lets AI agents control VLC over the Model Context Protocol | Windows, Linux, macOS |
 
 ### Advanced samples
 
