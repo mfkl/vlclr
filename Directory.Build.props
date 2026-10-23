@@ -1,0 +1,14 @@
+<Project>
+  <!--
+    SixLabors.ImageSharp 3.1.12 advisories, fixed only in 4.x, whose builds
+    need a Six Labors license key. Each needs ImageSharp to decode an untrusted
+    image (a TIFF, an embedded ICC profile) or to equalize one's histogram.
+    VLCLR decodes no image with ImageSharp: it copies VLC's pictures and draws
+    text and shapes on blank images.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-j3p4-wp97-rph4" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-gwg2-r3hj-4w44" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-wmxv-xphr-5c9g" />
+  </ItemGroup>
+</Project>
