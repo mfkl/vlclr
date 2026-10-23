@@ -7,7 +7,8 @@ namespace McpRemote;
 /// <summary>
 /// Searches what is said: the SubRip subtitle file next to a local media
 /// (<c>movie.srt</c> or <c>movie.en.srt</c> for <c>movie.mp4</c>). A line
-/// scores by the share of the query's words it contains, plus one when it
+/// scores by the share of the query's words it contains, compared by their
+/// English stems ("argue" finds "argument"), plus one when it
 /// contains the query as a phrase. A sentence often spans two lines, so a line
 /// and the next also score together, when that beats both alone.
 /// </summary>
@@ -28,7 +29,7 @@ public sealed partial class SubtitleSearch : IMomentSearch
         // Words of one or two letters match almost every line: score the
         // others, unless the query has only those.
         string[] all = Words(query).Distinct().ToArray();
-        string[] terms = all.Any(w => w.Length > 2) ? all.Where(w => w.Length > 2).ToArray() : all;
+        string[] terms = (all.Any(w => w.Length > 2) ? all.Where(w => w.Length > 2) : all).Select(Stem).Distinct().ToArray();
         if (terms.Length == 0)
             return Task.FromResult<IReadOnlyList<Moment>>([]);
         string phrase = string.Join(' ', Words(query));
@@ -65,11 +66,29 @@ public sealed partial class SubtitleSearch : IMomentSearch
     private static double Score(string text, string[] terms, string phrase)
     {
         string normalized = string.Join(' ', Words(text));
-        var words = normalized.Split(' ').ToHashSet();
+        var words = normalized.Split(' ').Select(Stem).ToHashSet();
         double score = terms.Count(words.Contains) / (double)terms.Length;
         if (score > 0 && terms.Length > 1 && normalized.Contains(phrase, StringComparison.Ordinal))
             score += 1;
         return score;
+    }
+
+    // Common English endings, longest first: "argue", "argued", "arguing" and
+    // "argument" all become "argu". Words of four letters or fewer stay whole.
+    private static readonly string[] Suffixes = ["ments", "ment", "ings", "ing", "ers", "ies", "ed", "es", "er", "ly", "s", "e"];
+
+    internal static string Stem(string word)
+    {
+        if (word.Length <= 4)
+            return word;
+
+        foreach (string suffix in Suffixes)
+        {
+            if (word.EndsWith(suffix, StringComparison.Ordinal) && word.Length - suffix.Length >= 3)
+                return word[..^suffix.Length];
+        }
+
+        return word;
     }
 
     private static string? FindSubtitles(string mediaUri)
