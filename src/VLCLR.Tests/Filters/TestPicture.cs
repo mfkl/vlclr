@@ -3,9 +3,11 @@ using VLCLR.Native;
 
 namespace VLCLR.Tests.Filters;
 
-// A 4:2:0 picture in native memory with padded lines and spare lines
-// below, all filled: yadif reads three samples before and after each
-// line and two lines above and below, X a line below the picture.
+// A 4:2:0 picture in native memory with samples before the first line,
+// padded lines and spare lines below, all filled: yadif reads three
+// samples before and after each line (before the first line, from an edge
+// line of a three-line plane) and two lines above and below, X a line
+// below the picture.
 internal sealed unsafe class TestPicture : IDisposable
 {
     private const int PaddingSamples = 16;
@@ -22,7 +24,8 @@ internal sealed unsafe class TestPicture : IDisposable
             int w = i == 0 ? width : (width + 1) / 2;
             int h = i == 0 ? height : (height + 1) / 2;
             int pitch = (w + PaddingSamples) * pixelSize;
-            int size = pitch * (h + SpareLines);
+            int leading = PaddingSamples * pixelSize;
+            int size = leading + pitch * (h + SpareLines);
             _memory[i] = (nint)NativeMemory.Alloc((nuint)size);
             var bytes = new Span<byte>((void*)_memory[i], size);
             if (pixelSize == 1)
@@ -38,7 +41,7 @@ internal sealed unsafe class TestPicture : IDisposable
             }
             Planes[i] = new VLCPlane
             {
-                Pixels = _memory[i],
+                Pixels = _memory[i] + leading,
                 Lines = h + SpareLines,
                 Pitch = pitch,
                 PixelPitch = pixelSize,
