@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Runs the VLCLR sample plugins inside a real VLC 4 on this machine.
 #
-# Publishes GaussianBlur, Yadif, VideoOverlay and SubtitleRenderer with
-# Native AOT for the host, checks their VLC entry points, then runs generated
-# I420 clips through each one:
+# Publishes GaussianBlur, Yadif, VideoOverlay, SubtitleRenderer and McpRemote
+# with Native AOT for the host, checks their VLC entry points, then runs
+# generated I420 clips through each filter:
 #   - dotnet_gaussianblur must give the output of VLC's own gaussianblur on
 #     every frame (VLC transcodes the clip through each filter, twice),
 #   - dotnet_yadif must give the output of VLC's deinterlace filter in yadif
@@ -12,7 +12,9 @@
 #   - dotnet_subtitle must render the subtitles,
 #   - no video filter may allocate on the managed heap per frame after its
 #     warm-up (the plugins are built with VLCLRFrameAllocationCheck, which
-#     logs what the frames allocated when a filter closes).
+#     logs what the frames allocated when a filter closes),
+#   - dotnet_mcp must answer each of its MCP tools as expected
+#     (mcp-check.py), and stop with VLC.
 # A struct layout that does not match the platform ABI makes these fail
 # (the filter refuses the formats it is given, or reads garbage).
 #
@@ -58,7 +60,7 @@ case "$(uname -s)" in
 esac
 
 echo "== Publishing plugins"
-for sample in GaussianBlur Yadif VideoOverlay SubtitleRenderer; do
+for sample in GaussianBlur Yadif VideoOverlay SubtitleRenderer McpRemote; do
     dotnet publish "$repo/samples/$sample" -c Release -o "$work/plugins/$sample" --nologo -v quiet \
         -p:VLCLRFrameAllocationCheck=true \
         > "$work/publish-$sample.log" 2>&1 \
@@ -208,6 +210,35 @@ expect_log dotnet-overlay 'VideoOverlayFilter: Frame allocations: none in [1-9]'
 while IFS= read -r line; do
     fail "${line#*\[VLCLR\] }"
 done < <(grep -ahE '\[VLCLR\] [A-Za-z0-9_]+: Frame allocations: [0-9]+ bytes' "$work"/out/*.log | grep -v ' renders ' | sort -u)
+
+echo "== Controlling VLC over MCP"
+# dotnet_mcp serves VLC's player as MCP tools; mcp-check.py calls each one as
+# an agent would, on a tone with subtitles next to it. On Linux, VLC's ALSA
+# output on the null device has a (software) volume, so the volume is checked;
+# other runners may have no audio device, and it is checked only when VLC
+# finds an output with a volume.
+mcp="$work/mcp"
+"$python" -I "$here/mcp-check.py" media "$(native_path "$mcp")"
+case "$library_suffix" in
+    so) audio=(--aout=alsa --alsa-audio-device=null); volume=required ;;
+    *) audio=(); volume=optional ;;
+esac
+port=18765
+VLC_PLUGIN_PATH="$(native_path "$work/plugins")" "$vlc" -I dummy --extraintf=dotnet_mcp --mcp-port=$port \
+    --ignore-config --no-plugins-cache --no-media-library --no-auto-preparse --vout=vdummy "${audio[@]}" \
+    --play-and-exit -vv > "$work/out/mcp.log" 2>&1 &
+vlc_pid=$!
+(sleep 120 && kill -9 "$vlc_pid" 2> /dev/null) &
+watchdog=$!
+# VLC exits once the tone has played; after a failure the tone may not play.
+"$python" -I "$here/mcp-check.py" check "http://127.0.0.1:$port/mcp" "$(native_path "$mcp")" --volume $volume \
+    || { fail "mcp: a tool did not answer as expected (see $work/out/mcp.log)"; kill "$vlc_pid" 2> /dev/null || true; }
+status=0
+wait "$vlc_pid" || status=$?
+kill "$watchdog" 2> /dev/null || true
+[ "$status" -eq 0 ] || fail "mcp: VLC exited with status $status (see $work/out/mcp.log)"
+expect_log mcp '\[McpRemote\] MCP server on' "the MCP server did not start"
+expect_log mcp '\[McpRemote\] MCP server stopped' "the MCP server did not stop with VLC"
 
 if [ "$failures" -ne 0 ]; then
     echo "== $failures check(s) failed; logs and snapshots in $work"
