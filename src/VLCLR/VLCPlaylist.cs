@@ -323,6 +323,50 @@ public sealed class VLCPlaylist : IDisposable
     }
 
     /// <summary>
+    /// Add a media to the end of the playlist.
+    /// </summary>
+    /// <param name="uri">The media URI, such as file:///C:/Videos/movie.mp4</param>
+    /// <param name="name">The name to show, or null for one VLC derives from the URI</param>
+    /// <returns>The index of the new item, or -1 on failure</returns>
+    public long Append(string uri, string? name = null)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        nint media = VLCCore.InputItemNew(uri, name);
+        if (media == nint.Zero)
+        {
+            _logger.Warning($".NET plugin Cannot create a media for {uri}");
+            return -1;
+        }
+
+        try
+        {
+            VLCCore.PlaylistLock(_playlist);
+            try
+            {
+                long index = (long)VLCCore.PlaylistCount(_playlist);
+                int result = VLCCore.PlaylistInsert(_playlist, index, media);
+                if (result != 0)
+                {
+                    _logger.Warning($".NET plugin Playlist insert failed with code {result}");
+                    return -1;
+                }
+
+                _logger.Debug($".NET plugin Playlist appended {uri} at index {index}");
+                return index;
+            }
+            finally
+            {
+                VLCCore.PlaylistUnlock(_playlist);
+            }
+        }
+        finally
+        {
+            VLCCore.InputItemRelease(media);
+        }
+    }
+
+    /// <summary>
     /// Go to a specific index and start playback.
     /// </summary>
     /// <param name="index">Index to play</param>

@@ -220,6 +220,26 @@ public sealed class VLCPlayer : IDisposable
     }
 
     /// <summary>
+    /// Gets the URI of the current media.
+    /// Returns null if there is no current media.
+    /// </summary>
+    public string? CurrentMediaUri
+    {
+        get
+        {
+            VLCCore.PlayerLock(_player);
+            try
+            {
+                return VLCCore.PlayerGetCurrentMediaUri(_player);
+            }
+            finally
+            {
+                VLCCore.PlayerUnlock(_player);
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets whether seeking is supported for the current media.
     /// </summary>
     public bool CanSeek

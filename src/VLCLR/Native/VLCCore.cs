@@ -236,22 +236,61 @@ public static partial class VLCCore
     public static unsafe string? PlayerGetCurrentMediaName(nint player)
     {
         Gen.InputItem* media = Gen.VlcPlayer.GetCurrentMedia((Gen.Player*)player);
-        if (media == null)
-            return null;
+        return media == null ? null : TakeUtf8(Gen.InputItem.GetName(media));
+    }
 
-        byte* name = Gen.InputItem.GetName(media);
-        if (name == null)
+    /// <summary>
+    /// Get the URI of the current media.
+    /// Requires player lock to be held.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>The media URI, or null if no media</returns>
+    public static unsafe string? PlayerGetCurrentMediaUri(nint player)
+    {
+        Gen.InputItem* media = Gen.VlcPlayer.GetCurrentMedia((Gen.Player*)player);
+        return media == null ? null : TakeUtf8(Gen.InputItem.GetURI(media));
+    }
+
+    // Converts a string VLC allocated for the caller, and frees it.
+    private static unsafe string? TakeUtf8(byte* value)
+    {
+        if (value == null)
             return null;
 
         try
         {
-            return Marshal.PtrToStringUTF8((nint)name);
+            return Marshal.PtrToStringUTF8((nint)value);
         }
         finally
         {
-            Free((nint)name);
+            Free((nint)value);
         }
     }
+
+    #endregion
+
+    #region Input Items
+
+    /// <summary>
+    /// Create a media item (input_item_New).
+    /// </summary>
+    /// <param name="uri">The media URI</param>
+    /// <param name="name">The name to show, or null for one VLC derives from the URI</param>
+    /// <returns>Pointer to input_item_t, to release with <see cref="InputItemRelease"/>, or 0 on failure</returns>
+    public static unsafe nint InputItemNew(string uri, string? name)
+    {
+        using var uri8 = new Utf8Argument(uri, stackalloc byte[Utf8Argument.BufferSize]);
+        using var name8 = new Utf8Argument(name, stackalloc byte[Utf8Argument.BufferSize]);
+        return (nint)Gen.InputItem.NewExt(uri8.Pointer, name8.Pointer, Gen.VlcInputItem.InputDurationUnset,
+            Gen.InputItemType.Unknown, Gen.InputItemNetType.NetUnknown);
+    }
+
+    /// <summary>
+    /// Release a media item.
+    /// </summary>
+    /// <param name="item">Pointer to input_item_t</param>
+    public static unsafe void InputItemRelease(nint item)
+        => Gen.InputItem.Release((Gen.InputItem*)item);
 
     #endregion
 
@@ -415,6 +454,23 @@ public static partial class VLCCore
     /// <returns>True if there is a previous item</returns>
     public static unsafe bool PlaylistHasPrev(nint playlist)
         => Gen.VlcPlaylist.HasPrev((Gen.Playlist*)playlist) != 0;
+
+    /// <summary>
+    /// Insert one media item into the playlist. The playlist takes its own
+    /// reference: the caller still releases the item.
+    /// Requires playlist lock to be held.
+    /// </summary>
+    /// <param name="playlist">Pointer to vlc_playlist_t</param>
+    /// <param name="index">Index to insert at, from 0 to the item count</param>
+    /// <param name="media">Pointer to input_item_t</param>
+    /// <returns>0 on success, error code on failure</returns>
+    public static unsafe int PlaylistInsert(nint playlist, long index, nint media)
+        => PlaylistInsertNative(playlist, (nuint)index, &media, 1);
+
+    // Hand-written: the generator skips parameters of array type
+    // (see Native/Interop/cimport-report.md).
+    [LibraryImport(LibraryName, EntryPoint = "vlc_playlist_Insert")]
+    private static unsafe partial int PlaylistInsertNative(nint playlist, nuint index, nint* media, nuint count);
 
     #endregion
 
