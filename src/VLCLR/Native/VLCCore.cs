@@ -227,6 +227,32 @@ public static partial class VLCCore
     public static unsafe int PlayerGetCapabilities(nint player)
         => Gen.VlcPlayer.GetCapabilities((Gen.Player*)player);
 
+    /// <summary>
+    /// Get the name of the current media.
+    /// Requires player lock to be held.
+    /// </summary>
+    /// <param name="player">Pointer to vlc_player_t</param>
+    /// <returns>The media name (its title, or its file name), or null if no media</returns>
+    public static unsafe string? PlayerGetCurrentMediaName(nint player)
+    {
+        Gen.InputItem* media = Gen.VlcPlayer.GetCurrentMedia((Gen.Player*)player);
+        if (media == null)
+            return null;
+
+        byte* name = Gen.InputItem.GetName(media);
+        if (name == null)
+            return null;
+
+        try
+        {
+            return Marshal.PtrToStringUTF8((nint)name);
+        }
+        finally
+        {
+            Free((nint)name);
+        }
+    }
+
     #endregion
 
     #region Player Playback Control

@@ -200,6 +200,26 @@ public sealed class VLCPlayer : IDisposable
     }
 
     /// <summary>
+    /// Gets the name of the current media: its title, or its file name.
+    /// Returns null if there is no current media.
+    /// </summary>
+    public string? CurrentMediaName
+    {
+        get
+        {
+            VLCCore.PlayerLock(_player);
+            try
+            {
+                return VLCCore.PlayerGetCurrentMediaName(_player);
+            }
+            finally
+            {
+                VLCCore.PlayerUnlock(_player);
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets whether seeking is supported for the current media.
     /// </summary>
     public bool CanSeek
