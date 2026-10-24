@@ -225,7 +225,7 @@ case "$library_suffix" in
 esac
 port=18765
 VLC_PLUGIN_PATH="$(native_path "$work/plugins")" "$vlc" -I dummy --extraintf=dotnet_mcp --mcp-port=$port \
-    --ignore-config --no-plugins-cache --no-media-library --no-auto-preparse --vout=vdummy "${audio[@]}" \
+    --ignore-config --no-plugins-cache --no-media-library --no-auto-preparse --vout=vdummy ${audio[@]+"${audio[@]}"} \
     --play-and-exit -vv > "$work/out/mcp.log" 2>&1 &
 vlc_pid=$!
 (sleep 120 && kill -9 "$vlc_pid" 2> /dev/null) &
