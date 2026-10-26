@@ -5,10 +5,12 @@
 //    path; border pixels run the C's exact bounds.
 // 2. Symmetric kernel: distribution[-k] == distribution[k] (checked at setup,
 //    with a fallback), so each pair of taps costs one multiply: w*(a+b).
-// 3. Row-wise vertical pass: accumulate one output line from whole buffer
-//    rows (sequential memory) instead of walking each column through the
-//    buffer. Integer sums of non-negative terms do not depend on order and
-//    cannot overflow here (< 2^25), so the result is unchanged.
+// 3. Row-wise passes: accumulate one output line from whole buffer rows
+//    (sequential memory) instead of walking each column through the
+//    buffer, and the horizontal interior one tap at a time over the whole
+//    run instead of a short tap loop per pixel. Integer sums of
+//    non-negative terms do not depend on order and cannot overflow here
+//    (< 2^25), so the result is unchanged.
 // 4. Division by an invariant: in the interior the normalization divisor is
 //    the constant S = (sum of weights)^2, so value / S is computed as
 //    (value * M) >> K with M = ceil(2^K / S), K = N + L, where value < 2^N and
@@ -81,16 +83,6 @@ internal static unsafe class GaussianBlurTuned
         int interiorEnd = Math.Min(visiblePitch,
             Math.Max(interiorStart, visiblePitch - (dim + step) / step + 1));
 
-        // Tap offsets of -k and +k for this plane's subsampling.
-        int* negative = stackalloc int[dim + 1];
-        int* positive = stackalloc int[dim + 1];
-        for (int k = 0; k <= dim; k++)
-        {
-            negative[k] = (-k) >> xFactor;
-            positive[k] = k >> xFactor;
-        }
-        int w0 = center[0];
-
         for (int line = 0; line < visibleLines; line++)
         {
             byte* row = input + line * inPitch;
@@ -98,43 +90,45 @@ internal static unsafe class GaussianBlurTuned
 
             for (int col = 0; col < interiorStart; col++)
                 outRow[col] = BorderPixel(row, col, visiblePitch, xFactor, center, dim);
-
-            if (symmetric && xFactor == 0)
-            {
-                for (int col = interiorStart; col < interiorEnd; col++)
-                {
-                    byte* p = row + col;
-                    int value = w0 * p[0];
-                    for (int k = 1; k <= dim; k++)
-                        value += center[k] * (p[-k] + p[k]);
-                    outRow[col] = value;
-                }
-            }
-            else if (symmetric)
-            {
-                for (int col = interiorStart; col < interiorEnd; col++)
-                {
-                    byte* p = row + col;
-                    int value = w0 * p[0];
-                    for (int k = 1; k <= dim; k++)
-                        value += center[k] * (p[negative[k]] + p[positive[k]]);
-                    outRow[col] = value;
-                }
-            }
-            else
-            {
-                for (int col = interiorStart; col < interiorEnd; col++)
-                {
-                    byte* p = row + col;
-                    int value = 0;
-                    for (int x = -dim; x <= dim; x++)
-                        value += center[x] * p[x >> xFactor];
-                    outRow[col] = value;
-                }
-            }
-
+            Interior(row + interiorStart, outRow + interiorStart, interiorEnd - interiorStart,
+                xFactor, center, dim, symmetric);
             for (int col = interiorEnd; col < visiblePitch; col++)
                 outRow[col] = BorderPixel(row, col, visiblePitch, xFactor, center, dim);
+        }
+    }
+
+    // Interior columns, one tap at a time over the whole run, as the vertical
+    // pass does with rows: long loops of independent pixels instead of a
+    // short tap loop per pixel. Integer sums, so the order does not matter.
+    // nint indices: no sign extension in the loops.
+    private static void Interior(byte* row, int* sums, nint count, int xFactor, int* center, int dim, bool symmetric)
+    {
+        int w0 = center[0];
+        for (nint col = 0; col < count; col++)
+            sums[col] = w0 * row[col];
+
+        if (symmetric)
+        {
+            for (int k = 1; k <= dim; k++)
+            {
+                byte* left = row + ((-k) >> xFactor);
+                byte* right = row + (k >> xFactor);
+                int w = center[k];
+                for (nint col = 0; col < count; col++)
+                    sums[col] += w * (left[col] + right[col]);
+            }
+        }
+        else
+        {
+            for (int x = -dim; x <= dim; x++)
+            {
+                if (x == 0)
+                    continue;
+                byte* taps = row + (x >> xFactor);
+                int w = center[x];
+                for (nint col = 0; col < count; col++)
+                    sums[col] += w * taps[col];
+            }
         }
     }
 
@@ -159,9 +153,7 @@ internal static unsafe class GaussianBlurTuned
         int* center = distribution + dim;
         int step = yFactor + 1;
         int scalePitch = inPitch << xFactor;
-        int interiorScale = setup.InteriorScale;
-        ulong magic = setup.Magic;
-        int shift = setup.Shift;
+        nint count = visiblePitch;
 
         for (int line = 0; line < visibleLines; line++)
         {
@@ -172,7 +164,7 @@ internal static unsafe class GaussianBlurTuned
 
             // y = 0 is always inside [lo, hi].
             int w0 = center[0];
-            for (int col = 0; col < visiblePitch; col++)
+            for (nint col = 0; col < count; col++)
                 accumulator[col] = w0 * baseRow[col];
 
             int paired = setup.Symmetric ? Math.Min(-lo, hi) : 0;
@@ -181,31 +173,38 @@ internal static unsafe class GaussianBlurTuned
                 int* above = baseRow + ((-k) >> yFactor) * inPitch;
                 int* below = baseRow + (k >> yFactor) * inPitch;
                 int w = center[k];
-                for (int col = 0; col < visiblePitch; col++)
+                for (nint col = 0; col < count; col++)
                     accumulator[col] += w * (above[col] + below[col]);
             }
             for (int y = lo; y < -paired; y++)
-                AddRow(accumulator, baseRow + (y >> yFactor) * inPitch, center[y], visiblePitch);
+                AddRow(accumulator, baseRow + (y >> yFactor) * inPitch, center[y], count);
             for (int y = Math.Max(paired + 1, 1); y <= hi; y++)
-                AddRow(accumulator, baseRow + (y >> yFactor) * inPitch, center[y], visiblePitch);
+                AddRow(accumulator, baseRow + (y >> yFactor) * inPitch, center[y], count);
 
-            int* scaleRow = scale + (line << yFactor) * scalePitch;
-            byte* outRow = output + line * outPitch;
-            for (int col = 0; col < visiblePitch; col++)
-            {
-                int value = accumulator[col];
-                int s = scaleRow[col << xFactor];
-                int quotient = s == interiorScale
-                    ? (int)(((ulong)(uint)value * magic) >> shift)
-                    : value / s;
-                outRow[col] = (byte)quotient;
-            }
+            Normalize(accumulator, scale + (line << yFactor) * scalePitch, output + line * outPitch, count, xFactor, setup);
         }
     }
 
-    private static void AddRow(int* accumulator, int* row, int weight, int count)
+    // In a method of its own, so the loop gets the registers for its constants.
+    private static void Normalize(int* sums, int* scaleRow, byte* outRow, nint count, int xFactor, Setup setup)
     {
-        for (int col = 0; col < count; col++)
+        int interiorScale = setup.InteriorScale;
+        ulong magic = setup.Magic;
+        int shift = setup.Shift;
+        for (nint col = 0; col < count; col++)
+        {
+            int value = sums[col];
+            int s = scaleRow[col << xFactor];
+            int quotient = s == interiorScale
+                ? (int)(((ulong)(uint)value * magic) >> shift)
+                : value / s;
+            outRow[col] = (byte)quotient;
+        }
+    }
+
+    private static void AddRow(int* accumulator, int* row, int weight, nint count)
+    {
+        for (nint col = 0; col < count; col++)
             accumulator[col] += weight * row[col];
     }
 }
