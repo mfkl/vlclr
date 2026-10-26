@@ -40,6 +40,12 @@ public enum GaussianBlurImplementation
     /// makes of the C. Same loops and arithmetic otherwise.
     /// </summary>
     ReferenceHoisted,
+
+    /// <summary>
+    /// <see cref="Tuned"/> without unsafe code: spans and managed buffers,
+    /// every memory access bounds-checked.
+    /// </summary>
+    Safe,
 }
 
 /// <summary>
@@ -65,6 +71,10 @@ public sealed unsafe class GaussianBlur : IDisposable
     private int* _scale;
     private int* _accumulator;
     private ushort* _buffer16;
+    // Safe: managed buffers instead of the native ones above.
+    private int[]? _safeBuffer;
+    private int[]? _safeScale;
+    private int[]? _safeAccumulator;
     private readonly nint[] _divisors = new nint[MaxPlanes];
     private readonly nint[] _reciprocals = new nint[MaxPlanes];
     private bool _disposed;
@@ -87,7 +97,7 @@ public sealed unsafe class GaussianBlur : IDisposable
         Sigma = sigma;
         _distribution = GaussianBlurReference.Distribution(sigma, out _dim);
         Implementation = Resolve(implementation, _distribution);
-        if (Implementation == GaussianBlurImplementation.Tuned)
+        if (Implementation is GaussianBlurImplementation.Tuned or GaussianBlurImplementation.Safe)
         {
             _tunedSetup = GaussianBlurTuned.Prepare(_distribution, _dim);
         }
@@ -216,6 +226,15 @@ public sealed unsafe class GaussianBlur : IDisposable
                             destination, outPlane.Pitch, xFactor, yFactor, _buffer, _scale, distribution, _dim,
                             _tunedSetup!, _accumulator);
                         break;
+                    case GaussianBlurImplementation.Safe:
+                        // The only pointers: VLC's planes, as spans over the visible lines.
+                        GaussianBlurSafe.Plane(
+                            new ReadOnlySpan<byte>(source, (inPlane.VisibleLines - 1) * inPlane.Pitch + inPlane.VisiblePitch),
+                            inPlane.Pitch, inPlane.VisibleLines, inPlane.VisiblePitch,
+                            new Span<byte>(destination, (inPlane.VisibleLines - 1) * outPlane.Pitch + inPlane.VisiblePitch),
+                            outPlane.Pitch, xFactor, yFactor, _safeBuffer, _safeScale, _distribution, _dim,
+                            _tunedSetup!, _safeAccumulator);
+                        break;
                     case GaussianBlurImplementation.ReferenceHoisted:
                         GaussianBlurReferenceHoisted.Plane(source, inPlane.Pitch, inPlane.VisibleLines, inPlane.VisiblePitch,
                             destination, outPlane.Pitch, xFactor, yFactor, _buffer, _scale, distribution, _dim);
@@ -270,6 +289,15 @@ public sealed unsafe class GaussianBlur : IDisposable
         _pitch = luma.Pitch;
 
         nuint elements = (nuint)luma.VisibleLines * (nuint)luma.Pitch;
+        if (Implementation == GaussianBlurImplementation.Safe)
+        {
+            int count = checked(luma.VisibleLines * luma.Pitch);
+            _safeScale = GC.AllocateUninitializedArray<int>(count);
+            GaussianBlurSafe.Scale(_safeScale, _distribution, _dim, luma.VisibleLines, luma.VisiblePitch, luma.Pitch);
+            _safeBuffer = GC.AllocateUninitializedArray<int>(count);
+            _safeAccumulator = GC.AllocateUninitializedArray<int>(luma.Pitch);
+            return;
+        }
         _scale = (int*)NativeMemory.Alloc(elements, sizeof(int));
         fixed (int* distribution = _distribution)
         {
@@ -299,6 +327,7 @@ public sealed unsafe class GaussianBlur : IDisposable
         _scale = null;
         _accumulator = null;
         _buffer16 = null;
+        _safeBuffer = _safeScale = _safeAccumulator = null;
         for (int i = 0; i < MaxPlanes; i++)
         {
             NativeMemory.Free((void*)_divisors[i]);
