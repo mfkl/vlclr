@@ -100,6 +100,7 @@ public unsafe class GaussianBlurTests
             GaussianBlurImplementation.Reference,
             GaussianBlurImplementation.ReferenceHoisted,
             GaussianBlurImplementation.Tuned,
+            GaussianBlurImplementation.Safe,
         };
         if (Avx2.IsSupported)
         {
