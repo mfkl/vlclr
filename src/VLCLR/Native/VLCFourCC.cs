@@ -23,6 +23,7 @@ public static class VLCFourCC
     public const uint ABGR = Interop.VlcFourcc.CodecAbgr; // "ABGR" - memory order A,B,G,R
     public const uint RGBA = Interop.VlcFourcc.CodecRgba; // "RGBA"
     public const uint BGRA = Interop.VlcFourcc.CodecBgra; // "BGRA"
+    public const uint FL32 = Interop.VlcFourcc.CodecFl32; // "f32l" - native 32-bit float audio samples
     public const uint I420 = Interop.VlcFourcc.CodecI420; // "I420" - YUV 4:2:0 planar
     public const uint YV12 = Interop.VlcFourcc.CodecYv12; // "YV12" - YUV 4:2:0 planar
     public const uint D3D11Opaque = Interop.VlcFourcc.CodecD3d11Opaque; // "DX11" - D3D11 8-bit video surface
