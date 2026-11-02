@@ -57,6 +57,8 @@ public sealed class AbiSizedRecordTests
     {
         var unlisted = Vlclr.GetTypes()
             .Where(t => t.IsValueType && t.StructLayoutAttribute?.Value == LayoutKind.Explicit)
+            // The compiler's own, such as the data behind a constant ReadOnlySpan.
+            .Where(t => !t.FullName!.StartsWith("<PrivateImplementationDetails>", StringComparison.Ordinal))
             .Where(t => t.Namespace != typeof(Gen.Picture).Namespace && !Wrappers.ContainsKey(t))
             .Select(t => t.FullName)
             .ToList();

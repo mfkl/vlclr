@@ -66,6 +66,22 @@ public class ModuleEntryGeneratorTests
     }
 
     [Fact]
+    public void GeneratedAudioFilter_RegistersAudioFilterWithBlockCallback()
+    {
+        var generated = Generate(
+            "VLCAudioFilterBase",
+            "protected override void ProcessAudio(in VLCAudioBlock block) { }");
+
+        Assert.Contains(".WithCapability(\"audio filter\")", generated);
+        Assert.Contains(".WithSubcategory(VLCConfigSubcategory.SUBCAT_AUDIO_AFILTER)", generated);
+        Assert.Contains(".WithOpenCallback(&FilterOpen);", generated);
+        Assert.Contains("instance.InternalOpen(filterPtr, &FilterAudioCallback, &FilterCloseCallback, &FilterFlushCallback);", generated);
+        Assert.Contains("return instance.InternalFilterAudio(filterPtr, blockPtr);", generated);
+        Assert.Contains("catch { return blockPtr; }", generated);
+        Assert.Contains("try { context.SetSys(0); context.SetOperations(0); } catch { }", generated);
+    }
+
+    [Fact]
     public void GeneratedConfiguration_ExposesTypedPrefixTrimmedProperties()
     {
         var generated = Generate(

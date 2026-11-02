@@ -62,7 +62,7 @@ frame, and reuse buffers. Two tools check it:
 
 A VLC plugin is a module of one kind (video filter, decoder, demuxer, ...)
 that calls into libvlccore, VLC's core library. VLCLR has base classes for
-three kinds; any other kind is registered with `ModuleBuilder` and uses the
+four kinds; any other kind is registered with `ModuleBuilder` and uses the
 generated bindings directly.
 
 ```mermaid
@@ -71,9 +71,9 @@ flowchart LR
     VF["video filter<br/>VLCVideoFilterBase"]
     TR["text renderer<br/>VLCTextRendererBase"]
     IF["interface<br/>VLCInterfaceBase"]
+    AF["audio filter<br/>VLCAudioFilterBase"]
   end
   subgraph builder["Any other kind, with ModuleBuilder"]
-    AF[audio filter]
     DEC[decoder, encoder]
     DMX[demuxer]
     ACC[access, stream filter]
@@ -127,6 +127,7 @@ for how the bindings are generated and kept in step with VLC.
 | [SubtitleRenderer](samples/SubtitleRenderer/README.md) | ImageSharp text renderer | Windows, Linux, macOS |
 | [GaussianBlur](samples/GaussianBlur/README.md) | Port of VLC's Gaussian blur video filter with the same output, SIMD included | Windows, Linux, macOS |
 | [Yadif](samples/Yadif/README.md) | Port of VLC's yadif deinterlacer with the same output, SIMD included | Windows, Linux, macOS |
+| [Gain](samples/Gain/README.md) | Port of VLC's gain audio filter with the same output | Windows, Linux, macOS |
 | [McpRemote](samples/McpRemote/README.md) | Interface module that lets AI agents control VLC over the Model Context Protocol | Windows, Linux, macOS |
 
 ### Advanced samples

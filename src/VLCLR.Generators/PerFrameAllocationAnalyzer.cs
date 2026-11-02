@@ -14,8 +14,9 @@ using Microsoft.CodeAnalysis.Operations;
 namespace VLCLR.Generators;
 
 /// <summary>
-/// Reports the allocations of the code that runs for each video frame: the
-/// overrides of VLCVideoFilterBase's frame methods, methods marked
+/// Reports the allocations of the code that runs for each video frame or
+/// audio block: the overrides of VLCVideoFilterBase's frame methods and of
+/// VLCAudioFilterBase's ProcessAudio, methods marked
 /// [VLCPerFrame], and the methods of the same project they call (directly or
 /// through a virtual method of the project, not through a delegate or an
 /// interface).
@@ -32,10 +33,16 @@ public sealed class PerFrameAllocationAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "VLCLR001";
 
-    private const string VideoFilterBase = "VLCLR.Plugin.VLCVideoFilterBase";
     private const string PerFrameAttribute = "VLCLR.Plugin.VLCPerFrameAttribute";
-    private static readonly ImmutableHashSet<string> FrameMethods =
-        ImmutableHashSet.Create("ProcessFrame", "ProcessFrameToOutput", "SetOutputProperties");
+
+    /// <summary>The base classes whose overridden methods run per frame or block.</summary>
+    private static readonly ImmutableDictionary<string, ImmutableHashSet<string>> FrameMethods =
+        new Dictionary<string, ImmutableHashSet<string>>
+        {
+            ["VLCLR.Plugin.VLCVideoFilterBase"] =
+                ImmutableHashSet.Create("ProcessFrame", "ProcessFrameToOutput", "SetOutputProperties"),
+            ["VLCLR.Plugin.VLCAudioFilterBase"] = ImmutableHashSet.Create("ProcessAudio"),
+        }.ToImmutableDictionary();
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
@@ -79,9 +86,16 @@ public sealed class PerFrameAllocationAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(start =>
         {
-            INamedTypeSymbol? videoFilterBase = start.Compilation.GetTypeByMetadataName(VideoFilterBase);
+            var frameBases = new Dictionary<INamedTypeSymbol, ImmutableHashSet<string>>(SymbolEqualityComparer.Default);
+            foreach (var entry in FrameMethods)
+            {
+                if (start.Compilation.GetTypeByMetadataName(entry.Key) is { } baseType)
+                {
+                    frameBases[baseType] = entry.Value;
+                }
+            }
             INamedTypeSymbol? perFrameAttribute = start.Compilation.GetTypeByMetadataName(PerFrameAttribute);
-            if (videoFilterBase is null && perFrameAttribute is null)
+            if (frameBases.Count == 0 && perFrameAttribute is null)
             {
                 return;
             }
@@ -110,7 +124,7 @@ public sealed class PerFrameAllocationAnalyzer : DiagnosticAnalyzer
             {
                 var overrides = Overrides(methods.Keys, end.Compilation.Assembly);
                 var reported = new HashSet<Location>();
-                foreach (var root in methods.Keys.Where(m => IsFrameRoot(m, videoFilterBase, perFrameAttribute)).OrderBy(m => m.Name))
+                foreach (var root in methods.Keys.Where(m => IsFrameRoot(m, frameBases, perFrameAttribute)).OrderBy(m => m.Name))
                 {
                     string rootName = $"{root.ContainingType.Name}.{root.Name}";
                     foreach (var (method, via) in Reachable(root, methods, overrides))
@@ -131,7 +145,8 @@ public sealed class PerFrameAllocationAnalyzer : DiagnosticAnalyzer
         });
     }
 
-    private static bool IsFrameRoot(IMethodSymbol method, INamedTypeSymbol? videoFilterBase, INamedTypeSymbol? perFrameAttribute)
+    private static bool IsFrameRoot(IMethodSymbol method,
+        Dictionary<INamedTypeSymbol, ImmutableHashSet<string>> frameBases, INamedTypeSymbol? perFrameAttribute)
     {
         if (perFrameAttribute is not null
             && method.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, perFrameAttribute)))
@@ -139,14 +154,14 @@ public sealed class PerFrameAllocationAnalyzer : DiagnosticAnalyzer
             return true;
         }
 
-        if (videoFilterBase is null || !method.IsOverride || !FrameMethods.Contains(method.Name))
+        if (!method.IsOverride)
         {
             return false;
         }
 
         for (IMethodSymbol? overridden = method.OverriddenMethod; overridden is not null; overridden = overridden.OverriddenMethod)
         {
-            if (SymbolEqualityComparer.Default.Equals(overridden.ContainingType, videoFilterBase))
+            if (frameBases.TryGetValue(overridden.ContainingType, out var names) && names.Contains(method.Name))
             {
                 return true;
             }

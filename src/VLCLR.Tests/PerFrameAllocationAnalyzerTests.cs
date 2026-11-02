@@ -174,6 +174,23 @@ public class PerFrameAllocationAnalyzerTests
         Assert.True(diagnostics.IsEmpty, Messages(diagnostics));
     }
 
+    [Fact]
+    public async Task AllocationInProcessAudio_IsReported()
+    {
+        var diagnostics = await Analyze("""
+            protected override void ProcessAudio(in VLCAudioBlock block)
+            {
+                Scale(block.Output);
+            }
+            private void Scale(Span<float> samples) { var copy = new float[samples.Length]; }
+            private void NotPerBlock() { var list = new List<int>(); }
+            """,
+            baseType: "VLCAudioFilterBase");
+
+        Assert.True(diagnostics.Length == 1, Messages(diagnostics));
+        Assert.EndsWith("(Fixture.Scale runs per frame from Fixture.ProcessAudio)", diagnostics[0].GetMessage());
+    }
+
     private static string Messages(ImmutableArray<Diagnostic> diagnostics) =>
         string.Join(Environment.NewLine, diagnostics.Select(d => $"{d.Location.GetLineSpan().StartLinePosition}: {d.GetMessage()}"));
 

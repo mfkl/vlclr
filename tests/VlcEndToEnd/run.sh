@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 # Runs the VLCLR sample plugins inside a real VLC 4 on this machine.
 #
-# Publishes GaussianBlur, Yadif, VideoOverlay, SubtitleRenderer and McpRemote
-# with Native AOT for the host, checks their VLC entry points, then runs
-# generated I420 clips through each filter:
+# Publishes GaussianBlur, Yadif, VideoOverlay, SubtitleRenderer, McpRemote and
+# Gain with Native AOT for the host, checks their VLC entry points, then runs
+# generated I420 clips and WAV tones through each filter:
 #   - dotnet_gaussianblur must give the output of VLC's own gaussianblur on
 #     every frame (VLC transcodes the clip through each filter, twice),
 #   - dotnet_yadif must give the output of VLC's deinterlace filter in yadif
 #     mode on every frame of an interlaced clip, the same way,
+#   - dotnet_gain must give the output of VLC's gain audio filter on every
+#     sample of a stereo and a 5.1 tone,
 #   - dotnet_overlay must process every frame and change the picture,
 #   - dotnet_subtitle must render the subtitles,
-#   - no video filter may allocate on the managed heap per frame after its
+#   - no video or audio filter may allocate on the managed heap per frame after its
 #     warm-up (the plugins are built with VLCLRFrameAllocationCheck, which
 #     logs what the frames allocated when a filter closes),
 #   - dotnet_mcp must answer each of its MCP tools as expected
@@ -60,7 +62,7 @@ case "$(uname -s)" in
 esac
 
 echo "== Publishing plugins"
-for sample in GaussianBlur Yadif VideoOverlay SubtitleRenderer McpRemote; do
+for sample in GaussianBlur Yadif VideoOverlay SubtitleRenderer McpRemote Gain; do
     dotnet publish "$repo/samples/$sample" -c Release -o "$work/plugins/$sample" --nologo -v quiet \
         -p:VLCLRFrameAllocationCheck=true \
         > "$work/publish-$sample.log" 2>&1 \
@@ -89,6 +91,7 @@ subtitles="$work/clip.srt"
 printf '1\n00:00:00,000 --> 00:00:10,000\nVLCLR end-to-end\n' > "$subtitles"
 
 # run_vlc NAME OPTIONS...: runs VLC on the clip, logging to out/NAME.log.
+# Audio is off, unless the caller sets audio_option (empty to leave it on).
 run_vlc() {
     local name="$1"
     shift
@@ -96,7 +99,7 @@ run_vlc() {
     # vlc-preparser child processes, which the macOS arm64 nightly fails to
     # spawn; the test needs neither.
     VLC_PLUGIN_PATH="$(native_path "$work/plugins")" "$vlc" -I dummy --ignore-config --no-plugins-cache \
-        --no-media-library --no-auto-preparse --no-audio -vv "$@" > "$work/out/$name.log" 2>&1 &
+        --no-media-library --no-auto-preparse ${audio_option-"--no-audio"} -vv "$@" > "$work/out/$name.log" 2>&1 &
     local pid=$!
     (sleep 120 && kill -9 "$pid" 2> /dev/null) &
     local watchdog=$!
@@ -186,6 +189,44 @@ parity yadif deinterlace dotnet_yadif --sout-deinterlace-mode=yadif "" --skip-ed
 expect_log yadif-vlc-1 'using yadif deinterlace method' "VLC's deinterlace filter did not use yadif"
 clip="$progressive_clip"
 
+echo "== Comparing the ported audio filters with VLC's"
+# transcode_audio NAME TONE FILTER [OPTIONS...]: the tone through the audio
+# filter (none if empty), as 32-bit float in out/NAME.wav; no video.
+transcode_audio() {
+    local name="$1" tone="$2" filter="$3" audio_option=""
+    shift 3
+    local out="$work/out/$name.wav"
+    run_vlc "$name" --no-video "$@" "$(native_path "$tone")"         --sout "#transcode{acodec=f32l${filter:+,afilter=$filter}}:std{access=file,mux=wav,dst=\"$(sout_path "$out")\"}"         vlc://quit
+    [ -s "$out" ] || fail "$name: no samples written"
+}
+
+# audio_parity NAME TONE VLC_FILTER DOTNET_FILTER VLC_OPTION DOTNET_OPTION:
+# the ported filter must give the samples of VLC's, and change the tone.
+audio_parity() {
+    local name="$1" tone="$2" vlc_filter="$3" dotnet_filter="$4" vlc_option="$5" dotnet_option="$6"
+    local out="$work/out/$name" result status=0
+    transcode_audio "$name-none" "$tone" ""
+    transcode_audio "$name-vlc" "$tone" "$vlc_filter" $vlc_option
+    transcode_audio "$name-dotnet" "$tone" "$dotnet_filter" $dotnet_option
+    expect_log "$name-vlc" "using audio filter module \"$vlc_filter\"" "VLC's filter did not open"
+    expect_log "$name-dotnet" 'Filter [A-Za-z]+ initialized successfully' "filter did not open"
+    "$python" -I "$here/wavdiff.py" "$out-none.wav" "$out-dotnet.wav" --expect-different > /dev/null         || fail "$name: $dotnet_filter left the samples unchanged"
+    result="$("$python" -I "$here/wavdiff.py" "$out-vlc.wav" "$out-dotnet.wav")" || status=$?
+    echo "   $name: $result"
+    [ "$status" -eq 0 ] || fail "$name: $dotnet_filter does not give the output of VLC's $vlc_filter"
+}
+
+stereo_tone="$work/stereo.wav"
+surround_tone="$work/surround.wav"
+"$python" -I "$here/make-wav.py" "$stereo_tone" stereo
+"$python" -I "$here/make-wav.py" "$surround_tone" 5.1
+audio_parity gain-stereo "$stereo_tone" gain dotnet_gain --gain-value=0.5 --dotnet-gain-value=0.5
+audio_parity gain-5.1 "$surround_tone" gain dotnet_gain --gain-value=1.7 --dotnet-gain-value=1.7
+expect_log gain-5.1-dotnet 'Format: 48000 Hz, 6 to 6 channels' "the filter did not get the 6 channels"
+# The gain defaults to 1 (a float config default): the tone comes out as it went in.
+transcode_audio gain-default "$stereo_tone" dotnet_gain
+"$python" -I "$here/wavdiff.py" "$work/out/gain-stereo-none.wav" "$work/out/gain-default.wav" > /dev/null     || fail "gain-default: the gain default (a float config value) did not reach VLC"
+
 echo "== Playing the clip"
 play original "scene"
 
@@ -206,7 +247,8 @@ echo "== Per-frame allocations"
 expect_log blur-2-dotnet-1 'GaussianBlurPlugin: Frame allocations: none in [1-9]' "allocations were not measured"
 expect_log yadif-dotnet-1 'YadifPlugin: Frame allocations: none in [1-9]' "allocations were not measured"
 expect_log dotnet-overlay 'VideoOverlayFilter: Frame allocations: none in [1-9]' "allocations were not measured"
-# Any video filter, in any run above, whose frames allocated.
+expect_log gain-stereo-dotnet 'GainPlugin: Frame allocations: none in [1-9]' "allocations were not measured"
+# Any video or audio filter, in any run above, whose frames allocated.
 while IFS= read -r line; do
     fail "${line#*\[VLCLR\] }"
 done < <(grep -ahE '\[VLCLR\] [A-Za-z0-9_]+: Frame allocations: [0-9]+ bytes' "$work"/out/*.log | grep -v ' renders ' | sort -u)
