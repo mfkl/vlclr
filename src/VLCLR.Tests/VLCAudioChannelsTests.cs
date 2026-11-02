@@ -27,6 +27,28 @@ public class VLCAudioChannelsTests
         Assert.Equal(-1, VLCAudioChannels.IndexOf(VLCAudioChannels.Stereo, VLCAudioChannels.Center));
     }
 
+    [Fact]
+    public void ProposedChannels_KeepsAChannelMapAndIgnoresAmbisonics()
+    {
+        var stereo = new VLCAudioFormat
+        {
+            PhysicalChannels = VLCAudioChannels.Stereo,
+            ChannelType = (int)VLCLR.Native.Interop.AudioChannelType.Bitmap,
+        };
+        var ambisonics = stereo with { ChannelType = (int)VLCLR.Native.Interop.AudioChannelType.Ambisonics };
+
+        Assert.Equal(VLCAudioChannels.Stereo, VLCLR.Plugin.VLCAudioFilterBase.ProposedChannels(stereo));
+        Assert.Equal(0, VLCLR.Plugin.VLCAudioFilterBase.ProposedChannels(ambisonics));
+    }
+
+    [Fact]
+    public void Context_ReturnsTheProposedOutputChannels()
+    {
+        Assert.Equal(VLCAudioChannels.Stereo,
+            new VLCLR.Plugin.VLCAudioFilterContext(0, VLCAudioChannels.Stereo).ProposedOutputChannels);
+        Assert.Equal(0, new VLCLR.Plugin.VLCAudioFilterContext(0).ProposedOutputChannels);
+    }
+
     [Theory]
     [InlineData(0.5f)]
     [InlineData(1.7f)]
