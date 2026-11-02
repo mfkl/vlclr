@@ -29,6 +29,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
     private const string VLCVideoFilterBase = "VLCLR.Plugin.VLCVideoFilterBase";
     private const string VLCTextRendererBase = "VLCLR.Plugin.VLCTextRendererBase";
     private const string VLCInterfaceBase = "VLCLR.Plugin.VLCInterfaceBase";
+    private const string VLCAudioFilterBase = "VLCLR.Plugin.VLCAudioFilterBase";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -188,6 +189,11 @@ public class ModuleEntryGenerator : IIncrementalGenerator
                 filterType = FilterType.Interface;
                 break;
             }
+            else if (baseTypeName == VLCAudioFilterBase)
+            {
+                filterType = FilterType.AudioFilter;
+                break;
+            }
             baseType = baseType.BaseType;
         }
 
@@ -198,7 +204,8 @@ public class ModuleEntryGenerator : IIncrementalGenerator
             ModuleName = moduleName,
             Capability = capability ?? (filterType == FilterType.VideoFilter ? "video filter" :
                                        filterType == FilterType.TextRenderer ? "text renderer" :
-                                       filterType == FilterType.Interface ? "interface" : ""),
+                                       filterType == FilterType.Interface ? "interface" :
+                                       filterType == FilterType.AudioFilter ? "audio filter" : ""),
             Score = score,
             Description = description ?? $"{classSymbol.Name} {(filterType == FilterType.Interface ? "interface" : "filter")}",
             FilterType = filterType,
@@ -316,6 +323,10 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         {
             sb.AppendLine("            .WithSubcategory(VLCConfigSubcategory.SUBCAT_INTERFACE_CONTROL)");
         }
+        else if (info.Capability == "audio filter")
+        {
+            sb.AppendLine("            .WithSubcategory(VLCConfigSubcategory.SUBCAT_AUDIO_AFILTER)");
+        }
 
         // Generate config option calls
         foreach (var config in info.ConfigOptions)
@@ -354,6 +365,10 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         else if (info.FilterType == FilterType.Interface)
         {
             GenerateInterfaceCallbacks(sb, info);
+        }
+        else if (info.FilterType == FilterType.AudioFilter)
+        {
+            GenerateAudioFilterCallbacks(sb, info);
         }
 
         sb.AppendLine("}");
@@ -623,6 +638,101 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         sb.AppendLine("    }");
     }
 
+    private static void GenerateAudioFilterCallbacks(StringBuilder sb, ModuleInfo info)
+    {
+        // Helper to get instance from filter->p_sys
+        sb.AppendLine($"    private static {info.ClassName}? GetInstance(nint filterPtr)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        var context = new VLCFilterContext(filterPtr);");
+        sb.AppendLine("        var handlePtr = context.Sys;");
+        sb.AppendLine("        if (handlePtr == 0) return null;");
+        sb.AppendLine("        var handle = GCHandle.FromIntPtr(handlePtr);");
+        sb.AppendLine($"        return handle.Target as {info.ClassName};");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // FilterOpen - creates instance, stores GCHandle in filter->p_sys
+        sb.AppendLine("    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]");
+        sb.AppendLine("    private static unsafe int FilterOpen(nint filterPtr)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        var context = new VLCFilterContext(filterPtr);");
+        sb.AppendLine($"        {info.ClassName}? instance = null;");
+        sb.AppendLine("        GCHandle handle = default;");
+        sb.AppendLine("        var opened = false;");
+        sb.AppendLine("        try");
+        sb.AppendLine("        {");
+        sb.AppendLine($"            instance = new {info.ClassName}();");
+        sb.AppendLine("            handle = GCHandle.Alloc(instance);");
+        sb.AppendLine("            context.SetSys(GCHandle.ToIntPtr(handle));");
+        sb.AppendLine("            var result = instance.InternalOpen(filterPtr, &FilterAudioCallback, &FilterCloseCallback, &FilterFlushCallback);");
+        sb.AppendLine("            if (result != 0) return result;");
+        sb.AppendLine("            opened = true;");
+        sb.AppendLine("            return 0;");
+        sb.AppendLine("        }");
+        sb.AppendLine("        catch");
+        sb.AppendLine("        {");
+        sb.AppendLine("            return -1;");
+        sb.AppendLine("        }");
+        sb.AppendLine("        finally");
+        sb.AppendLine("        {");
+        sb.AppendLine("            if (!opened)");
+        sb.AppendLine("            {");
+        sb.AppendLine("                try { context.SetSys(0); context.SetOperations(0); } catch { }");
+        sb.AppendLine("                try { instance?.Dispose(); } catch { }");
+        sb.AppendLine("                try { if (handle.IsAllocated) handle.Free(); } catch { }");
+        sb.AppendLine("            }");
+        sb.AppendLine("        }");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // FilterAudioCallback - filter_audio: the input block, or what the filter returns in its place
+        sb.AppendLine("    [UnmanagedCallersOnly]");
+        sb.AppendLine("    private static nint FilterAudioCallback(nint filterPtr, nint blockPtr)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        try");
+        sb.AppendLine("        {");
+        sb.AppendLine("            var instance = GetInstance(filterPtr);");
+        sb.AppendLine("            if (instance is null) return blockPtr;");
+        sb.AppendLine("            return instance.InternalFilterAudio(filterPtr, blockPtr);");
+        sb.AppendLine("        }");
+        sb.AppendLine("        catch { return blockPtr; }");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // FilterFlushCallback - retrieves instance from filter->p_sys
+        sb.AppendLine("    [UnmanagedCallersOnly]");
+        sb.AppendLine("    private static void FilterFlushCallback(nint filterPtr)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        try { GetInstance(filterPtr)?.InternalFlush(filterPtr); } catch { }");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // FilterCloseCallback - retrieves instance, cleans up, frees GCHandle
+        sb.AppendLine("    [UnmanagedCallersOnly]");
+        sb.AppendLine("    private static void FilterCloseCallback(nint filterPtr)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        var context = new VLCFilterContext(filterPtr);");
+        sb.AppendLine("        GCHandle handle = default;");
+        sb.AppendLine($"        {info.ClassName}? instance = null;");
+        sb.AppendLine("        try");
+        sb.AppendLine("        {");
+        sb.AppendLine("            var handlePtr = context.Sys;");
+        sb.AppendLine("            if (handlePtr == 0) return;");
+        sb.AppendLine("            context.SetSys(0);");
+        sb.AppendLine("            handle = GCHandle.FromIntPtr(handlePtr);");
+        sb.AppendLine($"            instance = handle.Target as {info.ClassName};");
+        sb.AppendLine("            instance?.InternalClose(filterPtr);");
+        sb.AppendLine("        }");
+        sb.AppendLine("        catch { }");
+        sb.AppendLine("        finally");
+        sb.AppendLine("        {");
+        sb.AppendLine("            try { context.SetSys(0); context.SetOperations(0); } catch { }");
+        sb.AppendLine("            try { instance?.Dispose(); } catch { }");
+        sb.AppendLine("            try { if (handle.IsAllocated) handle.Free(); } catch { }");
+        sb.AppendLine("        }");
+        sb.AppendLine("    }");
+    }
+
     private static void GenerateTextRendererCallbacks(StringBuilder sb, ModuleInfo info)
     {
         // Helper to get instance from filter->p_sys
@@ -819,6 +929,7 @@ public class ModuleEntryGenerator : IIncrementalGenerator
         Unknown,
         VideoFilter,
         TextRenderer,
-        Interface
+        Interface,
+        AudioFilter
     }
 }
