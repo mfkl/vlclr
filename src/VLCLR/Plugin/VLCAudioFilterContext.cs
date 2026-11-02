@@ -14,11 +14,22 @@ namespace VLCLR.Plugin;
 public readonly struct VLCAudioFilterContext
 {
     private readonly nint _filterPtr;
+    private readonly ushort _proposedOutputChannels;
 
     /// <summary>Creates a context over a native <c>filter_t</c>.</summary>
     public VLCAudioFilterContext(nint filterPtr)
+        : this(filterPtr, 0)
+    {
+    }
+
+    /// <summary>
+    /// Creates a context over a native <c>filter_t</c>, with the output
+    /// channels VLC proposed when it created the filter.
+    /// </summary>
+    public VLCAudioFilterContext(nint filterPtr, ushort proposedOutputChannels)
     {
         _filterPtr = filterPtr;
+        _proposedOutputChannels = proposedOutputChannels;
     }
 
     /// <summary>A logger bound to this filter's VLC object.</summary>
@@ -41,6 +52,15 @@ public readonly struct VLCAudioFilterContext
 
     /// <summary>Output channels (<see cref="VLCAudioChannels"/> bits).</summary>
     public ushort OutputChannels => OutputFormat.PhysicalChannels;
+
+    /// <summary>
+    /// The output channels VLC proposed when it created the filter, before
+    /// the output was set to the input's layout: in playback the audio
+    /// device's layout, when transcoding the encoder's. 0 when VLC proposed
+    /// no channel map. A filter that mixes down itself (for example 5.1 to
+    /// the device's stereo) passes it to <see cref="SetOutputChannels"/>.
+    /// </summary>
+    public ushort ProposedOutputChannels => _proposedOutputChannels;
 
     /// <summary>
     /// Sets the output channels, for a filter that changes the layout (a

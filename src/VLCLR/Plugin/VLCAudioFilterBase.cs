@@ -23,6 +23,8 @@ namespace VLCLR.Plugin;
 /// processed in place; a filter that changes the layout calls
 /// <see cref="VLCAudioFilterContext.SetOutputChannels"/> in
 /// <see cref="OnOpen"/>, and gets a new output block for each input block.
+/// <see cref="VLCAudioFilterContext.ProposedOutputChannels"/> is the layout
+/// VLC converts to after the filters (the device's, the encoder's).
 /// </remarks>
 public abstract class VLCAudioFilterBase : IDisposable
 {
@@ -77,7 +79,6 @@ public abstract class VLCAudioFilterBase : IDisposable
         delegate* unmanaged<nint, void> close, delegate* unmanaged<nint, void> flush = null)
     {
         _filterPtr = filterPtr;
-        _context = new VLCAudioFilterContext(filterPtr);
         var filter = (VLCFilter*)filterPtr;
 
         // VLC asserts that a module that fails to open leaves both formats as
@@ -86,6 +87,11 @@ public abstract class VLCAudioFilterBase : IDisposable
         VLCAudioFormat outputFormat = filter->FormatOut->Audio;
         uint inputCodec = filter->FormatIn->Codec;
         uint outputCodec = filter->FormatOut->Codec;
+
+        // VLC proposes the format of what comes after the filters (the
+        // device, the encoder) as the output; the filter sees it through the
+        // context, since the output is set to the input's layout below.
+        _context = new VLCAudioFilterContext(filterPtr, ProposedChannels(outputFormat));
 
         try
         {
@@ -114,7 +120,8 @@ public abstract class VLCAudioFilterBase : IDisposable
             _inputChannelCount = VLCAudioChannels.Count(filter->FormatIn->Audio.PhysicalChannels);
             _outputChannelCount = VLCAudioChannels.Count(filter->FormatOut->Audio.PhysicalChannels);
             _context.Logger.Info(
-                $"[VLCLR] Format: {_context.Rate} Hz, {_inputChannelCount} to {_outputChannelCount} channels");
+                $"[VLCLR] Format: {_context.Rate} Hz, {_inputChannelCount} to {_outputChannelCount} channels"
+                + $" ({VLCAudioChannels.Count(_context.ProposedOutputChannels)} proposed)");
 
             _filterOps = new VLCFilterOperations
             {
@@ -224,6 +231,15 @@ public abstract class VLCAudioFilterBase : IDisposable
             return inPlace ? blockPtr : Drop(input, output);
         }
     }
+
+    /// <summary>
+    /// The channels of the output format VLC proposed, or 0 when it is not
+    /// a channel map (ambisonics, or no layout yet).
+    /// </summary>
+    internal static ushort ProposedChannels(in VLCAudioFormat proposed)
+        => proposed.ChannelType == (int)Interop.AudioChannelType.Bitmap
+            ? proposed.PhysicalChannels
+            : (ushort)0;
 
     private static unsafe nint Drop(Interop.Frame* input, Interop.Frame* output)
     {

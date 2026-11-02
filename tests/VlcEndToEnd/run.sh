@@ -192,11 +192,12 @@ clip="$progressive_clip"
 echo "== Comparing the ported audio filters with VLC's"
 # transcode_audio NAME TONE FILTER [OPTIONS...]: the tone through the audio
 # filter (none if empty), as 32-bit float in out/NAME.wav; no video.
+# transcode_options adds to the transcode{} options (e.g. channels=2).
 transcode_audio() {
     local name="$1" tone="$2" filter="$3" audio_option=""
     shift 3
     local out="$work/out/$name.wav"
-    run_vlc "$name" --no-video "$@" "$(native_path "$tone")"         --sout "#transcode{acodec=f32l${filter:+,afilter=$filter}}:std{access=file,mux=wav,dst=\"$(sout_path "$out")\"}"         vlc://quit
+    run_vlc "$name" --no-video "$@" "$(native_path "$tone")"         --sout "#transcode{acodec=f32l${transcode_options:+,$transcode_options}${filter:+,afilter=$filter}}:std{access=file,mux=wav,dst=\"$(sout_path "$out")\"}"         vlc://quit
     [ -s "$out" ] || fail "$name: no samples written"
 }
 
@@ -223,6 +224,10 @@ surround_tone="$work/surround.wav"
 audio_parity gain-stereo "$stereo_tone" gain dotnet_gain --gain-value=0.5 --dotnet-gain-value=0.5
 audio_parity gain-5.1 "$surround_tone" gain dotnet_gain --gain-value=1.7 --dotnet-gain-value=1.7
 expect_log gain-5.1-dotnet 'Format: 48000 Hz, 6 to 6 channels' "the filter did not get the 6 channels"
+# VLC proposes the layout of what follows the filters: the encoder's here.
+expect_log gain-5.1-dotnet '6 to 6 channels \(6 proposed\)' "the filter was not proposed the encoder's 6 channels"
+transcode_options=channels=2 transcode_audio gain-5.1-to-stereo "$surround_tone" dotnet_gain
+expect_log gain-5.1-to-stereo '6 to 6 channels \(2 proposed\)' "the filter was not proposed the encoder's stereo"
 # The gain defaults to 1 (a float config default): the tone comes out as it went in.
 transcode_audio gain-default "$stereo_tone" dotnet_gain
 "$python" -I "$here/wavdiff.py" "$work/out/gain-stereo-none.wav" "$work/out/gain-default.wav" > /dev/null     || fail "gain-default: the gain default (a float config value) did not reach VLC"
