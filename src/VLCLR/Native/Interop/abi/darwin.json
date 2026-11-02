@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "abi": "darwin",
   "target": "x86_64-apple-darwin",
-  "vlcCommit": "942cdaea17fc2daa9cb2b8098a3c9b8560aef1fb",
+  "vlcCommit": "c7834066e27cf07a2a15f1e8aab17c12df97e5d4",
   "pointerSize": 8,
   "headers": [
     "vlc_common.h",
@@ -11795,7 +11795,7 @@
       "name": "subs_format_t",
       "kind": "struct",
       "header": "vlc_es.h",
-      "size": 112,
+      "size": 104,
       "alignment": 8,
       "fields": [
         {
@@ -11810,28 +11810,12 @@
           "offset": 0
         },
         {
-          "name": "i_x_origin",
-          "type": {
-            "kind": "builtin",
-            "builtin": "int"
-          },
-          "offset": 8
-        },
-        {
-          "name": "i_y_origin",
-          "type": {
-            "kind": "builtin",
-            "builtin": "int"
-          },
-          "offset": 12
-        },
-        {
           "name": "spu",
           "type": {
             "kind": "record",
             "name": "subs_format_t::spu"
           },
-          "offset": 16
+          "offset": 8
         },
         {
           "name": "dvb",
@@ -11839,7 +11823,7 @@
             "kind": "record",
             "name": "subs_format_t::dvb"
           },
-          "offset": 92
+          "offset": 84
         },
         {
           "name": "teletext",
@@ -11847,7 +11831,7 @@
             "kind": "record",
             "name": "subs_format_t::teletext"
           },
-          "offset": 96
+          "offset": 88
         },
         {
           "name": "cc",
@@ -11855,7 +11839,7 @@
             "kind": "record",
             "name": "subs_format_t::cc"
           },
-          "offset": 100
+          "offset": 92
         },
         {
           "name": "b_forced",
@@ -11863,7 +11847,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 108
+          "offset": 100
         }
       ]
     },
@@ -40963,6 +40947,10 @@
         {
           "name": "VLC_ML_PLAYLIST_SET_FAVORITE",
           "value": 43
+        },
+        {
+          "name": "VLC_ML_CLEAR_HISTORY_BY_MEDIA_TYPE",
+          "value": 44
         }
       ]
     },
@@ -41841,6 +41829,14 @@
         {
           "name": "VLC_ML_SORTING_TRACKNUMBER",
           "value": 11
+        },
+        {
+          "name": "VLC_ML_SORTING_RATING",
+          "value": 12
+        },
+        {
+          "name": "VLC_ML_SORTING_TRACKNUMBER_ALBUM_RELEASE_YEAR",
+          "value": 13
         }
       ]
     },
@@ -90786,6 +90782,43 @@
       "callingConvention": "cdecl"
     },
     {
+      "name": "vlc_ml_clear_history_by_media_type",
+      "header": "vlc_media_library.h",
+      "returnType": {
+        "kind": "builtin",
+        "builtin": "int"
+      },
+      "parameters": [
+        {
+          "name": "p_ml",
+          "type": {
+            "kind": "pointer",
+            "element": {
+              "kind": "typedef",
+              "name": "vlc_medialibrary_t",
+              "element": {
+                "kind": "record",
+                "name": "vlc_medialibrary_t"
+              }
+            }
+          }
+        },
+        {
+          "name": "type",
+          "type": {
+            "kind": "typedef",
+            "name": "vlc_ml_media_type_t",
+            "element": {
+              "kind": "enum",
+              "name": "vlc_ml_media_type_t"
+            }
+          }
+        }
+      ],
+      "isInline": true,
+      "callingConvention": "cdecl"
+    },
+    {
       "name": "vlc_ml_control",
       "header": "vlc_media_library.h",
       "returnType": {
@@ -97725,6 +97758,7 @@
           }
         }
       ],
+      "isExported": true,
       "callingConvention": "cdecl"
     },
     {
@@ -101644,6 +101678,7 @@
           }
         }
       ],
+      "isExported": true,
       "callingConvention": "cdecl"
     },
     {
@@ -105469,6 +105504,7 @@
           }
         }
       ],
+      "isExported": true,
       "callingConvention": "cdecl"
     },
     {
