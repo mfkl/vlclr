@@ -491,7 +491,7 @@ public class VLCFilterTypesTests
     public unsafe void VLCFilter_OperationsOffset_CanBeWrittenAndRead()
     {
         // This test simulates what the filter does: writing the ops pointer
-        int opsOffset = OperatingSystem.IsWindows() ? 560 : 544;
+        int opsOffset = Native.Interop.Filter.Offsets.Ops;
         nint filterMemory = Marshal.AllocHGlobal(592);
         try
         {
@@ -566,7 +566,7 @@ public class VLCFilterTypesTests
 
             byte* picBase = (byte*)pictureMemory;
 
-            int planes = OperatingSystem.IsWindows() ? 152 : 144;
+            int planes = Native.Interop.Picture.Offsets.P;
 
             // Write chroma at offset 0
             *(uint*)(picBase + 0) = 0x30323449; // "I420"

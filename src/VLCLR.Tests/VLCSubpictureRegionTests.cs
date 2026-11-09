@@ -157,7 +157,7 @@ public class VLCSubpictureRegionTests
 
             byte* regionBase = (byte*)regionMemory;
 
-            int fmtEnd = OperatingSystem.IsWindows() ? 152 : 144;
+            int fmtEnd = Native.Interop.SubpictureRegion.Offsets.Picture;
 
             // Write Picture
             *(nint*)(regionBase + fmtEnd) = unchecked((nint)0xDEADBEEF);
