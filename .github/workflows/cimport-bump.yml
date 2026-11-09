@@ -1,6 +1,6 @@
 name: CImport bump
 
-# Regenerates the interop layer against the newest VLC 4 nightly, once a week,
+# Regenerates the interop layer against the newest VLC 4 nightly, once a day,
 # and opens or updates one PR (branch cimport/vlc-bump) when the generated code
 # changes. Most runs end in the first job: the nightly is the pin or was
 # already checked, or no libvlccore header changed. The PR merges itself
@@ -13,8 +13,8 @@ name: CImport bump
 
 on:
   schedule:
-    # Mondays, after the night's VLC builds are published.
-    - cron: "0 6 * * 1"
+    # Every morning, after the night's VLC builds are published.
+    - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
       vlc-commit:
