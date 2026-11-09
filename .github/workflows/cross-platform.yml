@@ -92,25 +92,32 @@ jobs:
       # PRs, except the bump PR from cimport-bump.yml, so VLC moving upstream
       # does not turn unrelated PRs red.
       - name: VLC nightly drift, interop layouts against the nightly headers
+        id: drift
         if: ${{ !cancelled() && runner.os != 'Windows' }}
         continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
         run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc/include
 
       - name: VLC nightly drift, interop layouts against the nightly headers (MSVC)
+        id: drift-msvc
         if: ${{ !cancelled() && runner.os == 'Windows' }}
         continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
         shell: cmd
         run: tests\AbiValidation\verify-vlc-abi.cmd artifacts\vlc\include
 
       - name: VLC nightly drift, interop layouts against the nightly headers (llvm-mingw)
+        id: drift-mingw
         if: ${{ !cancelled() && runner.os == 'Windows' }}
         continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' }}
         env:
           CC: x86_64-w64-mingw32-clang
         run: tests/AbiValidation/verify-vlc-abi.sh artifacts/vlc/include
 
+      # The plugins are built for the pinned layouts and run in the nightly, so
+      # once the nightly has drifted this step fails whatever the PR changes.
+      # Only then does it not block the PR; without drift it always blocks.
       - name: Run the plugins in VLC
         if: ${{ !cancelled() }}
+        continue-on-error: ${{ github.event_name == 'pull_request' && github.head_ref != 'cimport/vlc-bump' && (steps.drift.outcome == 'failure' || steps.drift-msvc.outcome == 'failure' || steps.drift-mingw.outcome == 'failure') }}
         env:
           PYTHON: ${{ runner.os == 'Windows' && 'python' || 'python3' }}
         run: tests/VlcEndToEnd/run.sh artifacts/vlc/vlc artifacts/vlc-e2e

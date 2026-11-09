@@ -124,9 +124,9 @@ generated files carry the commit too (the `*.g.cs` headers, `vlcCommit` in
    then open a PR. The `Cross-platform` workflow probes the layouts against
    the new pin on every OS and runs the plugins in VLC.
 
-### Weekly bump PR
+### Daily bump PR
 
-`.github/workflows/cimport-bump.yml` does the steps above every Monday at
+`.github/workflows/cimport-bump.yml` does the steps above every day at
 06:00 UTC, after the night's VLC builds are published:
 
 1. `check-vlc-nightly.sh` resolves the commit of the newest VLC 4 nightly. It
