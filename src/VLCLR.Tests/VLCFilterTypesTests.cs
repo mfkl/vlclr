@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using VLCLR.Native;
 using Xunit;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Tests;
 
@@ -17,35 +18,35 @@ public class VLCFilterTypesTests
     public void VLCPlane_Size_Is32Bytes()
     {
         // plane_t is 32 bytes on 64-bit (28 bytes data + 4 bytes padding)
-        Assert.Equal(32, Marshal.SizeOf<VLCPlane>());
+        Assert.Equal(Gen.Plane.MaxSizeOf, Marshal.SizeOf<VLCPlane>());
     }
 
     [Fact]
     public void VLCObjectHeader_Size_Is24Bytes()
     {
         // vlc_object_t header is 24 bytes on 64-bit
-        Assert.Equal(24, Marshal.SizeOf<VLCObjectHeader>());
+        Assert.Equal(Gen.ObjectHeader.MaxSizeOf, Marshal.SizeOf<VLCObjectHeader>());
     }
 
     [Fact]
     public void VLCFilterOperations_Size_Is48Bytes()
     {
         // 6 function pointers * 8 bytes = 48 bytes
-        Assert.Equal(48, Marshal.SizeOf<VLCFilterOperations>());
+        Assert.Equal(Gen.FilterOperations.MaxSizeOf, Marshal.SizeOf<VLCFilterOperations>());
     }
 
     [Fact]
     public void VLCFilterOwner_Size_Is24Bytes()
     {
         // 3 pointers * 8 bytes = 24 bytes
-        Assert.Equal(24, Marshal.SizeOf<VLCFilterOwner>());
+        Assert.Equal(Gen.FilterOwner.MaxSizeOf, Marshal.SizeOf<VLCFilterOwner>());
     }
 
     [Fact]
     public void VLCFilterVideoCallbacks_Size_Is16Bytes()
     {
         // 2 pointers * 8 bytes = 16 bytes
-        Assert.Equal(16, Marshal.SizeOf<VLCFilterVideoCallbacks>());
+        Assert.Equal(Gen.FilterVideoCallbacks.MaxSizeOf, Marshal.SizeOf<VLCFilterVideoCallbacks>());
     }
 
     #endregion
@@ -491,12 +492,12 @@ public class VLCFilterTypesTests
     public unsafe void VLCFilter_OperationsOffset_CanBeWrittenAndRead()
     {
         // This test simulates what the filter does: writing the ops pointer
-        int opsOffset = Native.Interop.Filter.Offsets.Ops;
-        nint filterMemory = Marshal.AllocHGlobal(592);
+        int opsOffset = Gen.Filter.Offsets.Ops;
+        nint filterMemory = Marshal.AllocHGlobal(Gen.Filter.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 592; i++)
+            for (int i = 0; i < Gen.Filter.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(filterMemory, i, 0);
             }
@@ -524,21 +525,19 @@ public class VLCFilterTypesTests
     public unsafe void VLCFilter_FormatInVideoChroma_CanBeReadFromNativeMemory()
     {
         // Simulate reading filter->fmt_in.video.i_chroma
-        nint filterMemory = Marshal.AllocHGlobal(592);
+        nint filterMemory = Marshal.AllocHGlobal(Gen.Filter.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 592; i++)
+            for (int i = 0; i < Gen.Filter.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(filterMemory, i, 0);
             }
 
-            // Write chroma at offset 96 (FormatIn.Video.Chroma)
-            // FormatIn is at offset 40, Video is at offset 56 within EsFormat
-            // So chroma is at 40 + 56 = 96
+            // Write FormatIn.Video.Chroma
             uint testChroma = 0x30323449; // "I420"
             byte* filterBase = (byte*)filterMemory;
-            *(uint*)(filterBase + 96) = testChroma;
+            *(uint*)(filterBase + Gen.Filter.Offsets.FmtIn + Gen.EsFormat.Offsets.Video + Gen.VideoFormat.Offsets.Chroma) = testChroma;
 
             // Read it back using struct access
             ref VLCFilter filter = ref *(VLCFilter*)filterMemory;
@@ -566,22 +565,23 @@ public class VLCFilterTypesTests
 
             byte* picBase = (byte*)pictureMemory;
 
-            int planes = Native.Interop.Picture.Offsets.P;
+            int format = Gen.Picture.Offsets.Format;
+            int planes = Gen.Picture.Offsets.P;
 
-            // Write chroma at offset 0
-            *(uint*)(picBase + 0) = 0x30323449; // "I420"
+            // Write chroma
+            *(uint*)(picBase + format + Gen.VideoFormat.Offsets.Chroma) = 0x30323449; // "I420"
 
-            // Write width at offset 4
-            *(uint*)(picBase + 4) = 1280;
+            // Write width
+            *(uint*)(picBase + format + Gen.VideoFormat.Offsets.Width) = 1280;
 
             // Write plane0.Pixels
-            *(nint*)(picBase + planes) = unchecked((nint)0xDEADBEEF);
+            *(nint*)(picBase + planes + Gen.Plane.Offsets.Pixels) = unchecked((nint)0xDEADBEEF);
 
-            // Write plane0.Pitch (Pitch offset 12 in plane_t)
-            *(int*)(picBase + planes + 12) = 1280;
+            // Write plane0.Pitch
+            *(int*)(picBase + planes + Gen.Plane.Offsets.Pitch) = 1280;
 
-            // Write PlaneCount after the 5 planes
-            *(int*)(picBase + planes + 160) = 3;
+            // Write PlaneCount
+            *(int*)(picBase + Gen.Picture.Offsets.Planes) = 3;
 
             // Read it back using struct access
             ref VLCPicture pic = ref *(VLCPicture*)pictureMemory;

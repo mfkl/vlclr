@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using VLCLR.Native;
 using Xunit;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Tests;
 
@@ -19,21 +20,21 @@ public class VLCSubpictureTests
         // i_channel (8) + i_order (8) + p_next (8) + regions (16) + i_start (8) + i_stop (8)
         // + 3 bytes flags + 1 padding + width (4) + height (4) + alpha (4)
         // + updater sys/ops (16) + p_private (8) = 96 bytes
-        Assert.Equal(96, Marshal.SizeOf<VLCSubpicture>());
+        Assert.Equal(Gen.Subpicture.MaxSizeOf, Marshal.SizeOf<VLCSubpicture>());
     }
 
     [Fact]
     public void VLCSubpictureUpdater_Size_Is16Bytes()
     {
         // subpicture_updater_t is 16 bytes on 64-bit (2 pointers)
-        Assert.Equal(16, Marshal.SizeOf<VLCSubpictureUpdater>());
+        Assert.Equal(Gen.SubpictureUpdater.MaxSizeOf, Marshal.SizeOf<VLCSubpictureUpdater>());
     }
 
     [Fact]
     public void VLCSubpictureUpdaterOps_Size_Is16Bytes()
     {
         // vlc_spu_updater_ops is 16 bytes on 64-bit (2 function pointers)
-        Assert.Equal(16, Marshal.SizeOf<VLCSubpictureUpdaterOps>());
+        Assert.Equal(Gen.SpuUpdaterOps.MaxSizeOf, Marshal.SizeOf<VLCSubpictureUpdaterOps>());
     }
 
     #endregion
@@ -263,37 +264,24 @@ public class VLCSubpictureTests
     [Fact]
     public unsafe void VLCSubpicture_FieldsCanBeWrittenAndReadFromNativeMemory()
     {
-        nint subpicMemory = Marshal.AllocHGlobal(104);
+        nint subpicMemory = Marshal.AllocHGlobal(Gen.Subpicture.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 104; i++)
+            for (int i = 0; i < Gen.Subpicture.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(subpicMemory, i, 0);
             }
 
             byte* subpicBase = (byte*)subpicMemory;
 
-            // Write Channel at offset 0
-            *(long*)(subpicBase + 0) = 42;
-
-            // Write Order at offset 8
-            *(long*)(subpicBase + 8) = 1234;
-
-            // Write Start at offset 40
-            *(long*)(subpicBase + 40) = 3 * VLCTick.Second;
-
-            // Write Stop at offset 48
-            *(long*)(subpicBase + 48) = 6 * VLCTick.Second;
-
-            // Write IsSubtitle at offset 58
-            *(byte*)(subpicBase + 58) = 1;
-
-            // Write OriginalPictureWidth at offset 60
-            *(uint*)(subpicBase + 60) = 1280;
-
-            // Write OriginalPictureHeight at offset 64
-            *(uint*)(subpicBase + 64) = 720;
+            *(long*)(subpicBase + Gen.Subpicture.Offsets.Channel) = 42;
+            *(long*)(subpicBase + Gen.Subpicture.Offsets.Order) = 1234;
+            *(long*)(subpicBase + Gen.Subpicture.Offsets.Start) = 3 * VLCTick.Second;
+            *(long*)(subpicBase + Gen.Subpicture.Offsets.Stop) = 6 * VLCTick.Second;
+            *(byte*)(subpicBase + Gen.Subpicture.Offsets.Subtitle) = 1;
+            *(uint*)(subpicBase + Gen.Subpicture.Offsets.OriginalPictureWidth) = 1280;
+            *(uint*)(subpicBase + Gen.Subpicture.Offsets.OriginalPictureHeight) = 720;
 
             // Read back using struct access
             ref VLCSubpicture subpic = ref *(VLCSubpicture*)subpicMemory;

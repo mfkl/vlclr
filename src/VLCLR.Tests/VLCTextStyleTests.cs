@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using VLCLR.Native;
 using Xunit;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Tests;
 
@@ -19,21 +20,21 @@ public class VLCTextStyleTests
         // 2 pointers (16) + 2 uint16 (4) + float (4) + int (4) + uint (4) + byte (1) + padding (3)
         // + int (4) + uint (4) + byte (1) + padding (3) + int (4) + uint (4) + byte (1) + padding (3)
         // + int (4) + uint (4) + byte (1) + padding (3) + enum/int (4) + padding (4) = 80 bytes
-        Assert.Equal(80, Marshal.SizeOf<VLCTextStyle>());
+        Assert.Equal(Gen.TextStyle.MaxSizeOf, Marshal.SizeOf<VLCTextStyle>());
     }
 
     [Fact]
     public void VLCTextSegment_Size_Is32Bytes()
     {
         // text_segment_t is 32 bytes on 64-bit (4 pointers)
-        Assert.Equal(32, Marshal.SizeOf<VLCTextSegment>());
+        Assert.Equal(Gen.TextSegment.MaxSizeOf, Marshal.SizeOf<VLCTextSegment>());
     }
 
     [Fact]
     public void VLCTextSegmentRuby_Size_Is24Bytes()
     {
         // text_segment_ruby_t is 24 bytes on 64-bit (3 pointers)
-        Assert.Equal(24, Marshal.SizeOf<VLCTextSegmentRuby>());
+        Assert.Equal(Gen.TextSegmentRuby.MaxSizeOf, Marshal.SizeOf<VLCTextSegmentRuby>());
     }
 
     #endregion
@@ -380,28 +381,21 @@ public class VLCTextStyleTests
     [Fact]
     public unsafe void VLCTextStyle_FieldsCanBeWrittenAndReadFromNativeMemory()
     {
-        nint styleMemory = Marshal.AllocHGlobal(80);
+        nint styleMemory = Marshal.AllocHGlobal(Gen.TextStyle.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 80; i++)
+            for (int i = 0; i < Gen.TextStyle.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(styleMemory, i, 0);
             }
 
             byte* styleBase = (byte*)styleMemory;
 
-            // Write font size at offset 24
-            *(int*)(styleBase + 24) = 32;
-
-            // Write font color at offset 28
-            *(uint*)(styleBase + 28) = 0x00FF0000;  // Red
-
-            // Write font alpha at offset 32
-            *(byte*)(styleBase + 32) = 0xFF;
-
-            // Write style flags at offset 18
-            *(ushort*)(styleBase + 18) = VLCTextStyleFlags.Bold | VLCTextStyleFlags.Italic;
+            *(int*)(styleBase + Gen.TextStyle.Offsets.FontSize) = 32;
+            *(uint*)(styleBase + Gen.TextStyle.Offsets.FontColor) = 0x00FF0000;  // Red
+            *(byte*)(styleBase + Gen.TextStyle.Offsets.FontAlpha) = 0xFF;
+            *(ushort*)(styleBase + Gen.TextStyle.Offsets.StyleFlags) = VLCTextStyleFlags.Bold | VLCTextStyleFlags.Italic;
 
             // Read back using struct access
             ref VLCTextStyle style = ref *(VLCTextStyle*)styleMemory;
