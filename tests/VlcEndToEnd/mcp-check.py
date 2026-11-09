@@ -133,6 +133,15 @@ def check(url, directory, volume):
            "search by word stems")
     expect(client.tool("search", query="spaceship").startswith("No moment matches"), "search with no match")
 
+    # VLC reports playing before its audio output has started, which took
+    # 2.8 s on a slow runner, and a seek answers after 2 s at most.
+    deadline = time.monotonic() + 30
+    while "time: not known yet" in client.tool("status"):
+        if time.monotonic() > deadline:
+            expect(False, "playback did not start")
+            break
+        time.sleep(0.25)
+
     # Seeks while playing: when paused, VLC updates the time of an audio-only
     # media only once it plays again.
     # Past what a TimeSpan holds: the start of the media.
