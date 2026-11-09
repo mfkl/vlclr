@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using VLCLR.Native;
 using Xunit;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Tests;
 
@@ -16,7 +17,7 @@ public class VLCSubpictureRegionTests
     public void VLCListNode_Size_Is16Bytes()
     {
         // vlc_list is 16 bytes on 64-bit (2 pointers)
-        Assert.Equal(16, Marshal.SizeOf<VLCListNode>());
+        Assert.Equal(Gen.List.MaxSizeOf, Marshal.SizeOf<VLCListNode>());
     }
 
     #endregion
@@ -146,36 +147,34 @@ public class VLCSubpictureRegionTests
     [Fact]
     public unsafe void VLCSubpictureRegion_FieldsCanBeWrittenAndReadFromNativeMemory()
     {
-        nint regionMemory = Marshal.AllocHGlobal(224);
+        nint regionMemory = Marshal.AllocHGlobal(Gen.SubpictureRegion.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 224; i++)
+            for (int i = 0; i < Gen.SubpictureRegion.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(regionMemory, i, 0);
             }
 
             byte* regionBase = (byte*)regionMemory;
 
-            int fmtEnd = Native.Interop.SubpictureRegion.Offsets.Picture;
-
             // Write Picture
-            *(nint*)(regionBase + fmtEnd) = unchecked((nint)0xDEADBEEF);
+            *(nint*)(regionBase + Gen.SubpictureRegion.Offsets.Picture) = unchecked((nint)0xDEADBEEF);
 
             // Write IsAbsolute
-            *(byte*)(regionBase + fmtEnd + 8) = 1;
+            *(byte*)(regionBase + Gen.SubpictureRegion.Offsets.Absolute) = 1;
 
             // Write X
-            *(int*)(regionBase + fmtEnd + 12) = 50;
+            *(int*)(regionBase + Gen.SubpictureRegion.Offsets.X) = 50;
 
             // Write Y
-            *(int*)(regionBase + fmtEnd + 16) = 100;
+            *(int*)(regionBase + Gen.SubpictureRegion.Offsets.Y) = 100;
 
             // Write Align
-            *(int*)(regionBase + fmtEnd + 20) = VLCSubpictureAlign.Bottom;
+            *(int*)(regionBase + Gen.SubpictureRegion.Offsets.Align) = VLCSubpictureAlign.Bottom;
 
             // Write Text
-            *(nint*)(regionBase + fmtEnd + 32) = unchecked((nint)0x12345678);
+            *(nint*)(regionBase + Gen.SubpictureRegion.Offsets.Text) = unchecked((nint)0x12345678);
 
             // Read back using struct access
             ref VLCSubpictureRegion region = ref *(VLCSubpictureRegion*)regionMemory;
@@ -197,26 +196,28 @@ public class VLCSubpictureRegionTests
     public unsafe void VLCSubpictureRegion_FormatChroma_CanBeAccessed()
     {
         // Verify we can access nested Format.Chroma field
-        nint regionMemory = Marshal.AllocHGlobal(224);
+        nint regionMemory = Marshal.AllocHGlobal(Gen.SubpictureRegion.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 224; i++)
+            for (int i = 0; i < Gen.SubpictureRegion.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(regionMemory, i, 0);
             }
 
             byte* regionBase = (byte*)regionMemory;
 
-            // Write Chroma at offset 0 (start of Format)
+            int format = Gen.SubpictureRegion.Offsets.Fmt;
+
+            // Write Chroma
             uint rgba = (uint)('R' | ('G' << 8) | ('B' << 16) | ('A' << 24));
-            *(uint*)(regionBase + 0) = rgba;
+            *(uint*)(regionBase + format + Gen.VideoFormat.Offsets.Chroma) = rgba;
 
-            // Write Width at offset 4
-            *(uint*)(regionBase + 4) = 1920;
+            // Write Width
+            *(uint*)(regionBase + format + Gen.VideoFormat.Offsets.Width) = 1920;
 
-            // Write Height at offset 8
-            *(uint*)(regionBase + 8) = 1080;
+            // Write Height
+            *(uint*)(regionBase + format + Gen.VideoFormat.Offsets.Height) = 1080;
 
             // Read back using struct access
             ref VLCSubpictureRegion region = ref *(VLCSubpictureRegion*)regionMemory;

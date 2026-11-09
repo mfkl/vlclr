@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using VLCLR.Native;
 using Xunit;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Tests;
 
@@ -16,14 +17,14 @@ public class VLCTextSegmentTests
     public void VLCTextSegment_Size_Is32Bytes()
     {
         // text_segment_t is 32 bytes on 64-bit (4 pointers)
-        Assert.Equal(32, Marshal.SizeOf<VLCTextSegment>());
+        Assert.Equal(Gen.TextSegment.MaxSizeOf, Marshal.SizeOf<VLCTextSegment>());
     }
 
     [Fact]
     public void VLCTextSegmentRuby_Size_Is24Bytes()
     {
         // text_segment_ruby_t is 24 bytes on 64-bit (3 pointers)
-        Assert.Equal(24, Marshal.SizeOf<VLCTextSegmentRuby>());
+        Assert.Equal(Gen.TextSegmentRuby.MaxSizeOf, Marshal.SizeOf<VLCTextSegmentRuby>());
     }
 
     #endregion
@@ -133,9 +134,9 @@ public class VLCTextSegmentTests
     public unsafe void VLCTextSegment_LinkedListCanBeTraversed()
     {
         // Simulate a linked list of 3 segments
-        nint segment1Memory = Marshal.AllocHGlobal(32);
-        nint segment2Memory = Marshal.AllocHGlobal(32);
-        nint segment3Memory = Marshal.AllocHGlobal(32);
+        nint segment1Memory = Marshal.AllocHGlobal(Gen.TextSegment.MaxSizeOf);
+        nint segment2Memory = Marshal.AllocHGlobal(Gen.TextSegment.MaxSizeOf);
+        nint segment3Memory = Marshal.AllocHGlobal(Gen.TextSegment.MaxSizeOf);
 
         try
         {
@@ -203,28 +204,21 @@ public class VLCTextSegmentTests
     [Fact]
     public unsafe void VLCTextSegment_FieldsCanBeWrittenAndReadFromNativeMemory()
     {
-        nint segmentMemory = Marshal.AllocHGlobal(32);
+        nint segmentMemory = Marshal.AllocHGlobal(Gen.TextSegment.MaxSizeOf);
         try
         {
             // Zero the memory
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < Gen.TextSegment.MaxSizeOf; i++)
             {
                 Marshal.WriteByte(segmentMemory, i, 0);
             }
 
             byte* segBase = (byte*)segmentMemory;
 
-            // Write text pointer at offset 0
-            *(nint*)(segBase + 0) = unchecked((nint)0xABCD1234);
-
-            // Write style pointer at offset 8
-            *(nint*)(segBase + 8) = unchecked((nint)0xDEADBEEF);
-
-            // Write next pointer at offset 16
-            *(nint*)(segBase + 16) = unchecked((nint)0x12345678);
-
-            // Write ruby pointer at offset 24
-            *(nint*)(segBase + 24) = unchecked((nint)0x87654321);
+            *(nint*)(segBase + Gen.TextSegment.Offsets.Text) = unchecked((nint)0xABCD1234);
+            *(nint*)(segBase + Gen.TextSegment.Offsets.Style) = unchecked((nint)0xDEADBEEF);
+            *(nint*)(segBase + Gen.TextSegment.Offsets.Next) = unchecked((nint)0x12345678);
+            *(nint*)(segBase + Gen.TextSegment.Offsets.Ruby) = unchecked((nint)0x87654321);
 
             // Read back using struct access
             ref VLCTextSegment segment = ref *(VLCTextSegment*)segmentMemory;

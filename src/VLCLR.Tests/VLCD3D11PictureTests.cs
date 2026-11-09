@@ -10,7 +10,7 @@ public sealed class VLCD3D11PictureTests
     [Fact]
     public void D3D11PictureStructures_MatchVlcX64Layout()
     {
-        Assert.Equal(24, Marshal.SizeOf<VLCPictureContext>());
+        Assert.Equal(VLCLR.Native.Interop.PictureContext.MaxSizeOf, Marshal.SizeOf<VLCPictureContext>());
         Assert.Equal(104, Marshal.SizeOf<VLCD3D11PictureSystem>());
         Assert.Equal(128, Marshal.SizeOf<VLCD3D11PictureContext>());
 

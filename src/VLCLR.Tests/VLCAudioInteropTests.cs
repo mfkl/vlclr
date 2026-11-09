@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using VLCLR.Native;
 using Xunit;
+using Gen = VLCLR.Native.Interop;
 
 namespace VLCLR.Tests;
 
@@ -9,19 +10,19 @@ public sealed class VLCAudioInteropTests
     [Fact]
     public void AudioFormatLayoutMatchesVlc4Headers()
     {
-        Assert.Equal(36, Marshal.SizeOf<VLCAudioFormat>());
-        Assert.Equal(0, Marshal.OffsetOf<VLCAudioFormat>(nameof(VLCAudioFormat.Format)).ToInt32());
-        Assert.Equal(4, Marshal.OffsetOf<VLCAudioFormat>(nameof(VLCAudioFormat.Rate)).ToInt32());
-        Assert.Equal(32, Marshal.OffsetOf<VLCAudioFormat>(nameof(VLCAudioFormat.Channels)).ToInt32());
+        Assert.Equal(Gen.AudioFormat.MaxSizeOf, Marshal.SizeOf<VLCAudioFormat>());
+        Assert.Equal(Gen.AudioFormat.Offsets.Format, Marshal.OffsetOf<VLCAudioFormat>(nameof(VLCAudioFormat.Format)).ToInt32());
+        Assert.Equal(Gen.AudioFormat.Offsets.Rate, Marshal.OffsetOf<VLCAudioFormat>(nameof(VLCAudioFormat.Rate)).ToInt32());
+        Assert.Equal(Gen.AudioFormat.Offsets.Channels, Marshal.OffsetOf<VLCAudioFormat>(nameof(VLCAudioFormat.Channels)).ToInt32());
     }
 
     [Fact]
     public void AudioBlockPrefixMatchesVlc4Headers()
     {
-        Assert.Equal(72, Marshal.SizeOf<VLCBlock>());
-        Assert.Equal(8, Marshal.OffsetOf<VLCBlock>(nameof(VLCBlock.Buffer)).ToInt32());
-        Assert.Equal(44, Marshal.OffsetOf<VLCBlock>(nameof(VLCBlock.SampleCount)).ToInt32());
-        Assert.Equal(48, Marshal.OffsetOf<VLCBlock>(nameof(VLCBlock.PresentationTimestamp)).ToInt32());
+        Assert.Equal(Gen.Frame.Offsets.Ancillaries, Marshal.SizeOf<VLCBlock>());
+        Assert.Equal(Gen.Frame.Offsets.Buffer, Marshal.OffsetOf<VLCBlock>(nameof(VLCBlock.Buffer)).ToInt32());
+        Assert.Equal(Gen.Frame.Offsets.NbSamples, Marshal.OffsetOf<VLCBlock>(nameof(VLCBlock.SampleCount)).ToInt32());
+        Assert.Equal(Gen.Frame.Offsets.Pts, Marshal.OffsetOf<VLCBlock>(nameof(VLCBlock.PresentationTimestamp)).ToInt32());
     }
 
     [Fact]
