@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "abi": "darwin",
   "target": "x86_64-apple-darwin",
-  "vlcCommit": "c7834066e27cf07a2a15f1e8aab17c12df97e5d4",
+  "vlcCommit": "978212a42d569a8d13fd83eae205e1bff4c7096d",
   "pointerSize": 8,
   "headers": [
     "vlc_common.h",
@@ -3207,7 +3207,7 @@
       "name": "decoder_t",
       "kind": "struct",
       "header": "vlc_codec.h",
-      "size": 328,
+      "size": 336,
       "alignment": 8,
       "fields": [
         {
@@ -3278,7 +3278,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 280
+          "offset": 288
         },
         {
           "name": "i_extra_picture_buffers",
@@ -3286,7 +3286,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 284
+          "offset": 292
         },
         {
           "name": "",
@@ -3294,7 +3294,7 @@
             "kind": "record",
             "name": "decoder_t::@0"
           },
-          "offset": 288,
+          "offset": 296,
           "isAnonymousMember": true
         },
         {
@@ -3328,7 +3328,7 @@
               }
             }
           },
-          "offset": 296
+          "offset": 304
         },
         {
           "name": "pf_get_cc",
@@ -3382,7 +3382,7 @@
               }
             }
           },
-          "offset": 304
+          "offset": 312
         },
         {
           "name": "p_description",
@@ -3397,7 +3397,7 @@
               }
             }
           },
-          "offset": 312
+          "offset": 320
         },
         {
           "name": "cbs",
@@ -3409,7 +3409,7 @@
               "isConst": true
             }
           },
-          "offset": 320
+          "offset": 328
         }
       ]
     },
@@ -3680,7 +3680,7 @@
       "name": "encoder_t",
       "kind": "struct",
       "header": "vlc_codec.h",
-      "size": 552,
+      "size": 568,
       "alignment": 8,
       "fields": [
         {
@@ -3742,7 +3742,7 @@
               }
             }
           },
-          "offset": 272
+          "offset": 280
         },
         {
           "name": "fmt_out",
@@ -3754,7 +3754,7 @@
               "name": "es_format_t"
             }
           },
-          "offset": 280
+          "offset": 288
         },
         {
           "name": "i_threads",
@@ -3762,7 +3762,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 512
+          "offset": 528
         },
         {
           "name": "i_iframes",
@@ -3770,7 +3770,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 516
+          "offset": 532
         },
         {
           "name": "i_bframes",
@@ -3778,7 +3778,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 520
+          "offset": 536
         },
         {
           "name": "i_tolerance",
@@ -3786,7 +3786,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 524
+          "offset": 540
         },
         {
           "name": "p_cfg",
@@ -3801,7 +3801,7 @@
               }
             }
           },
-          "offset": 528
+          "offset": 544
         },
         {
           "name": "ops",
@@ -3813,7 +3813,7 @@
               "isConst": true
             }
           },
-          "offset": 536
+          "offset": 552
         },
         {
           "name": "cbs",
@@ -3825,7 +3825,7 @@
               "isConst": true
             }
           },
-          "offset": 544
+          "offset": 560
         }
       ]
     },
@@ -3833,7 +3833,7 @@
       "name": "es_format_t",
       "kind": "struct",
       "header": "vlc_es.h",
-      "size": 232,
+      "size": 240,
       "alignment": 8,
       "fields": [
         {
@@ -3960,7 +3960,7 @@
             "kind": "builtin",
             "builtin": "uInt"
           },
-          "offset": 200
+          "offset": 208
         },
         {
           "name": "i_profile",
@@ -3968,7 +3968,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 204
+          "offset": 212
         },
         {
           "name": "i_level",
@@ -3976,7 +3976,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 208
+          "offset": 216
         },
         {
           "name": "b_packetized",
@@ -3984,7 +3984,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 212
+          "offset": 220
         },
         {
           "name": "i_extra",
@@ -4000,7 +4000,7 @@
               }
             }
           },
-          "offset": 216
+          "offset": 224
         },
         {
           "name": "p_extra",
@@ -4011,7 +4011,7 @@
               "builtin": "void"
             }
           },
-          "offset": 224
+          "offset": 232
         }
       ]
     },
@@ -4021,7 +4021,7 @@
       "header": "vlc_es.h",
       "isAnonymous": true,
       "parent": "es_format_t",
-      "size": 144,
+      "size": 152,
       "alignment": 8,
       "fields": [
         {
@@ -4727,7 +4727,7 @@
       "name": "filter_t",
       "kind": "struct",
       "header": "vlc_filter.h",
-      "size": 576,
+      "size": 592,
       "alignment": 8,
       "fields": [
         {
@@ -4789,7 +4789,7 @@
               }
             }
           },
-          "offset": 272
+          "offset": 280
         },
         {
           "name": "fmt_out",
@@ -4801,7 +4801,7 @@
               "name": "es_format_t"
             }
           },
-          "offset": 280
+          "offset": 288
         },
         {
           "name": "vctx_out",
@@ -4816,7 +4816,7 @@
               }
             }
           },
-          "offset": 512
+          "offset": 528
         },
         {
           "name": "b_allow_fmt_out_change",
@@ -4824,7 +4824,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 520
+          "offset": 536
         },
         {
           "name": "psz_name",
@@ -4836,7 +4836,7 @@
               "isConst": true
             }
           },
-          "offset": 528
+          "offset": 544
         },
         {
           "name": "p_cfg",
@@ -4852,7 +4852,7 @@
               "isConst": true
             }
           },
-          "offset": 536
+          "offset": 552
         },
         {
           "name": "ops",
@@ -4864,7 +4864,7 @@
               "isConst": true
             }
           },
-          "offset": 544
+          "offset": 560
         },
         {
           "name": "owner",
@@ -4876,7 +4876,7 @@
               "name": "filter_owner_t"
             }
           },
-          "offset": 552
+          "offset": 568
         }
       ]
     },
@@ -6263,7 +6263,7 @@
       "name": "input_item_es",
       "kind": "struct",
       "header": "vlc_input_item.h",
-      "size": 248,
+      "size": 256,
       "alignment": 8,
       "fields": [
         {
@@ -6287,7 +6287,7 @@
               "builtin": "char"
             }
           },
-          "offset": 232
+          "offset": 240
         },
         {
           "name": "id_stable",
@@ -6295,7 +6295,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 240
+          "offset": 248
         }
       ]
     },
@@ -8429,7 +8429,7 @@
       "name": "picture_t",
       "kind": "struct",
       "header": "vlc_picture.h",
-      "size": 368,
+      "size": 376,
       "alignment": 8,
       "fields": [
         {
@@ -8462,7 +8462,7 @@
             },
             "count": 5
           },
-          "offset": 144
+          "offset": 152
         },
         {
           "name": "i_planes",
@@ -8470,7 +8470,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 304
+          "offset": 312
         },
         {
           "name": "date",
@@ -8486,7 +8486,7 @@
               }
             }
           },
-          "offset": 312
+          "offset": 320
         },
         {
           "name": "b_force",
@@ -8494,7 +8494,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 320
+          "offset": 328
         },
         {
           "name": "b_still",
@@ -8502,7 +8502,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 321
+          "offset": 329
         },
         {
           "name": "b_progressive",
@@ -8510,7 +8510,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 322
+          "offset": 330
         },
         {
           "name": "b_top_field_first",
@@ -8518,7 +8518,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 323
+          "offset": 331
         },
         {
           "name": "b_multiview_left_eye",
@@ -8526,7 +8526,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 324
+          "offset": 332
         },
         {
           "name": "i_nb_fields",
@@ -8534,7 +8534,7 @@
             "kind": "builtin",
             "builtin": "uInt"
           },
-          "offset": 328
+          "offset": 336
         },
         {
           "name": "context",
@@ -8549,7 +8549,7 @@
               }
             }
           },
-          "offset": 336
+          "offset": 344
         },
         {
           "name": "p_sys",
@@ -8560,7 +8560,7 @@
               "builtin": "void"
             }
           },
-          "offset": 344
+          "offset": 352
         },
         {
           "name": "p_next",
@@ -8571,7 +8571,7 @@
               "name": "picture_t"
             }
           },
-          "offset": 352
+          "offset": 360
         },
         {
           "name": "refs",
@@ -8583,7 +8583,7 @@
               "name": "vlc_atomic_rc_t"
             }
           },
-          "offset": 360
+          "offset": 368
         }
       ]
     },
@@ -9695,7 +9695,7 @@
       "name": "sout_input_t",
       "kind": "struct",
       "header": "vlc_sout.h",
-      "size": 256,
+      "size": 264,
       "alignment": 8,
       "fields": [
         {
@@ -11460,7 +11460,7 @@
       "name": "subpicture_region_t",
       "kind": "struct",
       "header": "vlc_subpicture.h",
-      "size": 216,
+      "size": 224,
       "alignment": 8,
       "fields": [
         {
@@ -11488,7 +11488,7 @@
               }
             }
           },
-          "offset": 144
+          "offset": 152
         },
         {
           "name": "b_absolute",
@@ -11496,7 +11496,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 152
+          "offset": 160
         },
         {
           "name": "b_in_window",
@@ -11504,7 +11504,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 153
+          "offset": 161
         },
         {
           "name": "i_x",
@@ -11512,7 +11512,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 156
+          "offset": 164
         },
         {
           "name": "i_y",
@@ -11520,7 +11520,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 160
+          "offset": 168
         },
         {
           "name": "i_align",
@@ -11528,7 +11528,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 164
+          "offset": 172
         },
         {
           "name": "i_alpha",
@@ -11536,7 +11536,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 168
+          "offset": 176
         },
         {
           "name": "p_text",
@@ -11551,7 +11551,7 @@
               }
             }
           },
-          "offset": 176
+          "offset": 184
         },
         {
           "name": "text_flags",
@@ -11559,7 +11559,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 184
+          "offset": 192
         },
         {
           "name": "i_max_width",
@@ -11567,7 +11567,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 188
+          "offset": 196
         },
         {
           "name": "i_max_height",
@@ -11575,7 +11575,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 192
+          "offset": 200
         },
         {
           "name": "node",
@@ -11583,7 +11583,7 @@
             "kind": "record",
             "name": "vlc_list"
           },
-          "offset": 200
+          "offset": 208
         }
       ]
     },
@@ -12389,7 +12389,7 @@
       "name": "video_format_t",
       "kind": "struct",
       "header": "vlc_es.h",
-      "size": 144,
+      "size": 152,
       "alignment": 8,
       "fields": [
         {
@@ -12653,7 +12653,7 @@
               "builtin": "uInt"
             }
           },
-          "offset": 140
+          "offset": 144
         }
       ]
     },
@@ -12663,7 +12663,7 @@
       "header": "vlc_es.h",
       "isAnonymous": true,
       "parent": "video_format_t",
-      "size": 4,
+      "size": 8,
       "alignment": 4,
       "fields": [
         {
@@ -12739,6 +12739,26 @@
           "offset": 3,
           "bitOffset": 31,
           "bitWidth": 1
+        },
+        {
+          "name": "bl_signal_compatibility_id",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 4,
+          "bitOffset": 32,
+          "bitWidth": 4
+        },
+        {
+          "name": "md_compression",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 4,
+          "bitOffset": 36,
+          "bitWidth": 2
         }
       ]
     },
@@ -12886,7 +12906,7 @@
       "kind": "struct",
       "header": "vlc_video_splitter.h",
       "isTypedefNamed": true,
-      "size": 152,
+      "size": 160,
       "alignment": 8,
       "fields": [
         {
@@ -12910,7 +12930,7 @@
               "builtin": "char"
             }
           },
-          "offset": 144
+          "offset": 152
         }
       ]
     },
@@ -12918,7 +12938,7 @@
       "name": "video_splitter_t",
       "kind": "struct",
       "header": "vlc_video_splitter.h",
-      "size": 224,
+      "size": 232,
       "alignment": 8,
       "fields": [
         {
@@ -12977,7 +12997,7 @@
             "kind": "builtin",
             "builtin": "int"
           },
-          "offset": 184
+          "offset": 192
         },
         {
           "name": "p_output",
@@ -12992,7 +13012,7 @@
               }
             }
           },
-          "offset": 192
+          "offset": 200
         },
         {
           "name": "pf_filter",
@@ -13056,7 +13076,7 @@
               }
             }
           },
-          "offset": 200
+          "offset": 208
         },
         {
           "name": "mouse",
@@ -13106,7 +13126,7 @@
               }
             }
           },
-          "offset": 208
+          "offset": 216
         },
         {
           "name": "p_sys",
@@ -13117,7 +13137,7 @@
               "builtin": "void"
             }
           },
-          "offset": 216
+          "offset": 224
         }
       ]
     },
@@ -18194,7 +18214,7 @@
       "name": "vlc_gl_interop",
       "kind": "struct",
       "header": "vlc_opengl_interop.h",
-      "size": 520,
+      "size": 536,
       "alignment": 8,
       "fields": [
         {
@@ -18273,7 +18293,7 @@
               "name": "video_format_t"
             }
           },
-          "offset": 192
+          "offset": 200
         },
         {
           "name": "vctx",
@@ -18284,7 +18304,7 @@
               "name": "vlc_video_context"
             }
           },
-          "offset": 336
+          "offset": 352
         },
         {
           "name": "handle_texs_gen",
@@ -18292,7 +18312,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 344
+          "offset": 360
         },
         {
           "name": "texs",
@@ -18304,7 +18324,7 @@
             },
             "count": 5
           },
-          "offset": 348
+          "offset": 364
         },
         {
           "name": "tex_count",
@@ -18312,7 +18332,7 @@
             "kind": "builtin",
             "builtin": "uInt"
           },
-          "offset": 488
+          "offset": 504
         },
         {
           "name": "priv",
@@ -18323,7 +18343,7 @@
               "builtin": "void"
             }
           },
-          "offset": 496
+          "offset": 512
         },
         {
           "name": "ops",
@@ -18335,7 +18355,7 @@
               "isConst": true
             }
           },
-          "offset": 504
+          "offset": 520
         },
         {
           "name": "get_tex_format_size",
@@ -18408,7 +18428,7 @@
               }
             }
           },
-          "offset": 512
+          "offset": 528
         }
       ]
     },
@@ -19053,7 +19073,7 @@
       "name": "vlc_gl_sampler",
       "kind": "struct",
       "header": "vlc_opengl_sampler.h",
-      "size": 312,
+      "size": 320,
       "alignment": 8,
       "fields": [
         {
@@ -19112,7 +19132,7 @@
             "kind": "builtin",
             "builtin": "uInt"
           },
-          "offset": 184
+          "offset": 192
         },
         {
           "name": "tex_widths",
@@ -19128,7 +19148,7 @@
             },
             "count": 5
           },
-          "offset": 188
+          "offset": 196
         },
         {
           "name": "tex_heights",
@@ -19144,7 +19164,7 @@
             },
             "count": 5
           },
-          "offset": 208
+          "offset": 216
         },
         {
           "name": "tex_target",
@@ -19156,7 +19176,7 @@
               "builtin": "uInt"
             }
           },
-          "offset": 228
+          "offset": 236
         },
         {
           "name": "formats",
@@ -19172,7 +19192,7 @@
             },
             "count": 5
           },
-          "offset": 232
+          "offset": 240
         },
         {
           "name": "half_float",
@@ -19180,7 +19200,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 252
+          "offset": 260
         },
         {
           "name": "pic_to_tex_matrix",
@@ -19192,7 +19212,7 @@
               "isConst": true
             }
           },
-          "offset": 256
+          "offset": 264
         },
         {
           "name": "shader",
@@ -19200,7 +19220,7 @@
             "kind": "record",
             "name": "vlc_gl_sampler::shader"
           },
-          "offset": 264
+          "offset": 272
         },
         {
           "name": "ops",
@@ -19212,7 +19232,7 @@
               "isConst": true
             }
           },
-          "offset": 296
+          "offset": 304
         },
         {
           "name": "sys",
@@ -19223,7 +19243,7 @@
               "builtin": "void"
             }
           },
-          "offset": 304
+          "offset": 312
         }
       ]
     },
@@ -28009,7 +28029,7 @@
       "name": "vlc_player_track",
       "kind": "struct",
       "header": "vlc_player.h",
-      "size": 256,
+      "size": 264,
       "alignment": 8,
       "fields": [
         {
@@ -28057,7 +28077,7 @@
             "kind": "builtin",
             "builtin": "bool"
           },
-          "offset": 248
+          "offset": 256
         }
       ]
     },
@@ -34921,7 +34941,8 @@
             "kind": "pointer",
             "element": {
               "kind": "builtin",
-              "builtin": "char"
+              "builtin": "char",
+              "isConst": true
             }
           },
           "offset": 0
@@ -35006,7 +35027,7 @@
             "kind": "pointer",
             "element": {
               "kind": "builtin",
-              "builtin": "char"
+              "builtin": "void"
             }
           },
           "offset": 64
@@ -35017,7 +35038,7 @@
             "kind": "pointer",
             "element": {
               "kind": "builtin",
-              "builtin": "char"
+              "builtin": "void"
             }
           },
           "offset": 72

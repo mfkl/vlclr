@@ -3,7 +3,7 @@
   // and symbols (libvlccore's export list).
   "vlc": {
     "repository": "https://code.videolan.org/videolan/vlc.git",
-    "commit": "c7834066e27cf07a2a15f1e8aab17c12df97e5d4",
+    "commit": "978212a42d569a8d13fd83eae205e1bff4c7096d",
     "includeDir": "../../artifacts/vlc-headers/include",
     "symbols": "../../artifacts/vlc-headers/libvlccore.sym"
   },

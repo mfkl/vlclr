@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "abi": "windows",
   "target": "x86_64-w64-windows-gnu",
-  "vlcCommit": "c7834066e27cf07a2a15f1e8aab17c12df97e5d4",
+  "vlcCommit": "978212a42d569a8d13fd83eae205e1bff4c7096d",
   "pointerSize": 8,
   "headers": [
     "vlc_common.h",
@@ -12552,6 +12552,26 @@
           "offset": 5,
           "bitOffset": 47,
           "bitWidth": 1
+        },
+        {
+          "name": "bl_signal_compatibility_id",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 6,
+          "bitOffset": 48,
+          "bitWidth": 4
+        },
+        {
+          "name": "md_compression",
+          "type": {
+            "kind": "builtin",
+            "builtin": "uInt"
+          },
+          "offset": 6,
+          "bitOffset": 52,
+          "bitWidth": 2
         }
       ]
     },
@@ -34467,7 +34487,8 @@
             "kind": "pointer",
             "element": {
               "kind": "builtin",
-              "builtin": "char"
+              "builtin": "char",
+              "isConst": true
             }
           },
           "offset": 0
@@ -34552,7 +34573,7 @@
             "kind": "pointer",
             "element": {
               "kind": "builtin",
-              "builtin": "char"
+              "builtin": "void"
             }
           },
           "offset": 64
@@ -34563,7 +34584,7 @@
             "kind": "pointer",
             "element": {
               "kind": "builtin",
-              "builtin": "char"
+              "builtin": "void"
             }
           },
           "offset": 72
