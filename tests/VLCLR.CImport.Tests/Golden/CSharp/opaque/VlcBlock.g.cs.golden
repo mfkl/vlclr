@@ -13,7 +13,6 @@ public partial struct Block { }
 public unsafe partial struct Block
 {
     /// <summary>block_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "block_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(Block* block);
+    [DllImport("libvlccore", EntryPoint = "block_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(Block* block);
 }

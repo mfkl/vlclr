@@ -210,191 +210,154 @@ public enum PlaylistSortOrder : uint
 public static unsafe partial class VlcPlaylist
 {
     /// <summary>vlc_playlist_AddListener</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_AddListener")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PlaylistListenerId* AddListener(Playlist* playlist, PlaylistCallbacks* cbs, void* userdata, byte notify_current_state);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_AddListener", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PlaylistListenerId* AddListener(Playlist* playlist, PlaylistCallbacks* cbs, void* userdata, byte notify_current_state);
 
     /// <summary>vlc_playlist_Clear</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Clear")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Clear(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Clear", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Clear(Playlist* playlist);
 
     /// <summary>vlc_playlist_Count</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Count")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Count(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Count", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Count(Playlist* playlist);
 
     /// <summary>vlc_playlist_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Playlist* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Playlist* arg0);
 
     /// <summary>vlc_playlist_Export</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Export")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Export(Playlist* playlist, byte* filename, byte* type);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Export", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Export(Playlist* playlist, byte* filename, byte* type);
 
     /// <summary>vlc_playlist_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PlaylistItem* Get(Playlist* playlist, nuint index);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PlaylistItem* Get(Playlist* playlist, nuint index);
 
     /// <summary>vlc_playlist_GetCurrentIndex</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetCurrentIndex")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint GetCurrentIndex(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_GetCurrentIndex", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint GetCurrentIndex(Playlist* playlist);
 
     /// <summary>vlc_playlist_GetPlaybackOrder</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetPlaybackOrder")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PlaylistPlaybackOrder GetPlaybackOrder(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_GetPlaybackOrder", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PlaylistPlaybackOrder GetPlaybackOrder(Playlist* playlist);
 
     /// <summary>vlc_playlist_GetPlaybackRepeat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetPlaybackRepeat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PlaylistPlaybackRepeat GetPlaybackRepeat(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_GetPlaybackRepeat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PlaylistPlaybackRepeat GetPlaybackRepeat(Playlist* playlist);
 
     /// <summary>vlc_playlist_GetPlayer</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GetPlayer")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Player* GetPlayer(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_GetPlayer", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Player* GetPlayer(Playlist* playlist);
 
     /// <summary>vlc_playlist_GoTo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_GoTo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GoTo(Playlist* playlist, nint index);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_GoTo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GoTo(Playlist* playlist, nint index);
 
     /// <summary>vlc_playlist_HasNext</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_HasNext")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte HasNext(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_HasNext", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte HasNext(Playlist* playlist);
 
     /// <summary>vlc_playlist_HasPrev</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_HasPrev")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte HasPrev(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_HasPrev", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte HasPrev(Playlist* playlist);
 
     /// <summary>vlc_playlist_IndexOf</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_IndexOf")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint IndexOf(Playlist* playlist, PlaylistItem* item);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_IndexOf", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint IndexOf(Playlist* playlist, PlaylistItem* item);
 
     /// <summary>vlc_playlist_IndexOfId</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_IndexOfId")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint IndexOfId(Playlist* playlist, ulong id);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_IndexOfId", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint IndexOfId(Playlist* playlist, ulong id);
 
     /// <summary>vlc_playlist_IndexOfMedia</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_IndexOfMedia")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint IndexOfMedia(Playlist* playlist, InputItem* media);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_IndexOfMedia", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint IndexOfMedia(Playlist* playlist, InputItem* media);
 
     /// <summary>vlc_playlist_Lock</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Lock")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Lock(Playlist* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Lock", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Lock(Playlist* arg0);
 
     /// <summary>vlc_playlist_Move</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Move")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Move(Playlist* playlist, nuint index, nuint count, nuint target);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Move", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Move(Playlist* playlist, nuint index, nuint count, nuint target);
 
     /// <summary>vlc_playlist_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Playlist* New(ObjectHeader* parent, PlaylistPreparsing rec, uint preparse_max_threads, long preparse_timeout);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Playlist* New(ObjectHeader* parent, PlaylistPreparsing rec, uint preparse_max_threads, long preparse_timeout);
 
     /// <summary>vlc_playlist_Next</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Next")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Next(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Next", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Next(Playlist* playlist);
 
     /// <summary>vlc_playlist_Pause</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Pause")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Pause(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Pause", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Pause(Playlist* playlist);
 
     /// <summary>vlc_playlist_Prev</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Prev")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Prev(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Prev", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Prev(Playlist* playlist);
 
     /// <summary>vlc_playlist_Remove</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Remove")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Remove(Playlist* playlist, nuint index, nuint count);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Remove", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Remove(Playlist* playlist, nuint index, nuint count);
 
     /// <summary>vlc_playlist_RemoveListener</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_RemoveListener")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void RemoveListener(Playlist* playlist, PlaylistListenerId* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_RemoveListener", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void RemoveListener(Playlist* playlist, PlaylistListenerId* id);
 
     /// <summary>vlc_playlist_RequestGoTo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_RequestGoTo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int RequestGoTo(Playlist* playlist, PlaylistItem* item, nint index_hint);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_RequestGoTo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int RequestGoTo(Playlist* playlist, PlaylistItem* item, nint index_hint);
 
     /// <summary>vlc_playlist_Resume</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Resume")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Resume(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Resume", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Resume(Playlist* playlist);
 
     /// <summary>vlc_playlist_SetMediaStoppedAction</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_SetMediaStoppedAction")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetMediaStoppedAction(Playlist* playlist, PlaylistMediaStoppedAction action);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_SetMediaStoppedAction", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetMediaStoppedAction(Playlist* playlist, PlaylistMediaStoppedAction action);
 
     /// <summary>vlc_playlist_SetPlaybackOrder</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_SetPlaybackOrder")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetPlaybackOrder(Playlist* playlist, PlaylistPlaybackOrder order);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_SetPlaybackOrder", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetPlaybackOrder(Playlist* playlist, PlaylistPlaybackOrder order);
 
     /// <summary>vlc_playlist_SetPlaybackRepeat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_SetPlaybackRepeat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetPlaybackRepeat(Playlist* playlist, PlaylistPlaybackRepeat repeat);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_SetPlaybackRepeat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetPlaybackRepeat(Playlist* playlist, PlaylistPlaybackRepeat repeat);
 
     /// <summary>vlc_playlist_Shuffle</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Shuffle")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Shuffle(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Shuffle", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Shuffle(Playlist* playlist);
 
     /// <summary>vlc_playlist_Start</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Start")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Start(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Start", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Start(Playlist* playlist);
 
     /// <summary>vlc_playlist_Stop</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Stop")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Stop(Playlist* playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Stop", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Stop(Playlist* playlist);
 
     /// <summary>vlc_playlist_Unlock</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_Unlock")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Unlock(Playlist* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_Unlock", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Unlock(Playlist* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcPlaylistItem
 {
     /// <summary>vlc_playlist_item_GetId</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_GetId")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ulong GetId(PlaylistItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_item_GetId", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ulong GetId(PlaylistItem* arg0);
 
     /// <summary>vlc_playlist_item_GetMedia</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_GetMedia")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItem* GetMedia(PlaylistItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_item_GetMedia", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItem* GetMedia(PlaylistItem* arg0);
 
     /// <summary>vlc_playlist_item_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Hold(PlaylistItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_item_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Hold(PlaylistItem* arg0);
 
     /// <summary>vlc_playlist_item_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_item_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(PlaylistItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_item_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(PlaylistItem* arg0);
 }

@@ -126,12 +126,10 @@ public unsafe partial struct FingerprinterThread
 public static unsafe partial class Fingerprinter
 {
     /// <summary>fingerprinter_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "fingerprinter_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial FingerprinterThread* Create(ObjectHeader* p_this);
+    [DllImport("libvlccore", EntryPoint = "fingerprinter_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern FingerprinterThread* Create(ObjectHeader* p_this);
 
     /// <summary>fingerprinter_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "fingerprinter_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(FingerprinterThread* p_fingerprint);
+    [DllImport("libvlccore", EntryPoint = "fingerprinter_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(FingerprinterThread* p_fingerprint);
 }

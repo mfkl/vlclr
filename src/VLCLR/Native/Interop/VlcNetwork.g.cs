@@ -25,49 +25,40 @@ public unsafe partial struct VlcSockaddr
 public static unsafe partial class Net
 {
     /// <summary>net_Accept</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_Accept")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Accept(ObjectHeader* obj, int* fds);
+    [DllImport("libvlccore", EntryPoint = "net_Accept", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Accept(ObjectHeader* obj, int* fds);
 
     /// <summary>net_Connect</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_Connect")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Connect(ObjectHeader* p_this, byte* psz_host, int i_port, int socktype, int protocol);
+    [DllImport("libvlccore", EntryPoint = "net_Connect", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Connect(ObjectHeader* p_this, byte* psz_host, int i_port, int socktype, int protocol);
 
     /// <summary>net_ConnectDgram</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_ConnectDgram")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int ConnectDgram(ObjectHeader* p_this, byte* psz_host, uint i_port, int hlim, int proto);
+    [DllImport("libvlccore", EntryPoint = "net_ConnectDgram", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ConnectDgram(ObjectHeader* p_this, byte* psz_host, uint i_port, int hlim, int proto);
 
     /// <summary>net_Listen</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_Listen")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int* Listen(ObjectHeader* p_this, byte* psz_host, uint i_port, int socktype, int protocol);
+    [DllImport("libvlccore", EntryPoint = "net_Listen", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int* Listen(ObjectHeader* p_this, byte* psz_host, uint i_port, int socktype, int protocol);
 
     /// <summary>net_ListenClose</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_ListenClose")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ListenClose(int* fd);
+    [DllImport("libvlccore", EntryPoint = "net_ListenClose", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ListenClose(int* fd);
 
     /// <summary>net_OpenDgram</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_OpenDgram")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int OpenDgram(ObjectHeader* p_this, byte* psz_bind, uint i_bind, byte* psz_server, uint i_server, int proto);
+    [DllImport("libvlccore", EntryPoint = "net_OpenDgram", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int OpenDgram(ObjectHeader* p_this, byte* psz_bind, uint i_bind, byte* psz_server, uint i_server, int proto);
 
     /// <summary>net_Read</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_Read")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Read(ObjectHeader* p_this, int fd, void* p_data, nuint i_data);
+    [DllImport("libvlccore", EntryPoint = "net_Read", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Read(ObjectHeader* p_this, int fd, void* p_data, nuint i_data);
 
     /// <summary>net_SetCSCov</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_SetCSCov")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int SetCSCov(int fd, int sendcov, int recvcov);
+    [DllImport("libvlccore", EntryPoint = "net_SetCSCov", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int SetCSCov(int fd, int sendcov, int recvcov);
 
     /// <summary>net_Write</summary>
-    [LibraryImport("libvlccore", EntryPoint = "net_Write")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Write(ObjectHeader* p_this, int fd, void* p_data, nuint i_data);
+    [DllImport("libvlccore", EntryPoint = "net_Write", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Write(ObjectHeader* p_this, int fd, void* p_data, nuint i_data);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -96,32 +87,26 @@ public static unsafe partial class VlcNetwork
     public const int NoOldnames = 1;
 
     /// <summary>vlc_getProxyUrl</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_getProxyUrl")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcGetProxyUrl(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_getProxyUrl", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcGetProxyUrl(byte* arg0);
 
     /// <summary>vlc_getaddrinfo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_getaddrinfo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcGetaddrinfo(byte* node, uint i_port, Addrinfo* p_hints, Addrinfo** res);
+    [DllImport("libvlccore", EntryPoint = "vlc_getaddrinfo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcGetaddrinfo(byte* node, uint i_port, Addrinfo* p_hints, Addrinfo** res);
 
     /// <summary>vlc_getaddrinfo_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_getaddrinfo_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcGetaddrinfoI11e(byte* arg0, uint arg1, Addrinfo* arg2, Addrinfo** arg3);
+    [DllImport("libvlccore", EntryPoint = "vlc_getaddrinfo_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcGetaddrinfoI11e(byte* arg0, uint arg1, Addrinfo* arg2, Addrinfo** arg3);
 
     /// <summary>vlc_send</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_send")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcSend(int fd, void* buf, nuint buflen, int flags);
+    [DllImport("libvlccore", EntryPoint = "vlc_send", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcSend(int fd, void* buf, nuint buflen, int flags);
 
     /// <summary>vlc_sendmsg</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sendmsg")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcSendmsg(int fd, Msghdr* msg, int flags);
+    [DllImport("libvlccore", EntryPoint = "vlc_sendmsg", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcSendmsg(int fd, Msghdr* msg, int flags);
 
     /// <summary>vlc_socket</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_socket")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcSocket(int pf, int type, int proto, byte nonblock);
+    [DllImport("libvlccore", EntryPoint = "vlc_socket", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcSocket(int pf, int type, int proto, byte nonblock);
 }

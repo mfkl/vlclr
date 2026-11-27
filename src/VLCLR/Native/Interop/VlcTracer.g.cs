@@ -153,17 +153,14 @@ public enum TracerValueType : uint
 public static unsafe partial class VlcTracer
 {
     /// <summary>vlc_tracer_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tracer_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tracer* Create(ObjectHeader* parent, byte* name);
+    [DllImport("libvlccore", EntryPoint = "vlc_tracer_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tracer* Create(ObjectHeader* parent, byte* name);
 
     /// <summary>vlc_tracer_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tracer_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(Tracer* tracer);
+    [DllImport("libvlccore", EntryPoint = "vlc_tracer_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(Tracer* tracer);
 
     /// <summary>vlc_tracer_TraceWithTs</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tracer_TraceWithTs")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void TraceWithTs(Tracer* tracer, long ts, TracerTrace* trace);
+    [DllImport("libvlccore", EntryPoint = "vlc_tracer_TraceWithTs", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void TraceWithTs(Tracer* tracer, long ts, TracerTrace* trace);
 }

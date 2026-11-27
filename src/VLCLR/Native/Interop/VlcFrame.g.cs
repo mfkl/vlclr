@@ -114,54 +114,44 @@ public unsafe partial struct Frame
 public static unsafe partial class VlcFifo
 {
     /// <summary>vlc_fifo_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Fifo* arg0);
 
     /// <summary>vlc_fifo_DequeueAllUnlocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_DequeueAllUnlocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* DequeueAllUnlocked(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_DequeueAllUnlocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* DequeueAllUnlocked(Fifo* arg0);
 
     /// <summary>vlc_fifo_DequeueUnlocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_DequeueUnlocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* DequeueUnlocked(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_DequeueUnlocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* DequeueUnlocked(Fifo* arg0);
 
     /// <summary>vlc_fifo_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Get(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Get(Fifo* arg0);
 
     /// <summary>vlc_fifo_GetBytes</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_GetBytes")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint GetBytes(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_GetBytes", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint GetBytes(Fifo* arg0);
 
     /// <summary>vlc_fifo_GetCount</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_GetCount")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint GetCount(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_GetCount", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint GetCount(Fifo* arg0);
 
     /// <summary>vlc_fifo_Held</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Held")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte Held(Fifo* fifo);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_Held", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte Held(Fifo* fifo);
 
     /// <summary>vlc_fifo_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Fifo* New();
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Fifo* New();
 
     /// <summary>vlc_fifo_QueueUnlocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_QueueUnlocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void QueueUnlocked(Fifo* fifo, Frame* block);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_QueueUnlocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void QueueUnlocked(Fifo* fifo, Frame* block);
 
     /// <summary>vlc_fifo_Show</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fifo_Show")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Show(Fifo* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fifo_Show", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Show(Fifo* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -228,74 +218,62 @@ public static unsafe partial class VlcFrame
     public const int FrameFlagTypePb = 16;
 
     /// <summary>vlc_frame_Alloc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Alloc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Alloc(nuint size);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_Alloc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Alloc(nuint size);
 
     /// <summary>vlc_frame_CopyProperties</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_CopyProperties")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CopyProperties(Frame* dst, Frame* src);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_CopyProperties", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CopyProperties(Frame* dst, Frame* src);
 
     /// <summary>vlc_frame_File</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_File")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* File(int fd, byte write);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_File", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* File(int fd, byte write);
 
     /// <summary>vlc_frame_FilePath</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_FilePath")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* FilePath(byte* path, byte write);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_FilePath", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* FilePath(byte* path, byte write);
 
     /// <summary>vlc_frame_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Init(Frame* frame, FrameCallbacks* cbs, void* @base, nuint length);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Init(Frame* frame, FrameCallbacks* cbs, void* @base, nuint length);
 
     /// <summary>vlc_frame_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* New(FrameCallbacks* cbs, void* @base, nuint length);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* New(FrameCallbacks* cbs, void* @base, nuint length);
 
     /// <summary>vlc_frame_Realloc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Realloc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Realloc(Frame* frame, nint pre, nuint body);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_Realloc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Realloc(Frame* frame, nint pre, nuint body);
 
     /// <summary>vlc_frame_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(Frame* frame);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(Frame* frame);
 
     /// <summary>vlc_frame_TryRealloc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_TryRealloc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* TryRealloc(Frame* arg0, nint pre, nuint body);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_TryRealloc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* TryRealloc(Frame* arg0, nint pre, nuint body);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcFrameHeap
 {
     /// <summary>vlc_frame_heap_Alloc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_heap_Alloc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Alloc(void* addr, nuint length);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_heap_Alloc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Alloc(void* addr, nuint length);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcFrameMmap
 {
     /// <summary>vlc_frame_mmap_Alloc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_mmap_Alloc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Alloc(void* addr, nuint length);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_mmap_Alloc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Alloc(void* addr, nuint length);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcFrameShm
 {
     /// <summary>vlc_frame_shm_Alloc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_frame_shm_Alloc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Alloc(void* addr, nuint length);
+    [DllImport("libvlccore", EntryPoint = "vlc_frame_shm_Alloc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Alloc(void* addr, nuint length);
 }

@@ -220,72 +220,58 @@ public unsafe partial struct TlsServerOperations
 public static unsafe partial class VlcTls
 {
     /// <summary>vlc_tls_ClientCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_ClientCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TlsClient* ClientCreate(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_ClientCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TlsClient* ClientCreate(ObjectHeader* arg0);
 
     /// <summary>vlc_tls_ClientDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_ClientDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ClientDelete(TlsClient* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_ClientDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ClientDelete(TlsClient* arg0);
 
     /// <summary>vlc_tls_ClientSessionCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_ClientSessionCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tls* ClientSessionCreate(TlsClient* creds, Tls* sock, byte* hostname, byte* service, byte** alpn, byte** alp);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_ClientSessionCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tls* ClientSessionCreate(TlsClient* creds, Tls* sock, byte* hostname, byte* service, byte** alpn, byte** alp);
 
     /// <summary>vlc_tls_GetLine</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_GetLine")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetLine(Tls* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_GetLine", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetLine(Tls* arg0);
 
     /// <summary>vlc_tls_Read</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_Read")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Read(Tls* tls, void* buf, nuint len, byte waitall);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_Read", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Read(Tls* tls, void* buf, nuint len, byte waitall);
 
     /// <summary>vlc_tls_ServerCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_ServerCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TlsServer* ServerCreate(ObjectHeader* tls, byte* cert, byte* key);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_ServerCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TlsServer* ServerCreate(ObjectHeader* tls, byte* cert, byte* key);
 
     /// <summary>vlc_tls_ServerDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_ServerDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ServerDelete(TlsServer* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_ServerDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ServerDelete(TlsServer* arg0);
 
     /// <summary>vlc_tls_ServerSessionCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_ServerSessionCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tls* ServerSessionCreate(TlsServer* creds, Tls* sock, byte** alpn);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_ServerSessionCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tls* ServerSessionCreate(TlsServer* creds, Tls* sock, byte** alpn);
 
     /// <summary>vlc_tls_SessionDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_SessionDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SessionDelete(Tls* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_SessionDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SessionDelete(Tls* arg0);
 
     /// <summary>vlc_tls_SocketOpen</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_SocketOpen")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tls* SocketOpen(int fd);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_SocketOpen", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tls* SocketOpen(int fd);
 
     /// <summary>vlc_tls_SocketOpenAddrInfo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_SocketOpenAddrInfo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tls* SocketOpenAddrInfo(Addrinfo* ai, byte defer_connect);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_SocketOpenAddrInfo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tls* SocketOpenAddrInfo(Addrinfo* ai, byte defer_connect);
 
     /// <summary>vlc_tls_SocketOpenTCP</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_SocketOpenTCP")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tls* SocketOpenTCP(ObjectHeader* obj, byte* hostname, uint port);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_SocketOpenTCP", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tls* SocketOpenTCP(ObjectHeader* obj, byte* hostname, uint port);
 
     /// <summary>vlc_tls_SocketOpenTLS</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_SocketOpenTLS")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Tls* SocketOpenTLS(TlsClient* crd, byte* hostname, uint port, byte* service, byte** alpn, byte** alp);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_SocketOpenTLS", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Tls* SocketOpenTLS(TlsClient* crd, byte* hostname, uint port, byte* service, byte** alpn, byte** alp);
 
     /// <summary>vlc_tls_Write</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tls_Write")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Write(Tls* arg0, void* buf, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_tls_Write", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Write(Tls* arg0, void* buf, nuint len);
 }

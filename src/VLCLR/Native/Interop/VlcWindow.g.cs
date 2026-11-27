@@ -449,42 +449,34 @@ public enum WindowType : uint
 public static unsafe partial class VlcWindow
 {
     /// <summary>vlc_window_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Window* window);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Window* window);
 
     /// <summary>vlc_window_Disable</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_Disable")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Disable(Window* window);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_Disable", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Disable(Window* window);
 
     /// <summary>vlc_window_Enable</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_Enable")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Enable(Window* window);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_Enable", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Enable(Window* window);
 
     /// <summary>vlc_window_ReportFullscreen</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_ReportFullscreen")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ReportFullscreen(Window* wnd, byte* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_ReportFullscreen", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ReportFullscreen(Window* wnd, byte* id);
 
     /// <summary>vlc_window_ReportWindowed</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_ReportWindowed")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ReportWindowed(Window* wnd);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_ReportWindowed", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ReportWindowed(Window* wnd);
 
     /// <summary>vlc_window_SetFullScreen</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_SetFullScreen")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetFullScreen(Window* window, byte* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_SetFullScreen", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetFullScreen(Window* window, byte* id);
 
     /// <summary>vlc_window_SetSize</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_SetSize")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetSize(Window* window, uint width, uint height);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_SetSize", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetSize(Window* window, uint width, uint height);
 
     /// <summary>vlc_window_UnsetFullScreen</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_window_UnsetFullScreen")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void UnsetFullScreen(Window* window);
+    [DllImport("libvlccore", EntryPoint = "vlc_window_UnsetFullScreen", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void UnsetFullScreen(Window* window);
 }

@@ -34,47 +34,38 @@ public unsafe partial struct Spu
 public unsafe partial struct Spu
 {
     /// <summary>spu_ChangeFilters</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_ChangeFilters")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChangeFilters(Spu* arg0, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "spu_ChangeFilters", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChangeFilters(Spu* arg0, byte* arg1);
 
     /// <summary>spu_ChangeSources</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_ChangeSources")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChangeSources(Spu* arg0, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "spu_ChangeSources", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChangeSources(Spu* arg0, byte* arg1);
 
     /// <summary>spu_ClearChannel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_ClearChannel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ClearChannel(Spu* arg0, nuint arg1);
+    [DllImport("libvlccore", EntryPoint = "spu_ClearChannel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ClearChannel(Spu* arg0, nuint arg1);
 
     /// <summary>spu_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Spu* Create(ObjectHeader* arg0, VoutThread* arg1);
+    [DllImport("libvlccore", EntryPoint = "spu_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Spu* Create(ObjectHeader* arg0, VoutThread* arg1);
 
     /// <summary>spu_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(Spu* arg0);
+    [DllImport("libvlccore", EntryPoint = "spu_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(Spu* arg0);
 
     /// <summary>spu_PutSubpicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_PutSubpicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PutSubpicture(Spu* arg0, Subpicture* arg1);
+    [DllImport("libvlccore", EntryPoint = "spu_PutSubpicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PutSubpicture(Spu* arg0, Subpicture* arg1);
 
     /// <summary>spu_RegisterChannel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_RegisterChannel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint RegisterChannel(Spu* arg0);
+    [DllImport("libvlccore", EntryPoint = "spu_RegisterChannel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint RegisterChannel(Spu* arg0);
 
     /// <summary>spu_Render</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_Render")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial RenderSubpicture* Render(Spu* spu, uint* p_chroma_list, VideoFormat* p_fmt_dst, VideoFormat* p_fmt_src, byte spu_in_full_window, VoutDisplayPlace* video_position, long system_now, long pts, byte ignore_osd);
+    [DllImport("libvlccore", EntryPoint = "spu_Render", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern RenderSubpicture* Render(Spu* spu, uint* p_chroma_list, VideoFormat* p_fmt_dst, VideoFormat* p_fmt_src, byte spu_in_full_window, VoutDisplayPlace* video_position, long system_now, long pts, byte ignore_osd);
 
     /// <summary>spu_UnregisterChannel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "spu_UnregisterChannel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void UnregisterChannel(Spu* arg0, nuint arg1);
+    [DllImport("libvlccore", EntryPoint = "spu_UnregisterChannel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void UnregisterChannel(Spu* arg0, nuint arg1);
 }

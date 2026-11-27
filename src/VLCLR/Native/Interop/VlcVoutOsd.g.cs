@@ -33,22 +33,18 @@ public enum OsdWidgetType : uint
 public static unsafe partial class Vout
 {
     /// <summary>vout_OSDEpg</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_OSDEpg")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int OSDEpg(VoutThread* vout, InputItem* input);
+    [DllImport("libvlccore", EntryPoint = "vout_OSDEpg", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int OSDEpg(VoutThread* vout, InputItem* input);
 
     /// <summary>vout_OSDIcon</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_OSDIcon")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void OSDIcon(VoutThread* p_this, int i_channel, OsdWidgetType i_type);
+    [DllImport("libvlccore", EntryPoint = "vout_OSDIcon", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void OSDIcon(VoutThread* p_this, int i_channel, OsdWidgetType i_type);
 
     /// <summary>vout_OSDSlider</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_OSDSlider")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void OSDSlider(VoutThread* p_this, int i_channel, int i_position, OsdWidgetType i_type);
+    [DllImport("libvlccore", EntryPoint = "vout_OSDSlider", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void OSDSlider(VoutThread* p_this, int i_channel, int i_position, OsdWidgetType i_type);
 
     /// <summary>vout_OSDText</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_OSDText")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void OSDText(VoutThread* vout, int channel, int position, long duration, byte* text);
+    [DllImport("libvlccore", EntryPoint = "vout_OSDText", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void OSDText(VoutThread* vout, int channel, int position, long duration, byte* text);
 }

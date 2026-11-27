@@ -168,31 +168,26 @@ public enum GlApiType : uint
 public static unsafe partial class VlcGl
 {
     /// <summary>vlc_gl_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_gl_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Gl* Create(VoutDisplayCfg* cfg, uint flags, byte* name, GlCfg* gl_cfg);
+    [DllImport("libvlccore", EntryPoint = "vlc_gl_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Gl* Create(VoutDisplayCfg* cfg, uint flags, byte* name, GlCfg* gl_cfg);
 
     /// <summary>vlc_gl_CreateOffscreen</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_gl_CreateOffscreen")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Gl* CreateOffscreen(ObjectHeader* parent, DecoderDevice* device, uint width, uint height, uint flags, byte* name, GlCfg* gl_cfg);
+    [DllImport("libvlccore", EntryPoint = "vlc_gl_CreateOffscreen", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Gl* CreateOffscreen(ObjectHeader* parent, DecoderDevice* device, uint width, uint height, uint flags, byte* name, GlCfg* gl_cfg);
 
     /// <summary>vlc_gl_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_gl_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Gl* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_gl_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Gl* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcGlSurface
 {
     /// <summary>vlc_gl_surface_CheckSize</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_gl_surface_CheckSize")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte CheckSize(Gl* arg0, uint* w, uint* h);
+    [DllImport("libvlccore", EntryPoint = "vlc_gl_surface_CheckSize", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte CheckSize(Gl* arg0, uint* w, uint* h);
 
     /// <summary>vlc_gl_surface_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_gl_surface_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(Gl* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_gl_surface_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(Gl* arg0);
 }

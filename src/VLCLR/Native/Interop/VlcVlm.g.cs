@@ -326,32 +326,26 @@ public enum VlmState : uint
 public unsafe partial struct Vlm
 {
     /// <summary>vlm_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlm_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Vlm* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlm_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Vlm* arg0);
 
     /// <summary>vlm_ExecuteCommand</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlm_ExecuteCommand")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int ExecuteCommand(Vlm* arg0, byte* arg1, VlmMessage** arg2);
+    [DllImport("libvlccore", EntryPoint = "vlm_ExecuteCommand", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ExecuteCommand(Vlm* arg0, byte* arg1, VlmMessage** arg2);
 
     /// <summary>vlm_MessageAdd</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlm_MessageAdd")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VlmMessage* MessageAdd(VlmMessage* arg0, VlmMessage* arg1);
+    [DllImport("libvlccore", EntryPoint = "vlm_MessageAdd", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VlmMessage* MessageAdd(VlmMessage* arg0, VlmMessage* arg1);
 
     /// <summary>vlm_MessageDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlm_MessageDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void MessageDelete(VlmMessage* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlm_MessageDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MessageDelete(VlmMessage* arg0);
 
     /// <summary>vlm_MessageSimpleNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlm_MessageSimpleNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VlmMessage* MessageSimpleNew(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlm_MessageSimpleNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VlmMessage* MessageSimpleNew(byte* arg0);
 
     /// <summary>vlm_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlm_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Vlm* New(LibvlcInt* arg0, byte* path);
+    [DllImport("libvlccore", EntryPoint = "vlm_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Vlm* New(LibvlcInt* arg0, byte* path);
 }

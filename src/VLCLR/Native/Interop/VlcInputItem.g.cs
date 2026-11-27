@@ -661,233 +661,189 @@ public enum SlaveType : uint
 public unsafe partial struct InputItem
 {
     /// <summary>input_item_AddOpaque</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_AddOpaque")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int AddOpaque(InputItem* arg0, byte* arg1, void* arg2);
+    [DllImport("libvlccore", EntryPoint = "input_item_AddOpaque", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int AddOpaque(InputItem* arg0, byte* arg1, void* arg2);
 
     /// <summary>input_item_AddOption</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_AddOption")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int AddOption(InputItem* arg0, byte* arg1, uint i_flags);
+    [DllImport("libvlccore", EntryPoint = "input_item_AddOption", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int AddOption(InputItem* arg0, byte* arg1, uint i_flags);
 
     /// <summary>input_item_AddOptions</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_AddOptions")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int AddOptions(InputItem* arg0, int i_options, byte** ppsz_options, uint i_flags);
+    [DllImport("libvlccore", EntryPoint = "input_item_AddOptions", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int AddOptions(InputItem* arg0, int i_options, byte** ppsz_options, uint i_flags);
 
     /// <summary>input_item_AddSlave</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_AddSlave")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int AddSlave(InputItem* arg0, InputItemSlave* arg1);
+    [DllImport("libvlccore", EntryPoint = "input_item_AddSlave", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int AddSlave(InputItem* arg0, InputItemSlave* arg1);
 
     /// <summary>input_item_Copy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_Copy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItem* Copy(InputItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "input_item_Copy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItem* Copy(InputItem* arg0);
 
     /// <summary>input_item_CopyOptions</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_CopyOptions")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CopyOptions(InputItem* p_child, InputItem* p_parent);
+    [DllImport("libvlccore", EntryPoint = "input_item_CopyOptions", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CopyOptions(InputItem* p_child, InputItem* p_parent);
 
     /// <summary>input_item_CreateFilename</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_CreateFilename")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* CreateFilename(InputItem* arg0, byte* psz_path, byte* psz_prefix, byte* psz_extension);
+    [DllImport("libvlccore", EntryPoint = "input_item_CreateFilename", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* CreateFilename(InputItem* arg0, byte* psz_path, byte* psz_prefix, byte* psz_extension);
 
     /// <summary>input_item_DelInfo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_DelInfo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int DelInfo(InputItem* p_i, byte* psz_cat, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "input_item_DelInfo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int DelInfo(InputItem* p_i, byte* psz_cat, byte* psz_name);
 
     /// <summary>input_item_GetDuration</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetDuration")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial long GetDuration(InputItem* p_i);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetDuration", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern long GetDuration(InputItem* p_i);
 
     /// <summary>input_item_GetInfo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetInfo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetInfo(InputItem* p_i, byte* psz_cat, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetInfo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetInfo(InputItem* p_i, byte* psz_cat, byte* psz_name);
 
     /// <summary>input_item_GetInfoLocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetInfoLocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetInfoLocked(InputItem* p_i, byte* psz_cat, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetInfoLocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetInfoLocked(InputItem* p_i, byte* psz_cat, byte* psz_name);
 
     /// <summary>input_item_GetMeta</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMeta")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetMeta(InputItem* p_i, MetaType meta_type);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetMeta", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetMeta(InputItem* p_i, MetaType meta_type);
 
     /// <summary>input_item_GetMetaExtra</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMetaExtra")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetMetaExtra(InputItem* p_i, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetMetaExtra", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetMetaExtra(InputItem* p_i, byte* psz_name);
 
     /// <summary>input_item_GetMetaExtraNames</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMetaExtraNames")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint GetMetaExtraNames(InputItem* p_i, byte*** pppsz_names);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetMetaExtraNames", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint GetMetaExtraNames(InputItem* p_i, byte*** pppsz_names);
 
     /// <summary>input_item_GetMetaLocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetMetaLocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetMetaLocked(InputItem* arg0, MetaType meta_type);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetMetaLocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetMetaLocked(InputItem* arg0, MetaType meta_type);
 
     /// <summary>input_item_GetName</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetName")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetName(InputItem* p_i);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetName", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetName(InputItem* p_i);
 
     /// <summary>input_item_GetNowPlayingFb</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetNowPlayingFb")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetNowPlayingFb(InputItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetNowPlayingFb", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetNowPlayingFb(InputItem* p_item);
 
     /// <summary>input_item_GetTitleFbName</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetTitleFbName")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetTitleFbName(InputItem* p_i);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetTitleFbName", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetTitleFbName(InputItem* p_i);
 
     /// <summary>input_item_GetURI</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_GetURI")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetURI(InputItem* p_i);
+    [DllImport("libvlccore", EntryPoint = "input_item_GetURI", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetURI(InputItem* p_i);
 
     /// <summary>input_item_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItem* Hold(InputItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "input_item_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItem* Hold(InputItem* arg0);
 
     /// <summary>input_item_IsArtFetched</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_IsArtFetched")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsArtFetched(InputItem* p_i);
+    [DllImport("libvlccore", EntryPoint = "input_item_IsArtFetched", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsArtFetched(InputItem* p_i);
 
     /// <summary>input_item_IsPreparsed</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_IsPreparsed")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsPreparsed(InputItem* p_i);
+    [DllImport("libvlccore", EntryPoint = "input_item_IsPreparsed", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsPreparsed(InputItem* p_i);
 
     /// <summary>input_item_MergeInfos</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_MergeInfos")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void MergeInfos(InputItem* arg0, InfoCategory* arg1);
+    [DllImport("libvlccore", EntryPoint = "input_item_MergeInfos", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MergeInfos(InputItem* arg0, InfoCategory* arg1);
 
     /// <summary>input_item_MetaMatch</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_MetaMatch")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte MetaMatch(InputItem* p_i, MetaType meta_type, byte* psz);
+    [DllImport("libvlccore", EntryPoint = "input_item_MetaMatch", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte MetaMatch(InputItem* p_i, MetaType meta_type, byte* psz);
 
     /// <summary>input_item_NewExt</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_NewExt")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItem* NewExt(byte* psz_uri, byte* psz_name, long i_duration, InputItemType i_type, InputItemNetType i_net);
+    [DllImport("libvlccore", EntryPoint = "input_item_NewExt", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItem* NewExt(byte* psz_uri, byte* psz_name, long i_duration, InputItemType i_type, InputItemNetType i_net);
 
     /// <summary>input_item_Parse</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_Parse")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItemParserId* Parse(ObjectHeader* parent, InputItem* item, InputItemParserCfg* cfg);
+    [DllImport("libvlccore", EntryPoint = "input_item_Parse", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItemParserId* Parse(ObjectHeader* parent, InputItem* item, InputItemParserCfg* cfg);
 
     /// <summary>input_item_Playable</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_Playable")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte Playable(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "input_item_Playable", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte Playable(byte* arg0);
 
     /// <summary>input_item_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(InputItem* arg0);
+    [DllImport("libvlccore", EntryPoint = "input_item_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(InputItem* arg0);
 
     /// <summary>input_item_ReplaceInfos</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_ReplaceInfos")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ReplaceInfos(InputItem* arg0, InfoCategory* arg1);
+    [DllImport("libvlccore", EntryPoint = "input_item_ReplaceInfos", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ReplaceInfos(InputItem* arg0, InfoCategory* arg1);
 
     /// <summary>input_item_SetDuration</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_SetDuration")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetDuration(InputItem* p_i, long i_duration);
+    [DllImport("libvlccore", EntryPoint = "input_item_SetDuration", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetDuration(InputItem* p_i, long i_duration);
 
     /// <summary>input_item_SetMeta</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_SetMeta")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetMeta(InputItem* arg0, MetaType meta_type, byte* psz_val);
+    [DllImport("libvlccore", EntryPoint = "input_item_SetMeta", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetMeta(InputItem* arg0, MetaType meta_type, byte* psz_val);
 
     /// <summary>input_item_SetMetaExtra</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_SetMetaExtra")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetMetaExtra(InputItem* p_i, byte* psz_name, byte* psz_value);
+    [DllImport("libvlccore", EntryPoint = "input_item_SetMetaExtra", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetMetaExtra(InputItem* p_i, byte* psz_name, byte* psz_value);
 
     /// <summary>input_item_SetName</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_SetName")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetName(InputItem* p_item, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "input_item_SetName", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetName(InputItem* p_item, byte* psz_name);
 
     /// <summary>input_item_SetURI</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_SetURI")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetURI(InputItem* p_i, byte* psz_uri);
+    [DllImport("libvlccore", EntryPoint = "input_item_SetURI", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetURI(InputItem* p_i, byte* psz_uri);
 
     /// <summary>input_item_Update</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_Update")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Update(InputItem* dst, InputItem* src);
+    [DllImport("libvlccore", EntryPoint = "input_item_Update", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Update(InputItem* dst, InputItem* src);
 }
 
 public unsafe partial struct InputItemNode
 {
     /// <summary>input_item_node_AppendItem</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_node_AppendItem")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItemNode* AppendItem(InputItemNode* p_node, InputItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "input_item_node_AppendItem", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItemNode* AppendItem(InputItemNode* p_node, InputItem* p_item);
 
     /// <summary>input_item_node_AppendNode</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_node_AppendNode")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void AppendNode(InputItemNode* p_parent, InputItemNode* p_child);
+    [DllImport("libvlccore", EntryPoint = "input_item_node_AppendNode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void AppendNode(InputItemNode* p_parent, InputItemNode* p_child);
 
     /// <summary>input_item_node_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_node_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItemNode* Create(InputItem* p_input);
+    [DllImport("libvlccore", EntryPoint = "input_item_node_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItemNode* Create(InputItem* p_input);
 
     /// <summary>input_item_node_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_node_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(InputItemNode* p_node);
+    [DllImport("libvlccore", EntryPoint = "input_item_node_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(InputItemNode* p_node);
 
     /// <summary>input_item_node_RemoveNode</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_node_RemoveNode")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void RemoveNode(InputItemNode* parent, InputItemNode* child);
+    [DllImport("libvlccore", EntryPoint = "input_item_node_RemoveNode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void RemoveNode(InputItemNode* parent, InputItemNode* child);
 }
 
 public unsafe partial struct InputItemParserId
 {
     /// <summary>input_item_parser_id_Interrupt</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_parser_id_Interrupt")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Interrupt(InputItemParserId* parser);
+    [DllImport("libvlccore", EntryPoint = "input_item_parser_id_Interrupt", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Interrupt(InputItemParserId* parser);
 
     /// <summary>input_item_parser_id_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_parser_id_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(InputItemParserId* parser);
+    [DllImport("libvlccore", EntryPoint = "input_item_parser_id_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(InputItemParserId* parser);
 }
 
 public unsafe partial struct InputItemSlave
 {
     /// <summary>input_item_slave_GetType</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_slave_GetType")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte GetType(byte* arg0, SlaveType* arg1);
+    [DllImport("libvlccore", EntryPoint = "input_item_slave_GetType", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte GetType(byte* arg0, SlaveType* arg1);
 
     /// <summary>input_item_slave_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_slave_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItemSlave* New(byte* arg0, SlaveType arg1, SlavePriority arg2);
+    [DllImport("libvlccore", EntryPoint = "input_item_slave_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItemSlave* New(byte* arg0, SlaveType arg1, SlavePriority arg2);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -906,17 +862,14 @@ public static unsafe partial class VlcInputItem
     public const string InputRecordPrefix = "vlc-record-%Y-%m-%d-%Hh%Mm%Ss-$ N-$ p";
 
     /// <summary>vlc_readdir_helper_additem</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_readdir_helper_additem")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcReaddirHelperAdditem(ReaddirHelper* p_rdh, byte* psz_uri, byte* psz_flatpath, byte* psz_filename, int i_type, int i_net, InputItem** created_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_readdir_helper_additem", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcReaddirHelperAdditem(ReaddirHelper* p_rdh, byte* psz_uri, byte* psz_flatpath, byte* psz_filename, int i_type, int i_net, InputItem** created_item);
 
     /// <summary>vlc_readdir_helper_finish</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_readdir_helper_finish")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcReaddirHelperFinish(ReaddirHelper* p_rdh, byte b_success);
+    [DllImport("libvlccore", EntryPoint = "vlc_readdir_helper_finish", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcReaddirHelperFinish(ReaddirHelper* p_rdh, byte b_success);
 
     /// <summary>vlc_readdir_helper_init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_readdir_helper_init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcReaddirHelperInit(ReaddirHelper* p_rdh, ObjectHeader* p_obj, InputItemNode* p_node);
+    [DllImport("libvlccore", EntryPoint = "vlc_readdir_helper_init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcReaddirHelperInit(ReaddirHelper* p_rdh, ObjectHeader* p_obj, InputItemNode* p_node);
 }

@@ -124,30 +124,26 @@ public unsafe partial struct StreamExtractor
 public static unsafe partial class VlcStream
 {
     /// <summary>vlc_stream_NewMRL</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_NewMRL")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* NewMRL(ObjectHeader* obj, byte* mrl);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_NewMRL", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* NewMRL(ObjectHeader* obj, byte* mrl);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcStreamDirectory
 {
     /// <summary>vlc_stream_directory_Attach</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_directory_Attach")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Attach(Stream** source, byte* module_name, byte** volumes, nuint volumes_count);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_directory_Attach", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Attach(Stream** source, byte* module_name, byte** volumes, nuint volumes_count);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcStreamExtractor
 {
     /// <summary>vlc_stream_extractor_Attach</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_extractor_Attach")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Attach(Stream** source, byte* identifier, byte* module_name, byte** volumes, nuint volumes_count);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_extractor_Attach", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Attach(Stream** source, byte* identifier, byte* module_name, byte** volumes, nuint volumes_count);
 
     /// <summary>vlc_stream_extractor_CreateMRL</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_extractor_CreateMRL")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* CreateMRL(StreamDirectory* extractor, byte* subentry, byte** volumes, nuint volumes_count);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_extractor_CreateMRL", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* CreateMRL(StreamDirectory* extractor, byte* subentry, byte** volumes, nuint volumes_count);
 }

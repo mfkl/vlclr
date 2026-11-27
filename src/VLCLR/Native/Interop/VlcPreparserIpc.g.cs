@@ -445,21 +445,18 @@ public static partial class VlcPreparserIpc
 public static unsafe partial class VlcPreparserMsg
 {
     /// <summary>vlc_preparser_msg_Clean</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_msg_Clean")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Clean(PreparserMsg* msg);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_msg_Clean", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Clean(PreparserMsg* msg);
 
     /// <summary>vlc_preparser_msg_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_msg_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(PreparserMsg* msg, int msg_type, PreparserMsgReqType req_type);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_msg_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(PreparserMsg* msg, int msg_type, PreparserMsgReqType req_type);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcPreparserMsgSerdes
 {
     /// <summary>vlc_preparser_msg_serdes_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_msg_serdes_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PreparserMsgSerdes* Create(ObjectHeader* obj, PreparserMsgSerdesCbs* c, byte bin_data);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_msg_serdes_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PreparserMsgSerdes* Create(ObjectHeader* obj, PreparserMsgSerdesCbs* c, byte bin_data);
 }

@@ -14,7 +14,6 @@ public static unsafe partial class VlcAccess
     public static int AccessRedirect { [MethodImpl(MethodImplOptions.AggressiveInlining)] get => OperatingSystem.IsWindows() ? -138 : OperatingSystem.IsMacOS() ? -60 : -110; }
 
     /// <summary>vlc_access_NewMRL</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_access_NewMRL")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* NewMRL(ObjectHeader* obj, byte* mrl);
+    [DllImport("libvlccore", EntryPoint = "vlc_access_NewMRL", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* NewMRL(ObjectHeader* obj, byte* mrl);
 }

@@ -83,51 +83,42 @@ public partial struct HttpCookieJar { }
 public static unsafe partial class VlcHttp
 {
     /// <summary>vlc_http_cookies_destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_cookies_destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CookiesDestroy(HttpCookieJar* p_jar);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_cookies_destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CookiesDestroy(HttpCookieJar* p_jar);
 
     /// <summary>vlc_http_cookies_fetch</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_cookies_fetch")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* CookiesFetch(HttpCookieJar* jar, byte secure, byte* host, byte* path);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_cookies_fetch", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* CookiesFetch(HttpCookieJar* jar, byte secure, byte* host, byte* path);
 
     /// <summary>vlc_http_cookies_new</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_cookies_new")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpCookieJar* CookiesNew();
+    [DllImport("libvlccore", EntryPoint = "vlc_http_cookies_new", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpCookieJar* CookiesNew();
 
     /// <summary>vlc_http_cookies_store</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_cookies_store")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte CookiesStore(HttpCookieJar* jar, byte* cookie, byte* host, byte* path);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_cookies_store", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte CookiesStore(HttpCookieJar* jar, byte* cookie, byte* host, byte* path);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcHttpAuth
 {
     /// <summary>vlc_http_auth_Deinit</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_auth_Deinit")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Deinit(HttpAuth* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_auth_Deinit", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Deinit(HttpAuth* arg0);
 
     /// <summary>vlc_http_auth_FormatAuthorizationHeader</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_auth_FormatAuthorizationHeader")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* FormatAuthorizationHeader(ObjectHeader* arg0, HttpAuth* arg1, byte* arg2, byte* arg3, byte* arg4, byte* arg5);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_auth_FormatAuthorizationHeader", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* FormatAuthorizationHeader(ObjectHeader* arg0, HttpAuth* arg1, byte* arg2, byte* arg3, byte* arg4, byte* arg5);
 
     /// <summary>vlc_http_auth_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_auth_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(HttpAuth* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_auth_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(HttpAuth* arg0);
 
     /// <summary>vlc_http_auth_ParseAuthenticationInfoHeader</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_auth_ParseAuthenticationInfoHeader")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int ParseAuthenticationInfoHeader(ObjectHeader* arg0, HttpAuth* arg1, byte* arg2, byte* arg3, byte* arg4, byte* arg5, byte* arg6);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_auth_ParseAuthenticationInfoHeader", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ParseAuthenticationInfoHeader(ObjectHeader* arg0, HttpAuth* arg1, byte* arg2, byte* arg3, byte* arg4, byte* arg5, byte* arg6);
 
     /// <summary>vlc_http_auth_ParseWwwAuthenticateHeader</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_auth_ParseWwwAuthenticateHeader")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ParseWwwAuthenticateHeader(ObjectHeader* arg0, HttpAuth* arg1, byte* arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_auth_ParseWwwAuthenticateHeader", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ParseWwwAuthenticateHeader(ObjectHeader* arg0, HttpAuth* arg1, byte* arg2);
 }

@@ -4,7 +4,7 @@ using VLCLR.CImport.Naming;
 namespace VLCLR.CImport.Emit;
 
 /// <summary>Settings of the C# emitter.</summary>
-/// <param name="Library">Library name used in <c>[LibraryImport]</c>, e.g. <c>libvlccore</c>.</param>
+/// <param name="Library">Library name used in <c>[DllImport]</c>, e.g. <c>libvlccore</c>.</param>
 public sealed record CSharpEmitOptions(string Library);
 
 /// <summary>A symbol the emitter left out and why (for cimport-report.md).</summary>

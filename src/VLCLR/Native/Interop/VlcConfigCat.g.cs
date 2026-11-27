@@ -84,36 +84,30 @@ public unsafe partial struct ConfigSubcategory
 public static unsafe partial class VlcConfigCat
 {
     /// <summary>vlc_config_cat_Count</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_config_cat_Count")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Count();
+    [DllImport("libvlccore", EntryPoint = "vlc_config_cat_Count", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Count();
 
     /// <summary>vlc_config_cat_Find</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_config_cat_Find")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ConfigCategory* Find(ConfigCat cat);
+    [DllImport("libvlccore", EntryPoint = "vlc_config_cat_Find", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ConfigCategory* Find(ConfigCat cat);
 
     /// <summary>vlc_config_cat_GetAt</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_config_cat_GetAt")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ConfigCategory* GetAt(nuint index);
+    [DllImport("libvlccore", EntryPoint = "vlc_config_cat_GetAt", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ConfigCategory* GetAt(nuint index);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcConfigSubcat
 {
     /// <summary>vlc_config_subcat_Count</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_config_subcat_Count")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Count();
+    [DllImport("libvlccore", EntryPoint = "vlc_config_subcat_Count", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Count();
 
     /// <summary>vlc_config_subcat_Find</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_config_subcat_Find")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ConfigSubcategory* Find(ConfigSubcat subcat);
+    [DllImport("libvlccore", EntryPoint = "vlc_config_subcat_Find", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ConfigSubcategory* Find(ConfigSubcat subcat);
 
     /// <summary>vlc_config_subcat_GetAt</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_config_subcat_GetAt")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ConfigSubcategory* GetAt(nuint index);
+    [DllImport("libvlccore", EntryPoint = "vlc_config_subcat_GetAt", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ConfigSubcategory* GetAt(nuint index);
 }

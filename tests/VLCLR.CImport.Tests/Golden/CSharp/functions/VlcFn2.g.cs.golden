@@ -10,7 +10,6 @@ namespace Test.Interop;
 public unsafe partial struct VideoFormat
 {
     /// <summary>video_format_Copy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_Copy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Copy(VideoFormat* dst, VideoFormat* src);
+    [DllImport("libvlccore", EntryPoint = "video_format_Copy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Copy(VideoFormat* dst, VideoFormat* src);
 }

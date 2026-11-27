@@ -13,56 +13,46 @@ public partial struct InputDecoder { }
 public unsafe partial struct InputResource
 {
     /// <summary>input_resource_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_resource_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputResource* New(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "input_resource_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputResource* New(ObjectHeader* arg0);
 
     /// <summary>input_resource_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_resource_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(InputResource* arg0);
+    [DllImport("libvlccore", EntryPoint = "input_resource_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(InputResource* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcInputDecoder
 {
     /// <summary>vlc_input_decoder_ChangeDelay</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_ChangeDelay")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChangeDelay(InputDecoder* arg0, long i_delay);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_ChangeDelay", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChangeDelay(InputDecoder* arg0, long i_delay);
 
     /// <summary>vlc_input_decoder_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputDecoder* Create(ObjectHeader* arg0, EsFormat* arg1, byte* es_id, Clock* arg3, InputResource* arg4);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputDecoder* Create(ObjectHeader* arg0, EsFormat* arg1, byte* es_id, Clock* arg3, InputResource* arg4);
 
     /// <summary>vlc_input_decoder_Decode</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_Decode")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Decode(InputDecoder* p_dec, Frame* frame, byte do_pace);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_Decode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Decode(InputDecoder* p_dec, Frame* frame, byte do_pace);
 
     /// <summary>vlc_input_decoder_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(InputDecoder* decoder);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(InputDecoder* decoder);
 
     /// <summary>vlc_input_decoder_Drain</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_Drain")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Drain(InputDecoder* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_Drain", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Drain(InputDecoder* arg0);
 
     /// <summary>vlc_input_decoder_Flush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_Flush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Flush(InputDecoder* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_Flush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Flush(InputDecoder* arg0);
 
     /// <summary>vlc_input_decoder_IsDrained</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_IsDrained")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsDrained(InputDecoder* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_IsDrained", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsDrained(InputDecoder* arg0);
 
     /// <summary>vlc_input_decoder_SetSpuHighlight</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_decoder_SetSpuHighlight")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int SetSpuHighlight(InputDecoder* arg0, SpuHighlight* arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_decoder_SetSpuHighlight", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int SetSpuHighlight(InputDecoder* arg0, SpuHighlight* arg1);
 }

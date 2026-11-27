@@ -40,32 +40,26 @@ public unsafe partial struct Memstream
 public static unsafe partial class VlcMemstream
 {
     /// <summary>vlc_memstream_close</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memstream_close")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Close(Memstream* ms);
+    [DllImport("libvlccore", EntryPoint = "vlc_memstream_close", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Close(Memstream* ms);
 
     /// <summary>vlc_memstream_flush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memstream_flush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Flush(Memstream* ms);
+    [DllImport("libvlccore", EntryPoint = "vlc_memstream_flush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Flush(Memstream* ms);
 
     /// <summary>vlc_memstream_open</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memstream_open")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Open(Memstream* ms);
+    [DllImport("libvlccore", EntryPoint = "vlc_memstream_open", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Open(Memstream* ms);
 
     /// <summary>vlc_memstream_putc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memstream_putc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Putc(Memstream* ms, int c);
+    [DllImport("libvlccore", EntryPoint = "vlc_memstream_putc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Putc(Memstream* ms, int c);
 
     /// <summary>vlc_memstream_puts</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memstream_puts")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Puts(Memstream* ms, byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_memstream_puts", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Puts(Memstream* ms, byte* str);
 
     /// <summary>vlc_memstream_write</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memstream_write")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Write(Memstream* ms, void* ptr, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_memstream_write", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Write(Memstream* ms, void* ptr, nuint len);
 }

@@ -5,7 +5,7 @@ namespace VLCLR.Module;
 
 /// <summary>
 /// Fluent API for VLC module registration in vlc_entry.
-/// Handles string pinning and callback registration automatically.
+/// Keeps the module strings alive and registers the callbacks automatically.
 /// </summary>
 /// <remarks>
 /// Usage:
@@ -23,11 +23,6 @@ namespace VLCLR.Module;
 /// </remarks>
 public unsafe ref struct ModuleBuilder
 {
-    // Static storage for pinned strings - keeps them alive for plugin lifetime
-    // This is intentional: module strings must remain valid as long as VLC has the plugin loaded
-    private static readonly List<GCHandle> s_pinnedHandles = new();
-    private static readonly object s_lock = new();
-
     private readonly nint _vlcSetPtr;
     private readonly nint _opaque;
     private nint _module;
@@ -82,7 +77,7 @@ public unsafe ref struct ModuleBuilder
     {
         if (_result == 0)
         {
-            nint shortcutPtr = PinString(shortcut);
+            nint shortcutPtr = NativeUtf8(shortcut);
             nint* shortcuts = stackalloc nint[1];
             shortcuts[0] = shortcutPtr;
             _result = VLCVariadic.Call(
@@ -391,7 +386,7 @@ public unsafe ref struct ModuleBuilder
 
     private void SetConfigString(nint config, int key, string value)
     {
-        nint ptr = PinString(value);
+        nint ptr = NativeUtf8(value);
         if (key == VLCModuleConstants.VLC_CONFIG_NAME)
             _configName = ptr;
         _result = VLCVariadic.Call(_vlcSetPtr, _opaque, config, key, ptr);
@@ -430,8 +425,8 @@ public unsafe ref struct ModuleBuilder
 
     private void SetConfigDesc(nint config, string description, string? longDescription)
     {
-        nint descPtr = PinString(description);
-        nint longDescPtr = longDescription != null ? PinString(longDescription) : 0;
+        nint descPtr = NativeUtf8(description);
+        nint longDescPtr = longDescription != null ? NativeUtf8(longDescription) : 0;
         _result = VLCVariadic.Call(_vlcSetPtr, _opaque, config, VLCModuleConstants.VLC_CONFIG_DESC, descPtr, longDescPtr);
     }
 
@@ -447,7 +442,7 @@ public unsafe ref struct ModuleBuilder
         // Register open callback if set
         if (_openCallback != 0)
         {
-            nint namePtr = PinString(_openCallbackName);
+            nint namePtr = NativeUtf8(_openCallbackName);
             _result = VLCVariadic.Call(_vlcSetPtr, _opaque, _module, VLCModuleConstants.VLC_MODULE_CB_OPEN, namePtr, _openCallback);
             if (_result != 0)
                 return _result;
@@ -456,7 +451,7 @@ public unsafe ref struct ModuleBuilder
         // Register close callback if set
         if (_closeCallback != 0)
         {
-            nint namePtr = PinString(_closeCallbackName);
+            nint namePtr = NativeUtf8(_closeCallbackName);
             _result = VLCVariadic.Call(_vlcSetPtr, _opaque, _module, VLCModuleConstants.VLC_MODULE_CB_CLOSE, namePtr, _closeCallback);
             if (_result != 0)
                 return _result;
@@ -469,7 +464,7 @@ public unsafe ref struct ModuleBuilder
     {
         if (_result == 0)
         {
-            nint ptr = PinString(value);
+            nint ptr = NativeUtf8(value);
             _result = VLCVariadic.Call(_vlcSetPtr, _opaque, _module, key, ptr);
         }
         return this;
@@ -494,24 +489,17 @@ public unsafe ref struct ModuleBuilder
     }
 
     /// <summary>
-    /// Pins a string for the lifetime of the plugin.
-    /// Strings passed to VLC must remain valid as long as the plugin is loaded.
+    /// Copies a string to native memory as NUL-terminated UTF-8, for the
+    /// lifetime of the plugin: VLC keeps the pointers as long as it has the
+    /// plugin loaded, and VLCLR plugins are never unloaded. Intentionally
+    /// never freed.
     /// </summary>
-    private static nint PinString(string value)
+    private static nint NativeUtf8(string value)
     {
-        // Convert to null-terminated UTF-8 bytes
-        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(value + "\0");
-
-        // Pin the byte array
-        GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-        nint ptr = handle.AddrOfPinnedObject();
-
-        // Store handle to prevent GC (intentionally never freed - plugin lifetime)
-        lock (s_lock)
-        {
-            s_pinnedHandles.Add(handle);
-        }
-
-        return ptr;
+        int length = System.Text.Encoding.UTF8.GetByteCount(value);
+        byte* bytes = (byte*)NativeMemory.Alloc((nuint)length + 1);
+        System.Text.Encoding.UTF8.GetBytes(value, new Span<byte>(bytes, length));
+        bytes[length] = 0;
+        return (nint)bytes;
     }
 }

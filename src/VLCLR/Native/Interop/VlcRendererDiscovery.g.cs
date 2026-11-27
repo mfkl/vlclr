@@ -100,67 +100,54 @@ public static unsafe partial class VlcRendererDiscovery
     public const int RendererCanVideo = 2;
 
     /// <summary>vlc_rd_get_names</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rd_get_names")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcRdGetNames(ObjectHeader* p_obj, byte*** pppsz_names, byte*** pppsz_longnames);
+    [DllImport("libvlccore", EntryPoint = "vlc_rd_get_names", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcRdGetNames(ObjectHeader* p_obj, byte*** pppsz_names, byte*** pppsz_longnames);
 
     /// <summary>vlc_rd_new</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rd_new")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial RendererDiscovery* VlcRdNew(ObjectHeader* p_obj, byte* psz_name, RendererDiscoveryOwner* owner);
+    [DllImport("libvlccore", EntryPoint = "vlc_rd_new", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern RendererDiscovery* VlcRdNew(ObjectHeader* p_obj, byte* psz_name, RendererDiscoveryOwner* owner);
 
     /// <summary>vlc_rd_probe_add</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rd_probe_add")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcRdProbeAdd(Probe* p_probe, byte* psz_name, byte* psz_longname);
+    [DllImport("libvlccore", EntryPoint = "vlc_rd_probe_add", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcRdProbeAdd(Probe* p_probe, byte* psz_name, byte* psz_longname);
 
     /// <summary>vlc_rd_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rd_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcRdRelease(RendererDiscovery* p_rd);
+    [DllImport("libvlccore", EntryPoint = "vlc_rd_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcRdRelease(RendererDiscovery* p_rd);
 
     /// <summary>vlc_renderer_item_demux_filter</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_demux_filter")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcRendererItemDemuxFilter(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_demux_filter", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcRendererItemDemuxFilter(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_flags</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_flags")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcRendererItemFlags(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_flags", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcRendererItemFlags(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial RendererItem* VlcRendererItemHold(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern RendererItem* VlcRendererItemHold(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_icon_uri</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_icon_uri")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcRendererItemIconUri(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_icon_uri", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcRendererItemIconUri(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_name</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_name")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcRendererItemName(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_name", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcRendererItemName(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_new</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_new")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial RendererItem* VlcRendererItemNew(byte* psz_type, byte* psz_name, byte* psz_uri, byte* psz_extra_sout, byte* psz_demux_filter, byte* psz_icon_uri, int i_flags);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_new", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern RendererItem* VlcRendererItemNew(byte* psz_type, byte* psz_name, byte* psz_uri, byte* psz_extra_sout, byte* psz_demux_filter, byte* psz_icon_uri, int i_flags);
 
     /// <summary>vlc_renderer_item_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcRendererItemRelease(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcRendererItemRelease(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_sout</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_sout")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcRendererItemSout(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_sout", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcRendererItemSout(RendererItem* p_item);
 
     /// <summary>vlc_renderer_item_type</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_renderer_item_type")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcRendererItemType(RendererItem* p_item);
+    [DllImport("libvlccore", EntryPoint = "vlc_renderer_item_type", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcRendererItemType(RendererItem* p_item);
 }

@@ -261,122 +261,98 @@ public enum UserDir : uint
 public static unsafe partial class Config
 {
     /// <summary>config_AddIntf</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_AddIntf")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void AddIntf(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "config_AddIntf", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void AddIntf(byte* arg0);
 
     /// <summary>config_ChainCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ChainCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ChainCreate(byte** ppsz_name, ConfigChain** pp_cfg, byte* psz_string);
+    [DllImport("libvlccore", EntryPoint = "config_ChainCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ChainCreate(byte** ppsz_name, ConfigChain** pp_cfg, byte* psz_string);
 
     /// <summary>config_ChainDestroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ChainDestroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChainDestroy(ConfigChain* arg0);
+    [DllImport("libvlccore", EntryPoint = "config_ChainDestroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChainDestroy(ConfigChain* arg0);
 
     /// <summary>config_ChainDuplicate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ChainDuplicate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ConfigChain* ChainDuplicate(ConfigChain* arg0);
+    [DllImport("libvlccore", EntryPoint = "config_ChainDuplicate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ConfigChain* ChainDuplicate(ConfigChain* arg0);
 
     /// <summary>config_ChainParse</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ChainParse")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChainParse(ObjectHeader* arg0, byte* psz_prefix, byte** ppsz_options, ConfigChain* arg3);
+    [DllImport("libvlccore", EntryPoint = "config_ChainParse", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChainParse(ObjectHeader* arg0, byte* psz_prefix, byte** ppsz_options, ConfigChain* arg3);
 
     /// <summary>config_ChainParseOptions</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ChainParseOptions")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ChainParseOptions(ConfigChain** pp_cfg, byte* ppsz_opts);
+    [DllImport("libvlccore", EntryPoint = "config_ChainParseOptions", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ChainParseOptions(ConfigChain** pp_cfg, byte* ppsz_opts);
 
     /// <summary>config_ExistIntf</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ExistIntf")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte ExistIntf(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "config_ExistIntf", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte ExistIntf(byte* arg0);
 
     /// <summary>config_FindConfig</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_FindConfig")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ModuleConfig* FindConfig(byte* name);
+    [DllImport("libvlccore", EntryPoint = "config_FindConfig", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ModuleConfig* FindConfig(byte* name);
 
     /// <summary>config_GetFloat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetFloat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial float GetFloat(byte* name);
+    [DllImport("libvlccore", EntryPoint = "config_GetFloat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float GetFloat(byte* name);
 
     /// <summary>config_GetInt</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetInt")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial long GetInt(byte* name);
+    [DllImport("libvlccore", EntryPoint = "config_GetInt", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern long GetInt(byte* name);
 
     /// <summary>config_GetIntChoices</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetIntChoices")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint GetIntChoices(byte* arg0, long** values, byte*** texts);
+    [DllImport("libvlccore", EntryPoint = "config_GetIntChoices", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint GetIntChoices(byte* arg0, long** values, byte*** texts);
 
     /// <summary>config_GetPsz</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetPsz")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetPsz(byte* name);
+    [DllImport("libvlccore", EntryPoint = "config_GetPsz", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetPsz(byte* name);
 
     /// <summary>config_GetPszChoices</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetPszChoices")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint GetPszChoices(byte* arg0, byte*** values, byte*** texts);
+    [DllImport("libvlccore", EntryPoint = "config_GetPszChoices", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint GetPszChoices(byte* arg0, byte*** values, byte*** texts);
 
     /// <summary>config_GetSysPath</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetSysPath")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetSysPath(SystemDir dir, byte* filename);
+    [DllImport("libvlccore", EntryPoint = "config_GetSysPath", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetSysPath(SystemDir dir, byte* filename);
 
     /// <summary>config_GetType</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetType")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetType(byte* name);
+    [DllImport("libvlccore", EntryPoint = "config_GetType", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetType(byte* name);
 
     /// <summary>config_GetUserDir</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_GetUserDir")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetUserDir(UserDir arg0);
+    [DllImport("libvlccore", EntryPoint = "config_GetUserDir", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetUserDir(UserDir arg0);
 
     /// <summary>config_PutFloat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_PutFloat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PutFloat(byte* name, float val);
+    [DllImport("libvlccore", EntryPoint = "config_PutFloat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PutFloat(byte* name, float val);
 
     /// <summary>config_PutInt</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_PutInt")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PutInt(byte* name, long val);
+    [DllImport("libvlccore", EntryPoint = "config_PutInt", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PutInt(byte* name, long val);
 
     /// <summary>config_PutPsz</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_PutPsz")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PutPsz(byte* name, byte* val);
+    [DllImport("libvlccore", EntryPoint = "config_PutPsz", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PutPsz(byte* name, byte* val);
 
     /// <summary>config_RemoveIntf</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_RemoveIntf")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void RemoveIntf(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "config_RemoveIntf", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void RemoveIntf(byte* arg0);
 
     /// <summary>config_ResetAll</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_ResetAll")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ResetAll();
+    [DllImport("libvlccore", EntryPoint = "config_ResetAll", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ResetAll();
 
     /// <summary>config_SaveConfigFile</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_SaveConfigFile")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int SaveConfigFile(LibvlcInt* arg0);
+    [DllImport("libvlccore", EntryPoint = "config_SaveConfigFile", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int SaveConfigFile(LibvlcInt* arg0);
 
     /// <summary>config_StringEscape</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_StringEscape")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* StringEscape(byte* psz_string);
+    [DllImport("libvlccore", EntryPoint = "config_StringEscape", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* StringEscape(byte* psz_string);
 
     /// <summary>config_StringUnescape</summary>
-    [LibraryImport("libvlccore", EntryPoint = "config_StringUnescape")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* StringUnescape(byte* psz_string);
+    [DllImport("libvlccore", EntryPoint = "config_StringUnescape", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* StringUnescape(byte* psz_string);
 }

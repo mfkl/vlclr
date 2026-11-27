@@ -150,17 +150,14 @@ public static partial class VlcInput
 public static unsafe partial class VlcInputAttachment
 {
     /// <summary>vlc_input_attachment_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_attachment_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputAttachment* Hold(InputAttachment* a);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_attachment_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputAttachment* Hold(InputAttachment* a);
 
     /// <summary>vlc_input_attachment_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_attachment_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputAttachment* New(byte* psz_name, byte* psz_mime, byte* psz_description, void* p_data, nuint i_data);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_attachment_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputAttachment* New(byte* psz_name, byte* psz_mime, byte* psz_description, void* p_data, nuint i_data);
 
     /// <summary>vlc_input_attachment_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_input_attachment_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(InputAttachment* a);
+    [DllImport("libvlccore", EntryPoint = "vlc_input_attachment_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(InputAttachment* a);
 }

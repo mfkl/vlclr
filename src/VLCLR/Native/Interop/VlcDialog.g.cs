@@ -77,62 +77,50 @@ public enum DialogQuestionType : uint
 public static unsafe partial class VlcDialog
 {
     /// <summary>vlc_dialog_id_dismiss</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_id_dismiss")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int IdDismiss(DialogId* p_id);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_id_dismiss", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int IdDismiss(DialogId* p_id);
 
     /// <summary>vlc_dialog_id_get_context</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_id_get_context")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* IdGetContext(DialogId* p_id);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_id_get_context", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* IdGetContext(DialogId* p_id);
 
     /// <summary>vlc_dialog_id_post_action</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_id_post_action")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int IdPostAction(DialogId* p_id, int i_action);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_id_post_action", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int IdPostAction(DialogId* p_id, int i_action);
 
     /// <summary>vlc_dialog_id_post_login</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_id_post_login")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int IdPostLogin(DialogId* p_id, byte* psz_username, byte* psz_password, byte b_store);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_id_post_login", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int IdPostLogin(DialogId* p_id, byte* psz_username, byte* psz_password, byte b_store);
 
     /// <summary>vlc_dialog_id_set_context</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_id_set_context")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void IdSetContext(DialogId* p_id, void* p_context);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_id_set_context", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void IdSetContext(DialogId* p_id, void* p_context);
 
     /// <summary>vlc_dialog_is_cancelled</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_is_cancelled")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsCancelled(ObjectHeader* p_obj, DialogId* p_id);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_is_cancelled", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsCancelled(ObjectHeader* p_obj, DialogId* p_id);
 
     /// <summary>vlc_dialog_provider_set_callbacks</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_provider_set_callbacks")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ProviderSetCallbacks(ObjectHeader* p_obj, DialogCbs* p_cbs, void* p_data);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_provider_set_callbacks", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ProviderSetCallbacks(ObjectHeader* p_obj, DialogCbs* p_cbs, void* p_data);
 
     /// <summary>vlc_dialog_provider_set_error_callback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_provider_set_error_callback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ProviderSetErrorCallback(ObjectHeader* p_obj, delegate* unmanaged[Cdecl]<void*, byte*, byte*, void> p_cbs, void* p_data);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_provider_set_error_callback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ProviderSetErrorCallback(ObjectHeader* p_obj, delegate* unmanaged[Cdecl]<void*, byte*, byte*, void> p_cbs, void* p_data);
 
     /// <summary>vlc_dialog_provider_set_ext_callback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_provider_set_ext_callback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ProviderSetExtCallback(ObjectHeader* p_obj, delegate* unmanaged[Cdecl]<ExtensionDialog*, void*, void> pf_update, void* p_data);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_provider_set_ext_callback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ProviderSetExtCallback(ObjectHeader* p_obj, delegate* unmanaged[Cdecl]<ExtensionDialog*, void*, void> pf_update, void* p_data);
 
     /// <summary>vlc_dialog_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(ObjectHeader* p_obj, DialogId* p_id);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(ObjectHeader* p_obj, DialogId* p_id);
 
     /// <summary>vlc_dialog_update_progress</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dialog_update_progress")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int UpdateProgress(ObjectHeader* p_obj, DialogId* p_id, float f_position);
+    [DllImport("libvlccore", EntryPoint = "vlc_dialog_update_progress", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int UpdateProgress(ObjectHeader* p_obj, DialogId* p_id, float f_position);
 
     /// <summary>vlc_ext_dialog_update</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ext_dialog_update")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcExtDialogUpdate(ObjectHeader* p_obj, ExtensionDialog* dialog);
+    [DllImport("libvlccore", EntryPoint = "vlc_ext_dialog_update", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcExtDialogUpdate(ObjectHeader* p_obj, ExtensionDialog* dialog);
 }

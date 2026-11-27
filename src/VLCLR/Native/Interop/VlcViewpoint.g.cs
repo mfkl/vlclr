@@ -59,17 +59,14 @@ public static unsafe partial class VlcViewpoint
     public const float FieldOfViewDegreesMin = 20f;
 
     /// <summary>vlc_viewpoint_from_euler</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_from_euler")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FromEuler(Viewpoint* vp, float yaw, float pitch, float roll);
+    [DllImport("libvlccore", EntryPoint = "vlc_viewpoint_from_euler", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FromEuler(Viewpoint* vp, float yaw, float pitch, float roll);
 
     /// <summary>vlc_viewpoint_to_4x4</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_to_4x4")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void To4x4(Viewpoint* vp, float* matrix);
+    [DllImport("libvlccore", EntryPoint = "vlc_viewpoint_to_4x4", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void To4x4(Viewpoint* vp, float* matrix);
 
     /// <summary>vlc_viewpoint_to_euler</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_to_euler")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ToEuler(Viewpoint* vp, float* yaw, float* pitch, float* roll);
+    [DllImport("libvlccore", EntryPoint = "vlc_viewpoint_to_euler", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ToEuler(Viewpoint* vp, float* yaw, float* pitch, float* roll);
 }

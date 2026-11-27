@@ -318,61 +318,50 @@ public static unsafe partial class VlcPreparser
     public const uint ThumbnailerSeekTime = 1;
 
     /// <summary>vlc_preparser_Cancel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_Cancel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Cancel(Preparser* preparser, PreparserReq* req);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_Cancel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Cancel(Preparser* preparser, PreparserReq* req);
 
     /// <summary>vlc_preparser_CheckThumbnailerFormat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_CheckThumbnailerFormat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int CheckThumbnailerFormat(ThumbnailerFormat format);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_CheckThumbnailerFormat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int CheckThumbnailerFormat(ThumbnailerFormat format);
 
     /// <summary>vlc_preparser_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Preparser* preparser);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Preparser* preparser);
 
     /// <summary>vlc_preparser_GetBestThumbnailerFormat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_GetBestThumbnailerFormat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetBestThumbnailerFormat(ThumbnailerFormat* format, byte** out_ext);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_GetBestThumbnailerFormat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetBestThumbnailerFormat(ThumbnailerFormat* format, byte** out_ext);
 
     /// <summary>vlc_preparser_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Preparser* New(ObjectHeader* obj, PreparserCfg* cfg);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Preparser* New(ObjectHeader* obj, PreparserCfg* cfg);
 
     /// <summary>vlc_preparser_Submit</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_Submit")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Submit(Preparser* preparser, PreparserReq* req);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_Submit", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Submit(Preparser* preparser, PreparserReq* req);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcPreparserReq
 {
     /// <summary>vlc_preparser_req_GetItem</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_req_GetItem")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItem* GetItem(PreparserReq* req);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_req_GetItem", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItem* GetItem(PreparserReq* req);
 
     /// <summary>vlc_preparser_req_NewParse</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_req_NewParse")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PreparserReq* NewParse(Preparser* preparser, InputItem* item, int type_option, PreparserCbs* cbs, void* cbs_userdata);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_req_NewParse", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PreparserReq* NewParse(Preparser* preparser, InputItem* item, int type_option, PreparserCbs* cbs, void* cbs_userdata);
 
     /// <summary>vlc_preparser_req_NewThumbnail</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_req_NewThumbnail")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PreparserReq* NewThumbnail(Preparser* preparser, InputItem* item, ThumbnailerArg* arg, ThumbnailerCbs* cbs, void* cbs_userdata);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_req_NewThumbnail", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PreparserReq* NewThumbnail(Preparser* preparser, InputItem* item, ThumbnailerArg* arg, ThumbnailerCbs* cbs, void* cbs_userdata);
 
     /// <summary>vlc_preparser_req_NewThumbnailToFiles</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_req_NewThumbnailToFiles")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PreparserReq* NewThumbnailToFiles(Preparser* preparser, InputItem* item, ThumbnailerArg* arg, ThumbnailerOutput* outputs, nuint output_count, ThumbnailerToFilesCbs* cbs, void* cbs_userdata);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_req_NewThumbnailToFiles", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PreparserReq* NewThumbnailToFiles(Preparser* preparser, InputItem* item, ThumbnailerArg* arg, ThumbnailerOutput* outputs, nuint output_count, ThumbnailerToFilesCbs* cbs, void* cbs_userdata);
 
     /// <summary>vlc_preparser_req_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_preparser_req_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(PreparserReq* req);
+    [DllImport("libvlccore", EntryPoint = "vlc_preparser_req_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(PreparserReq* req);
 }

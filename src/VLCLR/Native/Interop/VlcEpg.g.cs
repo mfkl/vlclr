@@ -132,46 +132,38 @@ public unsafe partial struct Epg
 public static unsafe partial class VlcEpg
 {
     /// <summary>vlc_epg_AddEvent</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_AddEvent")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte AddEvent(Epg* p_epg, EpgEvent* p_evt);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_AddEvent", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte AddEvent(Epg* p_epg, EpgEvent* p_evt);
 
     /// <summary>vlc_epg_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Epg* p_epg);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Epg* p_epg);
 
     /// <summary>vlc_epg_Duplicate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_Duplicate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Epg* Duplicate(Epg* p_src);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_Duplicate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Epg* Duplicate(Epg* p_src);
 
     /// <summary>vlc_epg_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Epg* New(uint i_id, ushort i_source_id);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Epg* New(uint i_id, ushort i_source_id);
 
     /// <summary>vlc_epg_SetCurrent</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_SetCurrent")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetCurrent(Epg* p_epg, long i_start);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_SetCurrent", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetCurrent(Epg* p_epg, long i_start);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcEpgEvent
 {
     /// <summary>vlc_epg_event_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_event_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(EpgEvent* p_event);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_event_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(EpgEvent* p_event);
 
     /// <summary>vlc_epg_event_Duplicate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_event_Duplicate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial EpgEvent* Duplicate(EpgEvent* p_src);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_event_Duplicate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern EpgEvent* Duplicate(EpgEvent* p_src);
 
     /// <summary>vlc_epg_event_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_epg_event_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial EpgEvent* New(ushort i_id, long i_start, uint i_duration);
+    [DllImport("libvlccore", EntryPoint = "vlc_epg_event_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern EpgEvent* New(ushort i_id, long i_start, uint i_duration);
 }

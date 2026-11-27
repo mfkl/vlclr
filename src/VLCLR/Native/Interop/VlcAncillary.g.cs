@@ -549,51 +549,42 @@ public static unsafe partial class VlcAncillary
     public const uint AncillaryIdVpxAlpha = 1098412150;
 
     /// <summary>vlc_ancillary_CreateWithFreeCb</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_CreateWithFreeCb")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Ancillary* CreateWithFreeCb(void* data, uint id, delegate* unmanaged[Cdecl]<void*, void> free_cb);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_CreateWithFreeCb", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Ancillary* CreateWithFreeCb(void* data, uint id, delegate* unmanaged[Cdecl]<void*, void> free_cb);
 
     /// <summary>vlc_ancillary_GetData</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_GetData")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* GetData(Ancillary* ancillary);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_GetData", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* GetData(Ancillary* ancillary);
 
     /// <summary>vlc_ancillary_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Ancillary* Hold(Ancillary* ancillary);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Ancillary* Hold(Ancillary* ancillary);
 
     /// <summary>vlc_ancillary_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(Ancillary* ancillary);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(Ancillary* ancillary);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcAncillaryArray
 {
     /// <summary>vlc_ancillary_array_Clear</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Clear")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Clear(AncillaryArray* array);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_array_Clear", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Clear(AncillaryArray* array);
 
     /// <summary>vlc_ancillary_array_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Ancillary* Get(AncillaryArray* array, uint id);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_array_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Ancillary* Get(AncillaryArray* array, uint id);
 
     /// <summary>vlc_ancillary_array_Insert</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Insert")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Insert(AncillaryArray* array, Ancillary* ancillary);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_array_Insert", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Insert(AncillaryArray* array, Ancillary* ancillary);
 
     /// <summary>vlc_ancillary_array_Merge</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_Merge")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Merge(AncillaryArray* dst_array, AncillaryArray* src_array);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_array_Merge", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Merge(AncillaryArray* dst_array, AncillaryArray* src_array);
 
     /// <summary>vlc_ancillary_array_MergeAndClear</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ancillary_array_MergeAndClear")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MergeAndClear(AncillaryArray* dst_array, AncillaryArray* src_array);
+    [DllImport("libvlccore", EntryPoint = "vlc_ancillary_array_MergeAndClear", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MergeAndClear(AncillaryArray* dst_array, AncillaryArray* src_array);
 }

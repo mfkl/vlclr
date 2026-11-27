@@ -188,24 +188,20 @@ public enum DemuxQuery : uint
 public static unsafe partial class Demux
 {
     /// <summary>demux_Demux</summary>
-    [LibraryImport("libvlccore", EntryPoint = "demux_Demux")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Run(Stream* p_demux);
+    [DllImport("libvlccore", EntryPoint = "demux_Demux", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Run(Stream* p_demux);
 
     /// <summary>demux_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "demux_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* New(ObjectHeader* p_obj, byte* module_name, byte* url, Stream* s, EsOut* @out);
+    [DllImport("libvlccore", EntryPoint = "demux_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* New(ObjectHeader* p_obj, byte* module_name, byte* url, Stream* s, EsOut* @out);
 
     /// <summary>demux_PacketizerDestroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "demux_PacketizerDestroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PacketizerDestroy(Decoder* p_packetizer);
+    [DllImport("libvlccore", EntryPoint = "demux_PacketizerDestroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PacketizerDestroy(Decoder* p_packetizer);
 
     /// <summary>demux_PacketizerNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "demux_PacketizerNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Decoder* PacketizerNew(ObjectHeader* p_demux, EsFormat* p_fmt, byte* psz_msg);
+    [DllImport("libvlccore", EntryPoint = "demux_PacketizerNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Decoder* PacketizerNew(ObjectHeader* p_demux, EsFormat* p_fmt, byte* psz_msg);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -240,17 +236,14 @@ public static partial class VlcDemux
 public static unsafe partial class VlcDemuxChained
 {
     /// <summary>vlc_demux_chained_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_demux_chained_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(DemuxChained* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_demux_chained_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(DemuxChained* arg0);
 
     /// <summary>vlc_demux_chained_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_demux_chained_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DemuxChained* New(ObjectHeader* parent, byte* name, EsOut* @out);
+    [DllImport("libvlccore", EntryPoint = "vlc_demux_chained_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DemuxChained* New(ObjectHeader* parent, byte* name, EsOut* @out);
 
     /// <summary>vlc_demux_chained_Send</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_demux_chained_Send")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Send(DemuxChained* demux, Frame* block);
+    [DllImport("libvlccore", EntryPoint = "vlc_demux_chained_Send", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Send(DemuxChained* demux, Frame* block);
 }

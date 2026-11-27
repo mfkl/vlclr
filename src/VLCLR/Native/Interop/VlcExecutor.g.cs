@@ -48,27 +48,22 @@ public unsafe partial struct Runnable
 public static unsafe partial class VlcExecutor
 {
     /// <summary>vlc_executor_Cancel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_executor_Cancel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte Cancel(Executor* executor, Runnable* runnable);
+    [DllImport("libvlccore", EntryPoint = "vlc_executor_Cancel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte Cancel(Executor* executor, Runnable* runnable);
 
     /// <summary>vlc_executor_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_executor_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Executor* executor);
+    [DllImport("libvlccore", EntryPoint = "vlc_executor_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Executor* executor);
 
     /// <summary>vlc_executor_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_executor_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Executor* New(uint max_threads);
+    [DllImport("libvlccore", EntryPoint = "vlc_executor_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Executor* New(uint max_threads);
 
     /// <summary>vlc_executor_Submit</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_executor_Submit")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Submit(Executor* executor, Runnable* runnable);
+    [DllImport("libvlccore", EntryPoint = "vlc_executor_Submit", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Submit(Executor* executor, Runnable* runnable);
 
     /// <summary>vlc_executor_WaitIdle</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_executor_WaitIdle")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void WaitIdle(Executor* executor);
+    [DllImport("libvlccore", EntryPoint = "vlc_executor_WaitIdle", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void WaitIdle(Executor* executor);
 }

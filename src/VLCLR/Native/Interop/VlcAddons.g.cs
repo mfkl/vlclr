@@ -482,42 +482,35 @@ public enum AddonType : uint
 public unsafe partial struct AddonEntry
 {
     /// <summary>addon_entry_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addon_entry_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial AddonEntry* Hold(AddonEntry* arg0);
+    [DllImport("libvlccore", EntryPoint = "addon_entry_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern AddonEntry* Hold(AddonEntry* arg0);
 
     /// <summary>addon_entry_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addon_entry_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial AddonEntry* New();
+    [DllImport("libvlccore", EntryPoint = "addon_entry_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern AddonEntry* New();
 
     /// <summary>addon_entry_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addon_entry_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(AddonEntry* arg0);
+    [DllImport("libvlccore", EntryPoint = "addon_entry_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(AddonEntry* arg0);
 }
 
 public unsafe partial struct AddonsManager
 {
     /// <summary>addons_manager_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addons_manager_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(AddonsManager* arg0);
+    [DllImport("libvlccore", EntryPoint = "addons_manager_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(AddonsManager* arg0);
 
     /// <summary>addons_manager_Gather</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addons_manager_Gather")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Gather(AddonsManager* arg0, byte* psz_uri);
+    [DllImport("libvlccore", EntryPoint = "addons_manager_Gather", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Gather(AddonsManager* arg0, byte* psz_uri);
 
     /// <summary>addons_manager_LoadCatalog</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addons_manager_LoadCatalog")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int LoadCatalog(AddonsManager* arg0);
+    [DllImport("libvlccore", EntryPoint = "addons_manager_LoadCatalog", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int LoadCatalog(AddonsManager* arg0);
 
     /// <summary>addons_manager_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "addons_manager_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial AddonsManager* New(ObjectHeader* arg0, AddonsManagerOwner* arg1);
+    [DllImport("libvlccore", EntryPoint = "addons_manager_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern AddonsManager* New(ObjectHeader* arg0, AddonsManagerOwner* arg1);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

@@ -11,7 +11,6 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class VlcMime
 {
     /// <summary>vlc_mime_Ext2Mime</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_mime_Ext2Mime")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* Ext2Mime(byte* psz_url);
+    [DllImport("libvlccore", EntryPoint = "vlc_mime_Ext2Mime", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* Ext2Mime(byte* psz_url);
 }

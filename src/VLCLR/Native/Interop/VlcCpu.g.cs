@@ -11,19 +11,16 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class Vlc
 {
     /// <summary>vlc_CPU</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_CPU")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint Cpu();
+    [DllImport("libvlccore", EntryPoint = "vlc_CPU", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint Cpu();
 
     /// <summary>vlc_CPU_functions_init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_CPU_functions_init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CPUFunctionsInit(byte* name, void* funcs);
+    [DllImport("libvlccore", EntryPoint = "vlc_CPU_functions_init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CPUFunctionsInit(byte* name, void* funcs);
 
     /// <summary>vlc_CPU_set</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_CPU_set")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CPUSet(uint mask);
+    [DllImport("libvlccore", EntryPoint = "vlc_CPU_set", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CPUSet(uint mask);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

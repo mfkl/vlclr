@@ -1013,87 +1013,71 @@ public enum VideoTransform : uint
 public unsafe partial struct EsFormat
 {
     /// <summary>es_format_Clean</summary>
-    [LibraryImport("libvlccore", EntryPoint = "es_format_Clean")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Clean(EsFormat* fmt);
+    [DllImport("libvlccore", EntryPoint = "es_format_Clean", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Clean(EsFormat* fmt);
 
     /// <summary>es_format_Copy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "es_format_Copy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Copy(EsFormat* p_dst, EsFormat* p_src);
+    [DllImport("libvlccore", EntryPoint = "es_format_Copy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Copy(EsFormat* p_dst, EsFormat* p_src);
 
     /// <summary>es_format_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "es_format_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(EsFormat* arg0, int i_cat, uint i_codec);
+    [DllImport("libvlccore", EntryPoint = "es_format_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(EsFormat* arg0, int i_cat, uint i_codec);
 
     /// <summary>es_format_InitFromVideo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "es_format_InitFromVideo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void InitFromVideo(EsFormat* arg0, VideoFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "es_format_InitFromVideo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void InitFromVideo(EsFormat* arg0, VideoFormat* arg1);
 
     /// <summary>es_format_IsSimilar</summary>
-    [LibraryImport("libvlccore", EntryPoint = "es_format_IsSimilar")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsSimilar(EsFormat* arg0, EsFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "es_format_IsSimilar", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsSimilar(EsFormat* arg0, EsFormat* arg1);
 
     /// <summary>es_format_LogDifferences</summary>
-    [LibraryImport("libvlccore", EntryPoint = "es_format_LogDifferences")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void LogDifferences(Logger* arg0, byte* name_a, EsFormat* a, byte* name_b, EsFormat* b);
+    [DllImport("libvlccore", EntryPoint = "es_format_LogDifferences", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void LogDifferences(Logger* arg0, byte* name_a, EsFormat* a, byte* name_b, EsFormat* b);
 }
 
 public unsafe partial struct VideoFormat
 {
     /// <summary>video_format_ApplyRotation</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_ApplyRotation")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ApplyRotation(VideoFormat* @out, VideoFormat* @in);
+    [DllImport("libvlccore", EntryPoint = "video_format_ApplyRotation", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ApplyRotation(VideoFormat* @out, VideoFormat* @in);
 
     /// <summary>video_format_CopyCrop</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_CopyCrop")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CopyCrop(VideoFormat* arg0, VideoFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "video_format_CopyCrop", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CopyCrop(VideoFormat* arg0, VideoFormat* arg1);
 
     /// <summary>video_format_GetTransform</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_GetTransform")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VideoTransform GetTransform(VideoOrientation src, VideoOrientation dst);
+    [DllImport("libvlccore", EntryPoint = "video_format_GetTransform", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VideoTransform GetTransform(VideoOrientation src, VideoOrientation dst);
 
     /// <summary>video_format_IsSimilar</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_IsSimilar")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsSimilar(VideoFormat* arg0, VideoFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "video_format_IsSimilar", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsSimilar(VideoFormat* arg0, VideoFormat* arg1);
 
     /// <summary>video_format_LogDifferences</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_LogDifferences")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void LogDifferences(Logger* log, byte* name_a, VideoFormat* a, byte* name_b, VideoFormat* b);
+    [DllImport("libvlccore", EntryPoint = "video_format_LogDifferences", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void LogDifferences(Logger* log, byte* name_a, VideoFormat* a, byte* name_b, VideoFormat* b);
 
     /// <summary>video_format_Print</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_Print")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Print(ObjectHeader* arg0, byte* arg1, VideoFormat* arg2);
+    [DllImport("libvlccore", EntryPoint = "video_format_Print", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Print(ObjectHeader* arg0, byte* arg1, VideoFormat* arg2);
 
     /// <summary>video_format_ScaleCropAr</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_ScaleCropAr")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ScaleCropAr(VideoFormat* arg0, VideoFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "video_format_ScaleCropAr", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ScaleCropAr(VideoFormat* arg0, VideoFormat* arg1);
 
     /// <summary>video_format_Setup</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_Setup")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Setup(VideoFormat* arg0, uint i_chroma, int i_width, int i_height, int i_visible_width, int i_visible_height, int i_sar_num, int i_sar_den);
+    [DllImport("libvlccore", EntryPoint = "video_format_Setup", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Setup(VideoFormat* arg0, uint i_chroma, int i_width, int i_height, int i_visible_width, int i_visible_height, int i_sar_num, int i_sar_den);
 
     /// <summary>video_format_TransformBy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_TransformBy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void TransformBy(VideoFormat* fmt, VideoTransform transform);
+    [DllImport("libvlccore", EntryPoint = "video_format_TransformBy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void TransformBy(VideoFormat* fmt, VideoTransform transform);
 
     /// <summary>video_format_TransformTo</summary>
-    [LibraryImport("libvlccore", EntryPoint = "video_format_TransformTo")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void TransformTo(VideoFormat* fmt, VideoOrientation dst_orientation);
+    [DllImport("libvlccore", EntryPoint = "video_format_TransformTo", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void TransformTo(VideoFormat* fmt, VideoOrientation dst_orientation);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -1298,41 +1282,34 @@ public static unsafe partial class VlcEs
     public const int VideoPaletteColorsMax = 256;
 
     /// <summary>vlc_viewpoint_from_orientation</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_viewpoint_from_orientation")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcViewpointFromOrientation(Viewpoint* vp, VideoOrientation orient);
+    [DllImport("libvlccore", EntryPoint = "vlc_viewpoint_from_orientation", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcViewpointFromOrientation(Viewpoint* vp, VideoOrientation orient);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcEsId
 {
     /// <summary>vlc_es_id_GetCat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_GetCat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial EsFormatCategory GetCat(EsId* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_es_id_GetCat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern EsFormatCategory GetCat(EsId* id);
 
     /// <summary>vlc_es_id_GetInputId</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_GetInputId")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetInputId(EsId* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_es_id_GetInputId", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetInputId(EsId* id);
 
     /// <summary>vlc_es_id_GetStrId</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_GetStrId")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetStrId(EsId* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_es_id_GetStrId", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetStrId(EsId* id);
 
     /// <summary>vlc_es_id_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial EsId* Hold(EsId* es);
+    [DllImport("libvlccore", EntryPoint = "vlc_es_id_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern EsId* Hold(EsId* es);
 
     /// <summary>vlc_es_id_IsStrIdStable</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_IsStrIdStable")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte IsStrIdStable(EsId* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_es_id_IsStrIdStable", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte IsStrIdStable(EsId* id);
 
     /// <summary>vlc_es_id_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_es_id_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(EsId* id);
+    [DllImport("libvlccore", EntryPoint = "vlc_es_id_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(EsId* id);
 }

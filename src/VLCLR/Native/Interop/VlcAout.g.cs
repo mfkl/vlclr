@@ -399,138 +399,112 @@ public enum ChanOrderIdx : int
 public static unsafe partial class Aout
 {
     /// <summary>aout_BitsPerSample</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_BitsPerSample")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint BitsPerSample(uint i_format);
+    [DllImport("libvlccore", EntryPoint = "aout_BitsPerSample", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint BitsPerSample(uint i_format);
 
     /// <summary>aout_ChannelExtract</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_ChannelExtract")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChannelExtract(void* p_dst, int i_dst_channels, void* p_src, int i_src_channels, int i_sample_count, int* pi_selection, int i_bits_per_sample);
+    [DllImport("libvlccore", EntryPoint = "aout_ChannelExtract", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChannelExtract(void* p_dst, int i_dst_channels, void* p_src, int i_src_channels, int i_sample_count, int* pi_selection, int i_bits_per_sample);
 
     /// <summary>aout_ChannelReorder</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_ChannelReorder")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChannelReorder(void* ptr, nuint bytes, byte channels, byte* chans_table, uint fourcc);
+    [DllImport("libvlccore", EntryPoint = "aout_ChannelReorder", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChannelReorder(void* ptr, nuint bytes, byte channels, byte* chans_table, uint fourcc);
 
     /// <summary>aout_CheckChannelReorder</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_CheckChannelReorder")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint CheckChannelReorder(uint* arg0, uint* arg1, uint mask, byte* table);
+    [DllImport("libvlccore", EntryPoint = "aout_CheckChannelReorder", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint CheckChannelReorder(uint* arg0, uint* arg1, uint mask, byte* table);
 
     /// <summary>aout_Deinterleave</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_Deinterleave")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Deinterleave(void* dst, void* src, uint samples, uint channels, uint fourcc);
+    [DllImport("libvlccore", EntryPoint = "aout_Deinterleave", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Deinterleave(void* dst, void* src, uint samples, uint channels, uint fourcc);
 
     /// <summary>aout_DeviceGet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_DeviceGet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* DeviceGet(AudioOutput* arg0);
+    [DllImport("libvlccore", EntryPoint = "aout_DeviceGet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* DeviceGet(AudioOutput* arg0);
 
     /// <summary>aout_DeviceSet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_DeviceSet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int DeviceSet(AudioOutput* aout, byte* id);
+    [DllImport("libvlccore", EntryPoint = "aout_DeviceSet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int DeviceSet(AudioOutput* aout, byte* id);
 
     /// <summary>aout_DevicesList</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_DevicesList")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int DevicesList(AudioOutput* aout, byte*** ids, byte*** names);
+    [DllImport("libvlccore", EntryPoint = "aout_DevicesList", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int DevicesList(AudioOutput* aout, byte*** ids, byte*** names);
 
     /// <summary>aout_EnableFilter</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_EnableFilter")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int EnableFilter(AudioOutput* aout, byte* name, byte add);
+    [DllImport("libvlccore", EntryPoint = "aout_EnableFilter", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int EnableFilter(AudioOutput* aout, byte* name, byte add);
 
     /// <summary>aout_FiltersAdjustResampling</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersAdjustResampling")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte FiltersAdjustResampling(AoutFilters* arg0, int arg1);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersAdjustResampling", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte FiltersAdjustResampling(AoutFilters* arg0, int arg1);
 
     /// <summary>aout_FiltersChangeViewpoint</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersChangeViewpoint")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FiltersChangeViewpoint(AoutFilters* arg0, Viewpoint* vp);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersChangeViewpoint", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FiltersChangeViewpoint(AoutFilters* arg0, Viewpoint* vp);
 
     /// <summary>aout_FiltersDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FiltersDelete(ObjectHeader* arg0, AoutFilters* arg1);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FiltersDelete(ObjectHeader* arg0, AoutFilters* arg1);
 
     /// <summary>aout_FiltersDrain</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersDrain")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* FiltersDrain(AoutFilters* arg0);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersDrain", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* FiltersDrain(AoutFilters* arg0);
 
     /// <summary>aout_FiltersFlush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersFlush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FiltersFlush(AoutFilters* arg0);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersFlush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FiltersFlush(AoutFilters* arg0);
 
     /// <summary>aout_FiltersNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial AoutFilters* FiltersNew(ObjectHeader* arg0, AudioFormat* arg1, AudioFormat* arg2, AoutFiltersCfg* cfg);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern AoutFilters* FiltersNew(ObjectHeader* arg0, AudioFormat* arg1, AudioFormat* arg2, AoutFiltersCfg* cfg);
 
     /// <summary>aout_FiltersPlay</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FiltersPlay")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* FiltersPlay(AoutFilters* arg0, Frame* arg1, float rate);
+    [DllImport("libvlccore", EntryPoint = "aout_FiltersPlay", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* FiltersPlay(AoutFilters* arg0, Frame* arg1, float rate);
 
     /// <summary>aout_FormatPrepare</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FormatPrepare")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FormatPrepare(AudioFormat* p_format);
+    [DllImport("libvlccore", EntryPoint = "aout_FormatPrepare", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FormatPrepare(AudioFormat* p_format);
 
     /// <summary>aout_FormatPrint</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FormatPrint")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FormatPrint(ObjectHeader* arg0, byte* arg1, AudioFormat* arg2);
+    [DllImport("libvlccore", EntryPoint = "aout_FormatPrint", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FormatPrint(ObjectHeader* arg0, byte* arg1, AudioFormat* arg2);
 
     /// <summary>aout_FormatPrintChannels</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_FormatPrintChannels")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* FormatPrintChannels(AudioFormat* arg0);
+    [DllImport("libvlccore", EntryPoint = "aout_FormatPrintChannels", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* FormatPrintChannels(AudioFormat* arg0);
 
     /// <summary>aout_Interleave</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_Interleave")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Interleave(void* dst, void** planes, uint samples, uint channels, uint fourcc);
+    [DllImport("libvlccore", EntryPoint = "aout_Interleave", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Interleave(void* dst, void** planes, uint samples, uint channels, uint fourcc);
 
     /// <summary>aout_MuteGet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_MuteGet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MuteGet(AudioOutput* arg0);
+    [DllImport("libvlccore", EntryPoint = "aout_MuteGet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MuteGet(AudioOutput* arg0);
 
     /// <summary>aout_MuteSet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_MuteSet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MuteSet(AudioOutput* arg0, byte arg1);
+    [DllImport("libvlccore", EntryPoint = "aout_MuteSet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MuteSet(AudioOutput* arg0, byte arg1);
 
     /// <summary>aout_VolumeGet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_VolumeGet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial float VolumeGet(AudioOutput* arg0);
+    [DllImport("libvlccore", EntryPoint = "aout_VolumeGet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float VolumeGet(AudioOutput* arg0);
 
     /// <summary>aout_VolumeSet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_VolumeSet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VolumeSet(AudioOutput* arg0, float arg1);
+    [DllImport("libvlccore", EntryPoint = "aout_VolumeSet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VolumeSet(AudioOutput* arg0, float arg1);
 
     /// <summary>aout_VolumeUpdate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_VolumeUpdate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VolumeUpdate(AudioOutput* aout, int value, float* volp);
+    [DllImport("libvlccore", EntryPoint = "aout_VolumeUpdate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VolumeUpdate(AudioOutput* aout, int value, float* volp);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class AoutFilter
 {
     /// <summary>aout_filter_GetVout</summary>
-    [LibraryImport("libvlccore", EntryPoint = "aout_filter_GetVout")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VoutThread* GetVout(Filter* arg0, VideoFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "aout_filter_GetVout", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VoutThread* GetVout(Filter* arg0, VideoFormat* arg1);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -616,37 +590,30 @@ public static partial class VlcAout
 public static unsafe partial class VlcAudioMeter
 {
     /// <summary>vlc_audio_meter_AddPlugin</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_AddPlugin")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial AudioMeterPlugin* AddPlugin(AudioMeter* meter, byte* chain, AudioMeterPluginOwner* owner);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_AddPlugin", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern AudioMeterPlugin* AddPlugin(AudioMeter* meter, byte* chain, AudioMeterPluginOwner* owner);
 
     /// <summary>vlc_audio_meter_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(AudioMeter* meter);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(AudioMeter* meter);
 
     /// <summary>vlc_audio_meter_Flush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Flush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Flush(AudioMeter* meter);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_Flush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Flush(AudioMeter* meter);
 
     /// <summary>vlc_audio_meter_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(AudioMeter* meter, ObjectHeader* parent);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(AudioMeter* meter, ObjectHeader* parent);
 
     /// <summary>vlc_audio_meter_Process</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Process")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Process(AudioMeter* meter, Frame* block, long date);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_Process", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Process(AudioMeter* meter, Frame* block, long date);
 
     /// <summary>vlc_audio_meter_RemovePlugin</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_RemovePlugin")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void RemovePlugin(AudioMeter* meter, AudioMeterPlugin* plugin);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_RemovePlugin", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void RemovePlugin(AudioMeter* meter, AudioMeterPlugin* plugin);
 
     /// <summary>vlc_audio_meter_Reset</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_audio_meter_Reset")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Reset(AudioMeter* meter, AudioFormat* fmt);
+    [DllImport("libvlccore", EntryPoint = "vlc_audio_meter_Reset", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Reset(AudioMeter* meter, AudioFormat* fmt);
 }

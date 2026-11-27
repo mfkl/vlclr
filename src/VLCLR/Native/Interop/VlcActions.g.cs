@@ -585,27 +585,22 @@ public static unsafe partial class VlcActions
     public const int KeyZoomOut = 7143424;
 
     /// <summary>vlc_actions_get_id</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_actions_get_id")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ActionId GetId(byte* psz_key_name);
+    [DllImport("libvlccore", EntryPoint = "vlc_actions_get_id", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ActionId GetId(byte* psz_key_name);
 
     /// <summary>vlc_actions_get_key_names</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_actions_get_key_names")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte** GetKeyNames(ObjectHeader* p_obj);
+    [DllImport("libvlccore", EntryPoint = "vlc_actions_get_key_names", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte** GetKeyNames(ObjectHeader* p_obj);
 
     /// <summary>vlc_actions_get_keycodes</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_actions_get_keycodes")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint GetKeycodes(ObjectHeader* p_obj, byte* psz_key_name, byte b_global, uint** pp_keycodes);
+    [DllImport("libvlccore", EntryPoint = "vlc_actions_get_keycodes", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint GetKeycodes(ObjectHeader* p_obj, byte* psz_key_name, byte b_global, uint** pp_keycodes);
 
     /// <summary>vlc_keycode2str</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_keycode2str")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcKeycode2str(uint i_key, byte locale);
+    [DllImport("libvlccore", EntryPoint = "vlc_keycode2str", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcKeycode2str(uint i_key, byte locale);
 
     /// <summary>vlc_str2keycode</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_str2keycode")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint VlcStr2keycode(byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_str2keycode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint VlcStr2keycode(byte* str);
 }

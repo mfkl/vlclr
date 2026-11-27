@@ -14,47 +14,38 @@ public static unsafe partial class VlcCharset
     public const ulong IconvErr = 18446744073709551615;
 
     /// <summary>FromCharset</summary>
-    [LibraryImport("libvlccore", EntryPoint = "FromCharset")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* FromCharset(byte* charset, void* data, nuint data_size);
+    [DllImport("libvlccore", EntryPoint = "FromCharset", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* FromCharset(byte* charset, void* data, nuint data_size);
 
     /// <summary>ToCharset</summary>
-    [LibraryImport("libvlccore", EntryPoint = "ToCharset")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* ToCharset(byte* charset, byte* @in, nuint* outsize);
+    [DllImport("libvlccore", EntryPoint = "ToCharset", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* ToCharset(byte* charset, byte* @in, nuint* outsize);
 
     /// <summary>vlc_iconv</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_iconv")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint VlcIconv(void* arg0, byte** arg1, nuint* arg2, byte** arg3, nuint* arg4);
+    [DllImport("libvlccore", EntryPoint = "vlc_iconv", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint VlcIconv(void* arg0, byte** arg1, nuint* arg2, byte** arg3, nuint* arg4);
 
     /// <summary>vlc_iconv_close</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_iconv_close")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcIconvClose(void* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_iconv_close", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcIconvClose(void* arg0);
 
     /// <summary>vlc_iconv_open</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_iconv_open")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* VlcIconvOpen(byte* arg0, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_iconv_open", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* VlcIconvOpen(byte* arg0, byte* arg1);
 
     /// <summary>vlc_strcasestr</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_strcasestr")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcStrcasestr(byte* arg0, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_strcasestr", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcStrcasestr(byte* arg0, byte* arg1);
 
     /// <summary>vlc_strtod_c</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_strtod_c")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial double VlcStrtodC(byte* str, byte** end);
+    [DllImport("libvlccore", EntryPoint = "vlc_strtod_c", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern double VlcStrtodC(byte* str, byte** end);
 
     /// <summary>vlc_strtof_c</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_strtof_c")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial float VlcStrtofC(byte* str, byte** end);
+    [DllImport("libvlccore", EntryPoint = "vlc_strtof_c", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float VlcStrtofC(byte* str, byte** end);
 
     /// <summary>vlc_towc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_towc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcTowc(byte* str, uint* pwc);
+    [DllImport("libvlccore", EntryPoint = "vlc_towc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcTowc(byte* str, uint* pwc);
 }

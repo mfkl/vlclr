@@ -2883,127 +2883,102 @@ public enum MlTrackType : uint
 public static unsafe partial class VlcMediaLibrary
 {
     /// <summary>vlc_ml_album_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_album_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlAlbumListRelease(MlAlbumList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_album_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlAlbumListRelease(MlAlbumList* p_list);
 
     /// <summary>vlc_ml_album_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_album_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlAlbumRelease(MlAlbum* p_album);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_album_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlAlbumRelease(MlAlbum* p_album);
 
     /// <summary>vlc_ml_artist_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_artist_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlArtistListRelease(MlArtistList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_artist_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlArtistListRelease(MlArtistList* p_list);
 
     /// <summary>vlc_ml_artist_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_artist_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlArtistRelease(MlArtist* p_artist);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_artist_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlArtistRelease(MlArtist* p_artist);
 
     /// <summary>vlc_ml_bookmark_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_bookmark_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlBookmarkListRelease(MlBoomkmarkList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_bookmark_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlBookmarkListRelease(MlBoomkmarkList* p_list);
 
     /// <summary>vlc_ml_bookmark_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_bookmark_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlBookmarkRelease(MlBookmark* p_bookmark);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_bookmark_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlBookmarkRelease(MlBookmark* p_bookmark);
 
     /// <summary>vlc_ml_event_register_callback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_event_register_callback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MlEventCallback* VlcMlEventRegisterCallback(Medialibrary* p_ml, delegate* unmanaged[Cdecl]<void*, MlEvent*, void> cb, void* p_data);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_event_register_callback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MlEventCallback* VlcMlEventRegisterCallback(Medialibrary* p_ml, delegate* unmanaged[Cdecl]<void*, MlEvent*, void> cb, void* p_data);
 
     /// <summary>vlc_ml_event_unregister_callback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_event_unregister_callback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlEventUnregisterCallback(Medialibrary* p_ml, MlEventCallback* p_callback);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_event_unregister_callback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlEventUnregisterCallback(Medialibrary* p_ml, MlEventCallback* p_callback);
 
     /// <summary>vlc_ml_event_unregister_from_callback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_event_unregister_from_callback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlEventUnregisterFromCallback(Medialibrary* p_ml, MlEventCallback* p_callback);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_event_unregister_from_callback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlEventUnregisterFromCallback(Medialibrary* p_ml, MlEventCallback* p_callback);
 
     /// <summary>vlc_ml_file_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_file_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlFileListRelease(MlFileList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_file_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlFileListRelease(MlFileList* p_list);
 
     /// <summary>vlc_ml_folder_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_folder_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlFolderListRelease(MlFolderList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_folder_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlFolderListRelease(MlFolderList* p_list);
 
     /// <summary>vlc_ml_folder_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_folder_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlFolderRelease(MlFolder* p_folder);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_folder_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlFolderRelease(MlFolder* p_folder);
 
     /// <summary>vlc_ml_genre_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_genre_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlGenreListRelease(MlGenreList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_genre_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlGenreListRelease(MlGenreList* p_list);
 
     /// <summary>vlc_ml_genre_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_genre_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlGenreRelease(MlGenre* p_genre);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_genre_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlGenreRelease(MlGenre* p_genre);
 
     /// <summary>vlc_ml_group_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_group_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlGroupListRelease(MlGroupList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_group_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlGroupListRelease(MlGroupList* p_list);
 
     /// <summary>vlc_ml_group_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_group_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlGroupRelease(MlGroup* p_group);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_group_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlGroupRelease(MlGroup* p_group);
 
     /// <summary>vlc_ml_instance_get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_instance_get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Medialibrary* VlcMlInstanceGet(ObjectHeader* p_obj);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_instance_get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Medialibrary* VlcMlInstanceGet(ObjectHeader* p_obj);
 
     /// <summary>vlc_ml_label_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_label_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlLabelListRelease(MlLabelList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_label_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlLabelListRelease(MlLabelList* p_list);
 
     /// <summary>vlc_ml_media_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_media_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlMediaListRelease(MlMediaList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_media_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlMediaListRelease(MlMediaList* p_list);
 
     /// <summary>vlc_ml_media_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_media_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlMediaRelease(MlMedia* p_media);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_media_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlMediaRelease(MlMedia* p_media);
 
     /// <summary>vlc_ml_playback_states_all_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_playback_states_all_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlPlaybackStatesAllRelease(MlPlaybackStatesAll* prefs);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_playback_states_all_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlPlaybackStatesAllRelease(MlPlaybackStatesAll* prefs);
 
     /// <summary>vlc_ml_playlist_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_playlist_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlPlaylistListRelease(MlPlaylistList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_playlist_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlPlaylistListRelease(MlPlaylistList* p_list);
 
     /// <summary>vlc_ml_playlist_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_playlist_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlPlaylistRelease(MlPlaylist* p_playlist);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_playlist_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlPlaylistRelease(MlPlaylist* p_playlist);
 
     /// <summary>vlc_ml_show_list_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_show_list_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlShowListRelease(MlShowList* p_list);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_show_list_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlShowListRelease(MlShowList* p_list);
 
     /// <summary>vlc_ml_show_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ml_show_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcMlShowRelease(MlShow* p_show);
+    [DllImport("libvlccore", EntryPoint = "vlc_ml_show_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcMlShowRelease(MlShow* p_show);
 }

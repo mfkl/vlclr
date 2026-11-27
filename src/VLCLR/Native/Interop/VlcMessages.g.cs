@@ -134,26 +134,22 @@ public enum LogType : uint
 public static unsafe partial class Vlc
 {
     /// <summary>vlc_LogDestroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_LogDestroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void LogDestroy(Logger* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_LogDestroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void LogDestroy(Logger* arg0);
 
     /// <summary>vlc_LogHeaderCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_LogHeaderCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Logger* LogHeaderCreate(Logger* parent, byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_LogHeaderCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Logger* LogHeaderCreate(Logger* parent, byte* str);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcMessages
 {
     /// <summary>vlc_strerror</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_strerror")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcStrerror(int arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_strerror", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcStrerror(int arg0);
 
     /// <summary>vlc_strerror_c</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_strerror_c")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcStrerrorC(int arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_strerror_c", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcStrerrorC(int arg0);
 }

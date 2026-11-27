@@ -132,22 +132,18 @@ public static partial class VlcXml
 public unsafe partial struct Xml
 {
     /// <summary>xml_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "xml_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Xml* Create(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "xml_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Xml* Create(ObjectHeader* arg0);
 
     /// <summary>xml_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "xml_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Xml* arg0);
+    [DllImport("libvlccore", EntryPoint = "xml_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Xml* arg0);
 
     /// <summary>xml_ReaderCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "xml_ReaderCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial XmlReader* ReaderCreate(ObjectHeader* arg0, Stream* arg1);
+    [DllImport("libvlccore", EntryPoint = "xml_ReaderCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern XmlReader* ReaderCreate(ObjectHeader* arg0, Stream* arg1);
 
     /// <summary>xml_ReaderDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "xml_ReaderDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ReaderDelete(XmlReader* arg0);
+    [DllImport("libvlccore", EntryPoint = "xml_ReaderDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ReaderDelete(XmlReader* arg0);
 }

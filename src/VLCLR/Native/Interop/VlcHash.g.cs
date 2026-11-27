@@ -106,17 +106,14 @@ public static partial class VlcHash
 public static unsafe partial class VlcHashMd5
 {
     /// <summary>vlc_hash_md5_Finish</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_hash_md5_Finish")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Finish(HashMd5Ctx* ctx, void* output, nuint size);
+    [DllImport("libvlccore", EntryPoint = "vlc_hash_md5_Finish", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Finish(HashMd5Ctx* ctx, void* output, nuint size);
 
     /// <summary>vlc_hash_md5_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_hash_md5_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(HashMd5Ctx* ctx);
+    [DllImport("libvlccore", EntryPoint = "vlc_hash_md5_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(HashMd5Ctx* ctx);
 
     /// <summary>vlc_hash_md5_Update</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_hash_md5_Update")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Update(HashMd5Ctx* ctx, void* data, nuint size);
+    [DllImport("libvlccore", EntryPoint = "vlc_hash_md5_Update", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Update(HashMd5Ctx* ctx, void* data, nuint size);
 }

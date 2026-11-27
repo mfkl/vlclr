@@ -337,142 +337,114 @@ public enum SoutStreamQuery : uint
 public static unsafe partial class Sout
 {
     /// <summary>sout_AccessOutDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AccessOutDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void AccessOutDelete(SoutAccessOut* arg0);
+    [DllImport("libvlccore", EntryPoint = "sout_AccessOutDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void AccessOutDelete(SoutAccessOut* arg0);
 
     /// <summary>sout_AccessOutNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AccessOutNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SoutAccessOut* AccessOutNew(ObjectHeader* arg0, byte* psz_access, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "sout_AccessOutNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SoutAccessOut* AccessOutNew(ObjectHeader* arg0, byte* psz_access, byte* psz_name);
 
     /// <summary>sout_AccessOutRead</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AccessOutRead")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint AccessOutRead(SoutAccessOut* arg0, Frame* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_AccessOutRead", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint AccessOutRead(SoutAccessOut* arg0, Frame* arg1);
 
     /// <summary>sout_AccessOutSeek</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AccessOutSeek")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int AccessOutSeek(SoutAccessOut* arg0, ulong arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_AccessOutSeek", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int AccessOutSeek(SoutAccessOut* arg0, ulong arg1);
 
     /// <summary>sout_AccessOutWrite</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AccessOutWrite")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint AccessOutWrite(SoutAccessOut* arg0, Frame* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_AccessOutWrite", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint AccessOutWrite(SoutAccessOut* arg0, Frame* arg1);
 
     /// <summary>sout_AnnounceRegisterSDP</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AnnounceRegisterSDP")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SessionDescriptor* AnnounceRegisterSDP(ObjectHeader* arg0, byte* arg1, byte* arg2);
+    [DllImport("libvlccore", EntryPoint = "sout_AnnounceRegisterSDP", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SessionDescriptor* AnnounceRegisterSDP(ObjectHeader* arg0, byte* arg1, byte* arg2);
 
     /// <summary>sout_AnnounceUnRegister</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_AnnounceUnRegister")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void AnnounceUnRegister(ObjectHeader* arg0, SessionDescriptor* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_AnnounceUnRegister", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void AnnounceUnRegister(ObjectHeader* arg0, SessionDescriptor* arg1);
 
     /// <summary>sout_ClockCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_ClockCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Clock* ClockCreate(SoutClockBus* arg0, EsFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_ClockCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Clock* ClockCreate(SoutClockBus* arg0, EsFormat* arg1);
 
     /// <summary>sout_ClockDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_ClockDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ClockDelete(Clock* arg0);
+    [DllImport("libvlccore", EntryPoint = "sout_ClockDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ClockDelete(Clock* arg0);
 
     /// <summary>sout_ClockMainCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_ClockMainCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SoutClockBus* ClockMainCreate(SoutStream* arg0);
+    [DllImport("libvlccore", EntryPoint = "sout_ClockMainCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SoutClockBus* ClockMainCreate(SoutStream* arg0);
 
     /// <summary>sout_ClockMainDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_ClockMainDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ClockMainDelete(SoutClockBus* arg0);
+    [DllImport("libvlccore", EntryPoint = "sout_ClockMainDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ClockMainDelete(SoutClockBus* arg0);
 
     /// <summary>sout_ClockMainSetFirstPcr</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_ClockMainSetFirstPcr")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ClockMainSetFirstPcr(SoutClockBus* arg0, long pcr);
+    [DllImport("libvlccore", EntryPoint = "sout_ClockMainSetFirstPcr", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ClockMainSetFirstPcr(SoutClockBus* arg0, long pcr);
 
     /// <summary>sout_EncoderCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_EncoderCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Encoder* EncoderCreate(ObjectHeader* arg0, nuint arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_EncoderCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Encoder* EncoderCreate(ObjectHeader* arg0, nuint arg1);
 
     /// <summary>sout_MuxAddStream</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxAddStream")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SoutInput* MuxAddStream(SoutMux* arg0, EsFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxAddStream", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SoutInput* MuxAddStream(SoutMux* arg0, EsFormat* arg1);
 
     /// <summary>sout_MuxDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void MuxDelete(SoutMux* arg0);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MuxDelete(SoutMux* arg0);
 
     /// <summary>sout_MuxDeleteStream</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxDeleteStream")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void MuxDeleteStream(SoutMux* arg0, SoutInput* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxDeleteStream", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MuxDeleteStream(SoutMux* arg0, SoutInput* arg1);
 
     /// <summary>sout_MuxFlush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxFlush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void MuxFlush(SoutMux* arg0, SoutInput* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxFlush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MuxFlush(SoutMux* arg0, SoutInput* arg1);
 
     /// <summary>sout_MuxGetStream</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxGetStream")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MuxGetStream(SoutMux* arg0, uint arg1, long* arg2);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxGetStream", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MuxGetStream(SoutMux* arg0, uint arg1, long* arg2);
 
     /// <summary>sout_MuxNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SoutMux* MuxNew(SoutAccessOut* arg0, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SoutMux* MuxNew(SoutAccessOut* arg0, byte* arg1);
 
     /// <summary>sout_MuxSendBuffer</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_MuxSendBuffer")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MuxSendBuffer(SoutMux* arg0, SoutInput* arg1, Frame* arg2);
+    [DllImport("libvlccore", EntryPoint = "sout_MuxSendBuffer", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MuxSendBuffer(SoutMux* arg0, SoutInput* arg1, Frame* arg2);
 
     /// <summary>sout_StreamChainDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamChainDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void StreamChainDelete(SoutStream* first, SoutStream* end);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamChainDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void StreamChainDelete(SoutStream* first, SoutStream* end);
 
     /// <summary>sout_StreamChainNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamChainNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SoutStream* StreamChainNew(ObjectHeader* parent, byte* psz_chain, SoutStream* p_next);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamChainNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SoutStream* StreamChainNew(ObjectHeader* parent, byte* psz_chain, SoutStream* p_next);
 
     /// <summary>sout_StreamFlush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamFlush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void StreamFlush(SoutStream* s, void* id);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamFlush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void StreamFlush(SoutStream* s, void* id);
 
     /// <summary>sout_StreamIdAdd</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamIdAdd")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* StreamIdAdd(SoutStream* s, EsFormat* fmt, byte* es_id);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamIdAdd", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* StreamIdAdd(SoutStream* s, EsFormat* fmt, byte* es_id);
 
     /// <summary>sout_StreamIdDel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamIdDel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void StreamIdDel(SoutStream* s, void* id);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamIdDel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void StreamIdDel(SoutStream* s, void* id);
 
     /// <summary>sout_StreamIdSend</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamIdSend")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int StreamIdSend(SoutStream* s, void* id, Frame* f);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamIdSend", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StreamIdSend(SoutStream* s, void* id, Frame* f);
 
     /// <summary>sout_StreamNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SoutStream* StreamNew(ObjectHeader* parent, byte* config);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SoutStream* StreamNew(ObjectHeader* parent, byte* config);
 
     /// <summary>sout_StreamSetPCR</summary>
-    [LibraryImport("libvlccore", EntryPoint = "sout_StreamSetPCR")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void StreamSetPCR(SoutStream* arg0, long pcr);
+    [DllImport("libvlccore", EntryPoint = "sout_StreamSetPCR", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void StreamSetPCR(SoutStream* arg0, long pcr);
 }

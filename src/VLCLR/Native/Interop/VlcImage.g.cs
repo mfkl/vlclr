@@ -80,27 +80,22 @@ public unsafe partial struct ImageHandler
 public static unsafe partial class Image
 {
     /// <summary>image_Ext2Fourcc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "image_Ext2Fourcc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint Ext2Fourcc(byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "image_Ext2Fourcc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint Ext2Fourcc(byte* psz_name);
 
     /// <summary>image_HandlerCreate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "image_HandlerCreate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ImageHandler* HandlerCreate(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "image_HandlerCreate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ImageHandler* HandlerCreate(ObjectHeader* arg0);
 
     /// <summary>image_HandlerDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "image_HandlerDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void HandlerDelete(ImageHandler* arg0);
+    [DllImport("libvlccore", EntryPoint = "image_HandlerDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void HandlerDelete(ImageHandler* arg0);
 
     /// <summary>image_Mime2Fourcc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "image_Mime2Fourcc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint Mime2Fourcc(byte* psz_mime);
+    [DllImport("libvlccore", EntryPoint = "image_Mime2Fourcc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint Mime2Fourcc(byte* psz_mime);
 
     /// <summary>image_Type2Fourcc</summary>
-    [LibraryImport("libvlccore", EntryPoint = "image_Type2Fourcc")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint Type2Fourcc(byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "image_Type2Fourcc", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint Type2Fourcc(byte* psz_name);
 }

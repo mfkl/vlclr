@@ -105,84 +105,68 @@ public enum VarAtomicOp : uint
 public static unsafe partial class Var
 {
     /// <summary>var_AddCallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_AddCallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void AddCallback(ObjectHeader* obj, byte* name, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, Value, Value, void*, int> callback, void* opaque);
+    [DllImport("libvlccore", EntryPoint = "var_AddCallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void AddCallback(ObjectHeader* obj, byte* name, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, Value, Value, void*, int> callback, void* opaque);
 
     /// <summary>var_AddListCallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_AddListCallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void AddListCallback(ObjectHeader* arg0, byte* arg1, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, int, Value*, void*, int> arg2, void* arg3);
+    [DllImport("libvlccore", EntryPoint = "var_AddListCallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void AddListCallback(ObjectHeader* arg0, byte* arg1, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, int, Value*, void*, int> arg2, void* arg3);
 
     /// <summary>var_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Create(ObjectHeader* obj, byte* name, int type);
+    [DllImport("libvlccore", EntryPoint = "var_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Create(ObjectHeader* obj, byte* name, int type);
 
     /// <summary>var_DelCallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_DelCallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void DelCallback(ObjectHeader* obj, byte* name, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, Value, Value, void*, int> callback, void* opaque);
+    [DllImport("libvlccore", EntryPoint = "var_DelCallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void DelCallback(ObjectHeader* obj, byte* name, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, Value, Value, void*, int> callback, void* opaque);
 
     /// <summary>var_DelListCallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_DelListCallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void DelListCallback(ObjectHeader* arg0, byte* arg1, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, int, Value*, void*, int> arg2, void* arg3);
+    [DllImport("libvlccore", EntryPoint = "var_DelListCallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void DelListCallback(ObjectHeader* arg0, byte* arg1, delegate* unmanaged[Cdecl]<ObjectHeader*, byte*, int, Value*, void*, int> arg2, void* arg3);
 
     /// <summary>var_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(ObjectHeader* obj, byte* name);
+    [DllImport("libvlccore", EntryPoint = "var_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(ObjectHeader* obj, byte* name);
 
     /// <summary>var_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Get(ObjectHeader* obj, byte* name, Value* valp);
+    [DllImport("libvlccore", EntryPoint = "var_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Get(ObjectHeader* obj, byte* name, Value* valp);
 
     /// <summary>var_GetAndSet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_GetAndSet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetAndSet(ObjectHeader* obj, byte* name, int op, Value* value);
+    [DllImport("libvlccore", EntryPoint = "var_GetAndSet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetAndSet(ObjectHeader* obj, byte* name, int op, Value* value);
 
     /// <summary>var_GetChecked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_GetChecked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetChecked(ObjectHeader* arg0, byte* arg1, int arg2, Value* arg3);
+    [DllImport("libvlccore", EntryPoint = "var_GetChecked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetChecked(ObjectHeader* arg0, byte* arg1, int arg2, Value* arg3);
 
     /// <summary>var_Inherit</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_Inherit")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Inherit(ObjectHeader* arg0, byte* arg1, int arg2, Value* arg3);
+    [DllImport("libvlccore", EntryPoint = "var_Inherit", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Inherit(ObjectHeader* arg0, byte* arg1, int arg2, Value* arg3);
 
     /// <summary>var_InheritURational</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_InheritURational")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int InheritURational(ObjectHeader* obj, uint* num, uint* den, byte* name);
+    [DllImport("libvlccore", EntryPoint = "var_InheritURational", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int InheritURational(ObjectHeader* obj, uint* num, uint* den, byte* name);
 
     /// <summary>var_LocationParse</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_LocationParse")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int LocationParse(ObjectHeader* obj, byte* mrl, byte* prefix);
+    [DllImport("libvlccore", EntryPoint = "var_LocationParse", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int LocationParse(ObjectHeader* obj, byte* mrl, byte* prefix);
 
     /// <summary>var_Set</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_Set")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Set(ObjectHeader* obj, byte* name, Value val);
+    [DllImport("libvlccore", EntryPoint = "var_Set", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Set(ObjectHeader* obj, byte* name, Value val);
 
     /// <summary>var_SetChecked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_SetChecked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int SetChecked(ObjectHeader* arg0, byte* arg1, int arg2, Value arg3);
+    [DllImport("libvlccore", EntryPoint = "var_SetChecked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int SetChecked(ObjectHeader* arg0, byte* arg1, int arg2, Value arg3);
 
     /// <summary>var_TriggerCallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_TriggerCallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void TriggerCallback(ObjectHeader* obj, byte* name);
+    [DllImport("libvlccore", EntryPoint = "var_TriggerCallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void TriggerCallback(ObjectHeader* obj, byte* name);
 
     /// <summary>var_Type</summary>
-    [LibraryImport("libvlccore", EntryPoint = "var_Type")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Type(ObjectHeader* obj, byte* name);
+    [DllImport("libvlccore", EntryPoint = "var_Type", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Type(ObjectHeader* obj, byte* name);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

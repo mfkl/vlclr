@@ -458,78 +458,66 @@ public unsafe partial struct SpuUpdaterOps
 public unsafe partial struct Picture
 {
     /// <summary>picture_BlendSubpicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_BlendSubpicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint BlendSubpicture(Picture* arg0, Filter* arg1, RenderSubpicture* arg2);
+    [DllImport("libvlccore", EntryPoint = "picture_BlendSubpicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint BlendSubpicture(Picture* arg0, Filter* arg1, RenderSubpicture* arg2);
 }
 
 public unsafe partial struct Subpicture
 {
     /// <summary>subpicture_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Subpicture* p_subpic);
+    [DllImport("libvlccore", EntryPoint = "subpicture_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Subpicture* p_subpic);
 
     /// <summary>subpicture_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Subpicture* New(SubpictureUpdater* arg0);
+    [DllImport("libvlccore", EntryPoint = "subpicture_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Subpicture* New(SubpictureUpdater* arg0);
 
     /// <summary>subpicture_NewFromPicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_NewFromPicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Subpicture* NewFromPicture(ObjectHeader* arg0, Picture* arg1, uint i_chroma);
+    [DllImport("libvlccore", EntryPoint = "subpicture_NewFromPicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Subpicture* NewFromPicture(ObjectHeader* arg0, Picture* arg1, uint i_chroma);
 
     /// <summary>subpicture_Update</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_Update")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Update(Subpicture* arg0, VideoFormat* src, VideoFormat* arg2, uint display_width, uint display_height, long arg5);
+    [DllImport("libvlccore", EntryPoint = "subpicture_Update", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Update(Subpicture* arg0, VideoFormat* src, VideoFormat* arg2, uint display_width, uint display_height, long arg5);
 }
 
 public unsafe partial struct SubpictureRegion
 {
     /// <summary>subpicture_region_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_region_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(SubpictureRegion* p_region);
+    [DllImport("libvlccore", EntryPoint = "subpicture_region_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(SubpictureRegion* p_region);
 
     /// <summary>subpicture_region_ForPicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_region_ForPicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SubpictureRegion* ForPicture(Picture* pic);
+    [DllImport("libvlccore", EntryPoint = "subpicture_region_ForPicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SubpictureRegion* ForPicture(Picture* pic);
 
     /// <summary>subpicture_region_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_region_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SubpictureRegion* New(VideoFormat* p_fmt);
+    [DllImport("libvlccore", EntryPoint = "subpicture_region_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SubpictureRegion* New(VideoFormat* p_fmt);
 
     /// <summary>subpicture_region_NewText</summary>
-    [LibraryImport("libvlccore", EntryPoint = "subpicture_region_NewText")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial SubpictureRegion* NewText();
+    [DllImport("libvlccore", EntryPoint = "subpicture_region_NewText", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern SubpictureRegion* NewText();
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcRenderSubpicture
 {
     /// <summary>vlc_render_subpicture_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_render_subpicture_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(RenderSubpicture* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_render_subpicture_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(RenderSubpicture* arg0);
 
     /// <summary>vlc_render_subpicture_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_render_subpicture_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial RenderSubpicture* New();
+    [DllImport("libvlccore", EntryPoint = "vlc_render_subpicture_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern RenderSubpicture* New();
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcSpuRegions
 {
     /// <summary>vlc_spu_regions_Clear</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_spu_regions_Clear")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Clear(List* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_spu_regions_Clear", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Clear(List* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

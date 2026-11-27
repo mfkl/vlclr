@@ -317,27 +317,22 @@ public enum DiffutilResultFlag : uint
 public static unsafe partial class VlcDiffutil
 {
     /// <summary>vlc_diffutil_build_change_list</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_diffutil_build_change_list")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DiffutilChangelist* BuildChangeList(DiffutilSnake* snake, DiffutilCallback* diffOp, void* dataOld, void* dataNew, int flags);
+    [DllImport("libvlccore", EntryPoint = "vlc_diffutil_build_change_list", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DiffutilChangelist* BuildChangeList(DiffutilSnake* snake, DiffutilCallback* diffOp, void* dataOld, void* dataNew, int flags);
 
     /// <summary>vlc_diffutil_build_snake</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_diffutil_build_snake")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DiffutilSnake* BuildSnake(DiffutilCallback* diffOp, void* dataOld, void* dataNew);
+    [DllImport("libvlccore", EntryPoint = "vlc_diffutil_build_snake", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DiffutilSnake* BuildSnake(DiffutilCallback* diffOp, void* dataOld, void* dataNew);
 
     /// <summary>vlc_diffutil_free_change_list</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_diffutil_free_change_list")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FreeChangeList(DiffutilChangelist* changelist);
+    [DllImport("libvlccore", EntryPoint = "vlc_diffutil_free_change_list", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FreeChangeList(DiffutilChangelist* changelist);
 
     /// <summary>vlc_diffutil_free_snake</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_diffutil_free_snake")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FreeSnake(DiffutilSnake* snake);
+    [DllImport("libvlccore", EntryPoint = "vlc_diffutil_free_snake", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FreeSnake(DiffutilSnake* snake);
 
     /// <summary>vlc_diffutil_walk_snake</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_diffutil_walk_snake")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte WalkSnake(DiffutilSnake* snake, DiffutilSnakeCallback* snakeOp, void* cbData, DiffutilCallback* diffOp, void* dataOld, void* dataNew);
+    [DllImport("libvlccore", EntryPoint = "vlc_diffutil_walk_snake", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte WalkSnake(DiffutilSnake* snake, DiffutilSnakeCallback* snakeOp, void* cbData, DiffutilCallback* diffOp, void* dataOld, void* dataNew);
 }

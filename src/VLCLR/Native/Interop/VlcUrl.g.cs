@@ -80,61 +80,50 @@ public unsafe partial struct Url
 public static unsafe partial class Vlc
 {
     /// <summary>vlc_UrlClean</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_UrlClean")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void UrlClean(Url* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_UrlClean", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void UrlClean(Url* arg0);
 
     /// <summary>vlc_UrlParse</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_UrlParse")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int UrlParse(Url* url, byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_UrlParse", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int UrlParse(Url* url, byte* str);
 
     /// <summary>vlc_UrlParseFixup</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_UrlParseFixup")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int UrlParseFixup(Url* url, byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_UrlParseFixup", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int UrlParseFixup(Url* url, byte* str);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcUrl
 {
     /// <summary>vlc_path2uri</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_path2uri")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcPath2uri(byte* path, byte* scheme);
+    [DllImport("libvlccore", EntryPoint = "vlc_path2uri", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcPath2uri(byte* path, byte* scheme);
 
     /// <summary>vlc_uri2path</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri2path")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUri2path(byte* url);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri2path", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUri2path(byte* url);
 
     /// <summary>vlc_uri_compose</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri_compose")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUriCompose(Url* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri_compose", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUriCompose(Url* arg0);
 
     /// <summary>vlc_uri_decode</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri_decode")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUriDecode(byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri_decode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUriDecode(byte* str);
 
     /// <summary>vlc_uri_decode_duplicate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri_decode_duplicate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUriDecodeDuplicate(byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri_decode_duplicate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUriDecodeDuplicate(byte* str);
 
     /// <summary>vlc_uri_encode</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri_encode")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUriEncode(byte* str);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri_encode", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUriEncode(byte* str);
 
     /// <summary>vlc_uri_fixup</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri_fixup")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUriFixup(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri_fixup", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUriFixup(byte* arg0);
 
     /// <summary>vlc_uri_resolve</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_uri_resolve")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcUriResolve(byte* @base, byte* @ref);
+    [DllImport("libvlccore", EntryPoint = "vlc_uri_resolve", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcUriResolve(byte* @base, byte* @ref);
 }

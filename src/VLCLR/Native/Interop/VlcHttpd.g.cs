@@ -146,103 +146,84 @@ public partial struct HttpdUrl { }
 public static unsafe partial class Httpd
 {
     /// <summary>httpd_ClientIP</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_ClientIP")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ClientIP(HttpdClient* cl, byte* arg1, int* arg2);
+    [DllImport("libvlccore", EntryPoint = "httpd_ClientIP", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ClientIP(HttpdClient* cl, byte* arg1, int* arg2);
 
     /// <summary>httpd_FileDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_FileDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdFileSys* FileDelete(HttpdFile* arg0);
+    [DllImport("libvlccore", EntryPoint = "httpd_FileDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdFileSys* FileDelete(HttpdFile* arg0);
 
     /// <summary>httpd_FileNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_FileNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdFile* FileNew(HttpdHost* arg0, byte* psz_url, byte* psz_mime, byte* psz_user, byte* psz_password, delegate* unmanaged[Cdecl]<HttpdFileSys*, HttpdFile*, byte*, byte**, nuint*, int> pf_fill, HttpdFileSys* arg6);
+    [DllImport("libvlccore", EntryPoint = "httpd_FileNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdFile* FileNew(HttpdHost* arg0, byte* psz_url, byte* psz_mime, byte* psz_user, byte* psz_password, delegate* unmanaged[Cdecl]<HttpdFileSys*, HttpdFile*, byte*, byte**, nuint*, int> pf_fill, HttpdFileSys* arg6);
 
     /// <summary>httpd_HandlerDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_HandlerDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* HandlerDelete(HttpdHandler* arg0);
+    [DllImport("libvlccore", EntryPoint = "httpd_HandlerDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* HandlerDelete(HttpdHandler* arg0);
 
     /// <summary>httpd_HandlerNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_HandlerNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdHandler* HandlerNew(HttpdHost* arg0, byte* psz_url, byte* psz_user, byte* psz_password, delegate* unmanaged[Cdecl]<void*, HttpdHandler*, byte*, byte*, int, byte*, int, byte*, byte*, byte**, nuint*, int> pf_fill, void* arg5);
+    [DllImport("libvlccore", EntryPoint = "httpd_HandlerNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdHandler* HandlerNew(HttpdHost* arg0, byte* psz_url, byte* psz_user, byte* psz_password, delegate* unmanaged[Cdecl]<void*, HttpdHandler*, byte*, byte*, int, byte*, int, byte*, byte*, byte**, nuint*, int> pf_fill, void* arg5);
 
     /// <summary>httpd_HostDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_HostDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void HostDelete(HttpdHost* arg0);
+    [DllImport("libvlccore", EntryPoint = "httpd_HostDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void HostDelete(HttpdHost* arg0);
 
     /// <summary>httpd_MsgGet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_MsgGet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* MsgGet(HttpdMessage* arg0, byte* psz_name);
+    [DllImport("libvlccore", EntryPoint = "httpd_MsgGet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* MsgGet(HttpdMessage* arg0, byte* psz_name);
 
     /// <summary>httpd_RedirectDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_RedirectDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void RedirectDelete(HttpdRedirect* arg0);
+    [DllImport("libvlccore", EntryPoint = "httpd_RedirectDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void RedirectDelete(HttpdRedirect* arg0);
 
     /// <summary>httpd_RedirectNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_RedirectNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdRedirect* RedirectNew(HttpdHost* arg0, byte* psz_url_dst, byte* psz_url_src);
+    [DllImport("libvlccore", EntryPoint = "httpd_RedirectNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdRedirect* RedirectNew(HttpdHost* arg0, byte* psz_url_dst, byte* psz_url_src);
 
     /// <summary>httpd_ServerIP</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_ServerIP")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ServerIP(HttpdClient* cl, byte* arg1, int* arg2);
+    [DllImport("libvlccore", EntryPoint = "httpd_ServerIP", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ServerIP(HttpdClient* cl, byte* arg1, int* arg2);
 
     /// <summary>httpd_StreamDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_StreamDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void StreamDelete(HttpdStream* arg0);
+    [DllImport("libvlccore", EntryPoint = "httpd_StreamDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void StreamDelete(HttpdStream* arg0);
 
     /// <summary>httpd_StreamHeader</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_StreamHeader")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int StreamHeader(HttpdStream* arg0, byte* p_data, int i_data);
+    [DllImport("libvlccore", EntryPoint = "httpd_StreamHeader", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StreamHeader(HttpdStream* arg0, byte* p_data, int i_data);
 
     /// <summary>httpd_StreamNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_StreamNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdStream* StreamNew(HttpdHost* arg0, byte* psz_url, byte* psz_mime, byte* psz_user, byte* psz_password);
+    [DllImport("libvlccore", EntryPoint = "httpd_StreamNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdStream* StreamNew(HttpdHost* arg0, byte* psz_url, byte* psz_mime, byte* psz_user, byte* psz_password);
 
     /// <summary>httpd_StreamSend</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_StreamSend")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int StreamSend(HttpdStream* arg0, Frame* p_block);
+    [DllImport("libvlccore", EntryPoint = "httpd_StreamSend", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StreamSend(HttpdStream* arg0, Frame* p_block);
 
     /// <summary>httpd_StreamSetHTTPHeaders</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_StreamSetHTTPHeaders")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int StreamSetHTTPHeaders(HttpdStream* arg0, HttpdHeader* arg1, nuint arg2);
+    [DllImport("libvlccore", EntryPoint = "httpd_StreamSetHTTPHeaders", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StreamSetHTTPHeaders(HttpdStream* arg0, HttpdHeader* arg1, nuint arg2);
 
     /// <summary>httpd_UrlCatch</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_UrlCatch")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int UrlCatch(HttpdUrl* arg0, int i_msg, delegate* unmanaged[Cdecl]<HttpdCallbackSys*, HttpdClient*, HttpdMessage*, HttpdMessage*, int> arg2, HttpdCallbackSys* arg3);
+    [DllImport("libvlccore", EntryPoint = "httpd_UrlCatch", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int UrlCatch(HttpdUrl* arg0, int i_msg, delegate* unmanaged[Cdecl]<HttpdCallbackSys*, HttpdClient*, HttpdMessage*, HttpdMessage*, int> arg2, HttpdCallbackSys* arg3);
 
     /// <summary>httpd_UrlDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_UrlDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void UrlDelete(HttpdUrl* arg0);
+    [DllImport("libvlccore", EntryPoint = "httpd_UrlDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void UrlDelete(HttpdUrl* arg0);
 
     /// <summary>httpd_UrlNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "httpd_UrlNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdUrl* UrlNew(HttpdHost* arg0, byte* psz_url, byte* psz_user, byte* psz_password);
+    [DllImport("libvlccore", EntryPoint = "httpd_UrlNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdUrl* UrlNew(HttpdHost* arg0, byte* psz_url, byte* psz_user, byte* psz_password);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcHttp
 {
     /// <summary>vlc_http_HostNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_http_HostNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdHost* HostNew(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_http_HostNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdHost* HostNew(ObjectHeader* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -304,16 +285,14 @@ public static partial class VlcHttpd
 public static unsafe partial class VlcHttps
 {
     /// <summary>vlc_https_HostNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_https_HostNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdHost* HostNew(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_https_HostNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdHost* HostNew(ObjectHeader* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcRtsp
 {
     /// <summary>vlc_rtsp_HostNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rtsp_HostNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial HttpdHost* HostNew(ObjectHeader* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_rtsp_HostNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern HttpdHost* HostNew(ObjectHeader* arg0);
 }

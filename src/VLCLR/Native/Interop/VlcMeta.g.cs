@@ -145,9 +145,8 @@ public enum MetaType : uint
 public unsafe partial struct InputItem
 {
     /// <summary>input_item_WriteMeta</summary>
-    [LibraryImport("libvlccore", EntryPoint = "input_item_WriteMeta")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int WriteMeta(ObjectHeader* arg0, InputItem* arg1);
+    [DllImport("libvlccore", EntryPoint = "input_item_WriteMeta", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int WriteMeta(ObjectHeader* arg0, InputItem* arg1);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -169,67 +168,54 @@ public static unsafe partial class VlcMeta
     public const int MetaTypeCount = 28;
 
     /// <summary>vlc_meta_CopyExtraNames</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_CopyExtraNames")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte** CopyExtraNames(Meta* m);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_CopyExtraNames", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte** CopyExtraNames(Meta* m);
 
     /// <summary>vlc_meta_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Meta* m);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Meta* m);
 
     /// <summary>vlc_meta_GetExtraCount</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_GetExtraCount")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint GetExtraCount(Meta* m);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_GetExtraCount", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint GetExtraCount(Meta* m);
 
     /// <summary>vlc_meta_GetExtraWithPriority</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_GetExtraWithPriority")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetExtraWithPriority(Meta* m, byte* name, MetaPriority* priority);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_GetExtraWithPriority", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetExtraWithPriority(Meta* m, byte* name, MetaPriority* priority);
 
     /// <summary>vlc_meta_GetStatus</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_GetStatus")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetStatus(Meta* m);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_GetStatus", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetStatus(Meta* m);
 
     /// <summary>vlc_meta_GetWithPriority</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_GetWithPriority")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetWithPriority(Meta* p_meta, MetaType meta_type, MetaPriority* priority);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_GetWithPriority", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetWithPriority(Meta* p_meta, MetaType meta_type, MetaPriority* priority);
 
     /// <summary>vlc_meta_Merge</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_Merge")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Merge(Meta* dst, Meta* src);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_Merge", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Merge(Meta* dst, Meta* src);
 
     /// <summary>vlc_meta_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Meta* New();
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Meta* New();
 
     /// <summary>vlc_meta_SetExtraWithPriority</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_SetExtraWithPriority")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetExtraWithPriority(Meta* m, byte* psz_name, byte* psz_value, MetaPriority priority);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_SetExtraWithPriority", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetExtraWithPriority(Meta* m, byte* psz_name, byte* psz_value, MetaPriority priority);
 
     /// <summary>vlc_meta_SetStatus</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_SetStatus")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetStatus(Meta* m, int status);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_SetStatus", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetStatus(Meta* m, int status);
 
     /// <summary>vlc_meta_SetWithPriority</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_SetWithPriority")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetWithPriority(Meta* p_meta, MetaType meta_type, byte* psz_val, MetaPriority priority);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_SetWithPriority", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetWithPriority(Meta* p_meta, MetaType meta_type, byte* psz_val, MetaPriority priority);
 
     /// <summary>vlc_meta_TypeToLocalizedString</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_TypeToLocalizedString")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* TypeToLocalizedString(MetaType meta_type);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_TypeToLocalizedString", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* TypeToLocalizedString(MetaType meta_type);
 
     /// <summary>vlc_meta_TypeToString</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_meta_TypeToString")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* TypeToString(MetaType meta_type);
+    [DllImport("libvlccore", EntryPoint = "vlc_meta_TypeToString", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* TypeToString(MetaType meta_type);
 }

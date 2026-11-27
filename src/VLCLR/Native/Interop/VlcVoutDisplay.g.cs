@@ -420,37 +420,30 @@ public static partial class VlcVoutDisplay
 public unsafe partial struct VoutDisplay
 {
     /// <summary>vout_display_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(VoutDisplay* arg0);
+    [DllImport("libvlccore", EntryPoint = "vout_display_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(VoutDisplay* arg0);
 
     /// <summary>vout_display_GetDefaultDisplaySize</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_GetDefaultDisplaySize")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void GetDefaultDisplaySize(uint* width, uint* height, VideoFormat* source, VoutDisplayPlacement* arg3);
+    [DllImport("libvlccore", EntryPoint = "vout_display_GetDefaultDisplaySize", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void GetDefaultDisplaySize(uint* width, uint* height, VideoFormat* source, VoutDisplayPlacement* arg3);
 
     /// <summary>vout_display_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VoutDisplay* New(ObjectHeader* arg0, VideoFormat* arg1, VideoContext* arg2, VoutDisplayCfg* arg3, byte* module, VoutDisplayOwner* arg5);
+    [DllImport("libvlccore", EntryPoint = "vout_display_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VoutDisplay* New(ObjectHeader* arg0, VideoFormat* arg1, VideoContext* arg2, VoutDisplayCfg* arg3, byte* module, VoutDisplayOwner* arg5);
 
     /// <summary>vout_display_PlacePicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_PlacePicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PlacePicture(VoutDisplayPlace* place, VideoFormat* source, VoutDisplayPlacement* cfg);
+    [DllImport("libvlccore", EntryPoint = "vout_display_PlacePicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PlacePicture(VoutDisplayPlace* place, VideoFormat* source, VoutDisplayPlacement* cfg);
 
     /// <summary>vout_display_Prepare</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_Prepare")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* Prepare(VoutDisplay* vd, Picture* picture, RenderSubpicture* subpic, long date);
+    [DllImport("libvlccore", EntryPoint = "vout_display_Prepare", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* Prepare(VoutDisplay* vd, Picture* picture, RenderSubpicture* subpic, long date);
 
     /// <summary>vout_display_SetFormat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_SetFormat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int SetFormat(VoutDisplay* arg0, VideoFormat* fmt, VideoContext* vctx);
+    [DllImport("libvlccore", EntryPoint = "vout_display_SetFormat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int SetFormat(VoutDisplay* arg0, VideoFormat* fmt, VideoContext* vctx);
 
     /// <summary>vout_display_SetSize</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_display_SetSize")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void SetSize(VoutDisplay* vd, uint width, uint height);
+    [DllImport("libvlccore", EntryPoint = "vout_display_SetSize", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetSize(VoutDisplay* vd, uint width, uint height);
 }

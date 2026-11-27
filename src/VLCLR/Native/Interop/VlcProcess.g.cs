@@ -14,26 +14,22 @@ public partial struct Process { }
 public static unsafe partial class VlcProcess
 {
     /// <summary>vlc_process_Kill</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_process_Kill")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Kill(Process* process);
+    [DllImport("libvlccore", EntryPoint = "vlc_process_Kill", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Kill(Process* process);
 
     /// <summary>vlc_process_Terminate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_process_Terminate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Terminate(Process* process, byte kill_process);
+    [DllImport("libvlccore", EntryPoint = "vlc_process_Terminate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Terminate(Process* process, byte kill_process);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcProcessFd
 {
     /// <summary>vlc_process_fd_Read</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_process_fd_Read")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Read(Process* process, byte* buf, nuint size, long timeout_ms);
+    [DllImport("libvlccore", EntryPoint = "vlc_process_fd_Read", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Read(Process* process, byte* buf, nuint size, long timeout_ms);
 
     /// <summary>vlc_process_fd_Write</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_process_fd_Write")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Write(Process* process, byte* buf, nuint size, long timeout_ms);
+    [DllImport("libvlccore", EntryPoint = "vlc_process_fd_Write", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Write(Process* process, byte* buf, nuint size, long timeout_ms);
 }

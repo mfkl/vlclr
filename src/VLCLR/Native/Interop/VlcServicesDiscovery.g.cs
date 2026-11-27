@@ -195,26 +195,22 @@ public enum ServicesDiscoveryCommand : uint
 public static unsafe partial class VlcSd
 {
     /// <summary>vlc_sd_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sd_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ServicesDiscovery* Create(ObjectHeader* parent, byte* chain, ServicesDiscoveryOwner* owner);
+    [DllImport("libvlccore", EntryPoint = "vlc_sd_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ServicesDiscovery* Create(ObjectHeader* parent, byte* chain, ServicesDiscoveryOwner* owner);
 
     /// <summary>vlc_sd_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sd_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(ServicesDiscovery* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_sd_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(ServicesDiscovery* arg0);
 
     /// <summary>vlc_sd_GetNames</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sd_GetNames")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte** GetNames(ObjectHeader* arg0, byte*** arg1, int** arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_sd_GetNames", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte** GetNames(ObjectHeader* arg0, byte*** arg1, int** arg2);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcSdProbe
 {
     /// <summary>vlc_sd_probe_Add</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sd_probe_Add")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Add(Probe* arg0, byte* arg1, byte* arg2, int category);
+    [DllImport("libvlccore", EntryPoint = "vlc_sd_probe_Add", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Add(Probe* arg0, byte* arg1, byte* arg2, int category);
 }

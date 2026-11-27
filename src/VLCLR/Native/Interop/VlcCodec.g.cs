@@ -549,39 +549,32 @@ public enum DecoderDeviceType : uint
 public unsafe partial struct Decoder
 {
     /// <summary>decoder_Clean</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_Clean")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Clean(Decoder* p_dec);
+    [DllImport("libvlccore", EntryPoint = "decoder_Clean", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Clean(Decoder* p_dec);
 
     /// <summary>decoder_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(Decoder* dec, EsFormat* fmt_in, EsFormat* fmt);
+    [DllImport("libvlccore", EntryPoint = "decoder_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(Decoder* dec, EsFormat* fmt_in, EsFormat* fmt);
 
     /// <summary>decoder_LoadModule</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_LoadModule")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int LoadModule(Decoder* dec, byte packetizer, byte use_varoption);
+    [DllImport("libvlccore", EntryPoint = "decoder_LoadModule", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int LoadModule(Decoder* dec, byte packetizer, byte use_varoption);
 
     /// <summary>decoder_NewAudioBuffer</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_NewAudioBuffer")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* NewAudioBuffer(Decoder* arg0, int i_nb_samples);
+    [DllImport("libvlccore", EntryPoint = "decoder_NewAudioBuffer", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* NewAudioBuffer(Decoder* arg0, int i_nb_samples);
 
     /// <summary>decoder_NewPicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_NewPicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* NewPicture(Decoder* dec);
+    [DllImport("libvlccore", EntryPoint = "decoder_NewPicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* NewPicture(Decoder* dec);
 
     /// <summary>decoder_UpdateVideoFormat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_UpdateVideoFormat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int UpdateVideoFormat(Decoder* dec);
+    [DllImport("libvlccore", EntryPoint = "decoder_UpdateVideoFormat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int UpdateVideoFormat(Decoder* dec);
 
     /// <summary>decoder_UpdateVideoOutput</summary>
-    [LibraryImport("libvlccore", EntryPoint = "decoder_UpdateVideoOutput")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int UpdateVideoOutput(Decoder* dec, VideoContext* vctx_out);
+    [DllImport("libvlccore", EntryPoint = "decoder_UpdateVideoOutput", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int UpdateVideoOutput(Decoder* dec, VideoContext* vctx_out);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -601,31 +594,26 @@ public static partial class VlcCodec
 public static unsafe partial class VlcDecoderDevice
 {
     /// <summary>vlc_decoder_device_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_decoder_device_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DecoderDevice* Create(ObjectHeader* arg0, Window* window);
+    [DllImport("libvlccore", EntryPoint = "vlc_decoder_device_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DecoderDevice* Create(ObjectHeader* arg0, Window* window);
 
     /// <summary>vlc_decoder_device_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_decoder_device_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DecoderDevice* Hold(DecoderDevice* device);
+    [DllImport("libvlccore", EntryPoint = "vlc_decoder_device_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DecoderDevice* Hold(DecoderDevice* device);
 
     /// <summary>vlc_decoder_device_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_decoder_device_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(DecoderDevice* device);
+    [DllImport("libvlccore", EntryPoint = "vlc_decoder_device_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(DecoderDevice* device);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcEncoder
 {
     /// <summary>vlc_encoder_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_encoder_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(Encoder* encoder);
+    [DllImport("libvlccore", EntryPoint = "vlc_encoder_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(Encoder* encoder);
 
     /// <summary>vlc_encoder_GetDecoderDevice</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_encoder_GetDecoderDevice")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DecoderDevice* GetDecoderDevice(Encoder* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_encoder_GetDecoderDevice", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DecoderDevice* GetDecoderDevice(Encoder* arg0);
 }

@@ -97,7 +97,6 @@ public static unsafe partial class VlcReplayGain
     public const int AudioReplayGainTrack = 0;
 
     /// <summary>vlc_replay_gain_CopyFromMeta</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_replay_gain_CopyFromMeta")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int CopyFromMeta(AudioReplayGain* p_dst, Meta* p_meta);
+    [DllImport("libvlccore", EntryPoint = "vlc_replay_gain_CopyFromMeta", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int CopyFromMeta(AudioReplayGain* p_dst, Meta* p_meta);
 }

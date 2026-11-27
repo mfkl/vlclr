@@ -49,24 +49,20 @@ public unsafe partial struct Date
 public unsafe partial struct Date
 {
     /// <summary>date_Change</summary>
-    [LibraryImport("libvlccore", EntryPoint = "date_Change")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Change(Date* date, uint num, uint den);
+    [DllImport("libvlccore", EntryPoint = "date_Change", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Change(Date* date, uint num, uint den);
 
     /// <summary>date_Decrement</summary>
-    [LibraryImport("libvlccore", EntryPoint = "date_Decrement")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial long Decrement(Date* date, uint count);
+    [DllImport("libvlccore", EntryPoint = "date_Decrement", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern long Decrement(Date* date, uint count);
 
     /// <summary>date_Increment</summary>
-    [LibraryImport("libvlccore", EntryPoint = "date_Increment")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial long Increment(Date* date, uint count);
+    [DllImport("libvlccore", EntryPoint = "date_Increment", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern long Increment(Date* date, uint count);
 
     /// <summary>date_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "date_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(Date* date, uint num, uint den);
+    [DllImport("libvlccore", EntryPoint = "date_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(Date* date, uint num, uint den);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -82,17 +78,14 @@ public static unsafe partial class VlcTick
     public const long TickMin = -9223372036854775808;
 
     /// <summary>vlc_ntp_time</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ntp_time")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ulong VlcNtpTime();
+    [DllImport("libvlccore", EntryPoint = "vlc_ntp_time", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ulong VlcNtpTime();
 
     /// <summary>vlc_tick_to_str</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tick_to_str")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ToStr(byte* psz_buffer, long ticks);
+    [DllImport("libvlccore", EntryPoint = "vlc_tick_to_str", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ToStr(byte* psz_buffer, long ticks);
 
     /// <summary>vlc_tick_to_timespec</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_tick_to_timespec")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Timespec* ToTimespec(Timespec* ts, long tick);
+    [DllImport("libvlccore", EntryPoint = "vlc_tick_to_timespec", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Timespec* ToTimespec(Timespec* ts, long tick);
 }

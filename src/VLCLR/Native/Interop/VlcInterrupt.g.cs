@@ -17,87 +17,70 @@ public partial struct Interrupt { }
 public static unsafe partial class VlcInterrupt
 {
     /// <summary>vlc_interrupt_create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Interrupt* Create();
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Interrupt* Create();
 
     /// <summary>vlc_interrupt_destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(Interrupt* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(Interrupt* arg0);
 
     /// <summary>vlc_interrupt_kill</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_kill")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Kill(Interrupt* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_kill", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Kill(Interrupt* arg0);
 
     /// <summary>vlc_interrupt_raise</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_raise")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Raise(Interrupt* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_raise", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Raise(Interrupt* arg0);
 
     /// <summary>vlc_interrupt_register</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_register")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Register(delegate* unmanaged[Cdecl]<void*, void> cb, void* opaque);
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_register", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Register(delegate* unmanaged[Cdecl]<void*, void> cb, void* opaque);
 
     /// <summary>vlc_interrupt_set</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_set")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Interrupt* Set(Interrupt* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_set", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Interrupt* Set(Interrupt* arg0);
 
     /// <summary>vlc_interrupt_unregister</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_interrupt_unregister")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Unregister();
+    [DllImport("libvlccore", EntryPoint = "vlc_interrupt_unregister", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Unregister();
 
     /// <summary>vlc_killed</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_killed")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte VlcKilled();
+    [DllImport("libvlccore", EntryPoint = "vlc_killed", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte VlcKilled();
 
     /// <summary>vlc_mwait_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_mwait_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcMwaitI11e(long arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_mwait_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcMwaitI11e(long arg0);
 
     /// <summary>vlc_poll_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_poll_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcPollI11e(Pollfd* arg0, uint arg1, int arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_poll_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcPollI11e(Pollfd* arg0, uint arg1, int arg2);
 
     /// <summary>vlc_read_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_read_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcReadI11e(int fd, void* arg1, nuint arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_read_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcReadI11e(int fd, void* arg1, nuint arg2);
 
     /// <summary>vlc_readv_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_readv_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcReadvI11e(int fd, Iovec* arg1, int arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_readv_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcReadvI11e(int fd, Iovec* arg1, int arg2);
 
     /// <summary>vlc_recvmsg_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_recvmsg_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcRecvmsgI11e(int fd, Msghdr* arg1, int flags);
+    [DllImport("libvlccore", EntryPoint = "vlc_recvmsg_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcRecvmsgI11e(int fd, Msghdr* arg1, int flags);
 
     /// <summary>vlc_sem_wait_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sem_wait_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcSemWaitI11e(Sem* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_sem_wait_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcSemWaitI11e(Sem* arg0);
 
     /// <summary>vlc_sendmsg_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_sendmsg_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcSendmsgI11e(int fd, Msghdr* arg1, int flags);
+    [DllImport("libvlccore", EntryPoint = "vlc_sendmsg_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcSendmsgI11e(int fd, Msghdr* arg1, int flags);
 
     /// <summary>vlc_write_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_write_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcWriteI11e(int fd, void* arg1, nuint arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_write_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcWriteI11e(int fd, void* arg1, nuint arg2);
 
     /// <summary>vlc_writev_i11e</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_writev_i11e")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcWritevI11e(int fd, Iovec* arg1, int arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_writev_i11e", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcWritevI11e(int fd, Iovec* arg1, int arg2);
 }

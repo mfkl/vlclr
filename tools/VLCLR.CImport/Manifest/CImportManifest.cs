@@ -197,7 +197,7 @@ public sealed record Output
 {
     public required string Namespace { get; init; }
 
-    /// <summary>Native library name for <c>LibraryImport</c>.</summary>
+    /// <summary>Native library name for the imports (<c>[DllImport]</c>).</summary>
     public required string Library { get; init; }
 
     /// <summary>Generated C# (<c>*.g.cs</c>), <c>abi/*.json</c> and <c>cimport-report.md</c>.</summary>

@@ -125,18 +125,16 @@ public unsafe partial struct ChromaConvVec
 public static unsafe partial class VlcChromaConv
 {
     /// <summary>vlc_chroma_conv_Probe</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_chroma_conv_Probe")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ChromaConvResult* Probe(uint @in, uint @out, uint width, uint height, uint max_indirect_steps, int flags, nuint* count);
+    [DllImport("libvlccore", EntryPoint = "vlc_chroma_conv_Probe", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ChromaConvResult* Probe(uint @in, uint @out, uint width, uint height, uint max_indirect_steps, int flags, nuint* count);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcChromaConvResult
 {
     /// <summary>vlc_chroma_conv_result_ToString</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_chroma_conv_result_ToString")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ToString(ChromaConvResult* res);
+    [DllImport("libvlccore", EntryPoint = "vlc_chroma_conv_result_ToString", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ToString(ChromaConvResult* res);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>

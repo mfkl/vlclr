@@ -390,92 +390,75 @@ public enum VideoContextType : uint
 public unsafe partial struct Picture
 {
     /// <summary>picture_AttachAncillary</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_AttachAncillary")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int AttachAncillary(Picture* pic, Ancillary* ancillary);
+    [DllImport("libvlccore", EntryPoint = "picture_AttachAncillary", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int AttachAncillary(Picture* pic, Ancillary* ancillary);
 
     /// <summary>picture_AttachNewAncillary</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_AttachNewAncillary")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* AttachNewAncillary(Picture* pic, uint id, nuint size);
+    [DllImport("libvlccore", EntryPoint = "picture_AttachNewAncillary", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* AttachNewAncillary(Picture* pic, uint id, nuint size);
 
     /// <summary>picture_Clone</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_Clone")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* Clone(Picture* pic);
+    [DllImport("libvlccore", EntryPoint = "picture_Clone", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* Clone(Picture* pic);
 
     /// <summary>picture_Copy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_Copy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Copy(Picture* p_dst, Picture* p_src);
+    [DllImport("libvlccore", EntryPoint = "picture_Copy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Copy(Picture* p_dst, Picture* p_src);
 
     /// <summary>picture_CopyPixels</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_CopyPixels")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CopyPixels(Picture* p_dst, Picture* p_src);
+    [DllImport("libvlccore", EntryPoint = "picture_CopyPixels", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CopyPixels(Picture* p_dst, Picture* p_src);
 
     /// <summary>picture_CopyProperties</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_CopyProperties")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CopyProperties(Picture* p_dst, Picture* p_src);
+    [DllImport("libvlccore", EntryPoint = "picture_CopyProperties", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CopyProperties(Picture* p_dst, Picture* p_src);
 
     /// <summary>picture_Destroy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_Destroy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Destroy(Picture* picture);
+    [DllImport("libvlccore", EntryPoint = "picture_Destroy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Destroy(Picture* picture);
 
     /// <summary>picture_Export</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_Export")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Export(ObjectHeader* p_obj, Frame** pp_image, VideoFormat* p_fmt, Picture* p_picture, uint i_codec, int i_override_width, int i_override_height, byte b_crop);
+    [DllImport("libvlccore", EntryPoint = "picture_Export", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Export(ObjectHeader* p_obj, Frame** pp_image, VideoFormat* p_fmt, Picture* p_picture, uint i_codec, int i_override_width, int i_override_height, byte b_crop);
 
     /// <summary>picture_GetAncillary</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_GetAncillary")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Ancillary* GetAncillary(Picture* pic, uint id);
+    [DllImport("libvlccore", EntryPoint = "picture_GetAncillary", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Ancillary* GetAncillary(Picture* pic, uint id);
 
     /// <summary>picture_MergeAncillaries</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_MergeAncillaries")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MergeAncillaries(Picture* pic, AncillaryArray* src_array);
+    [DllImport("libvlccore", EntryPoint = "picture_MergeAncillaries", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MergeAncillaries(Picture* pic, AncillaryArray* src_array);
 
     /// <summary>picture_MergeAndClearAncillaries</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_MergeAndClearAncillaries")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int MergeAndClearAncillaries(Picture* pic, AncillaryArray* src_array);
+    [DllImport("libvlccore", EntryPoint = "picture_MergeAndClearAncillaries", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int MergeAndClearAncillaries(Picture* pic, AncillaryArray* src_array);
 
     /// <summary>picture_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* New(uint i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den);
+    [DllImport("libvlccore", EntryPoint = "picture_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* New(uint i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den);
 
     /// <summary>picture_NewFromFormat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_NewFromFormat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* NewFromFormat(VideoFormat* p_fmt);
+    [DllImport("libvlccore", EntryPoint = "picture_NewFromFormat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* NewFromFormat(VideoFormat* p_fmt);
 
     /// <summary>picture_NewFromResource</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_NewFromResource")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* NewFromResource(VideoFormat* arg0, PictureResource* arg1);
+    [DllImport("libvlccore", EntryPoint = "picture_NewFromResource", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* NewFromResource(VideoFormat* arg0, PictureResource* arg1);
 
     /// <summary>picture_Reset</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_Reset")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Reset(Picture* arg0);
+    [DllImport("libvlccore", EntryPoint = "picture_Reset", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Reset(Picture* arg0);
 
     /// <summary>picture_Setup</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_Setup")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Setup(Picture* arg0, VideoFormat* arg1);
+    [DllImport("libvlccore", EntryPoint = "picture_Setup", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Setup(Picture* arg0, VideoFormat* arg1);
 }
 
 public unsafe partial struct Plane
 {
     /// <summary>plane_CopyPixels</summary>
-    [LibraryImport("libvlccore", EntryPoint = "plane_CopyPixels")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void CopyPixels(Plane* p_dst, Plane* p_src);
+    [DllImport("libvlccore", EntryPoint = "plane_CopyPixels", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void CopyPixels(Plane* p_dst, Plane* p_src);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -501,32 +484,26 @@ public static partial class VlcPicture
 public static unsafe partial class VlcVideoContext
 {
     /// <summary>vlc_video_context_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VideoContext* Create(DecoderDevice* arg0, VideoContextType private_type, nuint private_size, VideoContextOperations* arg3);
+    [DllImport("libvlccore", EntryPoint = "vlc_video_context_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VideoContext* Create(DecoderDevice* arg0, VideoContextType private_type, nuint private_size, VideoContextOperations* arg3);
 
     /// <summary>vlc_video_context_GetPrivate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_GetPrivate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* GetPrivate(VideoContext* arg0, VideoContextType arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_video_context_GetPrivate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* GetPrivate(VideoContext* arg0, VideoContextType arg1);
 
     /// <summary>vlc_video_context_GetType</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_GetType")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VideoContextType GetType(VideoContext* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_video_context_GetType", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VideoContextType GetType(VideoContext* arg0);
 
     /// <summary>vlc_video_context_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VideoContext* Hold(VideoContext* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_video_context_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VideoContext* Hold(VideoContext* arg0);
 
     /// <summary>vlc_video_context_HoldDevice</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_HoldDevice")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial DecoderDevice* HoldDevice(VideoContext* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_video_context_HoldDevice", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern DecoderDevice* HoldDevice(VideoContext* arg0);
 
     /// <summary>vlc_video_context_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_video_context_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(VideoContext* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_video_context_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(VideoContext* arg0);
 }

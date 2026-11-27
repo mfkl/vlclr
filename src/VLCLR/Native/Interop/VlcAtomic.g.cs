@@ -35,22 +35,18 @@ public unsafe partial struct AtomicRc
 public static unsafe partial class VlcAtomic
 {
     /// <summary>vlc_atomic_notify_all</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_atomic_notify_all")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void NotifyAll(void* addr);
+    [DllImport("libvlccore", EntryPoint = "vlc_atomic_notify_all", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void NotifyAll(void* addr);
 
     /// <summary>vlc_atomic_notify_one</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_atomic_notify_one")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void NotifyOne(void* addr);
+    [DllImport("libvlccore", EntryPoint = "vlc_atomic_notify_one", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void NotifyOne(void* addr);
 
     /// <summary>vlc_atomic_timedwait</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_atomic_timedwait")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Timedwait(void* addr, uint val, long deadline);
+    [DllImport("libvlccore", EntryPoint = "vlc_atomic_timedwait", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Timedwait(void* addr, uint val, long deadline);
 
     /// <summary>vlc_atomic_wait</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_atomic_wait")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Wait(void* addr, uint val);
+    [DllImport("libvlccore", EntryPoint = "vlc_atomic_wait", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Wait(void* addr, uint val);
 }

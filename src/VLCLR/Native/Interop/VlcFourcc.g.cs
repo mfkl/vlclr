@@ -1704,42 +1704,34 @@ public static unsafe partial class VlcFourcc
     public const uint CodecZmbv = 1447185754;
 
     /// <summary>vlc_fourcc_GetChromaDescription</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetChromaDescription")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ChromaDescription* GetChromaDescription(uint fourcc);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetChromaDescription", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ChromaDescription* GetChromaDescription(uint fourcc);
 
     /// <summary>vlc_fourcc_GetCodec</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodec")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint GetCodec(int i_cat, uint i_fourcc);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodec", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint GetCodec(int i_cat, uint i_fourcc);
 
     /// <summary>vlc_fourcc_GetCodecAudio</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodecAudio")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint GetCodecAudio(uint i_fourcc, int i_bits);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodecAudio", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint GetCodecAudio(uint i_fourcc, int i_bits);
 
     /// <summary>vlc_fourcc_GetCodecFromString</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodecFromString")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint GetCodecFromString(int i_cat, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetCodecFromString", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint GetCodecFromString(int i_cat, byte* arg1);
 
     /// <summary>vlc_fourcc_GetDescription</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetDescription")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* GetDescription(int i_cat, uint i_fourcc);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetDescription", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* GetDescription(int i_cat, uint i_fourcc);
 
     /// <summary>vlc_fourcc_GetFallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetFallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint* GetFallback(uint arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetFallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint* GetFallback(uint arg0);
 
     /// <summary>vlc_fourcc_GetRGBFallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetRGBFallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint* GetRGBFallback(uint arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetRGBFallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint* GetRGBFallback(uint arg0);
 
     /// <summary>vlc_fourcc_GetYUVFallback</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_fourcc_GetYUVFallback")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint* GetYUVFallback(uint arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_fourcc_GetYUVFallback", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint* GetYUVFallback(uint arg0);
 }

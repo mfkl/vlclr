@@ -197,80 +197,66 @@ public unsafe partial struct TextStyle
 public unsafe partial struct TextSegment
 {
     /// <summary>text_segment_ChainDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_ChainDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChainDelete(TextSegment* arg0);
+    [DllImport("libvlccore", EntryPoint = "text_segment_ChainDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChainDelete(TextSegment* arg0);
 
     /// <summary>text_segment_Copy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_Copy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextSegment* Copy(TextSegment* arg0);
+    [DllImport("libvlccore", EntryPoint = "text_segment_Copy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextSegment* Copy(TextSegment* arg0);
 
     /// <summary>text_segment_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(TextSegment* arg0);
+    [DllImport("libvlccore", EntryPoint = "text_segment_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(TextSegment* arg0);
 
     /// <summary>text_segment_FromRuby</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_FromRuby")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextSegment* FromRuby(TextSegmentRuby* p_ruby);
+    [DllImport("libvlccore", EntryPoint = "text_segment_FromRuby", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextSegment* FromRuby(TextSegmentRuby* p_ruby);
 
     /// <summary>text_segment_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextSegment* New(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "text_segment_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextSegment* New(byte* arg0);
 
     /// <summary>text_segment_NewInheritStyle</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_NewInheritStyle")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextSegment* NewInheritStyle(TextStyle* p_style);
+    [DllImport("libvlccore", EntryPoint = "text_segment_NewInheritStyle", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextSegment* NewInheritStyle(TextStyle* p_style);
 }
 
 public unsafe partial struct TextSegmentRuby
 {
     /// <summary>text_segment_ruby_ChainDelete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_ruby_ChainDelete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ChainDelete(TextSegmentRuby* p_ruby);
+    [DllImport("libvlccore", EntryPoint = "text_segment_ruby_ChainDelete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ChainDelete(TextSegmentRuby* p_ruby);
 
     /// <summary>text_segment_ruby_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_segment_ruby_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextSegmentRuby* New(byte* psz_base, byte* psz_rt);
+    [DllImport("libvlccore", EntryPoint = "text_segment_ruby_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextSegmentRuby* New(byte* psz_base, byte* psz_rt);
 }
 
 public unsafe partial struct TextStyle
 {
     /// <summary>text_style_Copy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_style_Copy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextStyle* Copy(TextStyle* arg0, TextStyle* arg1);
+    [DllImport("libvlccore", EntryPoint = "text_style_Copy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextStyle* Copy(TextStyle* arg0, TextStyle* arg1);
 
     /// <summary>text_style_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_style_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextStyle* Create(int arg0);
+    [DllImport("libvlccore", EntryPoint = "text_style_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextStyle* Create(int arg0);
 
     /// <summary>text_style_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_style_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(TextStyle* arg0);
+    [DllImport("libvlccore", EntryPoint = "text_style_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(TextStyle* arg0);
 
     /// <summary>text_style_Duplicate</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_style_Duplicate")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextStyle* Duplicate(TextStyle* arg0);
+    [DllImport("libvlccore", EntryPoint = "text_style_Duplicate", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextStyle* Duplicate(TextStyle* arg0);
 
     /// <summary>text_style_Merge</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_style_Merge")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Merge(TextStyle* arg0, TextStyle* arg1, byte b_override);
+    [DllImport("libvlccore", EntryPoint = "text_style_Merge", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Merge(TextStyle* arg0, TextStyle* arg1, byte b_override);
 
     /// <summary>text_style_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "text_style_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial TextStyle* New();
+    [DllImport("libvlccore", EntryPoint = "text_style_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern TextStyle* New();
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -379,7 +365,6 @@ public static unsafe partial class VlcTextStyle
     public const uint StyleWrapNone = 2;
 
     /// <summary>vlc_html_color</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_html_color")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial uint VlcHtmlColor(byte* psz_value, byte* ok);
+    [DllImport("libvlccore", EntryPoint = "vlc_html_color", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint VlcHtmlColor(byte* psz_value, byte* ok);
 }

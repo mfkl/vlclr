@@ -11,17 +11,14 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class VlcSpawn
 {
     /// <summary>vlc_spawn</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_spawn")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Spawn(long* pid, byte* file, int* fdv, byte** argv);
+    [DllImport("libvlccore", EntryPoint = "vlc_spawn", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Spawn(long* pid, byte* file, int* fdv, byte** argv);
 
     /// <summary>vlc_spawnp</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_spawnp")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcSpawnp(long* pid, byte* path, int* fdv, byte** argv);
+    [DllImport("libvlccore", EntryPoint = "vlc_spawnp", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcSpawnp(long* pid, byte* path, int* fdv, byte** argv);
 
     /// <summary>vlc_waitpid</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_waitpid")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcWaitpid(long pid);
+    [DllImport("libvlccore", EntryPoint = "vlc_waitpid", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcWaitpid(long pid);
 }

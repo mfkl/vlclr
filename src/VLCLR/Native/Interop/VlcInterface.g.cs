@@ -331,27 +331,24 @@ public enum IntfDialog : uint
 public static unsafe partial class Intf
 {
     /// <summary>intf_Create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "intf_Create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Create(LibvlcInt* arg0, byte* arg1);
+    [DllImport("libvlccore", EntryPoint = "intf_Create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Create(LibvlcInt* arg0, byte* arg1);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class Libvlc
 {
     /// <summary>libvlc_Quit</summary>
-    [LibraryImport("libvlccore", EntryPoint = "libvlc_Quit")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Quit(LibvlcInt* arg0);
+    [DllImport("libvlccore", EntryPoint = "libvlc_Quit", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Quit(LibvlcInt* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class Vlc
 {
     /// <summary>vlc_LogSet</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_LogSet")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void LogSet(LibvlcInt* arg0, LoggerOperations* arg1, void* data);
+    [DllImport("libvlccore", EntryPoint = "vlc_LogSet", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void LogSet(LibvlcInt* arg0, LoggerOperations* arg1, void* data);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -428,7 +425,6 @@ public static partial class VlcInterface
 public static unsafe partial class VlcIntf
 {
     /// <summary>vlc_intf_GetMainPlaylist</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_intf_GetMainPlaylist")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Playlist* GetMainPlaylist(IntfThread* intf);
+    [DllImport("libvlccore", EntryPoint = "vlc_intf_GetMainPlaylist", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Playlist* GetMainPlaylist(IntfThread* intf);
 }

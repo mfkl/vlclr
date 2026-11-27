@@ -107,42 +107,34 @@ public static partial class VlcVout
 public static unsafe partial class Vout
 {
     /// <summary>vout_Close</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_Close")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Close(VoutThread* vout);
+    [DllImport("libvlccore", EntryPoint = "vout_Close", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Close(VoutThread* vout);
 
     /// <summary>vout_Flush</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_Flush")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial long Flush(VoutThread* p_vout, long i_date);
+    [DllImport("libvlccore", EntryPoint = "vout_Flush", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern long Flush(VoutThread* p_vout, long i_date);
 
     /// <summary>vout_FlushSubpictureChannel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_FlushSubpictureChannel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void FlushSubpictureChannel(VoutThread* arg0, nuint arg1);
+    [DllImport("libvlccore", EntryPoint = "vout_FlushSubpictureChannel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void FlushSubpictureChannel(VoutThread* arg0, nuint arg1);
 
     /// <summary>vout_GetSnapshot</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_GetSnapshot")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int GetSnapshot(VoutThread* p_vout, Frame** pp_image, Picture** pp_picture, VideoFormat* p_fmt, byte* psz_format, long i_timeout);
+    [DllImport("libvlccore", EntryPoint = "vout_GetSnapshot", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int GetSnapshot(VoutThread* p_vout, Frame** pp_image, Picture** pp_picture, VideoFormat* p_fmt, byte* psz_format, long i_timeout);
 
     /// <summary>vout_PutPicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_PutPicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PutPicture(VoutThread* arg0, Picture* arg1);
+    [DllImport("libvlccore", EntryPoint = "vout_PutPicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PutPicture(VoutThread* arg0, Picture* arg1);
 
     /// <summary>vout_PutSubpicture</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_PutSubpicture")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void PutSubpicture(VoutThread* arg0, Subpicture* arg1);
+    [DllImport("libvlccore", EntryPoint = "vout_PutSubpicture", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PutSubpicture(VoutThread* arg0, Subpicture* arg1);
 
     /// <summary>vout_RegisterSubpictureChannel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_RegisterSubpictureChannel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint RegisterSubpictureChannel(VoutThread* arg0);
+    [DllImport("libvlccore", EntryPoint = "vout_RegisterSubpictureChannel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint RegisterSubpictureChannel(VoutThread* arg0);
 
     /// <summary>vout_UnregisterSubpictureChannel</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vout_UnregisterSubpictureChannel")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void UnregisterSubpictureChannel(VoutThread* arg0, nuint arg1);
+    [DllImport("libvlccore", EntryPoint = "vout_UnregisterSubpictureChannel", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void UnregisterSubpictureChannel(VoutThread* arg0, nuint arg1);
 }

@@ -234,32 +234,26 @@ public static unsafe partial class VlcKeystore
     public const string KeystoreName = "libVLC";
 
     /// <summary>vlc_credential_clean</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_credential_clean")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcCredentialClean(Credential* p_credential);
+    [DllImport("libvlccore", EntryPoint = "vlc_credential_clean", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcCredentialClean(Credential* p_credential);
 
     /// <summary>vlc_credential_init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_credential_init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcCredentialInit(Credential* p_credential, Url* p_url);
+    [DllImport("libvlccore", EntryPoint = "vlc_credential_init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcCredentialInit(Credential* p_credential, Url* p_url);
 
     /// <summary>vlc_credential_store</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_credential_store")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte VlcCredentialStore(Credential* p_credential, ObjectHeader* p_parent);
+    [DllImport("libvlccore", EntryPoint = "vlc_credential_store", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte VlcCredentialStore(Credential* p_credential, ObjectHeader* p_parent);
 
     /// <summary>vlc_keystore_create</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_keystore_create")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Keystore* Create(ObjectHeader* p_parent);
+    [DllImport("libvlccore", EntryPoint = "vlc_keystore_create", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Keystore* Create(ObjectHeader* p_parent);
 
     /// <summary>vlc_keystore_release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_keystore_release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(Keystore* p_keystore);
+    [DllImport("libvlccore", EntryPoint = "vlc_keystore_release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(Keystore* p_keystore);
 
     /// <summary>vlc_keystore_release_entries</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_keystore_release_entries")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ReleaseEntries(KeystoreEntry* p_entries, uint i_count);
+    [DllImport("libvlccore", EntryPoint = "vlc_keystore_release_entries", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ReleaseEntries(KeystoreEntry* p_entries, uint i_count);
 }

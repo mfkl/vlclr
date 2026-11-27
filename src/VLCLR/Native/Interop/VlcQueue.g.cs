@@ -59,37 +59,30 @@ public partial struct QueueEntry { }
 public static unsafe partial class VlcQueue
 {
     /// <summary>vlc_queue_Dequeue</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_Dequeue")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* Dequeue(Queue* queue);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_Dequeue", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* Dequeue(Queue* queue);
 
     /// <summary>vlc_queue_DequeueAll</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_DequeueAll")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* DequeueAll(Queue* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_DequeueAll", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* DequeueAll(Queue* arg0);
 
     /// <summary>vlc_queue_DequeueAllUnlocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_DequeueAllUnlocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* DequeueAllUnlocked(Queue* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_DequeueAllUnlocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* DequeueAllUnlocked(Queue* arg0);
 
     /// <summary>vlc_queue_DequeueUnlocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_DequeueUnlocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* DequeueUnlocked(Queue* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_DequeueUnlocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* DequeueUnlocked(Queue* arg0);
 
     /// <summary>vlc_queue_Enqueue</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_Enqueue")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Enqueue(Queue* q, void* entry);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_Enqueue", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Enqueue(Queue* q, void* entry);
 
     /// <summary>vlc_queue_EnqueueUnlocked</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_EnqueueUnlocked")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void EnqueueUnlocked(Queue* q, void* entry);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_EnqueueUnlocked", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void EnqueueUnlocked(Queue* q, void* entry);
 
     /// <summary>vlc_queue_Init</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_queue_Init")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Init(Queue* queue, nint next_offset);
+    [DllImport("libvlccore", EntryPoint = "vlc_queue_Init", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Init(Queue* queue, nint next_offset);
 }

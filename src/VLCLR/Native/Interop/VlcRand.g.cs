@@ -11,22 +11,18 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class VlcRand
 {
     /// <summary>vlc_drand48</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_drand48")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial double VlcDrand48();
+    [DllImport("libvlccore", EntryPoint = "vlc_drand48", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern double VlcDrand48();
 
     /// <summary>vlc_lrand48</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_lrand48")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial CLong VlcLrand48();
+    [DllImport("libvlccore", EntryPoint = "vlc_lrand48", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern CLong VlcLrand48();
 
     /// <summary>vlc_mrand48</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_mrand48")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial CLong VlcMrand48();
+    [DllImport("libvlccore", EntryPoint = "vlc_mrand48", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern CLong VlcMrand48();
 
     /// <summary>vlc_rand_bytes</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rand_bytes")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Bytes(void* buf, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_rand_bytes", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Bytes(void* buf, nuint len);
 }

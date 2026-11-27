@@ -136,109 +136,90 @@ public partial struct MediaTreeListenerId { }
 public static unsafe partial class VlcMediaSource
 {
     /// <summary>vlc_media_source_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Hold(MediaSource* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Hold(MediaSource* arg0);
 
     /// <summary>vlc_media_source_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(MediaSource* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(MediaSource* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcMediaSourceMetaList
 {
     /// <summary>vlc_media_source_meta_list_Count</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_meta_list_Count")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Count(MediaSourceMetaList* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_meta_list_Count", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Count(MediaSourceMetaList* arg0);
 
     /// <summary>vlc_media_source_meta_list_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_meta_list_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(MediaSourceMetaList* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_meta_list_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(MediaSourceMetaList* arg0);
 
     /// <summary>vlc_media_source_meta_list_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_meta_list_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MediaSourceMeta* Get(MediaSourceMetaList* arg0, nuint index);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_meta_list_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MediaSourceMeta* Get(MediaSourceMetaList* arg0, nuint index);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcMediaSourceProvider
 {
     /// <summary>vlc_media_source_provider_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_provider_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MediaSourceProvider* Get(LibvlcInt* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_provider_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MediaSourceProvider* Get(LibvlcInt* arg0);
 
     /// <summary>vlc_media_source_provider_GetMediaSource</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_provider_GetMediaSource")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MediaSource* GetMediaSource(MediaSourceProvider* arg0, byte* name);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_provider_GetMediaSource", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MediaSource* GetMediaSource(MediaSourceProvider* arg0, byte* name);
 
     /// <summary>vlc_media_source_provider_List</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_source_provider_List")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MediaSourceMetaList* List(MediaSourceProvider* arg0, ServicesDiscoveryCategory category);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_source_provider_List", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MediaSourceMetaList* List(MediaSourceProvider* arg0, ServicesDiscoveryCategory category);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcMediaTree
 {
     /// <summary>vlc_media_tree_Add</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Add")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial InputItemNode* Add(MediaTree* tree, InputItemNode* parent, InputItem* media);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Add", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern InputItemNode* Add(MediaTree* tree, InputItemNode* parent, InputItem* media);
 
     /// <summary>vlc_media_tree_AddListener</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_AddListener")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MediaTreeListenerId* AddListener(MediaTree* tree, MediaTreeCallbacks* cbs, void* userdata, byte notify_current_state);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_AddListener", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MediaTreeListenerId* AddListener(MediaTree* tree, MediaTreeCallbacks* cbs, void* userdata, byte notify_current_state);
 
     /// <summary>vlc_media_tree_Find</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Find")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte Find(MediaTree* tree, InputItem* media, InputItemNode** result, InputItemNode** result_parent);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Find", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte Find(MediaTree* tree, InputItem* media, InputItemNode** result, InputItemNode** result_parent);
 
     /// <summary>vlc_media_tree_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Hold(MediaTree* tree);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Hold(MediaTree* tree);
 
     /// <summary>vlc_media_tree_Lock</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Lock")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Lock(MediaTree* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Lock", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Lock(MediaTree* arg0);
 
     /// <summary>vlc_media_tree_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial MediaTree* New();
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MediaTree* New();
 
     /// <summary>vlc_media_tree_Preparse</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Preparse")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PreparserReq* Preparse(MediaTree* tree, Preparser* parser, InputItem* media);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Preparse", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PreparserReq* Preparse(MediaTree* tree, Preparser* parser, InputItem* media);
 
     /// <summary>vlc_media_tree_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(MediaTree* tree);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(MediaTree* tree);
 
     /// <summary>vlc_media_tree_Remove</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Remove")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte Remove(MediaTree* tree, InputItem* media);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Remove", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte Remove(MediaTree* tree, InputItem* media);
 
     /// <summary>vlc_media_tree_RemoveListener</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_RemoveListener")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void RemoveListener(MediaTree* tree, MediaTreeListenerId* listener);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_RemoveListener", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void RemoveListener(MediaTree* tree, MediaTreeListenerId* listener);
 
     /// <summary>vlc_media_tree_Unlock</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_media_tree_Unlock")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Unlock(MediaTree* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_media_tree_Unlock", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Unlock(MediaTree* arg0);
 }

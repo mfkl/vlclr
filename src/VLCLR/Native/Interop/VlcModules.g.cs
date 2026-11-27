@@ -11,87 +11,70 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class VlcModules
 {
     /// <summary>module_config_free</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_config_free")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ModuleConfigFree(ModuleConfig* tab);
+    [DllImport("libvlccore", EntryPoint = "module_config_free", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ModuleConfigFree(ModuleConfig* tab);
 
     /// <summary>module_config_get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_config_get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ModuleConfig* ModuleConfigGet(Module* module, uint* psize);
+    [DllImport("libvlccore", EntryPoint = "module_config_get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ModuleConfig* ModuleConfigGet(Module* module, uint* psize);
 
     /// <summary>module_find</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_find")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Module* ModuleFind(byte* name);
+    [DllImport("libvlccore", EntryPoint = "module_find", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Module* ModuleFind(byte* name);
 
     /// <summary>module_get_capability</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_get_capability")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ModuleGetCapability(Module* m);
+    [DllImport("libvlccore", EntryPoint = "module_get_capability", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ModuleGetCapability(Module* m);
 
     /// <summary>module_get_help</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_get_help")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ModuleGetHelp(Module* m);
+    [DllImport("libvlccore", EntryPoint = "module_get_help", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ModuleGetHelp(Module* m);
 
     /// <summary>module_get_help_html</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_get_help_html")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ModuleGetHelpHtml(Module* m);
+    [DllImport("libvlccore", EntryPoint = "module_get_help_html", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ModuleGetHelpHtml(Module* m);
 
     /// <summary>module_get_name</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_get_name")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ModuleGetName(Module* m, byte longname);
+    [DllImport("libvlccore", EntryPoint = "module_get_name", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ModuleGetName(Module* m, byte longname);
 
     /// <summary>module_get_object</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_get_object")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ModuleGetObject(Module* m);
+    [DllImport("libvlccore", EntryPoint = "module_get_object", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ModuleGetObject(Module* m);
 
     /// <summary>module_get_score</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_get_score")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int ModuleGetScore(Module* m);
+    [DllImport("libvlccore", EntryPoint = "module_get_score", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ModuleGetScore(Module* m);
 
     /// <summary>module_gettext</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_gettext")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ModuleGettext(Module* m, byte* s);
+    [DllImport("libvlccore", EntryPoint = "module_gettext", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ModuleGettext(Module* m, byte* s);
 
     /// <summary>module_list_free</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_list_free")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ModuleListFree(Module** arg0);
+    [DllImport("libvlccore", EntryPoint = "module_list_free", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ModuleListFree(Module** arg0);
 
     /// <summary>module_list_get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_list_get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Module** ModuleListGet(nuint* n);
+    [DllImport("libvlccore", EntryPoint = "module_list_get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Module** ModuleListGet(nuint* n);
 
     /// <summary>module_need</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_need")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Module* ModuleNeed(ObjectHeader* arg0, byte* arg1, byte* arg2, byte arg3);
+    [DllImport("libvlccore", EntryPoint = "module_need", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Module* ModuleNeed(ObjectHeader* arg0, byte* arg1, byte* arg2, byte arg3);
 
     /// <summary>module_provides</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_provides")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte ModuleProvides(Module* m, byte* cap);
+    [DllImport("libvlccore", EntryPoint = "module_provides", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte ModuleProvides(Module* m, byte* cap);
 
     /// <summary>module_unneed</summary>
-    [LibraryImport("libvlccore", EntryPoint = "module_unneed")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void ModuleUnneed(ObjectHeader* arg0, Module* arg1);
+    [DllImport("libvlccore", EntryPoint = "module_unneed", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void ModuleUnneed(ObjectHeader* arg0, Module* arg1);
 
     /// <summary>vlc_module_map</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_module_map")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void* VlcModuleMap(Logger* log, Module* mod);
+    [DllImport("libvlccore", EntryPoint = "vlc_module_map", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void* VlcModuleMap(Logger* log, Module* mod);
 
     /// <summary>vlc_module_match</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_module_match")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcModuleMatch(byte* capability, byte* names, byte strict, Module*** modules, nuint* strict_matches);
+    [DllImport("libvlccore", EntryPoint = "vlc_module_match", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcModuleMatch(byte* capability, byte* names, byte strict, Module*** modules, nuint* strict_matches);
 }

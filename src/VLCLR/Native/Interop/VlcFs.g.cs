@@ -18,67 +18,54 @@ public partial struct VlcDir { }
 public static unsafe partial class VlcFs
 {
     /// <summary>vlc_close</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_close")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcClose(int fd);
+    [DllImport("libvlccore", EntryPoint = "vlc_close", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcClose(int fd);
 
     /// <summary>vlc_dup</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dup")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcDup(int oldfd);
+    [DllImport("libvlccore", EntryPoint = "vlc_dup", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcDup(int oldfd);
 
     /// <summary>vlc_dup2</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_dup2")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcDup2(int oldfd, int newfd);
+    [DllImport("libvlccore", EntryPoint = "vlc_dup2", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcDup2(int oldfd, int newfd);
 
     /// <summary>vlc_getcwd</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_getcwd")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcGetcwd();
+    [DllImport("libvlccore", EntryPoint = "vlc_getcwd", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcGetcwd();
 
     /// <summary>vlc_memfd</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_memfd")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcMemfd();
+    [DllImport("libvlccore", EntryPoint = "vlc_memfd", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcMemfd();
 
     /// <summary>vlc_mkdir</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_mkdir")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcMkdir(byte* dirname, ushort mode);
+    [DllImport("libvlccore", EntryPoint = "vlc_mkdir", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcMkdir(byte* dirname, ushort mode);
 
     /// <summary>vlc_mkdir_parent</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_mkdir_parent")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcMkdirParent(byte* dirname, ushort mode);
+    [DllImport("libvlccore", EntryPoint = "vlc_mkdir_parent", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcMkdirParent(byte* dirname, ushort mode);
 
     /// <summary>vlc_mkstemp</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_mkstemp")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcMkstemp(byte* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_mkstemp", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcMkstemp(byte* arg0);
 
     /// <summary>vlc_rename</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_rename")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcRename(byte* oldpath, byte* newpath);
+    [DllImport("libvlccore", EntryPoint = "vlc_rename", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcRename(byte* oldpath, byte* newpath);
 
     /// <summary>vlc_scandir</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_scandir")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcScandir(byte* dirname, byte*** namelist, delegate* unmanaged[Cdecl]<byte*, int> select, delegate* unmanaged[Cdecl]<byte**, byte**, int> compar);
+    [DllImport("libvlccore", EntryPoint = "vlc_scandir", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcScandir(byte* dirname, byte*** namelist, delegate* unmanaged[Cdecl]<byte*, int> select, delegate* unmanaged[Cdecl]<byte**, byte**, int> compar);
 
     /// <summary>vlc_unlink</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_unlink")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int VlcUnlink(byte* filename);
+    [DllImport("libvlccore", EntryPoint = "vlc_unlink", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int VlcUnlink(byte* filename);
 
     /// <summary>vlc_write</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_write")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcWrite(int arg0, void* arg1, nuint arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_write", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcWrite(int arg0, void* arg1, nuint arg2);
 
     /// <summary>vlc_writev</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_writev")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint VlcWritev(int arg0, Iovec* arg1, int arg2);
+    [DllImport("libvlccore", EntryPoint = "vlc_writev", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint VlcWritev(int arg0, Iovec* arg1, int arg2);
 }

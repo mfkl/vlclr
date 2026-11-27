@@ -42,7 +42,6 @@ public partial struct VlcObject { }
 public unsafe partial struct VlcObject
 {
     /// <summary>vlc_object_Hold</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_object_Hold")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial VlcObject* Hold(VlcObject* obj);
+    [DllImport("libvlccore", EntryPoint = "vlc_object_Hold", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern VlcObject* Hold(VlcObject* obj);
 }

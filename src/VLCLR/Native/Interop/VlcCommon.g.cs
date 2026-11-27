@@ -82,19 +82,16 @@ public partial struct Vod { }
 public static unsafe partial class Vlc
 {
     /// <summary>VLC_CompileBy</summary>
-    [LibraryImport("libvlccore", EntryPoint = "VLC_CompileBy")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* CompileBy();
+    [DllImport("libvlccore", EntryPoint = "VLC_CompileBy", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* CompileBy();
 
     /// <summary>VLC_CompileHost</summary>
-    [LibraryImport("libvlccore", EntryPoint = "VLC_CompileHost")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* CompileHost();
+    [DllImport("libvlccore", EntryPoint = "VLC_CompileHost", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* CompileHost();
 
     /// <summary>VLC_Compiler</summary>
-    [LibraryImport("libvlccore", EntryPoint = "VLC_Compiler")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* Compiler();
+    [DllImport("libvlccore", EntryPoint = "VLC_Compiler", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* Compiler();
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
@@ -141,17 +138,14 @@ public static unsafe partial class VlcCommon
     public const int Success = 0;
 
     /// <summary>vlc_gettext</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_gettext")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcGettext(byte* msgid);
+    [DllImport("libvlccore", EntryPoint = "vlc_gettext", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcGettext(byte* msgid);
 
     /// <summary>vlc_ngettext</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ngettext")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* VlcNgettext(byte* s, byte* p, CULong n);
+    [DllImport("libvlccore", EntryPoint = "vlc_ngettext", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* VlcNgettext(byte* s, byte* p, CULong n);
 
     /// <summary>vlc_ureduce</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_ureduce")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte VlcUreduce(uint* arg0, uint* arg1, ulong arg2, ulong arg3, ulong arg4);
+    [DllImport("libvlccore", EntryPoint = "vlc_ureduce", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte VlcUreduce(uint* arg0, uint* arg1, ulong arg2, ulong arg3, ulong arg4);
 }

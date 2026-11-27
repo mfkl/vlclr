@@ -11,7 +11,6 @@ namespace VLCLR.Native.Interop;
 public static unsafe partial class VlcSort
 {
     /// <summary>vlc_qsort</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_qsort")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void VlcQsort(void* @base, nuint nmemb, nuint size, delegate* unmanaged[Cdecl]<void*, void*, void*, int> compar, void* arg);
+    [DllImport("libvlccore", EntryPoint = "vlc_qsort", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void VlcQsort(void* @base, nuint nmemb, nuint size, delegate* unmanaged[Cdecl]<void*, void*, void*, int> compar, void* arg);
 }

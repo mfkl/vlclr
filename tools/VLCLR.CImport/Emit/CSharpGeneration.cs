@@ -282,14 +282,17 @@ internal sealed partial class CSharpGeneration
 
         var q = names.Function(d.Name);
         RegisterMember(q.Class, q.Member, d.Name);
-        var convention = d.CallingConvention == Model.CallingConvention.Stdcall ? "CallConvStdcall" : "CallConvCdecl";
+        // Every mapped signature is blittable, so a plain [DllImport] is what
+        // the LibraryImport generator would emit for it anyway, without
+        // needing the generator: compilers that run no source generators
+        // (bflat) take the interop as it is.
+        var convention = d.CallingConvention == Model.CallingConvention.Stdcall ? "StdCall" : "Cdecl";
         var lines = new List<string> { $"/// <summary>{CSharpLiterals.Xml(d.Name)}</summary>" };
         lines.AddRange(PlatformAttributes(d.Name));
         lines.AddRange(
         [
-            $"[LibraryImport({CSharpLiterals.String(options.Library)}, EntryPoint = {CSharpLiterals.String(d.Name)})]",
-            $"[UnmanagedCallConv(CallConvs = [typeof({convention})])]",
-            $"public static partial {returnType} {q.Member}({string.Join(", ", parameters)});",
+            $"[DllImport({CSharpLiterals.String(options.Library)}, EntryPoint = {CSharpLiterals.String(d.Name)}, ExactSpelling = true, CallingConvention = CallingConvention.{convention})]",
+            $"public static extern {returnType} {q.Member}({string.Join(", ", parameters)});",
         ]);
         var unit = Class(d.Header, q.Class);
         unit.HasFunctions = true;

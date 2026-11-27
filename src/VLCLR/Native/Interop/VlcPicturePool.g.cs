@@ -13,27 +13,22 @@ public partial struct PicturePool { }
 public unsafe partial struct PicturePool
 {
     /// <summary>picture_pool_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_pool_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* Get(PicturePool* arg0);
+    [DllImport("libvlccore", EntryPoint = "picture_pool_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* Get(PicturePool* arg0);
 
     /// <summary>picture_pool_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_pool_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PicturePool* New(uint count, Picture** tab);
+    [DllImport("libvlccore", EntryPoint = "picture_pool_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PicturePool* New(uint count, Picture** tab);
 
     /// <summary>picture_pool_NewFromFormat</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_pool_NewFromFormat")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PicturePool* NewFromFormat(VideoFormat* fmt, uint count);
+    [DllImport("libvlccore", EntryPoint = "picture_pool_NewFromFormat", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PicturePool* NewFromFormat(VideoFormat* fmt, uint count);
 
     /// <summary>picture_pool_Release</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_pool_Release")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Release(PicturePool* arg0);
+    [DllImport("libvlccore", EntryPoint = "picture_pool_Release", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Release(PicturePool* arg0);
 
     /// <summary>picture_pool_Wait</summary>
-    [LibraryImport("libvlccore", EntryPoint = "picture_pool_Wait")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Picture* Wait(PicturePool* arg0);
+    [DllImport("libvlccore", EntryPoint = "picture_pool_Wait", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Picture* Wait(PicturePool* arg0);
 }

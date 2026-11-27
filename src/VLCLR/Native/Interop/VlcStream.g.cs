@@ -563,101 +563,82 @@ public enum StreamQuery : uint
 public static unsafe partial class VlcStream
 {
     /// <summary>vlc_stream_Block</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Block")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* Block(Stream* s, nuint arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Block", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* Block(Stream* s, nuint arg1);
 
     /// <summary>vlc_stream_CommonNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_CommonNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* CommonNew(ObjectHeader* arg0, delegate* unmanaged[Cdecl]<Stream*, void> arg1);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_CommonNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* CommonNew(ObjectHeader* arg0, delegate* unmanaged[Cdecl]<Stream*, void> arg1);
 
     /// <summary>vlc_stream_Delete</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Delete")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Delete(Stream* s);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Delete", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Delete(Stream* s);
 
     /// <summary>vlc_stream_Eof</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Eof")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte Eof(Stream* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Eof", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte Eof(Stream* arg0);
 
     /// <summary>vlc_stream_FilterNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_FilterNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* FilterNew(Stream* p_source, byte* psz_stream_filter);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_FilterNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* FilterNew(Stream* p_source, byte* psz_stream_filter);
 
     /// <summary>vlc_stream_MemoryNew</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_MemoryNew")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* MemoryNew(ObjectHeader* obj, byte* @base, nuint size, byte preserve);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_MemoryNew", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* MemoryNew(ObjectHeader* obj, byte* @base, nuint size, byte preserve);
 
     /// <summary>vlc_stream_NewURL</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_NewURL")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Stream* NewURL(ObjectHeader* obj, byte* url);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_NewURL", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Stream* NewURL(ObjectHeader* obj, byte* url);
 
     /// <summary>vlc_stream_Peek</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Peek")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Peek(Stream* s, byte** bufp, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Peek", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Peek(Stream* s, byte** bufp, nuint len);
 
     /// <summary>vlc_stream_Read</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Read")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Read(Stream* s, void* buf, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Read", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Read(Stream* s, void* buf, nuint len);
 
     /// <summary>vlc_stream_ReadBlock</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_ReadBlock")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Frame* ReadBlock(Stream* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_ReadBlock", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Frame* ReadBlock(Stream* arg0);
 
     /// <summary>vlc_stream_ReadDir</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_ReadDir")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int ReadDir(Stream* s, InputItemNode* node);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_ReadDir", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ReadDir(Stream* s, InputItemNode* node);
 
     /// <summary>vlc_stream_ReadLine</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_ReadLine")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte* ReadLine(Stream* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_ReadLine", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* ReadLine(Stream* arg0);
 
     /// <summary>vlc_stream_ReadPartial</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_ReadPartial")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint ReadPartial(Stream* s, void* buf, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_ReadPartial", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint ReadPartial(Stream* s, void* buf, nuint len);
 
     /// <summary>vlc_stream_Seek</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Seek")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Seek(Stream* s, ulong offset);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Seek", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Seek(Stream* s, ulong offset);
 
     /// <summary>vlc_stream_Tell</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_Tell")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ulong Tell(Stream* arg0);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_Tell", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ulong Tell(Stream* arg0);
 }
 
 /// <summary>Constants and functions from the C headers.</summary>
 public static unsafe partial class VlcStreamFifo
 {
     /// <summary>vlc_stream_fifo_Close</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_fifo_Close")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void Close(StreamFifo* s);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_fifo_Close", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Close(StreamFifo* s);
 
     /// <summary>vlc_stream_fifo_New</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_fifo_New")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial StreamFifo* New(ObjectHeader* parent, Stream** reader);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_fifo_New", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern StreamFifo* New(ObjectHeader* parent, Stream** reader);
 
     /// <summary>vlc_stream_fifo_Queue</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_fifo_Queue")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial int Queue(StreamFifo* s, Frame* block);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_fifo_Queue", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Queue(StreamFifo* s, Frame* block);
 
     /// <summary>vlc_stream_fifo_Write</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_stream_fifo_Write")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nint Write(StreamFifo* s, void* buf, nuint len);
+    [DllImport("libvlccore", EntryPoint = "vlc_stream_fifo_Write", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Write(StreamFifo* s, void* buf, nuint len);
 }

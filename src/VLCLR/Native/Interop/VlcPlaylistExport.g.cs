@@ -48,12 +48,10 @@ public partial struct PlaylistView { }
 public static unsafe partial class VlcPlaylistView
 {
     /// <summary>vlc_playlist_view_Count</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_view_Count")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial nuint Count(PlaylistView* view);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_view_Count", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nuint Count(PlaylistView* view);
 
     /// <summary>vlc_playlist_view_Get</summary>
-    [LibraryImport("libvlccore", EntryPoint = "vlc_playlist_view_Get")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial PlaylistItem* Get(PlaylistView* view, nuint index);
+    [DllImport("libvlccore", EntryPoint = "vlc_playlist_view_Get", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    public static extern PlaylistItem* Get(PlaylistView* view, nuint index);
 }
